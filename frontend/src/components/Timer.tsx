@@ -4,10 +4,9 @@ import { useState, useEffect } from 'react'
 
 interface TimerProps {
   isRunning: boolean
-  onReset?: () => void
 }
 
-export default function Timer({ isRunning, onReset }: TimerProps) {
+export default function Timer({ isRunning }: TimerProps) {
   const [seconds, setSeconds] = useState(0)
 
   useEffect(() => {
@@ -22,12 +21,6 @@ export default function Timer({ isRunning, onReset }: TimerProps) {
 
     return () => clearInterval(interval)
   }, [isRunning])
-
-  useEffect(() => {
-    if (onReset) {
-      setSeconds(0)
-    }
-  }, [onReset])
 
   const minutes = Math.floor(seconds / 60)
   const remainingSeconds = seconds % 60

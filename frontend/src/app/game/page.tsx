@@ -10,7 +10,6 @@ export default function GamePage() {
   const [moves, setMoves] = useState(0)
   const [isGameStarted, setIsGameStarted] = useState(false)
   const [isGameOver, setIsGameOver] = useState(false)
-  const [timerReset, setTimerReset] = useState(0)
 
   const handleGameOver = (finalScore: number, finalMoves: number) => {
     setIsGameOver(true)
@@ -22,7 +21,6 @@ export default function GamePage() {
     setMoves(0)
     setIsGameStarted(true)
     setIsGameOver(false)
-    setTimerReset(prev => prev + 1)
   }
 
   return (
@@ -31,7 +29,7 @@ export default function GamePage() {
 
       <div className="game-stats">
         <ScoreBoard score={score} moves={moves} />
-        <Timer isRunning={isGameStarted} onReset={() => setTimerReset(prev => prev + 1)} />
+        <Timer isRunning={isGameStarted} />
       </div>
 
       {!isGameStarted && !isGameOver && (
