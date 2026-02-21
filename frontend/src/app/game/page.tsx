@@ -25,18 +25,16 @@ export default function GamePage() {
 
   return (
     <div className="game-page">
-      <h1 className="game-title">🎮 เกมจับคู่การ์ด</h1>
-
-      <div className="game-stats">
-        <ScoreBoard score={score} moves={moves} />
-        <Timer isRunning={isGameStarted} />
-      </div>
-
+     <h1 className="game-title">📦 เกมแยกสิ่งของ (Management Mode)</h1>
       {!isGameStarted && !isGameOver && (
-        <button className="start-button" onClick={handleStartGame}>
-          เริ่มเกม 🚀
-        </button>
-      )}
+        <div>
+          <p>ลากสิ่งของไปยังหมวดหมู่ที่ถูกต้องเพื่อทำคะแนน</p>
+          <button className="start-button" onClick={handleStartGame}>
+            เริ่มเกม 🚀
+          </button>
+        </div>
+    )}
+
 
       {isGameOver && (
         <div className="game-over">

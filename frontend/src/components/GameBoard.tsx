@@ -1,13 +1,25 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import GameCard from './GameCard'
+import { useEffect, useMemo, useState } from 'react'
+import CategoryBox from './CategoryBox'
+import DraggableItem from './DraggableItem'
 
-interface Card {
-  id: number
+type Color = 'red' | 'yellow' | 'green'
+type Shape = 'circle' | 'square' | 'triangle'
+
+interface Item {
+  id: string
+  label: string
   emoji: string
-  isFlipped: boolean
-  isMatched: boolean
+  color: Color
+  shape: Shape
+  placedInCategoryId?: string
+}
+
+interface Category {
+  id: string
+  title: string
+  accepts: (item: Item) => boolean
 }
 
 interface GameBoardProps {
@@ -16,111 +28,126 @@ interface GameBoardProps {
   onMovesChange: (moves: number) => void
 }
 
-// 8 คู่ emoji ผลไม้
-const EMOJIS = ['🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🥝']
-
+// Mockup: Level 1 แยกสีและรูปทรง (1 ด่าน = 1 ชุด)
 export default function GameBoard({ onGameOver, onScoreChange, onMovesChange }: GameBoardProps) {
-  const [cards, setCards] = useState<Card[]>([])
-  const [flippedCards, setFlippedCards] = useState<number[]>([])
-  const [moves, setMoves] = useState(0)
-  const [matchedPairs, setMatchedPairs] = useState(0)
+  const categories: Category[] = useMemo(
+    () => [
+      { id: 'color:red', title: 'สีแดง', accepts: item => item.color === 'red' },
+      { id: 'color:yellow', title: 'สีเหลือง', accepts: item => item.color === 'yellow' },
+      { id: 'color:green', title: 'สีเขียว', accepts: item => item.color === 'green' },
 
-  // Initialize cards
+      { id: 'shape:circle', title: 'วงกลม', accepts: item => item.shape === 'circle' },
+      { id: 'shape:square', title: 'สี่เหลี่ยม', accepts: item => item.shape === 'square' },
+      { id: 'shape:triangle', title: 'สามเหลี่ยม', accepts: item => item.shape === 'triangle' }
+    ],
+    []
+  )
+
+  const initialItems: Item[] = useMemo(
+    () =>
+      ([
+        { id: 'i1', label: 'แอปเปิลแดง (วงกลม)', emoji: '🍎', color: 'red', shape: 'circle' },
+        { id: 'i2', label: 'เลมอน (วงกลม)', emoji: '🍋', color: 'yellow', shape: 'circle' },
+        { id: 'i3', label: 'กีวี (วงกลม)', emoji: '🥝', color: 'green', shape: 'circle' },
+        { id: 'i4', label: 'สี่เหลี่ยมแดง', emoji: '🟥', color: 'red', shape: 'square' },
+        { id: 'i5', label: 'สี่เหลี่ยมเหลือง', emoji: '🟨', color: 'yellow', shape: 'square' },
+        { id: 'i6', label: 'สามเหลี่ยมเขียว', emoji: '🔺', color: 'green', shape: 'triangle' }
+      ] as const).map(i => ({ ...i })) as Item[],
+    []
+  )
+
+  const [items, setItems] = useState<Item[]>([])
+  const [moves, setMoves] = useState(0)
+  const [score, setScore] = useState(0)
+
   useEffect(() => {
     initializeGame()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const initializeGame = () => {
-    // สร้างการ์ด 8 คู่ (16 ใบ)
-    const cardPairs = EMOJIS.flatMap((emoji, index) => [
-      { id: index * 2, emoji, isFlipped: false, isMatched: false },
-      { id: index * 2 + 1, emoji, isFlipped: false, isMatched: false }
-    ])
-    
-    // Shuffle cards
-    const shuffled = cardPairs.sort(() => Math.random() - 0.5)
-    setCards(shuffled)
-    setFlippedCards([])
+    setItems(initialItems.map(i => ({ ...i, placedInCategoryId: undefined })))
     setMoves(0)
-    setMatchedPairs(0)
+    setScore(0)
     onMovesChange(0)
     onScoreChange(0)
   }
 
-  const handleCardClick = (cardId: number) => {
-    // ถ้าการ์ดถูก flip หรือ match แล้ว หรือมีการ์ด 2 ใบที่กำลัง flip อยู่แล้ว ไม่ทำอะไร
-    const card = cards.find(c => c.id === cardId)
-    if (!card || card.isFlipped || card.isMatched || flippedCards.length >= 2) {
-      return
-    }
+  const totalCount = items.length
+  const placedCount = items.filter(i => i.placedInCategoryId).length
 
-    const newFlippedCards = [...flippedCards, cardId]
-    setFlippedCards(newFlippedCards)
+  const handleDropItemToCategory = (itemId: string, categoryId: string) => {
+    const item = items.find(i => i.id === itemId)
+    const category = categories.find(c => c.id === categoryId)
+    if (!item || !category) return
 
-    // Update card state
-    setCards(cards.map(c => 
-      c.id === cardId ? { ...c, isFlipped: true } : c
-    ))
+    const newMoves = moves + 1
+    setMoves(newMoves)
+    onMovesChange(newMoves)
 
-    // ถ้า flip การ์ดครบ 2 ใบแล้ว
-    if (newFlippedCards.length === 2) {
-      const newMoves = moves + 1
-      setMoves(newMoves)
-      onMovesChange(newMoves)
+    const isCorrect = category.accepts(item)
 
-      const [firstId, secondId] = newFlippedCards
-      const firstCard = cards.find(c => c.id === firstId)
-      const secondCard = cards.find(c => c.id === secondId)
+    // วางถูก -> เข้า category, วางผิด -> กลับไปกองกลาง (undefined)
+    setItems(prev =>
+      prev.map(i =>
+        i.id === itemId ? { ...i, placedInCategoryId: isCorrect ? categoryId : undefined } : i
+      )
+    )
 
-      if (firstCard && secondCard && firstCard.emoji === secondCard.emoji) {
-        // Match!
-        setTimeout(() => {
-          setCards(cards.map(c => 
-            c.id === firstId || c.id === secondId 
-              ? { ...c, isMatched: true, isFlipped: false } 
-              : c
-          ))
-          setFlippedCards([])
-          
-          const newMatchedPairs = matchedPairs + 1
-          setMatchedPairs(newMatchedPairs)
-          
-          // คำนวณคะแนน (ยิ่งใช้ครั้งน้อยยิ่งได้คะแนนสูง)
-          const score = Math.max(1000 - (newMoves * 10), 100)
-          onScoreChange(score)
+    const nextScore = Math.max(0, score + (isCorrect ? 50 : -10))
+    setScore(nextScore)
+    onScoreChange(nextScore)
 
-          // ถ้าจับคู่ครบทั้งหมด
-          if (newMatchedPairs === EMOJIS.length) {
-            setTimeout(() => {
-              onGameOver(score, newMoves)
-            }, 500)
-          }
-        }, 500)
-      } else {
-        // ไม่ Match
-        setTimeout(() => {
-          setCards(cards.map(c => 
-            c.id === firstId || c.id === secondId 
-              ? { ...c, isFlipped: false } 
-              : c
-          ))
-          setFlippedCards([])
-        }, 1000)
-      }
+    // คำนวณจำนวนที่วาง (แบบคาดการณ์หลังอัปเดต)
+    const nextPlacedCount =
+      placedCount + (isCorrect ? 1 : 0) - (item.placedInCategoryId ? 1 : 0)
+
+    if (totalCount > 0 && nextPlacedCount === totalCount) {
+      onGameOver(nextScore, newMoves)
     }
   }
 
+  const unplacedItems = items.filter(i => !i.placedInCategoryId)
+
   return (
-    <div className="game-board">
-      {cards.map(card => (
-        <GameCard
-          key={card.id}
-          emoji={card.emoji}
-          isFlipped={card.isFlipped}
-          isMatched={card.isMatched}
-          onClick={() => handleCardClick(card.id)}
-        />
-      ))}
+  <div className="management-board">
+    <div className="topbar">
+      <div className="instructions">
+        <div className="title">เกมแยกสิ่งของ (Management Mode)</div>
+        <div className="subtitle">ด่าน 1: แยก “สี” และ “รูปทรง” — ลากของไปวางในกล่องที่ถูกต้อง</div>
+      </div>
+
+      <div className="stats">
+        <div className="stat">คะแนน: <b>{score}</b></div>
+        <div className="stat">ครั้งที่ลาก: <b>{moves}</b></div>
+        <div className="stat">จัดแล้ว: <b>{placedCount}/{totalCount}</b></div>
+      </div>
     </div>
-  )
+
+    <div className="board">
+      <section className="pool">
+        <div className="section-title">ของที่ต้องจัด</div>
+        <div className="pool-grid">
+          {unplacedItems.map(item => (
+            <DraggableItem key={item.id} item={item} />
+          ))}
+        </div>
+      </section>
+
+      <section className="categories">
+        <div className="section-title">หมวดหมู่</div>
+        <div className="categories-grid">
+          {categories.map(cat => (
+            <CategoryBox
+              key={cat.id}
+              category={cat}
+              items={items.filter(i => i.placedInCategoryId === cat.id)}
+              onDropItem={(itemId) => handleDropItemToCategory(itemId, cat.id)}
+            />
+          ))}
+        </div>
+      </section>
+    </div>
+  </div>
+)
 }
