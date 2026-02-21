@@ -54,8 +54,8 @@ export default function SubLevelPage({
       setStatus('no_keys')
       return
     }
-    // v1 stub: record play immediately with 0 score as placeholder;
-    // actual score integration happens when minigame result callback is added
+    // v1 stub: record play immediately with 0 score.
+    // TODO: integrate actual score from minigame result once a result callback is added.
     recordPlay(villageId, 0)
     setStatus('redirecting')
     router.replace(getMinigameUrl(villageId, subLevelId))

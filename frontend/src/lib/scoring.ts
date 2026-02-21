@@ -17,9 +17,8 @@ export function calculateScore(params: {
   perfect: boolean
 }): number {
   if (!params.perfect) return 0
-  const timePercent = (params.timeUsed * 100) / params.timeLimit
   const baseMaxScore = params.villageIndex * 100
-  return Math.round((timePercent / 100) * baseMaxScore)
+  return Math.round((params.timeUsed / params.timeLimit) * baseMaxScore)
 }
 
 export function getExpPercent(playsCompleted: number): number {

@@ -5,13 +5,15 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { loadProgress, getVillageProgress, PLAYS_PER_VILLAGE } from '@/lib/levelSystem'
 
+const FINAL_VILLAGE_ID = 10
+
 export default function EndingPage() {
   const router = useRouter()
   const [totalScore, setTotalScore] = useState(0)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const vp10 = getVillageProgress(10)
+    const vp10 = getVillageProgress(FINAL_VILLAGE_ID)
     if (vp10.playsCompleted < PLAYS_PER_VILLAGE) {
       router.replace('/world')
       return

@@ -3,7 +3,7 @@ import { promises as fs } from 'fs'
 import ClientPage from './client'
 import path from 'path'
 
-export function setUpImage(name: string) {
+function setUpImage(name: string) {
   return <Image src={name} alt={'something'} />
 }
 export default async function Page() {
