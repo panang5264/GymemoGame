@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-import { redirect } from 'next/navigation'
-
-export default function RelationPage() {
-  redirect('/minigame/spatial')
-=======
 import Image from 'next/image'
 import { promises as fs } from 'fs'
 import ClientPage from './client'
@@ -39,5 +33,4 @@ export default async function Page() {
       <ClientPage filenames={rightElement} />
     </div>
   );
->>>>>>> main
 }
