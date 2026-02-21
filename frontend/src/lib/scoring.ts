@@ -1,4 +1,7 @@
-export const PLAYS_PER_VILLAGE = 126
+import { PLAYS_PER_VILLAGE as _PLAYS_PER_VILLAGE } from './levelSystem'
+
+// Re-export for consumers that import only from scoring
+export const PLAYS_PER_VILLAGE = _PLAYS_PER_VILLAGE
 
 /**
  * Calculates score for a completed run.

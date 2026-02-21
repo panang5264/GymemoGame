@@ -15,7 +15,8 @@ function getMinigameUrl(villageId: number, subId: number): string {
   if (subId <= 12) {
     return `/minigame/spatial?villageId=${villageId}&subId=${subId}&mode=village`
   }
-  // subId 13-14: pick based on subId % 3
+  // subId 13-14: distribute across the 3 minigame types based on subId % 3
+  // 13 % 3 = 1 → calculation, 14 % 3 = 2 → spatial
   const pick = subId % 3
   if (pick === 0) {
     return `/minigame/Management?villageId=${villageId}&subId=${subId}&mode=village`
@@ -53,6 +54,8 @@ export default function SubLevelPage({
       setStatus('no_keys')
       return
     }
+    // v1 stub: record play immediately with 0 score as placeholder;
+    // actual score integration happens when minigame result callback is added
     recordPlay(villageId, 0)
     setStatus('redirecting')
     router.replace(getMinigameUrl(villageId, subLevelId))
