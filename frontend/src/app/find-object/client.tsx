@@ -22,6 +22,7 @@ export default function ClientPage({ question }: { question: string }) {
     }
   }
 
+  // NOTE: For Debugging
   const showMessage = function() {
     if (is_corrected == null) {
       return
