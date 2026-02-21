@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import DailyChallengeButton from '@/components/DailyChallengeButton'
 
 export default function Home() {
   return (
@@ -9,10 +10,13 @@ export default function Home() {
         <p className="hero-description">
           ท้าทายความจำของคุณด้วยเกมจับคู่การ์ด พัฒนาสมองและความจำให้แข็งแรง
         </p>
-        <Link href="/game" className="cta-button">
+        <Link href="/village" className="cta-button">
           เริ่มเล่นเกม 🎮
         </Link>
       </section>
+
+      {/* Daily Challenge entry point – availability shown in client component */}
+      <DailyChallengeButton />
 
       <section className="features">
         <div className="feature-card">
