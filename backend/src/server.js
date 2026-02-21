@@ -4,6 +4,7 @@ const cors = require('cors')
 const connectDB = require('./config/db')
 const authRoutes = require('./routes/authRoutes')
 const scoreRoutes = require('./routes/scoreRoutes')
+const progressionRoutes = require('./routes/progressionRoutes')
 
 const app = express()
 
@@ -29,6 +30,11 @@ app.get('/', (req, res) => {
         submit: 'POST /api/scores (Protected)',
         leaderboard: 'GET /api/scores/leaderboard',
         myScores: 'GET /api/scores/my-scores (Protected)'
+      },
+      progression: {
+        get: 'GET /api/progression/:guestId',
+        complete: 'POST /api/progression/complete',
+        unlock: 'POST /api/progression/unlock'
       }
     }
   })
@@ -37,6 +43,7 @@ app.get('/', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/scores', scoreRoutes)
+app.use('/api/progression', progressionRoutes)
 
 // Error Handler Middleware
 app.use((err, req, res, next) => {

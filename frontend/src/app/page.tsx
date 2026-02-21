@@ -9,7 +9,7 @@ export default function Home() {
         <p className="hero-description">
           ท้าทายความจำของคุณด้วยเกมจับคู่การ์ด พัฒนาสมองและความจำให้แข็งแรง
         </p>
-        <Link href="/game" className="cta-button">
+        <Link href="/world" className="cta-button">
           เริ่มเล่นเกม 🎮
         </Link>
       </section>
