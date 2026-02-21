@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { promises as fs } from 'fs'
+import ClientPage from './client'
 import path from 'path'
 
 export function setUpImage(name: string) {
@@ -28,34 +29,8 @@ export default async function Page() {
 
   return (
     <div className='flex justify-center gap-8 mt-10 mb-10'>
-      <div className="grid grid-rows-4 gap-4 pr-5">
-        {leftElement.map(function(name) {
-          return (
-            <Image
-              key={name}
-              src={`/assets/level1/relation1-1/${name}`}
-              alt={name}
-              width={150}
-              height={150}
-            />
-          )
-        })}
-      </div>
-      <div className="grid grid-rows-4 gap-4 pl-5">
-        {
-          rightElement.map(function(name) {
-            return (
-              <Image
-                key={name}
-                src={`/assets/level1/relation1-1/${name}`}
-                alt={name}
-                width={150}
-                height={150}
-              />
-            )
-          })
-        }
-      </div>
+      <ClientPage filenames={leftElement} />
+      <ClientPage filenames={rightElement} />
     </div>
   );
 }
