@@ -2,7 +2,7 @@ import Image from 'next/image'
 import { promises as fs } from 'fs'
 import path from 'path'
 
-export function setUpImage(name: string) {
+function setUpImage(name: string) {
   return <Image src={name} alt={'something'} />
 }
 export default async function Page() {
