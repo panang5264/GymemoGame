@@ -169,7 +169,7 @@ function CalculationGameInner() {
             ))}
           </div>
           <p style={{ fontSize: '0.9rem', opacity: 0.6, marginTop: '1rem' }}>
-            คะแนน: {score} / {currentIndex}
+            คะแนน: {score} / {currentIndex + 1}
           </p>
         </div>
       </div>

@@ -48,10 +48,7 @@ function makeChoices(answer: number, rng: () => number, count = 4): number[] {
   }
   // Fill in case rng didn't produce enough distinct values
   let fill = 1
-  while (wrong.size < count - 1) {
-    if (answer + fill !== answer) wrong.add(answer + fill)
-    fill++
-  }
+  while (wrong.size < count - 1) { wrong.add(answer + fill); fill++ }
   return [answer, ...wrong].sort(() => rng() - 0.5)
 }
 
@@ -223,7 +220,7 @@ export const CALC_LEVELS: CalcLevel[] = [
         const x = randInt(rng, 2, 9)
         const a = randInt(rng, 1, 5)
         const b = randInt(rng, 1, 5)
-        const answer = x + a - b      // x + a = answer + b
+        const answer = x + a - b      // x + a = ? + b  ⟹  ? = x + a - b
         return {
           expression: `${x} + ${a} = ? + ${b}`,
           answer,
