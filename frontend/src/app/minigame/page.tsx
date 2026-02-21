@@ -6,13 +6,10 @@ export default function MinigamePage() {
       <h1>🎮 มินิเกม</h1>
       <ul>
         <li>
-          <Link href="/minigame/memory">🧩 Memory – จับคู่การ์ด</Link>
+          <Link href="/minigame/Management">📦 Management</Link>
         </li>
         <li>
           <Link href="/minigame/spatial">🗺️ Spatial – จับคู่ความสัมพันธ์</Link>
-        </li>
-        <li>
-          <span>📦 Management – เร็วๆ นี้</span>
         </li>
         <li>
           <span>🔢 Calculation – เร็วๆ นี้</span>

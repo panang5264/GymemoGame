@@ -25,7 +25,7 @@ export default function GamePage() {
 
   return (
     <div className="game-page">
-     <h1 className="game-title">🃏 เกมจับคู่การ์ด (Memory Mode)</h1>
+     <h1 className="game-title">📦 Management</h1>
       {!isGameStarted && !isGameOver && (
         <div>
           <p>ลากสิ่งของไปยังหมวดหมู่ที่ถูกต้องเพื่อทำคะแนน</p>
