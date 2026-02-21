@@ -8,6 +8,8 @@ import {
   isVillage1Completed,
   VILLAGE1_TOTAL_LEVELS,
 } from '@/lib/progression'
+import { getKeys, consumeKey } from '@/lib/levelSystem'
+import ConfirmUseKeyModal from '@/components/ConfirmUseKeyModal'
 
 // ─── Card matching mini-game data ───────────────────────────────────────────
 
@@ -51,6 +53,8 @@ export default function VillagePage() {
   const [matched, setMatched] = useState(0)
   const [moves, setMoves] = useState(0)
   const [phase, setPhase] = useState<'start' | 'playing' | 'level_clear'>('start')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [keysLeft, setKeysLeft] = useState(0)
 
   // Current level index (0-based)
   const currentLevel = Math.min(progress, VILLAGE1_TOTAL_LEVELS - 1)
@@ -62,6 +66,8 @@ export default function VillagePage() {
     const p = getVillage1Progress()
     setProgress(p)
     setVillage1Done(isVillage1Completed())
+    const { currentKeys } = getKeys()
+    setKeysLeft(currentKeys)
   }, [])
 
   const startLevel = useCallback(() => {
@@ -158,10 +164,28 @@ export default function VillagePage() {
           <p style={{ margin: '1rem 0', opacity: 0.85 }}>
             จับคู่การ์ดให้ครบเพื่อผ่านด่านนี้
           </p>
-          <button className="start-button" onClick={startLevel}>
+          <button
+            className="start-button"
+            onClick={() => setModalOpen(true)}
+          >
             เริ่มด่านที่ {progress + 1} 🚀
           </button>
         </div>
+        <ConfirmUseKeyModal
+          open={modalOpen}
+          keysLeft={keysLeft}
+          onCancel={() => setModalOpen(false)}
+          onConfirm={() => {
+            const ok = consumeKey()
+            if (ok) {
+              setKeysLeft(k => k - 1)
+              setModalOpen(false)
+              startLevel()
+            } else {
+              setModalOpen(false)
+            }
+          }}
+        />
       </div>
     )
   }

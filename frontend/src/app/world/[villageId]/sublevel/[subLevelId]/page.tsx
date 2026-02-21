@@ -2,8 +2,8 @@
 
 import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { getKeys, consumeKey, recordPlay } from '@/lib/levelSystem'
+import ConfirmUseKeyModal from '@/components/ConfirmUseKeyModal'
 
 function getMinigameUrl(villageId: number, subId: number): string {
   if (subId <= 4) {
@@ -37,7 +37,8 @@ export default function SubLevelPage({
   const villageId = parseInt(villageIdStr, 10)
   const subLevelId = parseInt(subLevelIdStr, 10)
 
-  const [status, setStatus] = useState<'loading' | 'no_keys' | 'redirecting'>('loading')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [keysLeft, setKeysLeft] = useState(0)
 
   useEffect(() => {
     if (isNaN(villageId) || isNaN(subLevelId) || subLevelId < 1) {
@@ -45,39 +46,27 @@ export default function SubLevelPage({
       return
     }
     const { currentKeys } = getKeys()
-    if (currentKeys <= 0) {
-      setStatus('no_keys')
-      return
-    }
+    setKeysLeft(currentKeys)
+    setModalOpen(true)
+  }, [villageId, subLevelId, router])
+
+  const handleConfirm = () => {
     const consumed = consumeKey()
     if (!consumed) {
-      setStatus('no_keys')
+      setModalOpen(false)
+      router.back()
       return
     }
+    setModalOpen(false)
     // v1 stub: record play immediately with 0 score.
     // TODO: integrate actual score from minigame result once a result callback is added.
     recordPlay(villageId, 0)
-    setStatus('redirecting')
     router.replace(getMinigameUrl(villageId, subLevelId))
-  }, [villageId, subLevelId, router])
+  }
 
-  if (status === 'no_keys') {
-    return (
-      <div className="game-page">
-        <div className="dc-card">
-          <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>🔒</div>
-          <h2 style={{ marginBottom: '0.75rem' }}>ไม่มีกุญแจ</h2>
-          <p className="dc-subtitle">กุญแจหมดแล้ว รอรีเจนทุก 30 นาที</p>
-          <Link
-            href={`/world/${villageId}`}
-            className="cta-button"
-            style={{ marginTop: '1.5rem', display: 'inline-block' }}
-          >
-            ← กลับหมู่บ้าน
-          </Link>
-        </div>
-      </div>
-    )
+  const handleCancel = () => {
+    setModalOpen(false)
+    router.back()
   }
 
   return (
@@ -85,7 +74,12 @@ export default function SubLevelPage({
       <div className="dc-card">
         <p className="dc-subtitle">กำลังโหลด...</p>
       </div>
+      <ConfirmUseKeyModal
+        open={modalOpen}
+        keysLeft={keysLeft}
+        onCancel={handleCancel}
+        onConfirm={handleConfirm}
+      />
     </div>
   )
 }
-
