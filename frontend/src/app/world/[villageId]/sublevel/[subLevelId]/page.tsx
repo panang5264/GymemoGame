@@ -1,16 +1,88 @@
-import { redirect, notFound } from 'next/navigation'
+'use client'
 
-const MINIGAMES = ['/minigame/memory', '/minigame/spatial']
+import { use, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { getKeys, consumeKey, recordPlay } from '@/lib/levelSystem'
+
+function getMinigameUrl(villageId: number, subId: number): string {
+  if (subId <= 4) {
+    return `/minigame/Management?villageId=${villageId}&subId=${subId}&mode=village`
+  }
+  if (subId <= 8) {
+    return `/minigame/calculation?level=${villageId}&villageId=${villageId}&subId=${subId}&mode=village`
+  }
+  if (subId <= 12) {
+    return `/minigame/spatial?villageId=${villageId}&subId=${subId}&mode=village`
+  }
+  // subId 13-14: pick based on subId % 3
+  const pick = subId % 3
+  if (pick === 0) {
+    return `/minigame/Management?villageId=${villageId}&subId=${subId}&mode=village`
+  }
+  if (pick === 1) {
+    return `/minigame/calculation?level=${villageId}&villageId=${villageId}&subId=${subId}&mode=village`
+  }
+  return `/minigame/spatial?villageId=${villageId}&subId=${subId}&mode=village`
+}
 
 export default function SubLevelPage({
   params,
 }: {
-  params: { villageId: string; subLevelId: string }
+  params: Promise<{ villageId: string; subLevelId: string }>
 }) {
-  const subLevelNum = parseInt(params.subLevelId, 10)
-  if (isNaN(subLevelNum) || subLevelNum < 1) {
-    notFound()
+  const router = useRouter()
+  const { villageId: villageIdStr, subLevelId: subLevelIdStr } = use(params)
+  const villageId = parseInt(villageIdStr, 10)
+  const subLevelId = parseInt(subLevelIdStr, 10)
+
+  const [status, setStatus] = useState<'loading' | 'no_keys' | 'redirecting'>('loading')
+
+  useEffect(() => {
+    if (isNaN(villageId) || isNaN(subLevelId) || subLevelId < 1) {
+      router.replace('/world')
+      return
+    }
+    const { currentKeys } = getKeys()
+    if (currentKeys <= 0) {
+      setStatus('no_keys')
+      return
+    }
+    const consumed = consumeKey()
+    if (!consumed) {
+      setStatus('no_keys')
+      return
+    }
+    recordPlay(villageId, 0)
+    setStatus('redirecting')
+    router.replace(getMinigameUrl(villageId, subLevelId))
+  }, [villageId, subLevelId, router])
+
+  if (status === 'no_keys') {
+    return (
+      <div className="game-page">
+        <div className="dc-card">
+          <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>🔒</div>
+          <h2 style={{ marginBottom: '0.75rem' }}>ไม่มีกุญแจ</h2>
+          <p className="dc-subtitle">กุญแจหมดแล้ว รอรีเจนทุก 30 นาที</p>
+          <Link
+            href={`/world/${villageId}`}
+            className="cta-button"
+            style={{ marginTop: '1.5rem', display: 'inline-block' }}
+          >
+            ← กลับหมู่บ้าน
+          </Link>
+        </div>
+      </div>
+    )
   }
-  const index = (subLevelNum - 1) % MINIGAMES.length
-  redirect(MINIGAMES[index])
+
+  return (
+    <div className="game-page">
+      <div className="dc-card">
+        <p className="dc-subtitle">กำลังโหลด...</p>
+      </div>
+    </div>
+  )
 }
+

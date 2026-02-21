@@ -1,10 +1,19 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import styles from './page.module.css'
-
-const STORAGE_KEY = 'gymemo_world_progress'
+import styles from './world.module.css'
+import {
+  loadProgress,
+  saveProgress,
+  getDefaultProgress,
+  getKeys,
+  isVillageUnlocked,
+  getVillageProgress,
+  PLAYS_PER_VILLAGE,
+  MAX_KEYS,
+} from '@/lib/levelSystem'
+import { getExpPercent } from '@/lib/scoring'
 
 const TOTAL_STAGES = 10
 
@@ -23,85 +32,101 @@ const STAGE_POSITIONS: Array<{ x: number; y: number }> = [
 
 const INTRO_SLIDES: Array<{ emoji: string; title: string; desc: string }> = [
   { emoji: '👋', title: 'ยินดีต้อนรับ', desc: 'มาสำรวจแผนที่โลกกัน!' },
-  { emoji: '⭐', title: 'ปลดล็อกด่าน', desc: 'ผ่านด่านเพื่อปลดล็อกด่านถัดไป' },
+  { emoji: '⭐', title: 'ปลดล็อกด่าน', desc: 'เติม EXP ให้เต็มเพื่อปลดล็อกหมู่บ้านถัดไป' },
+  { emoji: '🗝️', title: 'กุญแจ', desc: 'ใช้กุญแจเพื่อเล่นแต่ละด่าน (รีเจนทุก 30 นาที)' },
   { emoji: '🚀', title: 'พร้อมเริ่ม', desc: 'กดเริ่มเลยเพื่อไปด่านแรก' },
 ]
-const VILLAGES = [
-  { id: '1', name: 'หมู่บ้านที่ 1' },
-  { id: '2', name: 'หมู่บ้านที่ 2' },
-  { id: '3', name: 'หมู่บ้านที่ 3' },
-  { id: '4', name: 'หมู่บ้านที่ 4' },
-  { id: '5', name: 'หมู่บ้านที่ 5' },
-  { id: '6', name: 'หมู่บ้านที่ 6' },
-  { id: '7', name: 'หมู่บ้านที่ 7' },
-  { id: '8', name: 'หมู่บ้านที่ 8' },
-  { id: '9', name: 'หมู่บ้านที่ 9' },
-  { id: '10', name: 'หมู่บ้านที่ 10' },
-]
 
-interface Progress {
-  introSeen: boolean
-  completed: number[]
+function formatCountdown(ms: number): string {
+  if (ms <= 0) return ''
+  const totalSec = Math.ceil(ms / 1000)
+  const m = Math.floor(totalSec / 60)
+  const s = totalSec % 60
+  return `(${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')})`
 }
 
-function loadProgress(): Progress {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw)
-  } catch {}
-  return { introSeen: false, completed: [] }
-}
-
-function saveProgress(p: Progress) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(p))
-}
-
-function getStageState(stage: number, completed: number[]): 'completed' | 'current' | 'locked' {
-  if (completed.includes(stage)) return 'completed'
-  const current = completed.length === 0 ? 1 : Math.max(0, ...completed) + 1
-  if (stage === current) return 'current'
-  return 'locked'
+function getStageState(
+  stage: number,
+  unlockedVillages: number[]
+): 'completed' | 'current' | 'locked' {
+  if (!unlockedVillages.includes(stage)) return 'locked'
+  // "current" = highest unlocked stage that isn't exp-tube-filled
+  const maxUnlocked = Math.max(...unlockedVillages)
+  if (stage === maxUnlocked) return 'current'
+  return 'completed'
 }
 
 export default function WorldPage() {
   const router = useRouter()
-  const [progress, setProgress] = useState<Progress>({ introSeen: false, completed: [] })
+  const [unlockedVillages, setUnlockedVillages] = useState<number[]>([1])
+  const [villageExp, setVillageExp] = useState<Record<number, number>>({})
   const [showIntro, setShowIntro] = useState(false)
   const [slideIndex, setSlideIndex] = useState(0)
   const [mounted, setMounted] = useState(false)
+  const [currentKeys, setCurrentKeys] = useState(MAX_KEYS)
+  const [nextRegenIn, setNextRegenIn] = useState(0)
 
-  useEffect(() => {
+  const refreshProgress = useCallback(() => {
     const p = loadProgress()
-    setProgress(p)
+    setUnlockedVillages(p.unlockedVillages)
+    const expMap: Record<number, number> = {}
+    for (let i = 1; i <= TOTAL_STAGES; i++) {
+      const vp = p.villages[String(i)] ?? { playsCompleted: 0 }
+      expMap[i] = getExpPercent(vp.playsCompleted)
+    }
+    setVillageExp(expMap)
     if (!p.introSeen) setShowIntro(true)
-    setMounted(true)
   }, [])
 
+  useEffect(() => {
+    refreshProgress()
+    setMounted(true)
+  }, [refreshProgress])
+
+  // Keys ticker
+  useEffect(() => {
+    if (!mounted) return
+    const tick = () => {
+      const { currentKeys: ck, nextRegenIn: nr } = getKeys()
+      setCurrentKeys(ck)
+      setNextRegenIn(nr)
+    }
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [mounted])
+
   function closeIntro() {
-
-  setShowIntro(false)
-  setSlideIndex(0)
-
-  setProgress((prev) => {
-    const updated = { ...prev, introSeen: true }
-    saveProgress(updated)
-    return updated
-  })
-}
+    setShowIntro(false)
+    setSlideIndex(0)
+    const p = loadProgress()
+    p.introSeen = true
+    saveProgress(p)
+  }
 
   function resetProgress() {
-    const updated: Progress = { introSeen: true, completed: [] }
-    setProgress(updated)
-    saveProgress(updated)
+    const fresh = getDefaultProgress()
+    fresh.introSeen = true
+    saveProgress(fresh)
+    setUnlockedVillages(fresh.unlockedVillages)
+    setVillageExp({})
+    const { currentKeys: ck, nextRegenIn: nr } = getKeys()
+    setCurrentKeys(ck)
+    setNextRegenIn(nr)
   }
 
   function handleStageClick(stage: number) {
-    if (getStageState(stage, progress.completed) !== 'locked') {
+    if (isVillageUnlocked(stage)) {
       router.push(`/world/${stage}`)
     }
   }
 
   if (!mounted) return null
+
+  const keysLabel =
+    currentKeys >= MAX_KEYS
+      ? `🗝️ ${currentKeys}/${MAX_KEYS}`
+      : `🗝️ ${currentKeys}/${MAX_KEYS} ${formatCountdown(nextRegenIn)}`
 
   return (
     <div className={styles.worldPage}>
@@ -116,11 +141,11 @@ export default function WorldPage() {
             </div>
             <div className={styles.slideDots}>
               {INTRO_SLIDES.map((_: unknown, i: number) => (
-                  <span
-                    key={i}
-                    className={`${styles.dot} ${i === slideIndex ? styles.dotActive : ''}`}
-                  />
-                ))}
+                <span
+                  key={i}
+                  className={`${styles.dot} ${i === slideIndex ? styles.dotActive : ''}`}
+                />
+              ))}
             </div>
             <div className={styles.slideNav}>
               {slideIndex > 0 && (
@@ -145,6 +170,21 @@ export default function WorldPage() {
       <div className={styles.topBar}>
         <h1 className={styles.mapTitle}>🗺️ แผนที่โลก</h1>
         <div className={styles.topActions}>
+          <span
+            style={{
+              background: 'rgba(255,255,255,0.2)',
+              border: '2px solid rgba(255,255,255,0.5)',
+              color: '#fff',
+              fontWeight: 700,
+              padding: '0.5rem 1rem',
+              borderRadius: '12px',
+              fontSize: '0.9rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+            }}
+          >
+            {keysLabel}
+          </span>
           <button
             className={styles.actionBtn}
             onClick={() => {
@@ -162,20 +202,42 @@ export default function WorldPage() {
 
       <div className={styles.mapContainer}>
         {Array.from({ length: TOTAL_STAGES }, (_, i) => i + 1).map((stage) => {
-          const state = getStageState(stage, progress.completed)
+          const state = getStageState(stage, unlockedVillages)
           const pos = STAGE_POSITIONS[stage - 1]
+          const exp = villageExp[stage] ?? 0
           return (
             <button
               key={stage}
               className={`${styles.stageNode} ${styles[state]}`}
               style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
               onClick={() => handleStageClick(stage)}
-              title={state === 'locked' ? 'ล็อก' : `ด่าน ${stage}`}
+              title={state === 'locked' ? 'ล็อก' : `หมู่บ้าน ${stage}`}
             >
               <span className={styles.stageIcon}>
                 {state === 'completed' ? '⭐' : state === 'current' ? '▶' : '🔒'}
               </span>
               <span className={styles.stageLabel}>ด่าน {stage}</span>
+              {state !== 'locked' && (
+                <div
+                  style={{
+                    width: '48px',
+                    height: '5px',
+                    background: 'rgba(0,0,0,0.15)',
+                    borderRadius: '3px',
+                    marginTop: '2px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${exp}%`,
+                      height: '100%',
+                      background: 'linear-gradient(90deg,#ffd700,#ffed4e)',
+                      borderRadius: '3px',
+                    }}
+                  />
+                </div>
+              )}
             </button>
           )
         })}
@@ -185,7 +247,11 @@ export default function WorldPage() {
         <span className={styles.legendItem}>▶ ด่านปัจจุบัน</span>
         <span className={styles.legendItem}>⭐ ผ่านแล้ว</span>
         <span className={styles.legendItem}>🔒 ล็อก</span>
+        <span className={styles.legendItem}>
+          EXP {Object.values(villageExp).filter((v) => v >= 100).length}/{TOTAL_STAGES}
+        </span>
       </div>
     </div>
   )
 }
+
