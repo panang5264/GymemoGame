@@ -4,25 +4,29 @@
  * Daily Challenge page
  *
  * Flow:
- *  1. Check Village 1 completion (isVillage1Completed) – locked if not done.
- *  2. Check canPlayDailyChallenge() – shows countdown if already played today.
- *  3. On start: run 3 × 60-second stages in order:
+ *  1. Check isDailyComplete(dateKey) – shows countdown if all modes done today.
+ *  2. On start: run 3 × 60-second stages in order:
  *       Stage 1 – Management  (📋 จัดการ)    : remember items, pick correct ones
  *       Stage 2 – Calculation (🧮 คำนวณ)     : remember equations, answer MCQ
  *       Stage 3 – Spatial     (🗺️ พื้นที่)   : remember grid pattern, reproduce it
- *  4. After stage 3: call markDailyChallengeCompleted(), show results.
+ *  3. After each stage: call markDailyMode(dateKey, mode).
+ *  4. After stage 3: show results.
  *
  * Reset: every day at local midnight (00:00). See src/lib/dailyChallenge.ts.
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
-import { isVillage1Completed } from '@/lib/progression'
 import {
-  canPlayDailyChallenge,
-  markDailyChallengeCompleted,
   getCountdownToReset,
+  getDateKey,
 } from '@/lib/dailyChallenge'
+import { CALC_LEVELS, seededRng, dateSeed, type CalcQuestion } from '@/lib/calculationLevels'
+import {
+  isDailyComplete,
+  getDailyProgress,
+  markDailyMode,
+} from '@/lib/levelSystem'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -46,34 +50,11 @@ function buildManagementRound() {
 
 // ─── Stage 2 – Calculation ───────────────────────────────────────────────────
 
-interface CalcQuestion {
-  expression: string
-  answer: number
-  choices: number[]
-}
-
 function buildCalcQuestions(): CalcQuestion[] {
-  const questions: CalcQuestion[] = []
-  for (let i = 0; i < 4; i++) {
-    const a = Math.floor(Math.random() * 9) + 1
-    const b = Math.floor(Math.random() * 9) + 1
-    const ops = ['+', '-', '×'] as const
-    const op = ops[Math.floor(Math.random() * ops.length)]
-    let answer: number
-    if (op === '+') answer = a + b
-    else if (op === '-') answer = a - b
-    else answer = a * b
-
-    const wrong = new Set<number>()
-    while (wrong.size < 3) {
-      const offset = Math.floor(Math.random() * 10) - 5
-      const w = answer + offset
-      if (w !== answer) wrong.add(w)
-    }
-    const choices = [answer, ...wrong].sort(() => Math.random() - 0.5)
-    questions.push({ expression: `${a} ${op} ${b}`, answer, choices })
-  }
-  return questions
+  // Use today's date as a deterministic seed so questions are consistent per day
+  const seed = getDateKey()
+  const rng = seededRng(dateSeed(seed))
+  return CALC_LEVELS[0].generate(rng, 4)
 }
 
 // ─── Stage 3 – Spatial ───────────────────────────────────────────────────────
@@ -127,7 +108,6 @@ function useCountdown(initial: number, running: boolean, onExpire: () => void) {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 type AppPhase =
-  | 'locked_village'
   | 'locked_daily'
   | 'ready'
   | 'stage1_memorize'
@@ -142,6 +122,7 @@ export default function DailyChallengePage() {
   const [phase, setPhase] = useState<AppPhase>('ready')
   const [countdown, setCountdown] = useState('')
   const [stageScore, setStageScore] = useState([0, 0, 0])
+  const [dateKey] = useState(() => getDateKey())
 
   // Stage timers (running flag)
   const [timerRunning, setTimerRunning] = useState(false)
@@ -172,9 +153,8 @@ export default function DailyChallengePage() {
 
   // ── Initial phase detection ────────────────────────────────────────────────
   useEffect(() => {
-    if (!isVillage1Completed()) {
-      setPhase('locked_village')
-    } else if (!canPlayDailyChallenge()) {
+    const dk = getDateKey()
+    if (isDailyComplete(dk)) {
       setPhase('locked_daily')
     } else {
       setPhase('ready')
@@ -188,6 +168,7 @@ export default function DailyChallengePage() {
       // Score stage 1
       const score = mgmtSelected.filter(s => mgmtRound.target.includes(s)).length
       setStageScore(prev => { const n = [...prev]; n[0] = score; return n })
+      markDailyMode(dateKey, 'management')
       // Start stage 2
       const qs = buildCalcQuestions()
       setCalcQuestions(qs)
@@ -196,6 +177,7 @@ export default function DailyChallengePage() {
       setCalcMemorizeLeft(10)
       setPhase('stage2_memorize')
     } else if (phase === 'stage2_test') {
+      markDailyMode(dateKey, 'calculation')
       setPhase('stage3_memorize')
       const p = buildSpatialPattern()
       setSpatialPattern(p)
@@ -209,11 +191,10 @@ export default function DailyChallengePage() {
           if (userPattern[r][c] === spatialPattern[r][c]) correct++
       const score = correct
       setStageScore(prev => { const n = [...prev]; n[2] = score; return n })
-      // Mark completed
-      markDailyChallengeCompleted()
+      markDailyMode(dateKey, 'spatial')
       setPhase('completed')
     }
-  }, [phase, mgmtSelected, mgmtRound, userPattern, spatialPattern])
+  }, [phase, mgmtSelected, mgmtRound, userPattern, spatialPattern, dateKey])
 
   const stageRemaining = useCountdown(STAGE_DURATION, timerRunning, handleStageExpire)
 
@@ -275,6 +256,7 @@ export default function DailyChallengePage() {
     setTimerRunning(false)
     const score = mgmtSelected.filter(s => mgmtRound.target.includes(s)).length
     setStageScore(prev => { const n = [...prev]; n[0] = score; return n })
+    markDailyMode(dateKey, 'management')
     const qs = buildCalcQuestions()
     setCalcQuestions(qs)
     setCalcIndex(0)
@@ -293,6 +275,7 @@ export default function DailyChallengePage() {
     } else {
       // Stage 2 done early
       setTimerRunning(false)
+      markDailyMode(dateKey, 'calculation')
       const p = buildSpatialPattern()
       setSpatialPattern(p)
       setUserPattern(Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(false)))
@@ -316,7 +299,7 @@ export default function DailyChallengePage() {
       for (let c = 0; c < GRID_SIZE; c++)
         if (userPattern[r][c] === spatialPattern[r][c]) correct++
     setStageScore(prev => { const n = [...prev]; n[2] = correct; return n })
-    markDailyChallengeCompleted()
+    markDailyMode(dateKey, 'spatial')
     setPhase('completed')
   }
 
@@ -334,23 +317,6 @@ export default function DailyChallengePage() {
       )}
     </div>
   )
-
-  // ── Locked: Village 1 not done ─────────────────────────────────────────────
-  if (phase === 'locked_village') {
-    return (
-      <div className="game-page">
-        <h1 className="game-title">🌟 ภารกิจรายวัน</h1>
-        <div className="dc-card">
-          <div className="dc-lock-icon">🔒</div>
-          <h2>ยังไม่ปลดล็อค</h2>
-          <p className="dc-subtitle">ผ่านหมู่บ้าน 1 ให้ครบ 12 ด่านเพื่อปลดล็อคภารกิจรายวัน</p>
-          <Link href="/village" className="cta-button" style={{ marginTop: '1.5rem', display: 'inline-block' }}>
-            🏡 ไปยังหมู่บ้าน 1
-          </Link>
-        </div>
-      </div>
-    )
-  }
 
   // ── Locked: already played today ──────────────────────────────────────────
   if (phase === 'locked_daily') {
@@ -371,6 +337,8 @@ export default function DailyChallengePage() {
 
   // ── Ready: can play ────────────────────────────────────────────────────────
   if (phase === 'ready') {
+    const todaySeed = getDateKey()
+    const todayModes = getDailyProgress(dateKey)
     return (
       <div className="game-page">
         <h1 className="game-title">🌟 ภารกิจรายวัน</h1>
@@ -378,13 +346,25 @@ export default function DailyChallengePage() {
           <div className="dc-available-badge">✅ พร้อมเล่นวันนี้!</div>
           <p className="dc-subtitle">
             3 ด่าน × 60 วินาที
-            <br />
-            📋 การจัดการ &nbsp;·&nbsp; 🧮 การคำนวณ &nbsp;·&nbsp; 🗺️ พื้นที่
           </p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', margin: '0.75rem 0', flexWrap: 'wrap' }}>
+            <span>{todayModes.management ? '✅' : '⬜'} 📋 การจัดการ</span>
+            <span>{todayModes.calculation ? '✅' : '⬜'} 🧮 การคำนวณ</span>
+            <span>{todayModes.spatial ? '✅' : '⬜'} 🗺️ พื้นที่</span>
+          </div>
           <p className="dc-note">ไม่ใช้กุญแจ &nbsp;|&nbsp; เล่นได้ 1 ครั้งต่อวัน</p>
           <button className="start-button" onClick={handleStart}>
             เริ่มภารกิจรายวัน 🚀
           </button>
+          <p className="dc-note" style={{ marginTop: '1rem' }}>
+            หรือฝึกเฉพาะโหมดคำนวณ:{' '}
+            <Link
+              href={`/minigame/calculation?mode=daily&seed=${todaySeed}&level=1`}
+              style={{ color: '#ffd700', textDecoration: 'underline' }}
+            >
+              🔢 เปิดมินิเกมคำนวณ
+            </Link>
+          </p>
         </div>
       </div>
     )
