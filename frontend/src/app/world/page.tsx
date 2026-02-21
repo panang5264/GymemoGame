@@ -1,5 +1,31 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import styles from './page.module.css'
+
+const STORAGE_KEY = 'gymemo_world_progress'
+
+const TOTAL_STAGES = 10
+
+const STAGE_POSITIONS: Array<{ x: number; y: number }> = [
+  { x: 10, y: 70 },
+  { x: 20, y: 55 },
+  { x: 30, y: 65 },
+  { x: 40, y: 50 },
+  { x: 50, y: 60 },
+  { x: 60, y: 45 },
+  { x: 70, y: 55 },
+  { x: 80, y: 40 },
+  { x: 85, y: 60 },
+  { x: 90, y: 45 },
+]
+
+const INTRO_SLIDES: Array<{ emoji: string; title: string; desc: string }> = [
+  { emoji: '👋', title: 'ยินดีต้อนรับ', desc: 'มาสำรวจแผนที่โลกกัน!' },
+  { emoji: '⭐', title: 'ปลดล็อกด่าน', desc: 'ผ่านด่านเพื่อปลดล็อกด่านถัดไป' },
+  { emoji: '🚀', title: 'พร้อมเริ่ม', desc: 'กดเริ่มเลยเพื่อไปด่านแรก' },
+]
 const VILLAGES = [
   { id: '1', name: 'หมู่บ้านที่ 1' },
   { id: '2', name: 'หมู่บ้านที่ 2' },
@@ -52,11 +78,16 @@ export default function WorldPage() {
   }, [])
 
   function closeIntro() {
-    const updated = { ...progress, introSeen: true }
-    setProgress(updated)
+
+  setShowIntro(false)
+  setSlideIndex(0)
+
+  setProgress((prev) => {
+    const updated = { ...prev, introSeen: true }
     saveProgress(updated)
-    setShowIntro(false)
-  }
+    return updated
+  })
+}
 
   function resetProgress() {
     const updated: Progress = { introSeen: true, completed: [] }
@@ -84,12 +115,12 @@ export default function WorldPage() {
               <p className={styles.slideDesc}>{INTRO_SLIDES[slideIndex].desc}</p>
             </div>
             <div className={styles.slideDots}>
-              {INTRO_SLIDES.map((_, i) => (
-                <span
-                  key={i}
-                  className={`${styles.dot} ${i === slideIndex ? styles.dotActive : ''}`}
-                />
-              ))}
+              {INTRO_SLIDES.map((_: unknown, i: number) => (
+                  <span
+                    key={i}
+                    className={`${styles.dot} ${i === slideIndex ? styles.dotActive : ''}`}
+                  />
+                ))}
             </div>
             <div className={styles.slideNav}>
               {slideIndex > 0 && (

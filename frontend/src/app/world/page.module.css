@@ -1,0 +1,154 @@
+.worldPage {
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.mapTitle {
+  margin: 0;
+}
+
+.topActions {
+  display: flex;
+  gap: 8px;
+}
+
+.actionBtn {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.mapContainer {
+  position: relative;
+  height: 420px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.stageNode {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid #aaa;
+  background: white;
+  cursor: pointer;
+}
+
+.completed {
+  border-color: #f2b01e;
+}
+
+.current {
+  border-color: #2f80ed;
+}
+
+.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.stageIcon {
+  margin-right: 6px;
+}
+
+.stageLabel {
+  font-size: 12px;
+}
+
+.legend {
+  margin-top: 12px;
+  display: flex;
+  gap: 12px;
+}
+
+.legendItem {
+  font-size: 12px;
+}
+
+/* Intro */
+.introOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: grid;
+  place-items: center;
+  z-index: 50;
+}
+
+.introCard {
+  width: min(520px, calc(100vw - 32px));
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  position: relative;
+}
+
+.skipBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.slideContent {
+  text-align: center;
+  padding: 24px 8px 8px;
+}
+
+.slideEmoji {
+  font-size: 40px;
+}
+
+.slideTitle {
+  margin: 10px 0 6px;
+}
+
+.slideDesc {
+  margin: 0;
+  color: #444;
+}
+
+.slideDots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 0;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  background: #ddd;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.dotActive {
+  background: #2f80ed;
+}
+
+.slideNav {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.navBtn {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.navBtnPrimary {
+  background: #2f80ed;
+  color: white;
+  border: none;
+}
