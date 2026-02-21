@@ -1,0 +1,559 @@
+'use client'
+
+/**
+ * Daily Challenge page
+ *
+ * Flow:
+ *  1. Check Village 1 completion (isVillage1Completed) – locked if not done.
+ *  2. Check canPlayDailyChallenge() – shows countdown if already played today.
+ *  3. On start: run 3 × 60-second stages in order:
+ *       Stage 1 – Management  (📋 จัดการ)    : remember items, pick correct ones
+ *       Stage 2 – Calculation (🧮 คำนวณ)     : remember equations, answer MCQ
+ *       Stage 3 – Spatial     (🗺️ พื้นที่)   : remember grid pattern, reproduce it
+ *  4. After stage 3: call markDailyChallengeCompleted(), show results.
+ *
+ * Reset: every day at local midnight (00:00). See src/lib/dailyChallenge.ts.
+ */
+
+import { useState, useEffect, useRef, useCallback } from 'react'
+import Link from 'next/link'
+import { isVillage1Completed } from '@/lib/progression'
+import {
+  canPlayDailyChallenge,
+  markDailyChallengeCompleted,
+  getCountdownToReset,
+} from '@/lib/dailyChallenge'
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const STAGE_DURATION = 60 // seconds per stage
+const STAGES = ['📋 การจัดการ', '🧮 การคำนวณ', '🗺️ พื้นที่'] as const
+
+// ─── Stage 1 – Management ────────────────────────────────────────────────────
+
+const ITEM_POOL = [
+  '🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🥝',
+  '🍑', '🍍', '🥭', '🍒', '🥕', '🌽', '🥦', '🥑',
+]
+
+function buildManagementRound() {
+  const shuffled = [...ITEM_POOL].sort(() => Math.random() - 0.5)
+  const target = shuffled.slice(0, 6)
+  const distractors = shuffled.slice(6, 12)
+  const choices = [...target, ...distractors].sort(() => Math.random() - 0.5)
+  return { target, choices }
+}
+
+// ─── Stage 2 – Calculation ───────────────────────────────────────────────────
+
+interface CalcQuestion {
+  expression: string
+  answer: number
+  choices: number[]
+}
+
+function buildCalcQuestions(): CalcQuestion[] {
+  const questions: CalcQuestion[] = []
+  for (let i = 0; i < 4; i++) {
+    const a = Math.floor(Math.random() * 9) + 1
+    const b = Math.floor(Math.random() * 9) + 1
+    const ops = ['+', '-', '×'] as const
+    const op = ops[Math.floor(Math.random() * ops.length)]
+    let answer: number
+    if (op === '+') answer = a + b
+    else if (op === '-') answer = a - b
+    else answer = a * b
+
+    const wrong = new Set<number>()
+    while (wrong.size < 3) {
+      const offset = Math.floor(Math.random() * 10) - 5
+      const w = answer + offset
+      if (w !== answer) wrong.add(w)
+    }
+    const choices = [answer, ...wrong].sort(() => Math.random() - 0.5)
+    questions.push({ expression: `${a} ${op} ${b}`, answer, choices })
+  }
+  return questions
+}
+
+// ─── Stage 3 – Spatial ───────────────────────────────────────────────────────
+
+const GRID_SIZE = 5
+const HIGHLIGHT_COUNT = 7
+
+function buildSpatialPattern(): boolean[][] {
+  const grid: boolean[][] = Array.from({ length: GRID_SIZE }, () =>
+    Array(GRID_SIZE).fill(false)
+  )
+  let count = 0
+  while (count < HIGHLIGHT_COUNT) {
+    const r = Math.floor(Math.random() * GRID_SIZE)
+    const c = Math.floor(Math.random() * GRID_SIZE)
+    if (!grid[r][c]) {
+      grid[r][c] = true
+      count++
+    }
+  }
+  return grid
+}
+
+// ─── Countdown hook ───────────────────────────────────────────────────────────
+
+function useCountdown(initial: number, running: boolean, onExpire: () => void) {
+  const [remaining, setRemaining] = useState(initial)
+  const expiredRef = useRef(false)
+
+  useEffect(() => {
+    setRemaining(initial)
+    expiredRef.current = false
+  }, [initial])
+
+  useEffect(() => {
+    if (!running) return
+    if (remaining <= 0) {
+      if (!expiredRef.current) {
+        expiredRef.current = true
+        onExpire()
+      }
+      return
+    }
+    const id = setTimeout(() => setRemaining(r => r - 1), 1000)
+    return () => clearTimeout(id)
+  }, [running, remaining, onExpire])
+
+  return remaining
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
+type AppPhase =
+  | 'locked_village'
+  | 'locked_daily'
+  | 'ready'
+  | 'stage1_memorize'
+  | 'stage1_test'
+  | 'stage2_memorize'
+  | 'stage2_test'
+  | 'stage3_memorize'
+  | 'stage3_test'
+  | 'completed'
+
+export default function DailyChallengePage() {
+  const [phase, setPhase] = useState<AppPhase>('ready')
+  const [countdown, setCountdown] = useState('')
+  const [stageScore, setStageScore] = useState([0, 0, 0])
+
+  // Stage timers (running flag)
+  const [timerRunning, setTimerRunning] = useState(false)
+
+  // ── Stage 1 state ──────────────────────────────────────────────────────────
+  const [mgmtRound, setMgmtRound] = useState(() => buildManagementRound())
+  const [mgmtSelected, setMgmtSelected] = useState<string[]>([])
+  const [mgmtMemorizeLeft, setMgmtMemorizeLeft] = useState(8)
+
+  // ── Stage 2 state ──────────────────────────────────────────────────────────
+  const [calcQuestions, setCalcQuestions] = useState<CalcQuestion[]>([])
+  const [calcIndex, setCalcIndex] = useState(0)
+  const [calcAnswered, setCalcAnswered] = useState(0)
+  const [calcMemorizeLeft, setCalcMemorizeLeft] = useState(10)
+
+  // ── Stage 3 state ──────────────────────────────────────────────────────────
+  const [spatialPattern, setSpatialPattern] = useState<boolean[][]>([])
+  const [userPattern, setUserPattern] = useState<boolean[][]>([])
+  const [spatialMemorizeLeft, setSpatialMemorizeLeft] = useState(5)
+
+  // ── Daily countdown ────────────────────────────────────────────────────────
+  useEffect(() => {
+    const tick = () => setCountdown(getCountdownToReset())
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  // ── Initial phase detection ────────────────────────────────────────────────
+  useEffect(() => {
+    if (!isVillage1Completed()) {
+      setPhase('locked_village')
+    } else if (!canPlayDailyChallenge()) {
+      setPhase('locked_daily')
+    } else {
+      setPhase('ready')
+    }
+  }, [])
+
+  // ── Stage timer (60 s per stage) ───────────────────────────────────────────
+  const handleStageExpire = useCallback(() => {
+    setTimerRunning(false)
+    if (phase === 'stage1_test') {
+      // Score stage 1
+      const score = mgmtSelected.filter(s => mgmtRound.target.includes(s)).length
+      setStageScore(prev => { const n = [...prev]; n[0] = score; return n })
+      // Start stage 2
+      const qs = buildCalcQuestions()
+      setCalcQuestions(qs)
+      setCalcIndex(0)
+      setCalcAnswered(0)
+      setCalcMemorizeLeft(10)
+      setPhase('stage2_memorize')
+    } else if (phase === 'stage2_test') {
+      setPhase('stage3_memorize')
+      const p = buildSpatialPattern()
+      setSpatialPattern(p)
+      setUserPattern(Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(false)))
+      setSpatialMemorizeLeft(5)
+    } else if (phase === 'stage3_test') {
+      // Score stage 3
+      let correct = 0
+      for (let r = 0; r < GRID_SIZE; r++)
+        for (let c = 0; c < GRID_SIZE; c++)
+          if (userPattern[r][c] === spatialPattern[r][c]) correct++
+      const score = correct
+      setStageScore(prev => { const n = [...prev]; n[2] = score; return n })
+      // Mark completed
+      markDailyChallengeCompleted()
+      setPhase('completed')
+    }
+  }, [phase, mgmtSelected, mgmtRound, userPattern, spatialPattern])
+
+  const stageRemaining = useCountdown(STAGE_DURATION, timerRunning, handleStageExpire)
+
+  // ── Memorize countdowns ────────────────────────────────────────────────────
+  useEffect(() => {
+    if (phase !== 'stage1_memorize') return
+    if (mgmtMemorizeLeft <= 0) {
+      setPhase('stage1_test')
+      setMgmtSelected([])
+      setTimerRunning(true)
+      return
+    }
+    const id = setTimeout(() => setMgmtMemorizeLeft(t => t - 1), 1000)
+    return () => clearTimeout(id)
+  }, [phase, mgmtMemorizeLeft])
+
+  useEffect(() => {
+    if (phase !== 'stage2_memorize') return
+    if (calcMemorizeLeft <= 0) {
+      setPhase('stage2_test')
+      setTimerRunning(true)
+      return
+    }
+    const id = setTimeout(() => setCalcMemorizeLeft(t => t - 1), 1000)
+    return () => clearTimeout(id)
+  }, [phase, calcMemorizeLeft])
+
+  useEffect(() => {
+    if (phase !== 'stage3_memorize') return
+    if (spatialMemorizeLeft <= 0) {
+      setPhase('stage3_test')
+      setTimerRunning(true)
+      return
+    }
+    const id = setTimeout(() => setSpatialMemorizeLeft(t => t - 1), 1000)
+    return () => clearTimeout(id)
+  }, [phase, spatialMemorizeLeft])
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Handlers
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const handleStart = () => {
+    const round = buildManagementRound()
+    setMgmtRound(round)
+    setMgmtSelected([])
+    setMgmtMemorizeLeft(8)
+    setStageScore([0, 0, 0])
+    setPhase('stage1_memorize')
+  }
+
+  const toggleMgmtItem = (item: string) => {
+    setMgmtSelected(prev =>
+      prev.includes(item) ? prev.filter(x => x !== item) : [...prev, item]
+    )
+  }
+
+  const submitMgmtAnswer = () => {
+    setTimerRunning(false)
+    const score = mgmtSelected.filter(s => mgmtRound.target.includes(s)).length
+    setStageScore(prev => { const n = [...prev]; n[0] = score; return n })
+    const qs = buildCalcQuestions()
+    setCalcQuestions(qs)
+    setCalcIndex(0)
+    setCalcAnswered(0)
+    setCalcMemorizeLeft(10)
+    setPhase('stage2_memorize')
+  }
+
+  const handleCalcAnswer = (chosen: number) => {
+    const q = calcQuestions[calcIndex]
+    const correct = chosen === q.answer ? 1 : 0
+    setStageScore(prev => { const n = [...prev]; n[1] += correct; return n })
+    setCalcAnswered(a => a + 1)
+    if (calcIndex + 1 < calcQuestions.length) {
+      setCalcIndex(i => i + 1)
+    } else {
+      // Stage 2 done early
+      setTimerRunning(false)
+      const p = buildSpatialPattern()
+      setSpatialPattern(p)
+      setUserPattern(Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(false)))
+      setSpatialMemorizeLeft(5)
+      setPhase('stage3_memorize')
+    }
+  }
+
+  const toggleCell = (r: number, c: number) => {
+    setUserPattern(prev => {
+      const next = prev.map(row => [...row])
+      next[r][c] = !next[r][c]
+      return next
+    })
+  }
+
+  const submitSpatial = () => {
+    setTimerRunning(false)
+    let correct = 0
+    for (let r = 0; r < GRID_SIZE; r++)
+      for (let c = 0; c < GRID_SIZE; c++)
+        if (userPattern[r][c] === spatialPattern[r][c]) correct++
+    setStageScore(prev => { const n = [...prev]; n[2] = correct; return n })
+    markDailyChallengeCompleted()
+    setPhase('completed')
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Render helpers
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const StageHeader = ({ stageNum }: { stageNum: number }) => (
+    <div className="dc-stage-header">
+      <span className="dc-stage-label">ด่านที่ {stageNum}/3: {STAGES[stageNum - 1]}</span>
+      {timerRunning && (
+        <span className={`dc-timer ${stageRemaining <= 10 ? 'dc-timer-warn' : ''}`}>
+          ⏱ {stageRemaining}s
+        </span>
+      )}
+    </div>
+  )
+
+  // ── Locked: Village 1 not done ─────────────────────────────────────────────
+  if (phase === 'locked_village') {
+    return (
+      <div className="game-page">
+        <h1 className="game-title">🌟 ภารกิจรายวัน</h1>
+        <div className="dc-card">
+          <div className="dc-lock-icon">🔒</div>
+          <h2>ยังไม่ปลดล็อค</h2>
+          <p className="dc-subtitle">ผ่านหมู่บ้าน 1 ให้ครบ 12 ด่านเพื่อปลดล็อคภารกิจรายวัน</p>
+          <Link href="/village" className="cta-button" style={{ marginTop: '1.5rem', display: 'inline-block' }}>
+            🏡 ไปยังหมู่บ้าน 1
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Locked: already played today ──────────────────────────────────────────
+  if (phase === 'locked_daily') {
+    return (
+      <div className="game-page">
+        <h1 className="game-title">🌟 ภารกิจรายวัน</h1>
+        <div className="dc-card">
+          <div className="dc-lock-icon">✅</div>
+          <h2>เล่นแล้ววันนี้!</h2>
+          <p className="dc-subtitle">คุณได้เล่นภารกิจรายวันแล้วในวันนี้</p>
+          <p className="dc-subtitle">รีเซ็ตครั้งถัดไปเมื่อ 00:00 เที่ยงคืน</p>
+          <div className="dc-countdown">{countdown}</div>
+          <p className="dc-countdown-label">เวลาที่เหลือจนถึงการรีเซ็ต</p>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Ready: can play ────────────────────────────────────────────────────────
+  if (phase === 'ready') {
+    return (
+      <div className="game-page">
+        <h1 className="game-title">🌟 ภารกิจรายวัน</h1>
+        <div className="dc-card">
+          <div className="dc-available-badge">✅ พร้อมเล่นวันนี้!</div>
+          <p className="dc-subtitle">
+            3 ด่าน × 60 วินาที
+            <br />
+            📋 การจัดการ &nbsp;·&nbsp; 🧮 การคำนวณ &nbsp;·&nbsp; 🗺️ พื้นที่
+          </p>
+          <p className="dc-note">ไม่ใช้กุญแจ &nbsp;|&nbsp; เล่นได้ 1 ครั้งต่อวัน</p>
+          <button className="start-button" onClick={handleStart}>
+            เริ่มภารกิจรายวัน 🚀
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Stage 1 – memorize ─────────────────────────────────────────────────────
+  if (phase === 'stage1_memorize') {
+    return (
+      <div className="game-page">
+        <StageHeader stageNum={1} />
+        <div className="dc-card">
+          <h2>จำสิ่งของเหล่านี้ไว้! ({mgmtMemorizeLeft}s)</h2>
+          <div className="dc-item-grid">
+            {mgmtRound.target.map(item => (
+              <div key={item} className="dc-item dc-item-show">{item}</div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Stage 1 – test ─────────────────────────────────────────────────────────
+  if (phase === 'stage1_test') {
+    return (
+      <div className="game-page">
+        <StageHeader stageNum={1} />
+        <div className="dc-card">
+          <h2>เลือกสิ่งของที่คุณเห็น ({mgmtSelected.length}/6)</h2>
+          <div className="dc-item-grid">
+            {mgmtRound.choices.map(item => (
+              <div
+                key={item}
+                className={`dc-item dc-item-choice ${mgmtSelected.includes(item) ? 'dc-item-selected' : ''}`}
+                onClick={() => toggleMgmtItem(item)}
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+          <button className="start-button dc-submit-btn" onClick={submitMgmtAnswer}>
+            ยืนยันคำตอบ ✔️
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Stage 2 – memorize ─────────────────────────────────────────────────────
+  if (phase === 'stage2_memorize') {
+    return (
+      <div className="game-page">
+        <StageHeader stageNum={2} />
+        <div className="dc-card">
+          <h2>จำโจทย์เลขเหล่านี้! ({calcMemorizeLeft}s)</h2>
+          <div className="dc-calc-list">
+            {calcQuestions.map((q, i) => (
+              <div key={i} className="dc-calc-row">
+                <span className="dc-calc-num">ข้อ {i + 1}:</span> {q.expression} = ?
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Stage 2 – test ─────────────────────────────────────────────────────────
+  if (phase === 'stage2_test' && calcQuestions.length > 0) {
+    const q = calcQuestions[calcIndex]
+    return (
+      <div className="game-page">
+        <StageHeader stageNum={2} />
+        <div className="dc-card">
+          <h2>ข้อ {calcIndex + 1} / {calcQuestions.length}</h2>
+          <div className="dc-calc-question">{q.expression} = ?</div>
+          <div className="dc-choice-grid">
+            {q.choices.map(c => (
+              <button key={c} className="dc-choice-btn" onClick={() => handleCalcAnswer(c)}>
+                {c}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Stage 3 – memorize ─────────────────────────────────────────────────────
+  if (phase === 'stage3_memorize') {
+    return (
+      <div className="game-page">
+        <StageHeader stageNum={3} />
+        <div className="dc-card">
+          <h2>จำตำแหน่งที่ไฮไลต์ไว้! ({spatialMemorizeLeft}s)</h2>
+          <div className="dc-spatial-grid">
+            {spatialPattern.map((row, r) =>
+              row.map((cell, c) => (
+                <div
+                  key={`${r}-${c}`}
+                  className={`dc-spatial-cell ${cell ? 'dc-spatial-on' : ''}`}
+                />
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Stage 3 – test ─────────────────────────────────────────────────────────
+  if (phase === 'stage3_test') {
+    return (
+      <div className="game-page">
+        <StageHeader stageNum={3} />
+        <div className="dc-card">
+          <h2>คลิกตำแหน่งที่คุณจำได้</h2>
+          <div className="dc-spatial-grid">
+            {userPattern.map((row, r) =>
+              row.map((cell, c) => (
+                <div
+                  key={`${r}-${c}`}
+                  className={`dc-spatial-cell dc-spatial-clickable ${cell ? 'dc-spatial-user' : ''}`}
+                  onClick={() => toggleCell(r, c)}
+                />
+              ))
+            )}
+          </div>
+          <button className="start-button dc-submit-btn" onClick={submitSpatial}>
+            ยืนยันคำตอบ ✔️
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Completed ──────────────────────────────────────────────────────────────
+  if (phase === 'completed') {
+    const total = stageScore[0] + stageScore[1] + stageScore[2]
+    return (
+      <div className="game-page">
+        <h1 className="game-title">🌟 ภารกิจรายวัน – สำเร็จ!</h1>
+        <div className="dc-card">
+          <div className="dc-complete-icon">🏆</div>
+          <h2>ยอดเยี่ยม!</h2>
+          <div className="dc-score-table">
+            <div className="dc-score-row">
+              <span>📋 การจัดการ</span>
+              <span>{stageScore[0]} / 6</span>
+            </div>
+            <div className="dc-score-row">
+              <span>🧮 การคำนวณ</span>
+              <span>{stageScore[1]} / 4</span>
+            </div>
+            <div className="dc-score-row">
+              <span>🗺️ พื้นที่</span>
+              <span>{stageScore[2]} / {GRID_SIZE * GRID_SIZE}</span>
+            </div>
+          </div>
+          <p className="dc-subtitle">กลับมาใหม่พรุ่งนี้!</p>
+          <div className="dc-countdown">{countdown}</div>
+          <p className="dc-countdown-label">รีเซ็ตใน</p>
+          <Link href="/" className="cta-button" style={{ marginTop: '1.5rem', display: 'inline-block' }}>
+            กลับหน้าแรก 🏠
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  return null
+}

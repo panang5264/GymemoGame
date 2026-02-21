@@ -361,6 +361,7 @@
     grid-template-columns: 1fr;
   }
 }
+<<<<<<< HEAD
 .management-board {
   max-width: 1100px;
   margin: 0 auto;
@@ -491,3 +492,344 @@
   .stats { text-align: left; }
   .categories-grid { grid-template-columns: 1fr; }
 }
+=======
+
+/* ─── Village 1 ─────────────────────────────────────────────────────────── */
+
+.village-progress-bar-wrap {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto 0.5rem;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.village-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd700, #ffed4e);
+  border-radius: 8px;
+  transition: width 0.4s ease;
+}
+
+.village-progress-text {
+  opacity: 0.85;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.village-complete-text {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+/* ─── Daily Challenge shared ────────────────────────────────────────────── */
+
+.dc-card {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  backdrop-filter: blur(10px);
+  max-width: 600px;
+  margin: 1.5rem auto 0;
+  text-align: center;
+}
+
+.dc-lock-icon,
+.dc-complete-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.dc-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.85;
+  margin: 0.75rem 0;
+  line-height: 1.6;
+}
+
+.dc-note {
+  font-size: 0.95rem;
+  opacity: 0.7;
+  margin-bottom: 1.5rem;
+}
+
+.dc-available-badge {
+  display: inline-block;
+  background: rgba(0, 200, 100, 0.25);
+  border: 1px solid rgba(0, 200, 100, 0.5);
+  border-radius: 20px;
+  padding: 0.3rem 1rem;
+  font-size: 1.05rem;
+  margin-bottom: 0.75rem;
+}
+
+.dc-countdown {
+  font-size: 3rem;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.1em;
+  color: #ffd700;
+  margin: 0.75rem 0 0.25rem;
+}
+
+.dc-countdown-label {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  margin-bottom: 0.75rem;
+}
+
+/* ─── Stage header ──────────────────────────────────────────────────────── */
+
+.dc-stage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 600px;
+  margin: 0 auto 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+}
+
+.dc-stage-label {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.dc-timer {
+  font-size: 1.3rem;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+}
+
+.dc-timer-warn {
+  color: #ff6b6b;
+  animation: blink 0.5s step-start infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0.4; }
+}
+
+/* ─── Stage 1 – Management items ────────────────────────────────────────── */
+
+.dc-item-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.dc-item {
+  font-size: 2.5rem;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  cursor: default;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.dc-item-show {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dc-item-choice {
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.dc-item-choice:hover {
+  transform: scale(1.08);
+}
+
+.dc-item-selected {
+  background: rgba(255, 215, 0, 0.25);
+  border-color: #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+/* ─── Stage 2 – Calculation ─────────────────────────────────────────────── */
+
+.dc-calc-list {
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dc-calc-row {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 0.75rem 1.25rem;
+  font-size: 1.3rem;
+  text-align: left;
+}
+
+.dc-calc-num {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.dc-calc-question {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 1.5rem 0;
+}
+
+.dc-choice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin: 0 auto;
+  max-width: 320px;
+}
+
+.dc-choice-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.dc-choice-btn:hover {
+  background: rgba(255, 215, 0, 0.3);
+  border-color: #ffd700;
+  transform: scale(1.05);
+}
+
+/* ─── Stage 3 – Spatial grid ─────────────────────────────────────────────── */
+
+.dc-spatial-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  max-width: 300px;
+  margin: 1.5rem auto;
+}
+
+.dc-spatial-cell {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  transition: background 0.15s;
+}
+
+.dc-spatial-on {
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  border-color: #ffd700;
+}
+
+.dc-spatial-clickable {
+  cursor: pointer;
+}
+
+.dc-spatial-clickable:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.dc-spatial-user {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  border-color: #4facfe;
+}
+
+/* ─── Score table ────────────────────────────────────────────────────────── */
+
+.dc-score-table {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1.5rem 0;
+}
+
+.dc-score-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  font-size: 1.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dc-score-row:last-child {
+  border-bottom: none;
+}
+
+/* ─── Submit button ──────────────────────────────────────────────────────── */
+
+.dc-submit-btn {
+  margin-top: 1.5rem;
+}
+
+/* ─── Daily Challenge home section ──────────────────────────────────────── */
+
+.dc-home-section {
+  padding: 0 2rem;
+  margin-bottom: 3rem;
+}
+
+.dc-home-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  max-width: 600px;
+  margin: 0 auto;
+  border: 1px solid rgba(255, 215, 0, 0.25);
+}
+
+.dc-home-title {
+  font-size: 1.8rem;
+  margin-bottom: 0.75rem;
+}
+
+.dc-home-subtitle {
+  font-size: 1.05rem;
+  opacity: 0.85;
+  margin-bottom: 0.5rem;
+}
+
+.dc-home-note {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  margin-bottom: 1.25rem;
+}
+
+.dc-home-progress-bar-wrap {
+  width: 80%;
+  margin: 0.5rem auto;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.dc-home-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd700, #ffed4e);
+  border-radius: 6px;
+  transition: width 0.4s ease;
+}
+
+.dc-home-progress-text {
+  font-size: 0.9rem;
+  opacity: 0.75;
+  margin: 0.3rem 0 0.75rem;
+}
+
+.dc-home-btn {
+  margin-top: 0.75rem;
+}
+>>>>>>> main
