@@ -12,7 +12,7 @@ export default function MinigamePage() {
           <Link href="/minigame/spatial">🗺️ Spatial – จับคู่ความสัมพันธ์</Link>
         </li>
         <li>
-          <span>🔢 Calculation – เร็วๆ นี้</span>
+          <Link href="/minigame/calculation">🔢 Calculation – โหมดคำนวณ</Link>
         </li>
       </ul>
     </div>

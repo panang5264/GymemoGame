@@ -22,7 +22,9 @@ import {
   canPlayDailyChallenge,
   markDailyChallengeCompleted,
   getCountdownToReset,
+  getDateKey,
 } from '@/lib/dailyChallenge'
+import { CALC_LEVELS, seededRng, dateSeed, type CalcQuestion } from '@/lib/calculationLevels'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -46,34 +48,11 @@ function buildManagementRound() {
 
 // ─── Stage 2 – Calculation ───────────────────────────────────────────────────
 
-interface CalcQuestion {
-  expression: string
-  answer: number
-  choices: number[]
-}
-
 function buildCalcQuestions(): CalcQuestion[] {
-  const questions: CalcQuestion[] = []
-  for (let i = 0; i < 4; i++) {
-    const a = Math.floor(Math.random() * 9) + 1
-    const b = Math.floor(Math.random() * 9) + 1
-    const ops = ['+', '-', '×'] as const
-    const op = ops[Math.floor(Math.random() * ops.length)]
-    let answer: number
-    if (op === '+') answer = a + b
-    else if (op === '-') answer = a - b
-    else answer = a * b
-
-    const wrong = new Set<number>()
-    while (wrong.size < 3) {
-      const offset = Math.floor(Math.random() * 10) - 5
-      const w = answer + offset
-      if (w !== answer) wrong.add(w)
-    }
-    const choices = [answer, ...wrong].sort(() => Math.random() - 0.5)
-    questions.push({ expression: `${a} ${op} ${b}`, answer, choices })
-  }
-  return questions
+  // Use today's date as a deterministic seed so questions are consistent per day
+  const seed = getDateKey()
+  const rng = seededRng(dateSeed(seed))
+  return CALC_LEVELS[0].generate(rng, 4)
 }
 
 // ─── Stage 3 – Spatial ───────────────────────────────────────────────────────
@@ -371,6 +350,7 @@ export default function DailyChallengePage() {
 
   // ── Ready: can play ────────────────────────────────────────────────────────
   if (phase === 'ready') {
+    const todaySeed = getDateKey()
     return (
       <div className="game-page">
         <h1 className="game-title">🌟 ภารกิจรายวัน</h1>
@@ -385,6 +365,15 @@ export default function DailyChallengePage() {
           <button className="start-button" onClick={handleStart}>
             เริ่มภารกิจรายวัน 🚀
           </button>
+          <p className="dc-note" style={{ marginTop: '1rem' }}>
+            หรือฝึกเฉพาะโหมดคำนวณ:{' '}
+            <Link
+              href={`/minigame/calculation?mode=daily&seed=${todaySeed}&level=1`}
+              style={{ color: '#ffd700', textDecoration: 'underline' }}
+            >
+              🔢 เปิดมินิเกมคำนวณ
+            </Link>
+          </p>
         </div>
       </div>
     )
