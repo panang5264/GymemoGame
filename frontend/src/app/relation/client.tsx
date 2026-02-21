@@ -14,7 +14,7 @@ export default function ClientPage({ filenames }: { filenames: string[] }) {
   })
 
   return (
-    <div className="grid grid-rows-4 gap-4 pr-5">
+    <div className="grid grid-rows-4 gap-4 px-30">
       {filenames.map((name) => (
         <Image
           key={name}
