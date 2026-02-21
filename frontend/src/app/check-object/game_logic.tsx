@@ -16,6 +16,7 @@ export function random_question(): Question {
 }
 
 export function checkAnswer(question: Question, answer: boolean): boolean {
+  console.log(question)
   return question.is_correct === answer
   // return true;
 }

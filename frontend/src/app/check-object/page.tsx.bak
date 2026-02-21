@@ -1,6 +1,0 @@
-import ClientPage from "./page"
-export default async function Page() {
-  return (
-    <ClientPage />
-  )
-}
