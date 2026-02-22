@@ -1,17 +1,23 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import GameBoard from '@/components/GameBoard'
-import ScoreBoard from '@/components/ScoreBoard'
-import Timer from '@/components/Timer'
 
-export default function GamePage() {
+function ManagementGame() {
+  const searchParams = useSearchParams()
+
+  const rawSubId = searchParams.get('subId')
+  const subId = rawSubId !== null ? parseInt(rawSubId, 10) || 1 : 1
+
   const [score, setScore] = useState(0)
   const [moves, setMoves] = useState(0)
   const [isGameStarted, setIsGameStarted] = useState(false)
   const [isGameOver, setIsGameOver] = useState(false)
 
   const handleGameOver = (finalScore: number, finalMoves: number) => {
+    setScore(finalScore)
+    setMoves(finalMoves)
     setIsGameOver(true)
     setIsGameStarted(false)
   }
@@ -25,7 +31,7 @@ export default function GamePage() {
 
   return (
     <div className="game-page">
-     <h1 className="game-title">📦 Management</h1>
+      <h1 className="game-title">📦 Management — ด่าน {subId}</h1>
       {!isGameStarted && !isGameOver && (
         <div>
           <p>ลากสิ่งของไปยังหมวดหมู่ที่ถูกต้องเพื่อทำคะแนน</p>
@@ -33,8 +39,7 @@ export default function GamePage() {
             เริ่มเกม 🚀
           </button>
         </div>
-    )}
-
+      )}
 
       {isGameOver && (
         <div className="game-over">
@@ -49,11 +54,20 @@ export default function GamePage() {
 
       {isGameStarted && (
         <GameBoard
+          level={subId}
           onGameOver={handleGameOver}
           onScoreChange={setScore}
           onMovesChange={setMoves}
         />
       )}
     </div>
+  )
+}
+
+export default function ManagementPage() {
+  return (
+    <Suspense fallback={<div className="game-page"><p>กำลังโหลด...</p></div>}>
+      <ManagementGame />
+    </Suspense>
   )
 }
