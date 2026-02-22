@@ -7,7 +7,7 @@ import ConfirmUseKeyModal from '@/components/ConfirmUseKeyModal'
 
 function getMinigameUrl(villageId: number, subId: number): string {
   if (subId <= 4) {
-    return `/minigame/Management?villageId=${villageId}&subId=${subId}&mode=village`
+    return `/minigame/management?villageId=${villageId}&subId=${subId}&mode=village`
   }
   if (subId <= 8) {
     return `/minigame/calculation?level=${villageId}&villageId=${villageId}&subId=${subId}&mode=village`
@@ -19,7 +19,7 @@ function getMinigameUrl(villageId: number, subId: number): string {
   // 13 % 3 = 1 → calculation, 14 % 3 = 2 → spatial
   const pick = subId % 3
   if (pick === 0) {
-    return `/minigame/Management?villageId=${villageId}&subId=${subId}&mode=village`
+    return `/minigame/management?villageId=${villageId}&subId=${subId}&mode=village`
   }
   if (pick === 1) {
     return `/minigame/calculation?level=${villageId}&villageId=${villageId}&subId=${subId}&mode=village`
