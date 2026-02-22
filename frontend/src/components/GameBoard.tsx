@@ -6,6 +6,7 @@ import DraggableItem from './DraggableItem'
 
 type Color = 'red' | 'yellow' | 'green'
 type Shape = 'circle' | 'square' | 'triangle'
+type CategoryMode = 'color' | 'shape' | 'both'
 
 interface Item {
   id: string
@@ -22,38 +23,90 @@ interface Category {
   accepts: (item: Item) => boolean
 }
 
+interface LevelConfig {
+  categoryMode: CategoryMode
+  itemIds: string[]
+  pointsPerCorrect: number
+  penaltyPerMistake: number
+  subtitle: string
+}
+
 interface GameBoardProps {
   onGameOver: (score: number, moves: number) => void
   onScoreChange: (score: number) => void
   onMovesChange: (moves: number) => void
+  level?: number
 }
 
-// Mockup: Level 1 แยกสีและรูปทรง (1 ด่าน = 1 ชุด)
-export default function GameBoard({ onGameOver, onScoreChange, onMovesChange }: GameBoardProps) {
-  const categories: Category[] = useMemo(
-    () => [
-      { id: 'color:red', title: 'สีแดง', accepts: item => item.color === 'red' },
-      { id: 'color:yellow', title: 'สีเหลือง', accepts: item => item.color === 'yellow' },
-      { id: 'color:green', title: 'สีเขียว', accepts: item => item.color === 'green' },
+const ALL_ITEMS: Omit<Item, 'placedInCategoryId'>[] = [
+  { id: 'i1', label: 'แอปเปิลแดง (วงกลม)', emoji: '🍎', color: 'red', shape: 'circle' },
+  { id: 'i2', label: 'เลมอน (วงกลม)', emoji: '🍋', color: 'yellow', shape: 'circle' },
+  { id: 'i3', label: 'กีวี (วงกลม)', emoji: '🥝', color: 'green', shape: 'circle' },
+  { id: 'i4', label: 'สี่เหลี่ยมแดง', emoji: '🟥', color: 'red', shape: 'square' },
+  { id: 'i5', label: 'สี่เหลี่ยมเหลือง', emoji: '🟨', color: 'yellow', shape: 'square' },
+  { id: 'i6', label: 'สามเหลี่ยมเขียว', emoji: '🔺', color: 'green', shape: 'triangle' },
+]
 
-      { id: 'shape:circle', title: 'วงกลม', accepts: item => item.shape === 'circle' },
-      { id: 'shape:square', title: 'สี่เหลี่ยม', accepts: item => item.shape === 'square' },
-      { id: 'shape:triangle', title: 'สามเหลี่ยม', accepts: item => item.shape === 'triangle' }
-    ],
-    []
-  )
+// 14 level configs – levels 1-4 are reached from world sublevel navigation (subId 1-4).
+// Higher levels increase difficulty via more items, harder scoring, or both category modes.
+const LEVEL_CONFIGS: LevelConfig[] = [
+  // 1 – easy: color only, 3 items
+  { categoryMode: 'color', itemIds: ['i1','i2','i3'],         pointsPerCorrect: 50, penaltyPerMistake: 5,  subtitle: 'ด่าน 1: แยกสี (3 ชิ้น) — ลากของไปวางในกล่องสีที่ถูกต้อง' },
+  // 2 – easy: shape only, 3 items
+  { categoryMode: 'shape', itemIds: ['i1','i4','i6'],         pointsPerCorrect: 50, penaltyPerMistake: 5,  subtitle: 'ด่าน 2: แยกรูปทรง (3 ชิ้น) — ลากของไปวางในกล่องรูปทรงที่ถูกต้อง' },
+  // 3 – medium: color only, all 6 items
+  { categoryMode: 'color', itemIds: ['i1','i2','i3','i4','i5','i6'], pointsPerCorrect: 50, penaltyPerMistake: 10, subtitle: 'ด่าน 3: แยกสี (6 ชิ้น) — ระวังโทษ!' },
+  // 4 – medium: shape only, all 6 items
+  { categoryMode: 'shape', itemIds: ['i1','i2','i3','i4','i5','i6'], pointsPerCorrect: 50, penaltyPerMistake: 10, subtitle: 'ด่าน 4: แยกรูปทรง (6 ชิ้น) — ระวังโทษ!' },
+  // 5 – medium: both modes, 4 items
+  { categoryMode: 'both',  itemIds: ['i1','i2','i4','i6'],    pointsPerCorrect: 40, penaltyPerMistake: 10, subtitle: 'ด่าน 5: แยกสีและรูปทรง (4 ชิ้น)' },
+  // 6 – medium: both modes, all 6 items
+  { categoryMode: 'both',  itemIds: ['i1','i2','i3','i4','i5','i6'], pointsPerCorrect: 40, penaltyPerMistake: 15, subtitle: 'ด่าน 6: แยกสีและรูปทรง (6 ชิ้น)' },
+  // 7 – hard: color only, penalty increases
+  { categoryMode: 'color', itemIds: ['i1','i2','i3','i4','i5','i6'], pointsPerCorrect: 30, penaltyPerMistake: 20, subtitle: 'ด่าน 7: แยกสี — โหมดยาก' },
+  // 8 – hard: shape only
+  { categoryMode: 'shape', itemIds: ['i1','i2','i3','i4','i5','i6'], pointsPerCorrect: 30, penaltyPerMistake: 20, subtitle: 'ด่าน 8: แยกรูปทรง — โหมดยาก' },
+  // 9 – hard: both modes
+  { categoryMode: 'both',  itemIds: ['i1','i2','i3','i4','i5','i6'], pointsPerCorrect: 30, penaltyPerMistake: 20, subtitle: 'ด่าน 9: แยกสีและรูปทรง — โหมดยาก' },
+  // 10 – very hard: both modes, high penalty
+  { categoryMode: 'both',  itemIds: ['i1','i2','i3','i4','i5','i6'], pointsPerCorrect: 20, penaltyPerMistake: 25, subtitle: 'ด่าน 10: ผู้เชี่ยวชาญ — โทษสูง' },
+  // 11 – expert: color, very high penalty
+  { categoryMode: 'color', itemIds: ['i1','i2','i3','i4','i5','i6'], pointsPerCorrect: 20, penaltyPerMistake: 30, subtitle: 'ด่าน 11: ผู้เชี่ยวชาญ — แยกสี' },
+  // 12 – expert: shape, very high penalty
+  { categoryMode: 'shape', itemIds: ['i1','i2','i3','i4','i5','i6'], pointsPerCorrect: 20, penaltyPerMistake: 30, subtitle: 'ด่าน 12: ผู้เชี่ยวชาญ — แยกรูปทรง' },
+  // 13 – master: both, near-max penalty
+  { categoryMode: 'both',  itemIds: ['i1','i2','i3','i4','i5','i6'], pointsPerCorrect: 15, penaltyPerMistake: 35, subtitle: 'ด่าน 13: มาสเตอร์' },
+  // 14 – grandmaster: both, max penalty
+  { categoryMode: 'both',  itemIds: ['i1','i2','i3','i4','i5','i6'], pointsPerCorrect: 10, penaltyPerMistake: 40, subtitle: 'ด่าน 14: แกรนด์มาสเตอร์' },
+]
+
+function getLevelConfig(level: number): LevelConfig {
+  const idx = Math.max(1, Math.min(14, level)) - 1
+  return LEVEL_CONFIGS[idx]
+}
+
+export default function GameBoard({ onGameOver, onScoreChange, onMovesChange, level = 1 }: GameBoardProps) {
+  const config = useMemo(() => getLevelConfig(level), [level])
+
+  const categories: Category[] = useMemo(() => {
+    const colorCats: Category[] = [
+      { id: 'color:red',    title: 'สีแดง',    accepts: item => item.color === 'red' },
+      { id: 'color:yellow', title: 'สีเหลือง', accepts: item => item.color === 'yellow' },
+      { id: 'color:green',  title: 'สีเขียว',  accepts: item => item.color === 'green' },
+    ]
+    const shapeCats: Category[] = [
+      { id: 'shape:circle',   title: 'วงกลม',     accepts: item => item.shape === 'circle' },
+      { id: 'shape:square',   title: 'สี่เหลี่ยม', accepts: item => item.shape === 'square' },
+      { id: 'shape:triangle', title: 'สามเหลี่ยม', accepts: item => item.shape === 'triangle' },
+    ]
+    if (config.categoryMode === 'color') return colorCats
+    if (config.categoryMode === 'shape') return shapeCats
+    return [...colorCats, ...shapeCats]
+  }, [config])
 
   const initialItems: Item[] = useMemo(
-    () =>
-      ([
-        { id: 'i1', label: 'แอปเปิลแดง (วงกลม)', emoji: '🍎', color: 'red', shape: 'circle' },
-        { id: 'i2', label: 'เลมอน (วงกลม)', emoji: '🍋', color: 'yellow', shape: 'circle' },
-        { id: 'i3', label: 'กีวี (วงกลม)', emoji: '🥝', color: 'green', shape: 'circle' },
-        { id: 'i4', label: 'สี่เหลี่ยมแดง', emoji: '🟥', color: 'red', shape: 'square' },
-        { id: 'i5', label: 'สี่เหลี่ยมเหลือง', emoji: '🟨', color: 'yellow', shape: 'square' },
-        { id: 'i6', label: 'สามเหลี่ยมเขียว', emoji: '🔺', color: 'green', shape: 'triangle' }
-      ] as const).map(i => ({ ...i })) as Item[],
-    []
+    () => ALL_ITEMS.filter(i => config.itemIds.includes(i.id)).map(i => ({ ...i })),
+    [config]
   )
 
   const [items, setItems] = useState<Item[]>([])
@@ -63,7 +116,7 @@ export default function GameBoard({ onGameOver, onScoreChange, onMovesChange }: 
   useEffect(() => {
     initializeGame()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [initialItems])
 
   const initializeGame = () => {
     setItems(initialItems.map(i => ({ ...i, placedInCategoryId: undefined })))
@@ -94,7 +147,7 @@ export default function GameBoard({ onGameOver, onScoreChange, onMovesChange }: 
       )
     )
 
-    const nextScore = Math.max(0, score + (isCorrect ? 50 : -10))
+    const nextScore = Math.max(0, score + (isCorrect ? config.pointsPerCorrect : -config.penaltyPerMistake))
     setScore(nextScore)
     onScoreChange(nextScore)
 
@@ -114,7 +167,7 @@ export default function GameBoard({ onGameOver, onScoreChange, onMovesChange }: 
     <div className="topbar">
       <div className="instructions">
         <div className="title">เกมแยกสิ่งของ (Management Mode)</div>
-        <div className="subtitle">ด่าน 1: แยก “สี” และ “รูปทรง” — ลากของไปวางในกล่องที่ถูกต้อง</div>
+        <div className="subtitle">{config.subtitle}</div>
       </div>
 
       <div className="stats">
