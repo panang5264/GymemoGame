@@ -68,7 +68,11 @@ export default function SubLevelPage({
     setModalOpen(false)
     router.back()
   }
-
+  const handlePlayNoKey = () => {
+    setModalOpen(false)
+    
+    router.replace(getMinigameUrl(villageId, subLevelId))
+  }
   return (
     <div className="game-page">
       <div className="dc-card">
@@ -79,6 +83,7 @@ export default function SubLevelPage({
         keysLeft={keysLeft}
         onCancel={handleCancel}
         onConfirm={handleConfirm}
+        onPlay={handlePlayNoKey} 
       />
     </div>
   )

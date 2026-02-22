@@ -9,6 +9,7 @@ type Props = {
   title?: string
   onCancel: () => void
   onConfirm: () => void
+  onPlay?: () => void // เพิ่ม: เล่นแบบไม่ใช้กุญแจ
 }
 
 export default function ConfirmUseKeyModal({
@@ -18,6 +19,7 @@ export default function ConfirmUseKeyModal({
   title = 'ใช้กุญแจเพื่อเริ่มเล่น?',
   onCancel,
   onConfirm,
+  onPlay,
 }: Props) {
   useEffect(() => {
     if (!open) return
@@ -38,7 +40,6 @@ export default function ConfirmUseKeyModal({
       aria-modal="true"
       aria-label="Confirm use key"
       onMouseDown={(e) => {
-        // click outside to close
         if (e.target === e.currentTarget) onCancel()
       }}
       style={{
@@ -59,10 +60,21 @@ export default function ConfirmUseKeyModal({
           borderRadius: 18,
           padding: 16,
           boxShadow: '0 14px 0 rgba(27,27,27,0.12)',
+          color: '#111',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-          <h3 style={{ margin: 0, fontWeight: 900 }}>{title}</h3>
+          <h3
+            style={{
+              margin: 0,
+              fontWeight: 1000,
+              letterSpacing: 0.2,
+              color: '#0F0F0F',
+              textShadow: '0 1px 0 rgba(255,255,255,0.65)', // ทำให้หัวข้อคมขึ้น
+            }}
+          >
+            {title}
+          </h3>
           <button
             onClick={onCancel}
             style={{
@@ -72,6 +84,7 @@ export default function ConfirmUseKeyModal({
               padding: '6px 10px',
               cursor: 'pointer',
               fontWeight: 900,
+              color: '#111',
             }}
             aria-label="Close"
           >
@@ -79,9 +92,13 @@ export default function ConfirmUseKeyModal({
           </button>
         </div>
 
-        <div style={{ marginTop: 12, fontWeight: 800, lineHeight: 1.5 }}>
-          <div>ต้องใช้กุญแจ: <b>{cost}</b> ดอก</div>
-          <div>กุญแจคงเหลือ: <b>{keysLeft}</b> ดอก</div>
+        <div style={{ marginTop: 12, fontWeight: 800, lineHeight: 1.5, color: '#1a1a1a' }}>
+          <div>
+            ต้องใช้กุญแจ: <b style={{ color: '#000' }}>{cost}</b> ดอก
+          </div>
+          <div>
+            กุญแจคงเหลือ: <b style={{ color: '#000' }}>{keysLeft}</b> ดอก
+          </div>
         </div>
 
         {!canPay ? (
@@ -91,8 +108,9 @@ export default function ConfirmUseKeyModal({
               padding: 10,
               borderRadius: 12,
               border: '2px dashed #1b1b1b',
-              background: 'rgba(255,255,255,0.65)',
+              background: 'rgba(255,255,255,0.75)',
               fontWeight: 900,
+              color: '#111',
             }}
           >
             กุญแจไม่พอ กรุณารอให้ฟื้นฟู
@@ -109,10 +127,29 @@ export default function ConfirmUseKeyModal({
               padding: '10px 14px',
               cursor: 'pointer',
               fontWeight: 900,
+              color: '#111',
             }}
           >
             ยกเลิก
           </button>
+
+          {/* เพิ่มปุ่ม "เล่น" (ไม่ใช้กุญแจ) */}
+          {onPlay ? (
+            <button
+              onClick={onPlay}
+              style={{
+                border: '2px solid #1b1b1b',
+                background: '#FFD34D', // สีเหลืองให้เป็นทางเลือกที่เด่นแต่ไม่เท่าปุ่มหลัก
+                borderRadius: 14,
+                padding: '10px 14px',
+                cursor: 'pointer',
+                fontWeight: 1000,
+                color: '#111',
+              }}
+            >
+              เล่น (ไม่ใช้กุญแจ)
+            </button>
+          ) : null}
 
           <button
             onClick={() => {
@@ -126,7 +163,9 @@ export default function ConfirmUseKeyModal({
               borderRadius: 14,
               padding: '10px 14px',
               cursor: canPay ? 'pointer' : 'not-allowed',
-              fontWeight: 900,
+              fontWeight: 1000,
+              color: canPay ? '#111' : '#666', // ให้ตัวอักษรชัด
+              textShadow: canPay ? '0 1px 0 rgba(255,255,255,0.25)' : 'none',
             }}
           >
             กดใช้กุญแจ ({cost})
