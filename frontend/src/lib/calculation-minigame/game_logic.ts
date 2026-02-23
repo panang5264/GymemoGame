@@ -24,15 +24,22 @@ const operatorImages: Operator[] = [
   { name: "-", path: path_to_dice + "minus.png" },
 ]
 
-export function RandomValue(): [Dice, Dice] {
+export function RandomDice(): [Dice, Dice] {
   const val1 = diceImages[Math.floor(Math.random() * diceImages.length)]
   const val2 = diceImages[Math.floor(Math.random() * diceImages.length)]
+  return [val1, val2]
+}
+
+export function RandomValue(maxNumber: number): [number, number] {
+  const val1 = Math.floor(Math.random() * maxNumber)
+  const val2 = Math.floor(Math.random() * maxNumber)
   return [val1, val2]
 }
 
 export function RandomOperator(): Operator {
   return operatorImages[Math.floor(Math.random() * operatorImages.length)]
 }
+
 
 export function Calculate(answer: number, val1: number, val2: number, operator_name: string): boolean {
   console.log(operator_name)
@@ -46,4 +53,8 @@ export function Calculate(answer: number, val1: number, val2: number, operator_n
     default:
       return false
   }
+}
+
+export function Calculate3Value(): boolean {
+  return false
 }

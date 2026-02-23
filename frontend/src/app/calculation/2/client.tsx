@@ -1,16 +1,14 @@
 'use client'
-
-import Image from 'next/image'
 import react from 'react'
 import * as game from '@/lib/calculation-minigame/game_logic'
 import Timer from '@/components/Timer'
 
 type Props = {
-  val1: game.Dice,
-  val2: game.Dice,
+  val1: number,
+  val2: number,
+  maxNumber: number,
   operator: game.Operator,
 }
-
 export default function ClientPage(props: Props) {
   const [val1, setVal1] = react.useState(props.val1)
   const [val2, setVal2] = react.useState(props.val2)
@@ -19,18 +17,21 @@ export default function ClientPage(props: Props) {
   const [answerResult, setAnswerResult] = react.useState<boolean | null>(null)
   const [isTimeUp, setIsTimeUp] = react.useState(false)
   const [isRunning, setIsRunning] = react.useState(true)
-
+  const handleTimeUp = () => {
+    setIsTimeUp(true)
+    setIsRunning(false)
+  }
   const showMessage = function() {
     if (answerResult === null) return;
     return answerResult ? "✅ ถูกต้อง" : "❌ ไม่ถูกต้อง"
   }
   const handleClick = function(answer: number) {
-    const result = game.Calculate(answer, val1.value, val2.value, operator.name)
+    const result = game.Calculate(answer, val1, val2, operator.name)
     setAnswerResult(result)
 
     // สุ่มโจทย์ใหม่และรีเซ็ตคำตอบ
     setTimeout(() => {
-      const [newVal1, newVal2] = game.RandomDice()
+      const [newVal1, newVal2] = game.RandomValue(props.maxNumber)
       const newOperator = game.RandomOperator()
       setVal1(newVal1)
       setVal2(newVal2)
@@ -38,10 +39,6 @@ export default function ClientPage(props: Props) {
       setAnswer("")
       setAnswerResult(null)
     }, 1000) // รอ 1 วินาทีเพื่อให้เห็นผลลัพธ์ก่อนสุ่มใหม่
-  }
-  const handleTimeUp = () => {
-    setIsTimeUp(true)
-    setIsRunning(false)
   }
   return (
     <div>
@@ -53,25 +50,8 @@ export default function ClientPage(props: Props) {
           <p className='text-red-500 font-bold text-xl'>⏰ หมดเวลา! ไม่สามารถเลือกได้แล้ว</p>
         </div>
       )}
-      <div className='flex justify-center justify-items-center grid grid-cols-3'>
-        <Image
-          src={val1.path}
-          width={150}
-          height={150}
-          alt={''}
-        />
-        <Image
-          src={operator.path}
-          width={150}
-          height={150}
-          alt={''}
-        />
-        <Image
-          src={val2.path}
-          width={150}
-          height={150}
-          alt={''}
-        />
+      <div className='game-title flex justify-center'>
+        {val1} {operator.name} {val2}
       </div>
       <div className='flex justify-center mt-20'>
         <label className='game-title'>
