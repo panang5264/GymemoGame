@@ -13,7 +13,10 @@ export default function Timer({ isRunning, initialSeconds = 60, onTimeUp }: Time
 
   useEffect(() => {
     if (!isRunning) {
-      setSeconds(initialSeconds)
+      // ไม่ reset ถ้าเวลาเป็น 0 (หมดเวลาแล้ว)
+      if (seconds !== 0) {
+        setSeconds(initialSeconds)
+      }
       return
     }
 
@@ -25,7 +28,7 @@ export default function Timer({ isRunning, initialSeconds = 60, onTimeUp }: Time
     const interval = setInterval(() => {
       setSeconds(prev => {
         if (prev <= 1) {
-          onTimeUp?.()
+          // onTimeUp?.()
           return 0
         }
         return prev - 1

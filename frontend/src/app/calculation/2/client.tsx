@@ -17,9 +17,10 @@ export default function ClientPage(props: Props) {
   const [answerResult, setAnswerResult] = react.useState<boolean | null>(null)
   const [isTimeUp, setIsTimeUp] = react.useState(false)
   const [isRunning, setIsRunning] = react.useState(true)
+
   const handleTimeUp = () => {
-    setIsTimeUp(true)
     setIsRunning(false)
+    setIsTimeUp(true)
   }
   const showMessage = function() {
     if (answerResult === null) return;
