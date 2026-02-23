@@ -58,6 +58,15 @@ export function RandomOperator(): Operator {
   return operatorImages[Math.floor(Math.random() * operatorImages.length)]
 }
 
+// NOTE: For calculation type 4
+export function CheckMissingValue(answer: number, actual_value: Operand): boolean {
+  if (typeof actual_value === "number") {
+    return answer === actual_value
+  } else {
+    return answer === actual_value.value
+  }
+}
+
 
 export function Calculate(answer: number, val1: number, val2: number, operator_name: string): boolean {
   console.log(operator_name)
@@ -73,20 +82,26 @@ export function Calculate(answer: number, val1: number, val2: number, operator_n
   }
 }
 
-export function CalculateMultiple(answer: number, operand: Operand[], operators: Operator[]): boolean {
-  if (operators.length !== operand.length - 1) {
+type CalculateParams = {
+  answer?: number
+  operands: Operand[]
+  operators: Operator[]
+}
+
+export function CalculateMultiple({ answer, operands, operators }: CalculateParams): [boolean, number] {
+  if (operators.length !== operands.length - 1) {
     throw new Error("Invalid expression")
   }
 
   let result = 0
-  if (typeof operand[0] === "number") {
-    result = operand[0]
+  if (typeof operands[0] === "number") {
+    result = operands[0]
   } else {
-    result = operand[0].value
+    result = operands[0].value
   }
 
-  for (let i = 1; i < operand.length; i++) {
-    const value = operand[i]
+  for (let i = 1; i < operands.length; i++) {
+    const value = operands[i]
     const operator = operators[i - 1]
     if (typeof value === "number") {
       result = operate(result, value, operator)
@@ -94,7 +109,7 @@ export function CalculateMultiple(answer: number, operand: Operand[], operators:
       result = operate(result, value.value, operator)
     }
   }
-  return answer === result
+  return [answer === result, result]
 }
 
 function operate(a: number, b: number, operator: Operator): number {

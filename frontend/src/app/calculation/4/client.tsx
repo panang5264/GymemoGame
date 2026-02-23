@@ -10,21 +10,31 @@ type Props = {
   maxNumber: number
   max_value: number
   max_operator: number
+  real_result: number
+  hide_index: number
 }
 export default function ClientPage(props: Props) {
   const [values, setValues] = react.useState(props.values)
   const [operators, setOperator] = react.useState(props.operators)
+  const [realResult, setRealResult] = react.useState(props.real_result)
+  const [hideIndex, setHideIndex] = react.useState(props.hide_index)
   const [answer, setAnswer] = react.useState("")
   const [answerResult, setAnswerResult] = react.useState<boolean | null>(null)
   const [isTimeUp, setIsTimeUp] = react.useState(false)
   const [isRunning, setIsRunning] = react.useState(true)
+
+  // สุ่ม hide_index เมื่อ values เปลี่ยน
+  react.useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * values.length)
+    setHideIndex(randomIndex)
+  }, [values])
 
   const showMessage = function() {
     if (answerResult === null) return;
     return answerResult ? "✅ ถูกต้อง" : "❌ ไม่ถูกต้อง"
   }
   const handleClick = function(answer: number) {
-    const [result] = game.CalculateMultiple({answer:answer, operands:values, operators:operators})
+    const result = game.CheckMissingValue(answer, values[hideIndex])
     setAnswerResult(result)
 
     // สุ่มโจทย์ใหม่และรีเซ็ตคำตอบ
@@ -38,8 +48,12 @@ export default function ClientPage(props: Props) {
       for (let i = 0; i < props.max_operator; i++) {
         operator.push(game.RandomOperator())
       }
+      const [_, calculated] = game.CalculateMultiple({ operands: v, operators: operator })
       setValues(v)
       setOperator(operator)
+      setRealResult(calculated)
+      const randomIndex = Math.floor(Math.random() * v.length)
+      setHideIndex(randomIndex)
       setAnswer("")
       setAnswerResult(null)
     }, 1000) // รอ 1 วินาทีเพื่อให้เห็นผลลัพธ์ก่อนสุ่มใหม่
@@ -61,16 +75,20 @@ export default function ClientPage(props: Props) {
       <div className='flex justify-center justify-items-center gap-4 mt-10'>
         {values.map((value, index) => (
           <react.Fragment key={index}>
-            {typeof value === 'number' ? (
+            {index === hideIndex ? (
+              <div className='text-4xl font-bold border-2 border-black p-2 rounded'>
+                ?
+              </div>
+            ) : typeof value === 'number' ? (
               <div className='game-title'>
                 {value}
               </div>
             ) : (
               <Image
                 src={value.path}
-                width={75}
+                width={50}
                 height={50}
-                style={{width:'auto', height: 'auto' }}
+                style={{ height: 'auto' }}
                 alt={value.name}
               />
             )}
@@ -81,6 +99,9 @@ export default function ClientPage(props: Props) {
             )}
           </react.Fragment>
         ))}
+        <div className='game-title'>
+          = {realResult}
+        </div>
       </div>
       <div className='flex justify-center mt-20'>
         <label className='game-title'>
@@ -90,8 +111,8 @@ export default function ClientPage(props: Props) {
             value={answer}
             disabled={isTimeUp}
             onKeyDown={
-              (event)=>{
-                if(event.key === 'Enter') {
+              (event) => {
+                if (event.key === 'Enter') {
                   if (isTimeUp) return
                   const parsed = Number(answer)
                   if (isNaN(parsed)) return
@@ -111,8 +132,8 @@ export default function ClientPage(props: Props) {
               handleClick(parsed)
             }}
             onKeyDown={
-              (event)=>{
-                if(event.key === 'Enter') {
+              (event) => {
+                if (event.key === 'Enter') {
                   if (isTimeUp) return
                   const parsed = Number(answer)
                   if (isNaN(parsed)) return
@@ -130,6 +151,5 @@ export default function ClientPage(props: Props) {
         {showMessage()}
       </div>
     </div>
-
   )
 }
