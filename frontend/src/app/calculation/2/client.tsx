@@ -72,6 +72,17 @@ export default function ClientPage(props: Props) {
               if (isNaN(parsed)) return
               handleClick(parsed)
             }}
+
+            onKeyDown={
+              (event) => {
+                if (event.key === 'Enter') {
+                  if (isTimeUp) return
+                  const parsed = Number(answer)
+                  if (isNaN(parsed)) return
+                  handleClick(parsed)
+                }
+              }
+            }
             style={{ opacity: isTimeUp ? 0.5 : 1, cursor: isTimeUp ? 'not-allowed' : 'pointer' }}
           >
             Yes

@@ -1,20 +1,19 @@
 'use client'
-
 import Image from 'next/image'
-import react from 'react'
 import * as game from '@/lib/calculation-minigame/game_logic'
-import Timer from '@/components/Timer'
+import * as react from 'react'
+import Timer from "@/components/Timer"
 
 type Props = {
-  val1: game.Dice,
-  val2: game.Dice,
-  operator: game.Operator,
+  values: game.Operand[]
+  operators: game.Operator[]
+  maxNumber: number
+  max_value: number
+  max_operator: number
 }
-
 export default function ClientPage(props: Props) {
-  const [val1, setVal1] = react.useState(props.val1)
-  const [val2, setVal2] = react.useState(props.val2)
-  const [operator, setOeprator] = react.useState(props.operator)
+  const [values, setValues] = react.useState(props.values)
+  const [operators, setOperator] = react.useState(props.operators)
   const [answer, setAnswer] = react.useState("")
   const [answerResult, setAnswerResult] = react.useState<boolean | null>(null)
   const [isTimeUp, setIsTimeUp] = react.useState(false)
@@ -25,16 +24,22 @@ export default function ClientPage(props: Props) {
     return answerResult ? "✅ ถูกต้อง" : "❌ ไม่ถูกต้อง"
   }
   const handleClick = function(answer: number) {
-    const result = game.Calculate(answer, val1.value, val2.value, operator.name)
+    const result = game.CalculateMultiple(answer, values, operators)
     setAnswerResult(result)
 
     // สุ่มโจทย์ใหม่และรีเซ็ตคำตอบ
     setTimeout(() => {
-      const [newVal1, newVal2] = game.RandomDice()
-      const newOperator = game.RandomOperator()
-      setVal1(newVal1)
-      setVal2(newVal2)
-      setOeprator(newOperator)
+      const v = []
+      const operator = []
+      for (let i = 0; i < props.max_value; i++) {
+        v.push(game.Random(props.maxNumber))
+      }
+
+      for (let i = 0; i < props.max_operator; i++) {
+        operator.push(game.RandomOperator())
+      }
+      setValues(v)
+      setOperator(operator)
       setAnswer("")
       setAnswerResult(null)
     }, 1000) // รอ 1 วินาทีเพื่อให้เห็นผลลัพธ์ก่อนสุ่มใหม่
@@ -53,25 +58,29 @@ export default function ClientPage(props: Props) {
           <p className='text-red-500 font-bold text-xl'>⏰ หมดเวลา! ไม่สามารถเลือกได้แล้ว</p>
         </div>
       )}
-      <div className='flex justify-center justify-items-center grid grid-cols-3'>
-        <Image
-          src={val1.path}
-          width={150}
-          height={150}
-          alt={''}
-        />
-        <Image
-          src={operator.path}
-          width={150}
-          height={150}
-          alt={''}
-        />
-        <Image
-          src={val2.path}
-          width={150}
-          height={150}
-          alt={''}
-        />
+      <div className='flex justify-center justify-items-center gap-4 mt-10'>
+        {values.map((value, index) => (
+          <react.Fragment key={index}>
+            {typeof value === 'number' ? (
+              <div className='game-title'>
+                {value}
+              </div>
+            ) : (
+              <Image
+                src={value.path}
+                width={75}
+                height={50}
+                style={{width:'auto', height: 'auto' }}
+                alt={value.name}
+              />
+            )}
+            {index < operators.length && (
+              <div className='game-title'>
+                {operators[index].name}
+              </div>
+            )}
+          </react.Fragment>
+        ))}
       </div>
       <div className='flex justify-center mt-20'>
         <label className='game-title'>
@@ -92,8 +101,8 @@ export default function ClientPage(props: Props) {
               handleClick(parsed)
             }}
             onKeyDown={
-              (event) => {
-                if (event.key === 'Enter') {
+              (event)=>{
+                if(event.key === 'Enter') {
                   if (isTimeUp) return
                   const parsed = Number(answer)
                   if (isNaN(parsed)) return
@@ -111,5 +120,6 @@ export default function ClientPage(props: Props) {
         {showMessage()}
       </div>
     </div>
+
   )
 }

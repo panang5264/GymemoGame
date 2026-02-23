@@ -24,6 +24,24 @@ const operatorImages: Operator[] = [
   { name: "-", path: path_to_dice + "minus.png" },
 ]
 
+export type Operand = Dice | number
+
+export function Random(maxNumber: number): Operand {
+  const types = ["d", "n"]
+  const type = types[Math.floor(Math.random() * types.length)]
+  let value: Operand = 0
+  switch (type) {
+    case "d":
+      value = diceImages[Math.floor(Math.random() * diceImages.length)]
+      return value
+    case "n":
+      value = Math.floor(Math.random() * maxNumber)
+      return value
+    default:
+      return 0
+  }
+}
+
 export function RandomDice(): [Dice, Dice] {
   const val1 = diceImages[Math.floor(Math.random() * diceImages.length)]
   const val2 = diceImages[Math.floor(Math.random() * diceImages.length)]
@@ -55,6 +73,41 @@ export function Calculate(answer: number, val1: number, val2: number, operator_n
   }
 }
 
-export function Calculate3Value(): boolean {
-  return false
+export function CalculateMultiple(answer: number, operand: Operand[], operators: Operator[]): boolean {
+  if (operators.length !== operand.length - 1) {
+    throw new Error("Invalid expression")
+  }
+
+  let result = 0
+  if (typeof operand[0] === "number") {
+    result = operand[0]
+  } else {
+    result = operand[0].value
+  }
+
+  for (let i = 1; i < operand.length; i++) {
+    const value = operand[i]
+    const operator = operators[i - 1]
+    if (typeof value === "number") {
+      result = operate(result, value, operator)
+    } else {
+      result = operate(result, value.value, operator)
+    }
+  }
+  return answer === result
+}
+
+function operate(a: number, b: number, operator: Operator): number {
+  let result = 0
+  switch (operator.name) {
+    case "+":
+      result = a + b
+      break;
+    case "-":
+      result = a - b
+      break;
+    default:
+      throw new Error("Invalid Operator or Doesn't add to operate function")
+  }
+  return result;
 }
