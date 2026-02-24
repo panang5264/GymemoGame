@@ -61,7 +61,7 @@ function CalculationGameInner() {
 
   // ── Start game ────────────────────────────────────────────────────────────
   const startGame = useCallback(() => {
-    const q = level.generate_problem(level.maxNumber)
+    const q = level.generate_problem()
     setQuestion(q)
     setScore(0)
     setTotal(0)
@@ -85,7 +85,7 @@ function CalculationGameInner() {
     const parsed = Number(answer)
     if (Number.isNaN(parsed)) return
 
-    const correct = parsed === question.result
+    const correct = parsed === question.expect_result
     setLastCorrect(correct)
     setScore(s => s + (correct ? 1 : 0))
     setTotal(t => t + 1)
@@ -93,7 +93,7 @@ function CalculationGameInner() {
     setTimeout(() => {
       setLastCorrect(null)
       setAnswer('')
-      setQuestion(level.generate_problem(level.maxNumber))
+      setQuestion(level.generate_problem())
     }, 400)
   }, [answer, isTimeUp, level, question])
 
@@ -154,24 +154,96 @@ function CalculationGameInner() {
             </div>
           )}
           <div className="dc-calc-question" style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            {question.operands.map((value, index) => (
-              <span key={`op-${index}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}>
-                {typeof value === 'number' ? (
-                  <span className="game-title">{value}</span>
+            {level.level === 8 ? (
+              <>
+                {typeof question.operands[0] === 'number' ? (
+                  <span className="game-title">{question.operands[0]}</span>
                 ) : (
                   <Image
-                    src={value.path}
+                    src={question.operands[0].path}
                     width={75}
                     height={50}
                     style={{ width: 'auto', height: 'auto' }}
-                    alt={value.name}
+                    alt={question.operands[0].name}
                   />
                 )}
-                {index < question.operators.length && (
-                  <span className="game-title">{question.operators[index].name}</span>
+                <span className="game-title">{question.operators[0].name}</span>
+                <span className="game-title">?</span>
+                <span className="game-title">=</span>
+                {typeof question.operands[1] === 'number' ? (
+                  <span className="game-title">{question.operands[1]}</span>
+                ) : (
+                  <Image
+                    src={question.operands[1].path}
+                    width={75}
+                    height={50}
+                    style={{ width: 'auto', height: 'auto' }}
+                    alt={question.operands[1].name}
+                  />
                 )}
-              </span>
-            ))}
+              </>
+            ) : level.level === 9 ? (
+              <>
+                {typeof question.operands[0] === 'number' ? (
+                  <span className="game-title">{question.operands[0]}</span>
+                ) : (
+                  <Image
+                    src={question.operands[0].path}
+                    width={75}
+                    height={50}
+                    style={{ width: 'auto', height: 'auto' }}
+                    alt={question.operands[0].name}
+                  />
+                )}
+                <span className="game-title">{question.operators[0].name}</span>
+                <span className="game-title">?</span>
+                <span className="game-title">{question.operators[1].name}</span>
+                {typeof question.operands[1] === 'number' ? (
+                  <span className="game-title">{question.operands[1]}</span>
+                ) : (
+                  <Image
+                    src={question.operands[1].path}
+                    width={75}
+                    height={50}
+                    style={{ width: 'auto', height: 'auto' }}
+                    alt={question.operands[1].name}
+                  />
+                )}
+                <span className="game-title">=</span>
+                {typeof question.operands[2] === 'number' ? (
+                  <span className="game-title">{question.operands[2]}</span>
+                ) : (
+                  <Image
+                    src={question.operands[2].path}
+                    width={75}
+                    height={50}
+                    style={{ width: 'auto', height: 'auto' }}
+                    alt={question.operands[2].name}
+                  />
+                )}
+              </>
+            ) : (
+              question.operands.map((value, index) => (
+                <span key={`op-${index}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}>
+                  {level.level === 10 && question.messing_index === index ? (
+                    <span className="game-title">🤡</span>
+                  ) : typeof value === 'number' ? (
+                    <span className="game-title">{value}</span>
+                  ) : (
+                    <Image
+                      src={value.path}
+                      width={75}
+                      height={50}
+                      style={{ width: 'auto', height: 'auto' }}
+                      alt={value.name}
+                    />
+                  )}
+                  {index < question.operators.length && (
+                    <span className="game-title">{question.operators[index].name}</span>
+                  )}
+                </span>
+              ))
+            )}
           </div>
           {lastCorrect !== null && (
             <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: lastCorrect ? '#4ade80' : '#f87171' }}>

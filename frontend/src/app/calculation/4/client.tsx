@@ -48,7 +48,7 @@ export default function ClientPage(props: Props) {
       for (let i = 0; i < props.max_operator; i++) {
         operator.push(game.RandomOperator())
       }
-      const [_, calculated] = game.Calculate({ operands: v, operators: operator })
+      const [calculated,_] = game.Calculate({ operands: v, operators: operator })
       setValues(v)
       setOperator(operator)
       setRealResult(calculated)

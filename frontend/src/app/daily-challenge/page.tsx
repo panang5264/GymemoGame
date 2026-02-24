@@ -52,7 +52,7 @@ function buildManagementRound() {
 // ─── Stage 2 – Calculation ───────────────────────────────────────────────────
 
 function buildCalcQuestion(): CalcQuestion {
-  return CALC_LEVELS[0].generate_problem(CALC_LEVELS[0].maxNumber)
+  return CALC_LEVELS[0].generate_problem()
 }
 
 // ─── Stage 3 – Spatial ───────────────────────────────────────────────────────
@@ -261,7 +261,7 @@ export default function DailyChallengePage() {
     const parsed = Number(calcAnswer)
     if (Number.isNaN(parsed)) return
 
-    const correct = parsed === calcQuestion.result
+    const correct = parsed === calcQuestion.expect_result
     setCalcLastCorrect(correct)
     setCalcScore(s => s + (correct ? 1 : 0))
     setCalcTotal(t => t + 1)
