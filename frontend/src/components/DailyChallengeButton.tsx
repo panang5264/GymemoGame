@@ -61,8 +61,8 @@ export default function DailyChallengeButton() {
             <p className="dc-home-progress-text">
               {village1Progress} / {VILLAGE1_TOTAL_LEVELS} ด่าน
             </p>
-            <Link href="/village" className="cta-button dc-home-btn">
-              🏡 เล่นหมู่บ้าน 1
+            <Link href="/world" className="cta-button dc-home-btn">
+              🗺️ ไปแผนที่โลก
             </Link>
           </>
         )}

@@ -6,7 +6,7 @@ export default function MinigamePage() {
       <h1>🎮 มินิเกม</h1>
       <ul>
         <li>
-          <Link href="/minigame/Management">📦 Management</Link>
+          <Link href="/minigame/management">📦 Management</Link>
         </li>
         <li>
           <Link href="/minigame/spatial">🗺️ Spatial – จับคู่ความสัมพันธ์</Link>

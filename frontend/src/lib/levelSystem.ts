@@ -1,6 +1,6 @@
 const STORAGE_KEY = 'gymemo_progress_v2'
 
-export const PLAYS_PER_VILLAGE = 126
+export const PLAYS_PER_VILLAGE = 12
 export const MAX_KEYS = 9
 export const REGEN_INTERVAL_MS = 30 * 60 * 1000
 
@@ -48,7 +48,7 @@ export function loadProgress(): GymemoProgressV2 {
       const parsed = JSON.parse(raw) as Partial<GymemoProgressV2>
       return { ...getDefaultProgress(), ...parsed }
     }
-  } catch {}
+  } catch { }
   return getDefaultProgress()
 }
 
