@@ -24,7 +24,7 @@ export default function ClientPage(props: Props) {
     return answerResult ? "✅ ถูกต้อง" : "❌ ไม่ถูกต้อง"
   }
   const handleClick = function(answer: number) {
-    const [result] = game.Calculate({ answer: answer, operands: values, operators: operators })
+    const [_,result] = game.Calculate({ answer: answer, operands: values, operators: operators })
     setAnswerResult(result)
 
     // สุ่มโจทย์ใหม่และรีเซ็ตคำตอบ

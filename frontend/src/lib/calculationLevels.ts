@@ -1,3 +1,4 @@
+import * as calGame from '@/lib/calculation-minigame/game_logic'
 /**
  * Calculation Mode – level configurations and question generation.
  *
@@ -55,18 +56,21 @@ function makeChoices(answer: number, rng: () => number, count = 4): number[] {
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface CalcQuestion {
-  expression: string
-  answer: number
-  choices: number[]
+  operands: calGame.Operand[]
+  operators: calGame.Operator[]
+  expect_result: number
+  messing_index?: number
 }
 
-export interface CalcLevel {
-  id: number
+export type CalcLevel = {
+  level: number
   /** Thai name shown in UI */
   name: string
   /** Short Thai description */
   description: string
-  generate(rng: () => number, count?: number): CalcQuestion[]
+  maxNumber: number
+  minNumber?: number
+  generate_problem(): CalcQuestion
 }
 
 // ─── Level definitions ────────────────────────────────────────────────────────
@@ -74,187 +78,239 @@ export interface CalcLevel {
 export const CALC_LEVELS: CalcLevel[] = [
   // ── Level 1: Add pips of 2 dice ────────────────────────────────────────────
   {
-    id: 1,
+    level: 1,
     name: 'บวกแต้มลูกเต๋า 2 ลูก',
     description: 'บวกแต้มจากลูกเต๋า 2 ลูก',
-    generate(rng, count = 4) {
-      return Array.from({ length: count }, () => {
-        const d1 = rollDice(rng)
-        const d2 = rollDice(rng)
-        const answer = d1.val + d2.val
-        return { expression: `${d1.face} + ${d2.face}`, answer, choices: makeChoices(answer, rng) }
-      })
+    maxNumber: 10,
+    generate_problem(): CalcQuestion {
+      const val1 = calGame.RandomDice()
+      const val2 = calGame.RandomDice()
+      const ope = calGame.GetOperator("+")
+      const [result, _] = calGame.Calculate({ operands: [val1, val2], operators: [ope] })
+      return {
+        operands: [val1, val2],
+        operators: [ope],
+        expect_result: result,
+      }
     },
   },
 
   // ── Level 2: Add/subtract single-digit numbers ─────────────────────────────
   {
-    id: 2,
+    level: 2,
     name: 'บวก/ลบเลขหลักเดียว',
     description: 'บวกหรือลบเลขหลักเดียว',
-    generate(rng, count = 4) {
-      return Array.from({ length: count }, () => {
-        const a = randInt(rng, 1, 9)
-        const b = randInt(rng, 1, 9)
-        const add = rng() > 0.5
-        const answer = add ? a + b : a - b
-        return { expression: `${a} ${add ? '+' : '-'} ${b}`, answer, choices: makeChoices(answer, rng) }
-      })
+    maxNumber: 10,
+    generate_problem(): CalcQuestion {
+      let val1 = 0
+      let val2 = 0
+      if (typeof this.maxNumber === "number") {
+        val1 = calGame.RandomValue(this.maxNumber)
+        val2 = calGame.RandomValue(this.maxNumber)
+      }
+      const ope = calGame.RandomOperator()
+      const [result, _] = calGame.Calculate({ operands: [val1, val2], operators: [ope] })
+      return {
+        operands: [val1, val2],
+        operators: [ope],
+        expect_result: result,
+      }
     },
   },
-
+  //
   // ── Level 3: Add three single-digit numbers ────────────────────────────────
   {
-    id: 3,
+    level: 3,
     name: 'บวกเลขหลักเดียว 3 จำนวน',
     description: 'บวกเลขหลักเดียว 3 จำนวนเข้าด้วยกัน',
-    generate(rng, count = 4) {
-      return Array.from({ length: count }, () => {
-        const a = randInt(rng, 1, 9)
-        const b = randInt(rng, 1, 9)
-        const c = randInt(rng, 1, 9)
-        const answer = a + b + c
-        return { expression: `${a} + ${b} + ${c}`, answer, choices: makeChoices(answer, rng) }
-      })
+    maxNumber: 10,
+    generate_problem(): CalcQuestion {
+      let val1 = 0
+      let val2 = 0
+      let val3 = 0
+      if (typeof this.maxNumber === "number") {
+        val1 = calGame.RandomValue(this.maxNumber)
+        val2 = calGame.RandomValue(this.maxNumber)
+        val3 = calGame.RandomValue(this.maxNumber)
+      }
+      const ope1 = calGame.GetOperator("+")
+      const ope2 = calGame.GetOperator("+")
+      const [result] = calGame.Calculate({ operands: [val1, val2, val3], operators: [ope1, ope2] })
+      return {
+        operands: [val1, val2, val3],
+        operators: [ope1, ope2],
+        expect_result: result,
+      }
     },
   },
-
+  //
   // ── Level 4: Dice + number ─────────────────────────────────────────────────
   {
-    id: 4,
+    level: 4,
     name: 'ลูกเต๋า + ตัวเลข',
     description: 'บวกหรือลบแต้มลูกเต๋ากับตัวเลข',
-    generate(rng, count = 4) {
-      return Array.from({ length: count }, () => {
-        const d = rollDice(rng)
-        const n = randInt(rng, 1, 9)
-        const add = rng() > 0.5
-        const answer = add ? d.val + n : d.val - n
-        return { expression: `${d.face} ${add ? '+' : '-'} ${n}`, answer, choices: makeChoices(answer, rng) }
-      })
+    maxNumber: 10,
+    generate_problem(): CalcQuestion {
+      var val1: calGame.Operand = 0
+      var val2: calGame.Operand = 0
+      if (typeof this.maxNumber === "number") {
+        val1 = calGame.Random(this.maxNumber)
+        if (typeof val1 === "number") {
+          val2 = calGame.RandomDice()
+        } else {
+          val2 = calGame.RandomValue(this.maxNumber)
+        }
+      }
+      const ope = calGame.RandomOperator()
+      const [result] = calGame.Calculate({ operands: [val1, val2], operators: [ope] })
+      return {
+        operands: [val1, val2],
+        operators: [ope],
+        expect_result: result
+      }
     },
   },
-
+  //
   // ── Level 5: Two-digit + one-digit with carry ──────────────────────────────
   {
-    id: 5,
+    level: 5,
     name: 'บวกสองหลัก + หนึ่งหลัก (มีทด)',
     description: 'เลขสองหลักบวกเลขหนึ่งหลัก (มีการทด)',
-    generate(rng, count = 4) {
-      return Array.from({ length: count }, () => {
-        const b = randInt(rng, 2, 9)
-        const onesA = randInt(rng, 10 - b, 9)   // guarantees carry
-        const tensA = randInt(rng, 1, 9)
-        const a = tensA * 10 + onesA
-        const answer = a + b
-        return { expression: `${a} + ${b}`, answer, choices: makeChoices(answer, rng) }
-      })
+    maxNumber: 20,
+    minNumber: 10,
+    generate_problem(): CalcQuestion {
+      let val1, val2 = 0
+      val1 = calGame.RandomValue(this.maxNumber, this.minNumber)
+      val2 = calGame.RandomValue(this.maxNumber, this.minNumber)
+      const ope = calGame.GetOperator("+")
+      const [result] = calGame.Calculate({ operands: [val1, val2], operators: [ope] })
+      return {
+        operands: [val1, val2],
+        operators: [ope],
+        expect_result: result
+      }
     },
   },
-
-  // ── Level 6: Two-digit − one-digit with borrowing ──────────────────────────
+  //
+  //   // ── Level 6: Two-digit − one-digit with borrowing ──────────────────────────
   {
-    id: 6,
+    level: 6,
     name: 'ลบสองหลัก − หนึ่งหลัก (มียืม)',
     description: 'เลขสองหลักลบเลขหนึ่งหลัก (มีการยืม)',
-    generate(rng, count = 4) {
-      return Array.from({ length: count }, () => {
-        const b = randInt(rng, 2, 9)
-        const onesA = randInt(rng, 1, b - 1)    // guarantees borrowing
-        const tensA = randInt(rng, 1, 9)
-        const a = tensA * 10 + onesA
-        const answer = a - b
-        return { expression: `${a} - ${b}`, answer, choices: makeChoices(answer, rng) }
-      })
+    maxNumber: 20,
+    minNumber: 10,
+    generate_problem(): CalcQuestion {
+      let val1, val2 = 0
+      val1 = calGame.RandomValue(this.maxNumber, this.minNumber)
+      if (this.minNumber === undefined) {
+        throw new Error("Please Define min value for Level 6")
+      }
+      val2 = calGame.RandomValue(this.minNumber)
+      const ope = calGame.GetOperator("-")
+      const [result] = calGame.Calculate({ operands: [val1, val2], operators: [ope] })
+      return {
+        operands: [val1, val2],
+        operators: [ope],
+        expect_result: result
+      }
     },
   },
-
+  //
   // ── Level 7: 3 dice mixed add/subtract ────────────────────────────────────
   {
-    id: 7,
+    level: 7,
     name: 'ลูกเต๋า 3 ลูก (บวก/ลบผสม)',
     description: 'บวกและลบแต้มจากลูกเต๋า 3 ลูก',
-    generate(rng, count = 4) {
-      return Array.from({ length: count }, () => {
-        const d1 = rollDice(rng)
-        const d2 = rollDice(rng)
-        const d3 = rollDice(rng)
-        const op = rng() > 0.5 ? '+' : '-'
-        const answer = d1.val + d2.val + (op === '+' ? d3.val : -d3.val)
-        return {
-          expression: `${d1.face} + ${d2.face} ${op} ${d3.face}`,
-          answer,
-          choices: makeChoices(answer, rng),
-        }
-      })
+    maxNumber: 10,
+    generate_problem(): CalcQuestion {
+      const val1 = calGame.RandomDice()
+      const val2 = calGame.RandomDice()
+      const val3 = calGame.RandomDice()
+      const ope1 = calGame.RandomOperator()
+      const ope2 = calGame.RandomOperator()
+      const [result] = calGame.Calculate({ operands: [val1, val2, val3], operators: [ope1, ope2] })
+      return {
+        operands: [val1, val2, val3],
+        operators: [ope1, ope2],
+        expect_result: result,
+      }
     },
   },
-
+  //
   // ── Level 8: Missing variable (dice as unknown) ────────────────────────────
   {
-    id: 8,
+    level: 8,
     name: 'สมการหาค่าที่ขาด (ลูกเต๋า)',
     description: 'หาค่าที่ขาดในสมการ โดยใช้ลูกเต๋าแทนตัวที่ไม่ทราบค่า',
-    generate(rng, count = 4) {
-      return Array.from({ length: count }, () => {
-        const x = randInt(rng, 1, 9)
-        const b = randInt(rng, 1, 9)
-        const add = rng() > 0.5
-        const total = add ? x + b : x - b
-        return {
-          expression: `? ${add ? '+' : '-'} ${b} = ${total}`,
-          answer: x,
-          choices: makeChoices(x, rng),
-        }
-      })
+    maxNumber: 10,
+    generate_problem(): CalcQuestion {
+      var ope = calGame.GetOperator("-")
+      const val1 = calGame.RandomValue(this.maxNumber)
+      const result = calGame.RandomDice()
+      var missingValue: number = 0
+      if (val1 >= result.value) {
+        [missingValue] = calGame.Calculate({ operands: [val1, result], operators: [ope] })
+      } else {
+        // NOTE: If val1 < result add result first and subtract with val1
+        [missingValue] = calGame.Calculate({ operands: [result, val1], operators: [ope] })
+        ope = calGame.GetOperator("+")
+      }
+
+      return {
+        operands: [val1, result],
+        operators: [ope],
+        expect_result: missingValue
+      }
     },
   },
 
   // ── Level 9: Missing variable multi-step ──────────────────────────────────
   {
-    id: 9,
+    level: 9,
     name: 'สมการหาค่าที่ขาด (หลายขั้นตอน)',
-    description: 'หาค่าที่ขาดในสมการ: a + b = ? + c',
-    generate(rng, count = 4) {
-      return Array.from({ length: count }, () => {
-        const x = randInt(rng, 2, 9)
-        const a = randInt(rng, 1, 5)
-        const b = randInt(rng, 1, 5)
-        const answer = x + a - b      // x + a = ? + b  ⟹  ? = x + a - b
-        return {
-          expression: `${x} + ${a} = ? + ${b}`,
-          answer,
-          choices: makeChoices(answer, rng),
-        }
-      })
+    description: 'หาค่าที่ขาดในสมการ: a + ? - b = c',
+    maxNumber: 10,
+    generate_problem(): CalcQuestion {
+      const val1 = calGame.RandomValue(this.maxNumber)
+      const val2 = calGame.RandomValue(this.maxNumber)
+      var ope1 = calGame.GetOperator("-")
+      var ope2 = calGame.RandomOperator()
+      var [sum] = calGame.Calculate({ operands: [val1, val2], operators: [ope2] })
+      const result = calGame.RandomDice()
+      var missingValue = 0
+      if (sum >= result.value) {
+        [missingValue] = calGame.Calculate({ operands: [sum, result], operators: [ope1] })
+      } else {
+        // NOTE: If val1 < result add result first and subtract with val1
+        [missingValue] = calGame.Calculate({ operands: [result, sum], operators: [ope1] })
+        ope1 = calGame.GetOperator("+")
+      }
+      return {
+        operands: [val1, val2, result],
+        operators: [ope1, ope2],
+        expect_result: missingValue
+      }
     },
   },
 
   // ── Level 10: Interference + calculation ──────────────────────────────────
   {
-    id: 10,
+    level: 10,
     name: 'คำนวณพร้อมตัวรบกวน',
     description: 'เลือกผลลัพธ์ที่ถูกต้องท่ามกลางตัวรบกวน (ทั้งบวกและลบ)',
-    generate(rng, count = 4) {
-      return Array.from({ length: count }, () => {
-        const a = randInt(rng, 10, 50)
-        const b = randInt(rng, 1, 20)
-        const useAdd = rng() > 0.5
-        const answer = useAdd ? a + b : a - b
-        const wrongOp = useAdd ? a - b : a + b     // result if wrong operator
-        const wrongNear1 = answer + randInt(rng, 1, 5)
-        const wrongNear2 = answer - randInt(rng, 1, 5)
-        const allChoices = [answer, wrongOp, wrongNear1, wrongNear2]
-        const unique = [...new Set(allChoices)]
-        let fill = 1
-        while (unique.length < 4) { unique.push(answer + fill * 7); fill++ }
-        const choices = unique.slice(0, 4).sort(() => rng() - 0.5)
-        return {
-          expression: `${a} ${useAdd ? '+' : '-'} ${b}`,
-          answer,
-          choices,
-        }
-      })
+    maxNumber: 10,
+    generate_problem(): CalcQuestion {
+      const values = [calGame.Random(this.maxNumber), calGame.Random(this.maxNumber), calGame.Random(this.maxNumber)]
+      const operator = [calGame.RandomOperator(), calGame.RandomOperator()]
+      const messingIndex = Math.floor(Math.random() * values.length)
+      values[messingIndex] = 0
+      const [result] = calGame.Calculate({ operands: values, operators: operator })
+      return {
+        operands: values,
+        operators: operator,
+        expect_result: result,
+        messing_index: messingIndex
+      }
     },
   },
 ]

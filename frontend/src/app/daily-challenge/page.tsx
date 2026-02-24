@@ -7,7 +7,7 @@
  *  1. Check isDailyComplete(dateKey) – shows countdown if all modes done today.
  *  2. On start: run 3 × 60-second stages in order:
  *       Stage 1 – Management  (📋 จัดการ)    : remember items, pick correct ones
- *       Stage 2 – Calculation (🧮 คำนวณ)     : remember equations, answer MCQ
+ *       Stage 2 – Calculation (🧮 คำนวณ)     : answer as many as possible
  *       Stage 3 – Spatial     (🗺️ พื้นที่)   : remember grid pattern, reproduce it
  *  3. After each stage: call markDailyMode(dateKey, mode).
  *  4. After stage 3: show results.
@@ -17,11 +17,12 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   getCountdownToReset,
   getDateKey,
 } from '@/lib/dailyChallenge'
-import { CALC_LEVELS, seededRng, dateSeed, type CalcQuestion } from '@/lib/calculationLevels'
+import { CALC_LEVELS, type CalcQuestion } from '@/lib/calculationLevels'
 import {
   isDailyComplete,
   getDailyProgress,
@@ -50,11 +51,8 @@ function buildManagementRound() {
 
 // ─── Stage 2 – Calculation ───────────────────────────────────────────────────
 
-function buildCalcQuestions(): CalcQuestion[] {
-  // Use today's date as a deterministic seed so questions are consistent per day
-  const seed = getDateKey()
-  const rng = seededRng(dateSeed(seed))
-  return CALC_LEVELS[0].generate(rng, 4)
+function buildCalcQuestion(): CalcQuestion {
+  return CALC_LEVELS[0].generate_problem()
 }
 
 // ─── Stage 3 – Spatial ───────────────────────────────────────────────────────
@@ -112,7 +110,6 @@ type AppPhase =
   | 'ready'
   | 'stage1_memorize'
   | 'stage1_test'
-  | 'stage2_memorize'
   | 'stage2_test'
   | 'stage3_memorize'
   | 'stage3_test'
@@ -133,10 +130,11 @@ export default function DailyChallengePage() {
   const [mgmtMemorizeLeft, setMgmtMemorizeLeft] = useState(8)
 
   // ── Stage 2 state ──────────────────────────────────────────────────────────
-  const [calcQuestions, setCalcQuestions] = useState<CalcQuestion[]>([])
-  const [calcIndex, setCalcIndex] = useState(0)
-  const [calcAnswered, setCalcAnswered] = useState(0)
-  const [calcMemorizeLeft, setCalcMemorizeLeft] = useState(10)
+  const [calcQuestion, setCalcQuestion] = useState<CalcQuestion | null>(null)
+  const [calcAnswer, setCalcAnswer] = useState('')
+  const [calcLastCorrect, setCalcLastCorrect] = useState<boolean | null>(null)
+  const [calcScore, setCalcScore] = useState(0)
+  const [calcTotal, setCalcTotal] = useState(0)
 
   // ── Stage 3 state ──────────────────────────────────────────────────────────
   const [spatialPattern, setSpatialPattern] = useState<boolean[][]>([])
@@ -170,13 +168,15 @@ export default function DailyChallengePage() {
       setStageScore(prev => { const n = [...prev]; n[0] = score; return n })
       markDailyMode(dateKey, 'management')
       // Start stage 2
-      const qs = buildCalcQuestions()
-      setCalcQuestions(qs)
-      setCalcIndex(0)
-      setCalcAnswered(0)
-      setCalcMemorizeLeft(10)
-      setPhase('stage2_memorize')
+      setCalcQuestion(buildCalcQuestion())
+      setCalcAnswer('')
+      setCalcLastCorrect(null)
+      setCalcScore(0)
+      setCalcTotal(0)
+      setPhase('stage2_test')
+      setTimerRunning(true)
     } else if (phase === 'stage2_test') {
+      setStageScore(prev => { const n = [...prev]; n[1] = calcScore; return n })
       markDailyMode(dateKey, 'calculation')
       setPhase('stage3_memorize')
       const p = buildSpatialPattern()
@@ -194,7 +194,7 @@ export default function DailyChallengePage() {
       markDailyMode(dateKey, 'spatial')
       setPhase('completed')
     }
-  }, [phase, mgmtSelected, mgmtRound, userPattern, spatialPattern, dateKey])
+  }, [phase, mgmtSelected, mgmtRound, userPattern, spatialPattern, dateKey, calcScore])
 
   const stageRemaining = useCountdown(STAGE_DURATION, timerRunning, handleStageExpire)
 
@@ -210,17 +210,6 @@ export default function DailyChallengePage() {
     const id = setTimeout(() => setMgmtMemorizeLeft(t => t - 1), 1000)
     return () => clearTimeout(id)
   }, [phase, mgmtMemorizeLeft])
-
-  useEffect(() => {
-    if (phase !== 'stage2_memorize') return
-    if (calcMemorizeLeft <= 0) {
-      setPhase('stage2_test')
-      setTimerRunning(true)
-      return
-    }
-    const id = setTimeout(() => setCalcMemorizeLeft(t => t - 1), 1000)
-    return () => clearTimeout(id)
-  }, [phase, calcMemorizeLeft])
 
   useEffect(() => {
     if (phase !== 'stage3_memorize') return
@@ -257,31 +246,31 @@ export default function DailyChallengePage() {
     const score = mgmtSelected.filter(s => mgmtRound.target.includes(s)).length
     setStageScore(prev => { const n = [...prev]; n[0] = score; return n })
     markDailyMode(dateKey, 'management')
-    const qs = buildCalcQuestions()
-    setCalcQuestions(qs)
-    setCalcIndex(0)
-    setCalcAnswered(0)
-    setCalcMemorizeLeft(10)
-    setPhase('stage2_memorize')
+    setCalcQuestion(buildCalcQuestion())
+    setCalcAnswer('')
+    setCalcLastCorrect(null)
+    setCalcScore(0)
+    setCalcTotal(0)
+    setPhase('stage2_test')
+    setTimerRunning(true)
   }
 
-  const handleCalcAnswer = (chosen: number) => {
-    const q = calcQuestions[calcIndex]
-    const correct = chosen === q.answer ? 1 : 0
-    setStageScore(prev => { const n = [...prev]; n[1] += correct; return n })
-    setCalcAnswered(a => a + 1)
-    if (calcIndex + 1 < calcQuestions.length) {
-      setCalcIndex(i => i + 1)
-    } else {
-      // Stage 2 done early
-      setTimerRunning(false)
-      markDailyMode(dateKey, 'calculation')
-      const p = buildSpatialPattern()
-      setSpatialPattern(p)
-      setUserPattern(Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(false)))
-      setSpatialMemorizeLeft(5)
-      setPhase('stage3_memorize')
-    }
+  const handleCalcSubmit = () => {
+    if (!calcQuestion) return
+    if (calcAnswer.trim() === '') return
+    const parsed = Number(calcAnswer)
+    if (Number.isNaN(parsed)) return
+
+    const correct = parsed === calcQuestion.expect_result
+    setCalcLastCorrect(correct)
+    setCalcScore(s => s + (correct ? 1 : 0))
+    setCalcTotal(t => t + 1)
+
+    setTimeout(() => {
+      setCalcLastCorrect(null)
+      setCalcAnswer('')
+      setCalcQuestion(buildCalcQuestion())
+    }, 400)
   }
 
   const toggleCell = (r: number, c: number) => {
@@ -413,41 +402,58 @@ export default function DailyChallengePage() {
     )
   }
 
-  // ── Stage 2 – memorize ─────────────────────────────────────────────────────
-  if (phase === 'stage2_memorize') {
-    return (
-      <div className="game-page">
-        <StageHeader stageNum={2} />
-        <div className="dc-card">
-          <h2>จำโจทย์เลขเหล่านี้! ({calcMemorizeLeft}s)</h2>
-          <div className="dc-calc-list">
-            {calcQuestions.map((q, i) => (
-              <div key={i} className="dc-calc-row">
-                <span className="dc-calc-num">ข้อ {i + 1}:</span> {q.expression} = ?
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   // ── Stage 2 – test ─────────────────────────────────────────────────────────
-  if (phase === 'stage2_test' && calcQuestions.length > 0) {
-    const q = calcQuestions[calcIndex]
+  if (phase === 'stage2_test' && calcQuestion) {
     return (
       <div className="game-page">
         <StageHeader stageNum={2} />
         <div className="dc-card">
-          <h2>ข้อ {calcIndex + 1} / {calcQuestions.length}</h2>
-          <div className="dc-calc-question">{q.expression} = ?</div>
-          <div className="dc-choice-grid">
-            {q.choices.map(c => (
-              <button key={c} className="dc-choice-btn" onClick={() => handleCalcAnswer(c)}>
-                {c}
-              </button>
+          <div className="dc-calc-question" style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            {calcQuestion.operands.map((value, index) => (
+              <span key={`op-${index}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}>
+                {typeof value === 'number' ? (
+                  <span className="game-title">{value}</span>
+                ) : (
+                  <Image
+                    src={value.path}
+                    width={75}
+                    height={50}
+                    style={{ width: 'auto', height: 'auto' }}
+                    alt={value.name}
+                  />
+                )}
+                {index < calcQuestion.operators.length && (
+                  <span className="game-title">{calcQuestion.operators[index].name}</span>
+                )}
+              </span>
             ))}
           </div>
+          {calcLastCorrect !== null && (
+            <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: calcLastCorrect ? '#4ade80' : '#f87171' }}>
+              {calcLastCorrect ? '✅ ถูกต้อง!' : '❌ ผิด'}
+            </div>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.25rem', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <label className="game-title" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              Answer:
+              <input
+                className="border-4 border-white-500"
+                name="calcAnswerDaily"
+                placeholder="พิมพ์คำตอบ..."
+                value={calcAnswer}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') handleCalcSubmit()
+                }}
+                onChange={(e) => setCalcAnswer(e.target.value)}
+              />
+            </label>
+            <button className="cta-button" onClick={handleCalcSubmit}>
+              ยืนยัน
+            </button>
+          </div>
+          <p style={{ fontSize: '0.9rem', opacity: 0.6, marginTop: '1rem' }}>
+            คะแนน: {calcScore} / {calcTotal}
+          </p>
         </div>
       </div>
     )
@@ -517,7 +523,7 @@ export default function DailyChallengePage() {
             </div>
             <div className="dc-score-row">
               <span>🧮 การคำนวณ</span>
-              <span>{stageScore[1]} / 4</span>
+              <span>{stageScore[1]} / {calcTotal}</span>
             </div>
             <div className="dc-score-row">
               <span>🗺️ พื้นที่</span>

@@ -24,6 +24,17 @@ const operatorImages: Operator[] = [
   { name: "-", path: path_to_dice + "minus.png" },
 ]
 
+export function GetOperator(name: string): Operator {
+  const ope = operatorImages.find((value, index, arr) => {
+    return value.name === name
+  })
+  if (ope === undefined) {
+    throw new Error(`There is no Operator name with ${name}
+only ${operatorImages}`)
+  }
+  return ope
+}
+
 export type Operand = Dice | number
 
 export function Random(maxNumber: number): Operand {
@@ -42,16 +53,14 @@ export function Random(maxNumber: number): Operand {
   }
 }
 
-export function RandomDice(): [Dice, Dice] {
+export function RandomDice(): Dice {
   const val1 = diceImages[Math.floor(Math.random() * diceImages.length)]
-  const val2 = diceImages[Math.floor(Math.random() * diceImages.length)]
-  return [val1, val2]
+  return val1
 }
 
-export function RandomValue(maxNumber: number): [number, number] {
-  const val1 = Math.floor(Math.random() * maxNumber)
-  const val2 = Math.floor(Math.random() * maxNumber)
-  return [val1, val2]
+export function RandomValue(maxNumber: number, minNumber: number = 0): number {
+  const val1 = Math.floor(Math.random() * (maxNumber - minNumber + 1) + minNumber)
+  return val1
 }
 
 export function RandomOperator(): Operator {
@@ -88,7 +97,7 @@ type CalculateParams = {
   operators: Operator[]
 }
 
-export function Calculate({ answer, operands, operators }: CalculateParams): [boolean, number] {
+export function Calculate({ answer, operands, operators }: CalculateParams): [number, boolean] {
   if (operators.length !== operands.length - 1) {
     throw new Error("Invalid expression")
   }
@@ -109,7 +118,7 @@ export function Calculate({ answer, operands, operators }: CalculateParams): [bo
       result = operate(result, value.value, operator)
     }
   }
-  return [answer === result, result]
+  return [result, answer === result]
 }
 
 function operate(a: number, b: number, operator: Operator): number {
