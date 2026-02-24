@@ -42,16 +42,14 @@ export function Random(maxNumber: number): Operand {
   }
 }
 
-export function RandomDice(): [Dice, Dice] {
+export function RandomDice(): Dice {
   const val1 = diceImages[Math.floor(Math.random() * diceImages.length)]
-  const val2 = diceImages[Math.floor(Math.random() * diceImages.length)]
-  return [val1, val2]
+  return val1
 }
 
-export function RandomValue(maxNumber: number): [number, number] {
+export function RandomValue(maxNumber: number): number {
   const val1 = Math.floor(Math.random() * maxNumber)
-  const val2 = Math.floor(Math.random() * maxNumber)
-  return [val1, val2]
+  return val1
 }
 
 export function RandomOperator(): Operator {
