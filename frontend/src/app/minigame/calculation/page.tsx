@@ -213,8 +213,8 @@ function CalculationGameInner() {
                       ) : typeof value === 'number' ? (
                         <span className="text-5xl md:text-7xl font-black text-slate-800 tracking-tighter">{value}</span>
                       ) : (
-                        <div className="p-2 md:p-3 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner">
-                          <Image src={value.path} width={70} height={50} className="rounded-lg md:w-[100px] md:h-[70px]" alt={value.name} />
+                        <div className="p-2 md:p-3 bg-white rounded-2xl border border-slate-100 shadow-md flex items-center justify-center w-[80px] h-[60px] md:w-[120px] md:h-[90px]">
+                          <Image src={value.path} width={100} height={70} className="rounded-lg object-contain w-full h-full" alt={value.name} />
                         </div>
                       )}
                       {index < question.operators.length && (

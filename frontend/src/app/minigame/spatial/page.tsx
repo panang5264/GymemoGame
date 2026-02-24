@@ -65,12 +65,18 @@ export default function Page() {
         rights = ['right1.PNG', 'right2.PNG', 'right3.PNG', 'right4.PNG', 'right5.PNG']
         break
       case 3:
+        mode = 'find'
+        path = '/assets/FindObject1/'
+        qText = 'เลือกภาพที่ต้นไม้อยู่ "ข้างหลัง" เก้าอี้ 🌳🪑'
+        lefts = ['image1.PNG', 'image2.PNG']
+        correctSet = new Set(['image2.PNG']) // Mock: image2 has tree behind chair
+        break
       case 4:
         mode = 'find'
         path = '/assets/FindObject1/'
+        qText = 'เลือกภาพที่แก้วกาแฟอยู่ "ใต้" โต๊ะ ☕️ table'
         lefts = ['image1.PNG', 'image2.PNG']
-        qText = levelParam === 3 ? 'ภาพที่มีเด็กและโคมไฟ' : 'ภาพที่มีกรอบรูป'
-        correctSet = levelParam === 3 ? new Set(['image2.PNG']) : new Set(['image1.PNG'])
+        correctSet = new Set(['image1.PNG']) // Mock: image1 has cup under table
         break
       case 5:
         mode = 'select'
@@ -84,11 +90,40 @@ export default function Page() {
         ]
         correctSet = new Set(["ball.PNG", "swimsuit.PNG", "slipper.PNG", "ice_bucket.PNG"])
         break
-      default:
-        mode = 'match'
-        path = levelParam % 2 === 0 ? '/assets/level1/relation1-1/' : '/assets/level1/relation1-2/'
-        lefts = ['left1.PNG', 'left2.PNG', 'left3.PNG', 'left4.PNG', 'left5.PNG']
-        rights = ['right1.PNG', 'right2.PNG', 'right3.PNG', 'right4.PNG', 'right5.PNG']
+      case 6:
+        mode = 'select'
+        path = '/assets/IsObject/1/' // Replace with bathroom assets later
+        qText = 'เลือกของใช้ที่อยู่ในห้องน้ำ 🛀'
+        lefts = ['soap.PNG', 'shampoo.PNG', 'towel.PNG', 'hammer.PNG', 'laptop.PNG', 'toothbrush.PNG']
+        correctSet = new Set(['soap.PNG', 'shampoo.PNG', 'towel.PNG', 'toothbrush.PNG'])
+        break
+      case 7:
+        mode = 'select'
+        path = '/assets/IsObject/1/' // Replace with kitchen assets later
+        qText = 'เลือกเครื่องใช้ในครัว (สีโทนเดียวกัน) 🍳'
+        lefts = ['pan.PNG', 'pot.PNG', 'knife.PNG', 'car.PNG', 'cat.PNG', 'spoon.PNG']
+        correctSet = new Set(['pan.PNG', 'pot.PNG', 'knife.PNG', 'spoon.PNG'])
+        break
+      case 8:
+        mode = 'find'
+        path = '/assets/FindObject1/'
+        qText = 'ทายว่ามีวัตถุอะไรซ้อนกันอยู่ (4 ชิ้น) 🔍'
+        lefts = ['silhouette_4.PNG'] // Placeholder asset
+        correctSet = new Set(['silhouette_4.PNG'])
+        break
+      case 9:
+        mode = 'find'
+        path = '/assets/FindObject1/'
+        qText = 'ทายว่ามีวัตถุอะไรซ้อนกันอยู่ (6 ชิ้น) 🔍'
+        lefts = ['silhouette_6.PNG'] // Placeholder asset
+        correctSet = new Set(['silhouette_6.PNG'])
+        break
+      case 10:
+        mode = 'find'
+        path = '/assets/FindObject1/'
+        qText = 'ทายวัตถุจากภาพเงาที่ซับซ้อนที่สุด 🎭'
+        lefts = ['silhouette_complex.PNG'] // Placeholder asset
+        correctSet = new Set(['silhouette_complex.PNG'])
         break
     }
 

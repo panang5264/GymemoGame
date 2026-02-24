@@ -42,6 +42,7 @@ function ManagementGameInner() {
   useEffect(() => {
     switch (levelParam) {
       case 1:
+        // เลเวล 1: แยกสี/รูปทรง
         setCategories([
           { id: 'cat:red', title: 'สีแดง 🔴', accepts: i => i.color === 'red' },
           { id: 'cat:circle', title: 'ทรงกลม 🔵', accepts: i => i.shape === 'circle' },
@@ -51,18 +52,141 @@ function ManagementGameInner() {
           { id: 'i2', label: 'เหรียญ', emoji: '🪙', color: 'yellow', shape: 'circle', initialTop: '45%', initialLeft: '15%' },
           { id: 'i3', label: 'ลูกบอล', emoji: '⚽', color: 'mixed', shape: 'circle', initialTop: '30%', initialLeft: '80%' },
           { id: 'i4', label: 'เข็มหมุด', emoji: '📌', color: 'red', shape: 'other', initialTop: '10%', initialLeft: '65%' },
-          { id: 'i5', label: 'ลูกพีช', emoji: '🍑', color: 'red', shape: 'other', initialTop: '50%', initialLeft: '55%' },
+          { id: 'i5', label: 'พริกแดง', emoji: '🌶️', color: 'red', shape: 'other', initialTop: '50%', initialLeft: '55%' },
+        ])
+        break
+      case 2:
+        // เลเวล 2: แยกสิ่งมีชีวิต / สิ่งของ
+        setCategories([
+          { id: 'cat:living', title: 'สิ่งมีชีวิต 🦋', accepts: i => i.color === 'living' },
+          { id: 'cat:object', title: 'สิ่งของ 📦', accepts: i => i.color === 'object' },
+        ])
+        setItems([
+          { id: 'i2-1', label: 'แมว', emoji: '🐱', color: 'living', shape: 'any', initialTop: '20%', initialLeft: '15%' },
+          { id: 'i2-2', label: 'กล่อง', emoji: '📦', color: 'object', shape: 'any', initialTop: '15%', initialLeft: '75%' },
+          { id: 'i2-3', label: 'นก', emoji: '🐦', color: 'living', shape: 'any', initialTop: '50%', initialLeft: '20%' },
+          { id: 'i2-4', label: 'นาฬิกา', emoji: '⏰', color: 'object', shape: 'any', initialTop: '10%', initialLeft: '45%' },
+          { id: 'i2-5', label: 'ต้นไม้', emoji: '🌲', color: 'living', shape: 'any', initialTop: '55%', initialLeft: '70%' },
+        ])
+        break
+      case 3:
+        // เลเวล 3: แยกตามสี / ขนาด
+        setCategories([
+          { id: 'cat:yellow', title: 'สีเหลือง 🟡', accepts: i => i.color === 'yellow' },
+          { id: 'cat:large', title: 'ขนาดใหญ่ 🐘', accepts: i => i.shape === 'large' },
+        ])
+        setItems([
+          { id: 'L3-1', label: 'รถเมล์', emoji: '🚌', color: 'yellow', shape: 'large', initialTop: '20%', initialLeft: '15%' },
+          { id: 'L3-2', label: 'เลมอน', emoji: '🍋', color: 'yellow', shape: 'any', initialTop: '15%', initialLeft: '75%' },
+          { id: 'L3-3', label: 'เรือใบ', emoji: '⛵', color: 'white', shape: 'large', initialTop: '50%', initialLeft: '20%' },
+          { id: 'L3-4', label: 'เครื่องบิน', emoji: '✈️', color: 'white', shape: 'large', initialTop: '10%', initialLeft: '45%' },
+          { id: 'L3-5', label: 'กล้วย', emoji: '🍌', color: 'yellow', shape: 'any', initialTop: '55%', initialLeft: '70%' },
+        ])
+        break
+      case 4:
+        // เลเวล 4: กินได้ / กินไม่ได้
+        setCategories([
+          { id: 'cat:edible', title: 'ของกิน 🍕', accepts: i => i.color === 'edible' },
+          { id: 'cat:inedible', title: 'ของใช้ 🛠️', accepts: i => i.color === 'inedible' },
+        ])
+        setItems([
+          { id: 'L4-1', label: 'พิซซ่า', emoji: '🍕', color: 'edible', shape: 'any', initialTop: '20%', initialLeft: '20%' },
+          { id: 'L4-2', label: 'ค้อน', emoji: '🔨', color: 'inedible', shape: 'any', initialTop: '45%', initialLeft: '15%' },
+          { id: 'L4-3', label: 'พริก', emoji: '🌶️', color: 'edible', shape: 'any', initialTop: '30%', initialLeft: '80%' },
+          { id: 'L4-4', label: 'กุญแจ', emoji: '🔑', color: 'inedible', shape: 'any', initialTop: '10%', initialLeft: '65%' },
+          { id: 'L4-5', label: 'โดนัท', emoji: '🍩', color: 'edible', shape: 'any', initialTop: '55%', initialLeft: '50%' },
+        ])
+        break
+      case 5:
+        // เลเวล 5: เสื้อผ้า / เครื่องใช้ไฟฟ้า
+        setCategories([
+          { id: 'cat:clot', title: 'เสื้อผ้า 👕', accepts: i => i.color === 'cloth' },
+          { id: 'cat:elec', title: 'เครื่องใช้ไฟฟ้า 💻', accepts: i => i.color === 'elec' },
+        ])
+        setItems([
+          { id: 'L5-1', label: 'หมวก', emoji: '🧢', color: 'cloth', shape: 'any', initialTop: '20%', initialLeft: '20%' },
+          { id: 'L5-2', label: 'พัดลม', emoji: '🌀', color: 'elec', shape: 'any', initialTop: '45%', initialLeft: '15%' },
+          { id: 'L5-3', label: 'กระโปรง', emoji: '👗', color: 'cloth', shape: 'any', initialTop: '30%', initialLeft: '80%' },
+          { id: 'L5-4', label: 'มือถือ', emoji: '📱', color: 'elec', shape: 'any', initialTop: '10%', initialLeft: '35%' },
+          { id: 'L5-5', label: 'ถุงเท้า', emoji: '🧦', color: 'cloth', shape: 'any', initialTop: '55%', initialLeft: '55%' },
+        ])
+        break
+      case 6:
+        // เลเวล 6: จับคู่สิ่งที่ใช้ร่วมกัน
+        setCategories([
+          { id: 'cat:study', title: 'เครื่องเขียน ✏️', accepts: i => i.color === 'study' },
+          { id: 'cat:chef', title: 'เครื่องครัว 🍳', accepts: i => i.color === 'chef' },
+        ])
+        setItems([
+          { id: 'L6-1', label: 'ดินสอ', emoji: '✏️', color: 'study', shape: 'any', initialTop: '20%', initialLeft: '25%' },
+          { id: 'L6-2', label: 'กระทะ', emoji: '🍳', color: 'chef', shape: 'any', initialTop: '45%', initialLeft: '55%' },
+          { id: 'L6-3', label: 'ยางลบ', emoji: '�', color: 'study', shape: 'any', initialTop: '30%', initialLeft: '75%' },
+          { id: 'L6-4', label: 'ตะหลิว', emoji: '🥄', color: 'chef', shape: 'any', initialTop: '10%', initialLeft: '45%' },
+          { id: 'L6-5', label: 'ไม้บรรทัด', emoji: '📏', color: 'study', shape: 'any', initialTop: '55%', initialLeft: '20%' },
+        ])
+        break
+      case 7:
+        // เลเวล 7: แยกหลายหมวดพร้อมกัน
+        setCategories([
+          { id: 'cat:r', title: 'แดง 🔴', accepts: i => i.color === 'red' },
+          { id: 'cat:b', title: 'ฟ้า 🔵', accepts: i => i.color === 'blue' },
+          { id: 'cat:g', title: 'เขียว 🟢', accepts: i => i.color === 'green' },
+        ])
+        setItems([
+          { id: 'L7-1', label: 'กุหลาบ', emoji: '🌹', color: 'red', shape: 'any', initialTop: '20%', initialLeft: '10%' },
+          { id: 'L7-2', label: 'คลื่น', emoji: '🌊', color: 'blue', shape: 'any', initialTop: '45%', initialLeft: '25%' },
+          { id: 'L7-3', label: 'มรกต', emoji: '🐍', color: 'green', shape: 'any', initialTop: '30%', initialLeft: '85%' },
+          { id: 'L7-4', label: 'น้ำเงิน', emoji: '�', color: 'blue', shape: 'any', initialTop: '10%', initialLeft: '50%' },
+          { id: 'L7-5', label: 'แตงโม', emoji: '�', color: 'red', shape: 'any', initialTop: '55%', initialLeft: '40%' },
+        ])
+        break
+      case 8:
+        // เลเวล 8: ใช้กฎห้าม (เช่น ห้ามเลือกสีแดง)
+        setCategories([
+          { id: 'cat:ok', title: 'เลือกได้ ✅', accepts: i => i.color !== 'red' },
+          { id: 'cat:no', title: 'ห้ามเลือก 🚫', accepts: i => i.color === 'red' },
+        ])
+        setItems([
+          { id: 'L8-1', label: 'ใบไม้', emoji: '🍃', color: 'green', shape: 'any', initialTop: '20%', initialLeft: '20%' },
+          { id: 'L8-2', label: 'ไฟจราจร', emoji: '🚥', color: 'red', shape: 'any', initialTop: '45%', initialLeft: '15%' },
+          { id: 'L8-3', label: 'ท้องฟ้า', emoji: '🌈', color: 'blue', shape: 'any', initialTop: '30%', initialLeft: '80%' },
+          { id: 'L8-4', label: 'สตรอว์เบอร์รี', emoji: '🍓', color: 'red', shape: 'any', initialTop: '10%', initialLeft: '65%' },
+          { id: 'L8-5', label: 'กล้วย', emoji: '🍌', color: 'yellow', shape: 'any', initialTop: '55%', initialLeft: '50%' },
+        ])
+        break
+      case 9:
+        // เลเวล 9: หาสิ่งที่แตกต่าง
+        setCategories([
+          { id: 'cat:cold', title: 'กลุ่มของเย็น ❄️', accepts: i => i.color === 'cold' },
+        ])
+        setItems([
+          { id: 'L9-1', label: 'น้ำแข็ง', emoji: '🧊', color: 'cold', shape: 'any', initialTop: '30%', initialLeft: '20%' },
+          { id: 'L9-2', label: 'ไอศกรีม', emoji: '🍦', color: 'cold', shape: 'any', initialTop: '50%', initialLeft: '40%' },
+          { id: 'L9-3', label: 'หิมะ', emoji: '❄️', color: 'cold', shape: 'any', initialTop: '20%', initialLeft: '70%' },
+          { id: 'L9-4', label: 'ภูเขาไฟ', emoji: '🌋', color: 'hot', shape: 'any', initialTop: '40%', initialLeft: '80%' },
+          { id: 'L9-5', label: 'เพนกวิน', emoji: '🐧', color: 'cold', shape: 'any', initialTop: '15%', initialLeft: '45%' },
+        ])
+        break
+      case 10:
+        // เลเวล 10: จับคู่คำพูด/วลีเข้าหมวดหมู่
+        setCategories([
+          { id: 'cat:polite', title: 'คำพูดดี 😊', accepts: i => i.color === 'good' },
+          { id: 'cat:rude', title: 'คำไม่ดี ☹️', accepts: i => i.color === 'bad' },
+        ])
+        setItems([
+          { id: 'L10-1', label: 'ขอบคุณ', emoji: '�', color: 'good', shape: 'any', initialTop: '20%', initialLeft: '20%' },
+          { id: 'L10-2', label: 'ว่าร้าย', emoji: '👿', color: 'bad', shape: 'any', initialTop: '45%', initialLeft: '15%' },
+          { id: 'L10-3', label: 'รักนะ', emoji: '�', color: 'good', shape: 'any', initialTop: '30%', initialLeft: '80%' },
+          { id: 'L10-4', label: 'ตะคอก', emoji: '😤', color: 'bad', shape: 'any', initialTop: '10%', initialLeft: '65%' },
+          { id: 'L10-5', label: 'สู้ๆ นะ', emoji: '✌️', color: 'good', shape: 'any', initialTop: '55%', initialLeft: '50%' },
         ])
         break
       default:
         setCategories([
-          { id: 'cat:1', title: `หมวดหมู่ A 📦`, accepts: i => i.color === 'red' },
-          { id: 'cat:2', title: `หมวดหมู่ B 📦`, accepts: i => i.shape === 'circle' },
+          { id: 'cat:1', title: `หมดด่านแล้ว 🎉`, accepts: i => true },
         ])
         setItems([
-          { id: 'i1', label: `ไอเทม 1`, emoji: '❓', color: 'red', shape: 'circle', initialTop: '25%', initialLeft: '20%' },
-          { id: 'i2', label: `ไอเทม 2`, emoji: '❓', color: 'yellow', shape: 'circle', initialTop: '45%', initialLeft: '50%' },
-          { id: 'i3', label: `ไอเทม 3`, emoji: '❓', color: 'red', shape: 'square', initialTop: '30%', initialLeft: '80%' },
+          { id: 'i-end', label: `เก่งมาก`, emoji: '🌟', color: 'any', shape: 'any', initialTop: '40%', initialLeft: '50%' },
         ])
         break
     }
@@ -166,16 +290,19 @@ function ManagementGameInner() {
         <div className="w-full max-w-5xl h-[700px] flex flex-col bg-slate-200 rounded-[2.5rem] border-[8px] border-white shadow-2xl overflow-hidden relative">
 
           {/* Header Bar */}
-          <div className="h-24 bg-white border-b-4 border-pink-400 flex justify-between items-center px-10 relative z-20">
-            <div className="flex items-center gap-4">
-              <span className="text-5xl">🍇</span>
-              <h2 className="text-xl font-black text-slate-700">
-                จงแยกวัตถุที่มีสีแดง และวัตถุทรงกลม
+          <div className="h-24 bg-white border-b-4 border-pink-400 flex justify-between items-center px-6 md:px-10 relative z-20">
+            <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
+              <span className="text-3xl md:text-5xl shrink-0">📦</span>
+              <h2 className="text-sm md:text-xl font-black text-slate-700 leading-tight">
+                {levelParam === 8 ? "แยกของเล่นบนพื้น และของเล่นที่บินได้" :
+                  levelParam === 9 ? "ทิ้งสิ่งของที่ไม่เข้าพวกออกไป!" :
+                    levelParam === 10 ? "แยกคำขอบคุณ/ขอโทษ ออกจากคำไม่ดี" :
+                      "ลากสิ่งของใส่กล่องให้ถูกต้องตามหมวดหมู่"}
               </h2>
             </div>
-            <div className="flex flex-col items-center">
-              <div className="bg-pink-500 text-white px-4 py-1 rounded-xl font-bold text-xs uppercase tracking-tighter shadow-sm z-10">Score</div>
-              <div className="bg-yellow-400 w-14 h-14 rounded-full border-4 border-white flex items-center justify-center text-white font-black text-2xl shadow-md -mt-3">
+            <div className="flex flex-col items-center shrink-0">
+              <div className="bg-pink-500 text-white px-3 py-1 rounded-xl font-bold text-[10px] md:text-xs uppercase tracking-tighter shadow-sm z-10">Score</div>
+              <div className="bg-yellow-400 w-10 h-10 md:w-14 md:h-14 rounded-full border-4 border-white flex items-center justify-center text-white font-black text-lg md:text-2xl shadow-md -mt-3">
                 {score}
               </div>
             </div>

@@ -11,33 +11,27 @@ function getMinigameUrl(villageId: number, subId: number): string {
     return `/bonus/chest?villageId=${villageId}&subId=${subId}`
   }
 
-  // 1 map แทน 1 level ความยาก
-  let difficulty = Math.min(villageId, 10)
+  // ความยากยากตาม Main Map (VillageId)
+  // Map 1 = Level 1, Map 2 = Level 2 ...
+  const difficulty = Math.min(villageId, 10)
 
-  let modeSelect = 0; // 0=Management, 1=Calculation, 2=Spatial
+  // กำหนดโหมดเกมตามลำดับ subId เพื่อความแน่นอน (ไม่ต้องสุ่ม)
+  // 1=M, 2=C, 3=S, 5=M, 6=C, 7=S ...
+  // เราใช้สูตรวนลูป 3 โหมด โดยหลบด่านกุญแจ/กล่อง (4, 9)
+  const modes = ['management', 'calculation', 'spatial']
 
-  if (subId === 1) {
-    modeSelect = 0; // Management
-    difficulty = 1; // บังคับระดับความยากที่ level 1
-  } else if (subId === 2) {
-    modeSelect = 1; // Calculation
-    difficulty = 1; // บังคับระดับความยากที่ level 1
-  } else if (subId === 3) {
-    modeSelect = 2; // Spatial
-    difficulty = 1; // บังคับระดับความยากที่ level 1
-  } else {
-    // หลังจากนั้นก็สุ่มโหมด
-    const modes = [0, 1, 2]
-    modeSelect = modes[Math.floor(Math.random() * modes.length)]
-  }
+  // ปรับ index ให้เหมาะสม:
+  // subId 1,2,3 -> 0,1,2
+  // subId 5,6,7 -> 0,1,2
+  // subId 8,10,11,12 -> วนตามลำดับ
+  let modeIndex = 0;
+  if (subId < 4) modeIndex = (subId - 1) % 3;
+  else if (subId < 9) modeIndex = (subId - 5) % 3;
+  else modeIndex = (subId - 10) % 3; // สำหรับ 10, 11, 12
 
-  if (modeSelect === 0) {
-    return `/minigame/management?villageId=${villageId}&subId=${subId}&level=${difficulty}&mode=village`
-  } else if (modeSelect === 1) {
-    return `/minigame/calculation?villageId=${villageId}&subId=${subId}&level=${difficulty}&mode=village`
-  } else {
-    return `/minigame/spatial?villageId=${villageId}&subId=${subId}&level=${difficulty}&mode=village`
-  }
+  const modePath = modes[modeIndex]
+
+  return `/minigame/${modePath}?villageId=${villageId}&subId=${subId}&level=${difficulty}&mode=village`
 }
 
 
