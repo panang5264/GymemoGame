@@ -24,7 +24,7 @@ export default function ClientPage(props: Props) {
     return answerResult ? "✅ ถูกต้อง" : "❌ ไม่ถูกต้อง"
   }
   const handleClick = function(answer: number) {
-    const [result] = game.CalculateMultiple({answer:answer, operands:values, operators:operators})
+    const [result] = game.Calculate({ answer: answer, operands: values, operators: operators })
     setAnswerResult(result)
 
     // สุ่มโจทย์ใหม่และรีเซ็ตคำตอบ
@@ -70,7 +70,7 @@ export default function ClientPage(props: Props) {
                 src={value.path}
                 width={75}
                 height={50}
-                style={{width:'auto', height: 'auto' }}
+                style={{ width: 'auto', height: 'auto' }}
                 alt={value.name}
               />
             )}
@@ -90,8 +90,8 @@ export default function ClientPage(props: Props) {
             value={answer}
             disabled={isTimeUp}
             onKeyDown={
-              (event)=>{
-                if(event.key === 'Enter') {
+              (event) => {
+                if (event.key === 'Enter') {
                   if (isTimeUp) return
                   const parsed = Number(answer)
                   if (isNaN(parsed)) return
@@ -111,8 +111,8 @@ export default function ClientPage(props: Props) {
               handleClick(parsed)
             }}
             onKeyDown={
-              (event)=>{
-                if(event.key === 'Enter') {
+              (event) => {
+                if (event.key === 'Enter') {
                   if (isTimeUp) return
                   const parsed = Number(answer)
                   if (isNaN(parsed)) return

@@ -68,19 +68,19 @@ export function CheckMissingValue(answer: number, actual_value: Operand): boolea
 }
 
 
-export function Calculate(answer: number, val1: number, val2: number, operator_name: string): boolean {
-  console.log(operator_name)
-  switch (operator_name) {
-    case "+":
-      console.log(val1 + val2)
-      return answer === (val1 + val2)
-    case "-":
-      console.log(val1 - val2)
-      return answer == (val1 - val2)
-    default:
-      return false
-  }
-}
+// export function Calculate(answer: number, val1: number, val2: number, operator_name: string): boolean {
+//   console.log(operator_name)
+//   switch (operator_name) {
+//     case "+":
+//       console.log(val1 + val2)
+//       return answer === (val1 + val2)
+//     case "-":
+//       console.log(val1 - val2)
+//       return answer == (val1 - val2)
+//     default:
+//       return false
+//   }
+// }
 
 type CalculateParams = {
   answer?: number
@@ -88,7 +88,7 @@ type CalculateParams = {
   operators: Operator[]
 }
 
-export function CalculateMultiple({ answer, operands, operators }: CalculateParams): [boolean, number] {
+export function Calculate({ answer, operands, operators }: CalculateParams): [boolean, number] {
   if (operators.length !== operands.length - 1) {
     throw new Error("Invalid expression")
   }

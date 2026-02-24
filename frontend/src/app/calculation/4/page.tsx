@@ -10,7 +10,7 @@ export default async function Page() {
   const ope2 = game.RandomOperator()
   const values = [val1, val2, val3]
   const operators = [ope1, ope2]
-  const [_, result] = game.CalculateMultiple({ operands: values, operators: operators })
+  const [_, result] = game.Calculate({ operands: values, operators: operators })
   const hide_value_index = Math.floor(Math.random() * values.length)
   return (
     <ClientPage values={values}

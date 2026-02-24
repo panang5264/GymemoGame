@@ -25,7 +25,7 @@ export default function ClientPage(props: Props) {
     return answerResult ? "✅ ถูกต้อง" : "❌ ไม่ถูกต้อง"
   }
   const handleClick = function(answer: number) {
-    const result = game.Calculate(answer, val1.value, val2.value, operator.name)
+    const [result] = game.Calculate({ answer: answer, operands: [val1, val2], operators: [operator] })
     setAnswerResult(result)
 
     // สุ่มโจทย์ใหม่และรีเซ็ตคำตอบ
@@ -81,8 +81,8 @@ export default function ClientPage(props: Props) {
             value={answer}
             disabled={isTimeUp}
             onKeyDown={
-              (event)=>{
-                if(event.key === 'Enter') {
+              (event) => {
+                if (event.key === 'Enter') {
                   if (isTimeUp) return
                   const parsed = Number(answer)
                   if (isNaN(parsed)) return
