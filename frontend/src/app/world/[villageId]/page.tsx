@@ -119,65 +119,108 @@ export default function VillagePage({ params }: { params: Promise<{ villageId: s
           )}
         </div>
 
-        {/* Sublevel grid */}
+        {/* Sublevel serpentine map */}
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))',
-            gap: '0.75rem',
+            position: 'relative',
             width: '100%',
+            height: '520px',
+            backgroundColor: '#F6EADB',
+            borderRadius: '16px',
+            border: '2px solid rgba(0,0,0,0.1)',
+            overflow: 'hidden',
           }}
         >
-          {sublevels.map((subId) => {
-            const isSpecial = subId >= 13
-            const noKeys = currentKeys === 0
+          {/* Dashed line connecting nodes exactly using SVG ViewBox */}
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }}>
+            <path
+              d={`M 25 15 L 15 30 L 15 50 L 25 70 L 40 85 L 60 85 L 75 70 L 85 50 L 85 30 L 75 15 L 50 15 L 50 30`}
+              stroke="#666"
+              strokeWidth="4"
+              strokeDasharray="8,8"
+              fill="none"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+
+          {/* Center text like diagram */}
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontWeight: 900, textAlign: 'center', opacity: 0.8, color: '#333', fontSize: '1.2rem', zIndex: 1 }}>
+            เมื่อเล่นครบ<br />12 ด่าน
+          </div>
+
+          {[
+            { id: 1, top: '15%', left: '25%', type: 'star' },
+            { id: 2, top: '30%', left: '15%', type: 'star' },
+            { id: 3, top: '50%', left: '15%', type: 'star' },
+            { id: 4, top: '70%', left: '25%', type: 'chest' },
+            { id: 5, top: '85%', left: '40%', type: 'star' },
+            { id: 6, top: '85%', left: '60%', type: 'star' },
+            { id: 7, top: '70%', left: '75%', type: 'star' },
+            { id: 8, top: '50%', left: '85%', type: 'star' },
+            { id: 9, top: '30%', left: '85%', type: 'chest' },
+            { id: 10, top: '15%', left: '75%', type: 'star' },
+            { id: 11, top: '15%', left: '50%', type: 'star' },
+            { id: 12, top: '30%', left: '50%', type: 'star' },
+          ].map((node) => {
+            const isChest = node.type === 'chest'
+
+            const currentSubId = (playsCompleted % 12) + 1
+            const loops = Math.floor(playsCompleted / 12)
+            const isUnlocked = loops > 0 || node.id <= currentSubId
+            const isCurrent = node.id === currentSubId
+
             return (
               <div
-                key={subId}
+                key={node.id}
+                onClick={() => {
+                  if (isUnlocked) handlePlay(node.id)
+                }}
                 style={{
-                  background: isSpecial
-                    ? 'linear-gradient(135deg,#ffd700,#ffed4e)'
-                    : '#fefce8',
-                  border: '2px solid #333',
-                  borderRadius: '14px',
-                  padding: '0.65rem 0.5rem',
-                  textAlign: 'center',
+                  position: 'absolute',
+                  top: node.top,
+                  left: node.left,
+                  transform: 'translate(-50%, -50%)',
+                  width: isChest ? '60px' : '50px',
+                  height: isChest ? '55px' : '50px',
+                  background: !isUnlocked
+                    ? 'linear-gradient(135deg, #d1d5db, #9ca3af)'
+                    : isChest
+                      ? 'linear-gradient(135deg, #d97706, #f59e0b)'
+                      : 'linear-gradient(135deg, #4ade80, #22c55e)',
+                  border: isCurrent ? '4px solid #fff' : '3px solid #fff',
+                  borderRadius: isChest ? '12px' : '50%',
+                  boxShadow: isCurrent
+                    ? '0 0 15px rgba(74,222,128,0.9), inset 0 2px 4px rgba(255,255,255,0.4)'
+                    : '0 4px 6px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.4)',
                   display: 'flex',
-                  flexDirection: 'column',
+                  justifyContent: 'center',
                   alignItems: 'center',
-                  gap: '0.35rem',
-                  opacity: noKeys ? 0.65 : 1,
-                  color: '#333',
+                  cursor: isUnlocked ? 'pointer' : 'not-allowed',
+                  fontSize: isChest ? '1.8rem' : '1.4rem',
+                  zIndex: isCurrent ? 10 : 2,
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  color: '#fff',
+                  opacity: !isUnlocked ? 0.8 : 1,
+                  filter: !isUnlocked ? 'grayscale(0.6)' : 'none',
+                }}
+                title={!isUnlocked ? '🔒 ยังไม่ถึงด่านนี้' : `ด่านที่ ${node.id}`}
+                onMouseEnter={(e) => {
+                  if (isUnlocked) {
+                    e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.15)';
+                    e.currentTarget.style.boxShadow = '0 6px 10px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.4)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (isUnlocked) {
+                    e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1)';
+                    e.currentTarget.style.boxShadow = isCurrent
+                      ? '0 0 15px rgba(74,222,128,0.9), inset 0 2px 4px rgba(255,255,255,0.4)'
+                      : '0 4px 6px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.4)';
+                  }
                 }}
               >
-                <span style={{ fontSize: '1.3rem' }}>
-                  {isSpecial ? '🎁' : subId}
-                </span>
-                {isSpecial && (
-                  <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#7c3aed' }}>
-                    พิเศษ
-                  </span>
-                )}
-                <button
-                  onClick={() => handlePlay(subId)}
-                  disabled={noKeys}
-                  title={noKeys ? '🔒 ไม่มีกุญแจ' : `เล่นด่าน ${subId}`}
-                  style={{
-                    background: noKeys
-                      ? '#e5e7eb'
-                      : 'linear-gradient(135deg,#667eea,#764ba2)',
-                    color: noKeys ? '#999' : '#fff',
-                    border: '2px solid #333',
-                    borderRadius: '8px',
-                    padding: '0.25rem 0.6rem',
-                    fontSize: '0.78rem',
-                    fontWeight: 700,
-                    cursor: noKeys ? 'not-allowed' : 'pointer',
-                    width: '100%',
-                  }}
-                >
-                  {noKeys ? '🔒' : '▶ เล่น'}
-                </button>
+                {!isUnlocked ? '🔒' :
+                  isChest ? '🎁' : '⭐'}
               </div>
             )
           })}

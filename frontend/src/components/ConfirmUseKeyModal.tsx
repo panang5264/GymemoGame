@@ -16,7 +16,7 @@ export default function ConfirmUseKeyModal({
   open,
   keysLeft,
   cost = 1,
-  title = 'ใช้กุญแจเพื่อเริ่มเล่น?',
+  title = 'เล่นฟรี หรือ ใช้กุญแจข้ามด่าน?',
   onCancel,
   onConfirm,
   onPlay,
@@ -139,7 +139,7 @@ export default function ConfirmUseKeyModal({
               onClick={onPlay}
               style={{
                 border: '2px solid #1b1b1b',
-                background: '#FFD34D', // สีเหลืองให้เป็นทางเลือกที่เด่นแต่ไม่เท่าปุ่มหลัก
+                background: '#4ade80', // สีเขียวให้เป็นปุ่มเล่นหลัก
                 borderRadius: 14,
                 padding: '10px 14px',
                 cursor: 'pointer',
@@ -147,7 +147,7 @@ export default function ConfirmUseKeyModal({
                 color: '#111',
               }}
             >
-              เล่น (ไม่ใช้กุญแจ)
+              ▶ เล่นด่านนี้ (ฟรี)
             </button>
           ) : null}
 
@@ -159,16 +159,16 @@ export default function ConfirmUseKeyModal({
             disabled={!canPay}
             style={{
               border: '2px solid #1b1b1b',
-              background: canPay ? '#FF6B8B' : '#ddd',
+              background: canPay ? '#FFD34D' : '#ddd',
               borderRadius: 14,
               padding: '10px 14px',
               cursor: canPay ? 'pointer' : 'not-allowed',
               fontWeight: 1000,
-              color: canPay ? '#111' : '#666', // ให้ตัวอักษรชัด
+              color: canPay ? '#111' : '#666',
               textShadow: canPay ? '0 1px 0 rgba(255,255,255,0.25)' : 'none',
             }}
           >
-            กดใช้กุญแจ ({cost})
+            ⏭ ใช้กุญแจข้ามด่าน ({cost})
           </button>
         </div>
       </div>

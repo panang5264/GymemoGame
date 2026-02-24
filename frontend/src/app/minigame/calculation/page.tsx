@@ -15,6 +15,7 @@ import { useSearchParams } from 'next/navigation'
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
 import { CALC_LEVELS, seededRng, dateSeed, CalcQuestion } from '@/lib/calculationLevels'
+import { recordPlay } from '@/lib/levelSystem'
 
 const MEMORIZE_DURATION = 10  // seconds to study questions before answering
 
@@ -26,6 +27,8 @@ function CalculationGameInner() {
   const levelParam = parseInt(searchParams.get('level') ?? '1', 10)
   const mode = searchParams.get('mode') ?? 'practice'
   const seed = searchParams.get('seed') ?? new Date().toISOString().split('T')[0]
+  const subId = parseInt(searchParams.get('subId') ?? '1', 10)
+  const villageId = searchParams.get('villageId')
 
   const levelIndex = Math.min(Math.max(levelParam - 1, 0), CALC_LEVELS.length - 1)
   const level = CALC_LEVELS[levelIndex]
@@ -45,6 +48,13 @@ function CalculationGameInner() {
     const id = setTimeout(() => setMemorizeLeft(t => t - 1), 1000)
     return () => clearTimeout(id)
   }, [phase, memorizeLeft])
+
+  // ── Record Play for Village Mode ──────────────────────────────────────────
+  useEffect(() => {
+    if (phase === 'done' && mode === 'village' && villageId) {
+      recordPlay(parseInt(villageId, 10), score * 25)
+    }
+  }, [phase, mode, villageId, score])
 
   // ── Start game ────────────────────────────────────────────────────────────
   const startGame = useCallback(() => {
@@ -179,6 +189,10 @@ function CalculationGameInner() {
   // ── Render: done ──────────────────────────────────────────────────────────
   if (phase === 'done') {
     const pct = Math.round((score / questions.length) * 100)
+
+    // Check if the game was triggered from village so route back to Map
+    const villageId = searchParams.get('villageId')
+
     return (
       <div className="game-page">
         <h1 className="game-title">🔢 Calculation – เสร็จสิ้น!</h1>
@@ -198,10 +212,22 @@ function CalculationGameInner() {
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'center' }}>
-            <button className="start-button" onClick={startGame} style={{ marginBottom: 0 }}>
-              เล่นอีกครั้ง 🔄
-            </button>
-            {mode === 'daily' ? (
+            {mode === 'village' && villageId ? (
+              <>
+                {subId < 12 ? (
+                  <Link href={`/world/${villageId}/sublevel/${subId + 1}`} className="start-button" style={{ display: 'inline-flex', justifyContent: 'center', marginBottom: '0', textDecoration: 'none' }}>
+                    ด่านต่อไป 🚀
+                  </Link>
+                ) : parseInt(villageId, 10) < 10 ? (
+                  <Link href={`/world/${parseInt(villageId, 10) + 1}`} className="start-button" style={{ display: 'inline-flex', justifyContent: 'center', marginBottom: '0', textDecoration: 'none', background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>
+                    หมู่บ้านถัดไป 🏘️
+                  </Link>
+                ) : null}
+                <Link href={`/world/${villageId}`} className="start-button" style={{ display: 'inline-flex', justifyContent: 'center', marginBottom: '0', marginTop: (subId < 12 || parseInt(villageId, 10) < 10) ? '1rem' : '0', background: 'linear-gradient(135deg, #667eea, #764ba2)', textDecoration: 'none', color: '#fff' }}>
+                  กลับสู่แผนที่ 🗺️
+                </Link>
+              </>
+            ) : mode === 'daily' ? (
               <Link href="/daily-challenge" className="cta-button" style={{ display: 'inline-block' }}>
                 กลับภารกิจรายวัน 🌟
               </Link>
@@ -210,6 +236,10 @@ function CalculationGameInner() {
                 กลับมินิเกม 🎮
               </Link>
             )}
+
+            <button className="start-button" onClick={startGame} style={{ marginBottom: 0, marginTop: '1rem', padding: '0.5rem 2rem', fontSize: '1rem' }}>
+              เล่นอีกครั้ง 🔄
+            </button>
           </div>
         </div>
       </div>
