@@ -265,7 +265,7 @@ export default function Page() {
   }, [matches, leftRefs, rightRefs, gameMode])
 
   return (
-    <div className='game-page min-h-screen py-10 flex flex-col items-center bg-slate-50 relative overflow-hidden'>
+    <div className='game-page min-h-screen py-10 flex flex-col items-center relative overflow-hidden'>
       {/* SVG Overlay for Lines */}
       {gameMode === 'match' && (
         <svg className="fixed inset-0 pointer-events-none z-0 overflow-visible" style={{ width: '100vw', height: '100vh' }}>
@@ -286,7 +286,7 @@ export default function Page() {
         </div>
 
         {isComplete ? (
-          <div className="bg-white border-2 border-slate-100 p-12 rounded-[3rem] shadow-xl text-center max-w-xl mx-auto animate-in zoom-in duration-500">
+          <div className="bg-white/95 backdrop-blur-md border-2 border-white/20 p-12 rounded-[3rem] shadow-2xl text-center max-w-xl mx-auto animate-in zoom-in duration-500">
             <div className="text-8xl mb-6">🏆</div>
             <h2 className="text-3xl font-black text-slate-800 mb-4">ยอดเยี่ยมที่สุด!</h2>
             <p className="text-slate-500 mb-10 text-lg">คุณมีความสามารถในการมองเห็นพื้นที่ได้ดีเยี่ยม</p>

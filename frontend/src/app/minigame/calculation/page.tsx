@@ -120,7 +120,7 @@ function CalculationGameInner() {
           🔢 Calculation
         </h1>
 
-        <div className="bg-white/90 backdrop-blur-md border border-white/20 p-6 md:p-10 rounded-[2.5rem] shadow-2xl max-w-lg w-full text-center animate-in zoom-in duration-500">
+        <div className="bg-white/95 backdrop-blur-md border border-white/20 p-6 md:p-10 rounded-[2.5rem] shadow-2xl max-w-lg w-full text-center animate-in zoom-in duration-500">
           <div className="text-6xl md:text-7xl mb-6">🧮</div>
           <h2 className="text-xl md:text-2xl font-black mb-2 text-slate-800">ระดับ {level.level}: {level.name}</h2>
           <p className="text-slate-500 mb-8 text-base md:text-lg px-2">{level.description}</p>
@@ -259,7 +259,7 @@ function CalculationGameInner() {
     const pct = total > 0 ? Math.round((score / total) * 100) : 0
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
-        <div className="bg-white/95 backdrop-blur-xl border border-white/20 p-8 md:p-12 rounded-[3rem] shadow-2xl max-w-sm md:max-w-md w-full text-center animate-in zoom-in duration-500">
+        <div className="bg-white/90 backdrop-blur-xl border border-white/20 p-8 md:p-12 rounded-[3rem] shadow-2xl max-w-sm md:max-w-md w-full text-center animate-in zoom-in duration-500">
           <div className="text-7xl md:text-8xl mb-6">
             {pct >= 75 ? '🏆' : pct >= 50 ? '🥈' : '🥉'}
           </div>

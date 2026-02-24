@@ -226,15 +226,15 @@ function ManagementGameInner() {
   const unplacedItems = items.filter(i => !i.placedInCategoryId)
 
   return (
-    <div className="game-page min-h-screen bg-slate-50 flex flex-col items-center p-4">
+    <div className="game-page min-h-screen flex flex-col items-center p-4">
       {!isGameStarted && !isGameOver && (
         <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-          <h1 className="text-5xl md:text-7xl font-black mb-4 text-slate-800">
+          <h1 className="text-5xl md:text-7xl font-black mb-4 text-white drop-shadow-md">
             Management
           </h1>
-          <p className="text-2xl font-bold text-slate-500 mb-12">ด่าน {subId} — ระดับ {levelParam}</p>
+          <p className="text-2xl font-bold text-white/80 mb-12 drop-shadow-sm">ด่าน {subId} — ระดับ {levelParam}</p>
 
-          <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-slate-200 max-w-lg">
+          <div className="bg-white/95 backdrop-blur-md p-10 rounded-[2.5rem] shadow-2xl border border-white/20 max-w-lg">
             <div className="text-8xl mb-8">📦</div>
             <p className="text-slate-600 text-lg mb-10 leading-relaxed text-center">
               ลากสิ่งของที่กระจายอยู่ ไปวางในกล่องตามหมวดหมู่ที่กำหนดให้ถูกต้อง!
@@ -250,8 +250,8 @@ function ManagementGameInner() {
       )}
 
       {isGameOver && (
-        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center bg-white p-12 rounded-[3.5rem] shadow-xl border border-slate-100 max-w-md w-full">
-          <div className="text-8xl mb-6">🏆</div>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center bg-white/95 backdrop-blur-md p-12 rounded-[3.5rem] shadow-2xl border border-white/20 max-w-md w-full animate-fadeUp">
+          <div className="text-8xl mb-6 drop-shadow-lg">🏆</div>
           <h2 className="text-4xl font-black text-slate-800 mb-2">ยอดเยี่ยม!</h2>
           <p className="text-slate-500 font-bold mb-8 text-center">จัดการหมวดหมู่ได้ครบถ้วนแล้ว</p>
 
@@ -287,7 +287,7 @@ function ManagementGameInner() {
       )}
 
       {isGameStarted && !isGameOver && (
-        <div className="w-full max-w-5xl h-[700px] flex flex-col bg-slate-200 rounded-[2.5rem] border-[8px] border-white shadow-2xl overflow-hidden relative">
+        <div className="w-full max-w-5xl h-[700px] flex flex-col bg-slate-200/90 backdrop-blur-md rounded-[2.5rem] border-[4px] md:border-[8px] border-white/50 shadow-2xl overflow-hidden relative animate-zoomIn">
 
           {/* Header Bar */}
           <div className="h-24 bg-white border-b-4 border-pink-400 flex justify-between items-center px-6 md:px-10 relative z-20">
