@@ -33,38 +33,31 @@ function ManagementGameInner() {
   const mode = searchParams.get('mode')
 
   const [score, setScore] = useState(0)
-  const [moves, setMoves] = useState(0)
   const [isGameStarted, setIsGameStarted] = useState(false)
   const [isGameOver, setIsGameOver] = useState(false)
-
   const [items, setItems] = useState<Item[]>([])
   const [categories, setCategories] = useState<Category[]>([])
+  const [feedback, setFeedback] = useState<{ type: 'correct' | 'wrong', message: string } | null>(null)
 
   useEffect(() => {
-    // สมมติตั้งแต่ระดับ 1-10 ให้ใช้ Layout การกระจายไอเทมหามุมแบบในรูป
     switch (levelParam) {
       case 1:
         setCategories([
-          // NOTE: หากมีรูปกล่องของจริง ให้ใส่ path รูปภาพลงไปใน boxImageUrl: '/assets/your_box_image.png' ตรงนี้ได้เลย
-          // ตอนนี้ไม่ได้ใส่ boxImageUrl ไป เพื่อให้ระบบแสดง emoji 📦 เป็น Placeholder ตามที่ต้องการ
-          { id: 'cat:red', title: 'สีแดง', accepts: i => i.color === 'red' },
-          { id: 'cat:circle', title: 'ทรงกลม', accepts: i => i.shape === 'circle' },
+          { id: 'cat:red', title: 'สีแดง 🔴', accepts: i => i.color === 'red' },
+          { id: 'cat:circle', title: 'ทรงกลม 🔵', accepts: i => i.shape === 'circle' },
         ])
         setItems([
-          // NOTE: หากมีรูปไอเทมจริง เช่น รูปลูกบอล รูปแอปเปิล ให้ใส่ path ใน imageUrl: '/assets/your_item_image.png' แทนคำว่า '' ด้านล่าง
-          // ถ้ามี imageUrl ตัว emoji จะถูกซ่อนอัตโนมัติ
-          { id: 'i1', label: 'แอปเปิลแดง', emoji: '🍎', imageUrl: '', color: 'red', shape: 'other', initialTop: '35%', initialLeft: '35%' },
-          { id: 'i2', label: 'เหรียญ', emoji: '🪙', imageUrl: '', color: 'yellow', shape: 'circle', initialTop: '25%', initialLeft: '15%' },
-          { id: 'i3', label: 'ลูกบอล', emoji: '⚽', imageUrl: '', color: 'mixed', shape: 'circle', initialTop: '30%', initialLeft: '80%' },
-          { id: 'i4', label: 'เข็มหมุด', emoji: '📌', imageUrl: '', color: 'red', shape: 'other', initialTop: '50%', initialLeft: '65%' },
-          { id: 'i5', label: 'ลูกพีช', emoji: '🍑', imageUrl: '', color: 'red', shape: 'other', initialTop: '28%', initialLeft: '55%' },
+          { id: 'i1', label: 'แอปเปิลแดง', emoji: '🍎', color: 'red', shape: 'other', initialTop: '15%', initialLeft: '20%' },
+          { id: 'i2', label: 'เหรียญ', emoji: '🪙', color: 'yellow', shape: 'circle', initialTop: '45%', initialLeft: '15%' },
+          { id: 'i3', label: 'ลูกบอล', emoji: '⚽', color: 'mixed', shape: 'circle', initialTop: '30%', initialLeft: '80%' },
+          { id: 'i4', label: 'เข็มหมุด', emoji: '📌', color: 'red', shape: 'other', initialTop: '10%', initialLeft: '65%' },
+          { id: 'i5', label: 'ลูกพีช', emoji: '🍑', color: 'red', shape: 'other', initialTop: '50%', initialLeft: '55%' },
         ])
         break
       default:
-        // Placeholder สำหรับระดับ 2-10
         setCategories([
-          { id: 'cat:1', title: `หมวดหมู่ A (ระดับ ${levelParam})`, accepts: i => i.color === 'red' },
-          { id: 'cat:2', title: `หมวดหมู่ B (ระดับ ${levelParam})`, accepts: i => i.shape === 'circle' },
+          { id: 'cat:1', title: `หมวดหมู่ A 📦`, accepts: i => i.color === 'red' },
+          { id: 'cat:2', title: `หมวดหมู่ B 📦`, accepts: i => i.shape === 'circle' },
         ])
         setItems([
           { id: 'i1', label: `ไอเทม 1`, emoji: '❓', color: 'red', shape: 'circle', initialTop: '25%', initialLeft: '20%' },
@@ -86,67 +79,81 @@ function ManagementGameInner() {
     const category = categories.find(c => c.id === categoryId)
     if (!item || !category) return
 
-    setMoves(moves + 1)
     const isCorrect = category.accepts(item)
-
-    setItems(prev => {
-      const newItems = prev.map(i =>
-        i.id === itemId ? { ...i, placedInCategoryId: isCorrect ? categoryId : undefined } : i
-      )
-      if (newItems.every(i => i.placedInCategoryId)) {
-        setIsGameOver(true)
-      }
-      return newItems
-    })
-
-    setScore(score + (isCorrect ? 50 : -5))
+    if (isCorrect) {
+      setFeedback({ type: 'correct', message: '✨ ถูกต้อง!' })
+      setScore(s => s + 50)
+      setItems(prev => {
+        const newItems = prev.map(i =>
+          i.id === itemId ? { ...i, placedInCategoryId: categoryId } : i
+        )
+        if (newItems.every(i => i.placedInCategoryId)) {
+          setTimeout(() => setIsGameOver(true), 1000)
+        }
+        return newItems
+      })
+    } else {
+      setFeedback({ type: 'wrong', message: '❌ ยังไม่ใช่นะ ลองใหม่ดู' })
+      setScore(s => Math.max(0, s - 5))
+    }
+    setTimeout(() => setFeedback(null), 1000)
   }
 
   const unplacedItems = items.filter(i => !i.placedInCategoryId)
 
   return (
-    <div className="game-page" style={{ maxWidth: '1000px', margin: '0 auto', padding: '1rem' }}>
-
+    <div className="game-page min-h-screen bg-slate-50 flex flex-col items-center p-4">
       {!isGameStarted && !isGameOver && (
-        <div style={{ textAlign: 'center', marginTop: '4rem' }}>
-          <h1 className="game-title" style={{ fontSize: '3rem', marginBottom: '1rem' }}>
-            ด่าน {subId} - จัดหมวดหมู่
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+          <h1 className="text-5xl md:text-7xl font-black mb-4 text-slate-800">
+            Management
           </h1>
-          <p style={{ fontSize: '1.4rem', marginBottom: '2rem', color: '#ffd700' }}>
-            ความยากระดับ {levelParam}
-          </p>
-          <button className="start-button" style={{ padding: '1.5rem 4rem', fontSize: '1.5rem' }} onClick={() => setIsGameStarted(true)}>
-            เริ่มเกม 🚀
-          </button>
+          <p className="text-2xl font-bold text-slate-500 mb-12">ด่าน {subId} — ระดับ {levelParam}</p>
+
+          <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-slate-200 max-w-lg">
+            <div className="text-8xl mb-8">📦</div>
+            <p className="text-slate-600 text-lg mb-10 leading-relaxed text-center">
+              ลากสิ่งของที่กระจายอยู่ ไปวางในกล่องตามหมวดหมู่ที่กำหนดให้ถูกต้อง!
+            </p>
+            <button
+              className="w-full py-5 bg-pink-500 hover:bg-pink-600 text-white rounded-3xl font-black text-2xl shadow-lg active:scale-95 transition-all"
+              onClick={() => setIsGameStarted(true)}
+            >
+              เริ่มระดมสมอง! 🚀
+            </button>
+          </div>
         </div>
       )}
 
       {isGameOver && (
-        <div className="dc-card" style={{ marginTop: '2rem', textAlign: 'center' }}>
-          <div style={{ fontSize: '5rem', marginBottom: '0.5rem' }}>🌟</div>
-          <h2>ยอดเยี่ยม! แยกหมวดหมู่เสร็จแล้ว</h2>
-          <p style={{ marginTop: '1rem', fontSize: '1.5rem' }}>คะแนนของคุณ: <span style={{ color: '#4ade80', fontWeight: 'bold' }}>{score}</span></p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', marginTop: '2.5rem' }}>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center bg-white p-12 rounded-[3.5rem] shadow-xl border border-slate-100 max-w-md w-full">
+          <div className="text-8xl mb-6">🏆</div>
+          <h2 className="text-4xl font-black text-slate-800 mb-2">ยอดเยี่ยม!</h2>
+          <p className="text-slate-500 font-bold mb-8 text-center">จัดการหมวดหมู่ได้ครบถ้วนแล้ว</p>
+
+          <div className="bg-slate-50 px-8 py-6 rounded-3xl border border-slate-100 mb-10 w-full text-center">
+            <p className="text-slate-400 text-sm font-bold uppercase tracking-widest mb-1">Score</p>
+            <p className="text-5xl font-black text-blue-600">{score}</p>
+          </div>
+
+          <div className="flex flex-col gap-4 w-full">
             {subId < 12 ? (
               <button
-                className="start-button"
-                style={{ marginBottom: 0 }}
+                className="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-black text-xl shadow-md transition-all active:scale-95"
                 onClick={() => router.push(`/world/${villageId}/sublevel/${subId + 1}`)}
               >
                 ด่านต่อไป 🚀
               </button>
             ) : villageId < 10 ? (
               <button
-                className="start-button"
-                style={{ marginBottom: 0, background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}
+                className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl font-black text-xl shadow-md transition-all active:scale-95"
                 onClick={() => router.push(`/world/${villageId + 1}`)}
               >
                 หมู่บ้านถัดไป 🏘️
               </button>
             ) : null}
             <button
-              className="start-button"
-              style={{ background: 'linear-gradient(135deg, #667eea, #764ba2)', color: '#fff', marginBottom: 0, marginTop: (subId < 12 || villageId < 10) ? '1rem' : 0 }}
+              className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-black text-lg transition-all"
               onClick={() => router.push(`/world/${villageId}`)}
             >
               กลับสู่แผนที่ 🗺️
@@ -156,65 +163,32 @@ function ManagementGameInner() {
       )}
 
       {isGameStarted && !isGameOver && (
-        <div style={{
-          position: 'relative',
-          width: '100%',
-          height: '650px',
-          backgroundColor: '#e5e7eb',
-          borderRadius: '24px',
-          border: '6px solid #fff',
-          boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
+        <div className="w-full max-w-5xl h-[700px] flex flex-col bg-slate-200 rounded-[2.5rem] border-[8px] border-white shadow-2xl overflow-hidden relative">
 
-          {/* Top Bar matching reference */}
-          <div style={{
-            height: '80px',
-            backgroundColor: '#fff',
-            borderBottom: '4px solid #f472b6',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '0 2rem',
-            position: 'relative',
-            zIndex: 10
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ fontSize: '2.5rem' }}>🍇</div> {/* Placeholder mascot */}
-              <h2 style={{ fontSize: '1.4rem', fontWeight: 900, color: '#333' }}>
+          {/* Header Bar */}
+          <div className="h-24 bg-white border-b-4 border-pink-400 flex justify-between items-center px-10 relative z-20">
+            <div className="flex items-center gap-4">
+              <span className="text-5xl">🍇</span>
+              <h2 className="text-xl font-black text-slate-700">
                 จงแยกวัตถุที่มีสีแดง และวัตถุทรงกลม
               </h2>
             </div>
-
-            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', transform: 'translateY(15px)' }}>
-              <div style={{ background: 'linear-gradient(90deg, #f59e0b, #ec4899)', padding: '0.4rem 1.5rem', borderRadius: '16px', color: '#fff', fontWeight: 900, fontSize: '1.2rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-                SCORE
-              </div>
-              <div style={{
-                backgroundColor: '#fbbf24',
-                color: '#fff',
-                width: '45px',
-                height: '45px',
-                borderRadius: '50%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                fontWeight: 900,
-                fontSize: '1.3rem',
-                marginTop: '-10px',
-                border: '3px solid #fff',
-                zIndex: 1,
-                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-              }}>
+            <div className="flex flex-col items-center">
+              <div className="bg-pink-500 text-white px-4 py-1 rounded-xl font-bold text-xs uppercase tracking-tighter shadow-sm z-10">Score</div>
+              <div className="bg-yellow-400 w-14 h-14 rounded-full border-4 border-white flex items-center justify-center text-white font-black text-2xl shadow-md -mt-3">
                 {score}
               </div>
             </div>
           </div>
 
           {/* Playing Field */}
-          <div style={{ flex: 1, position: 'relative', width: '100%' }}>
+          <div className="flex-1 relative w-full overflow-hidden">
+            {feedback && (
+              <div className={`absolute top-6 left-1/2 -translate-x-1/2 z-50 px-10 py-2 rounded-full font-black text-xl shadow-lg animate-bounce border-2 ${feedback.type === 'correct' ? 'bg-green-500 text-white border-green-400' : 'bg-red-500 text-white border-red-400'
+                }`}>
+                {feedback.message}
+              </div>
+            )}
 
             {/* Scattered Items */}
             {unplacedItems.map(item => (
@@ -228,35 +202,19 @@ function ManagementGameInner() {
                 onDragEnd={(e) => {
                   e.currentTarget.style.opacity = '1'
                 }}
+                className="absolute w-24 h-24 flex items-center justify-center cursor-grab active:cursor-grabbing hover:scale-110 transition-transform duration-100 z-10"
                 style={{
-                  position: 'absolute',
                   top: item.initialTop || '50%',
                   left: item.initialLeft || '50%',
                   transform: 'translate(-50%, -50%)',
-                  cursor: 'grab',
-                  width: '80px',
-                  height: '80px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fontSize: '4rem',
-                  userSelect: 'none',
-                  transition: 'transform 0.1s',
-                  zIndex: 5
                 }}
-                onMouseEnter={e => e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.15)'}
-                onMouseLeave={e => e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1)'}
               >
-                {item.imageUrl ? (
-                  <img src={item.imageUrl} alt={item.label} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))' }} />
-                ) : (
-                  <span style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))' }}>{item.emoji}</span>
-                )}
+                <span className="text-7xl drop-shadow-md select-none">{item.emoji}</span>
               </div>
             ))}
 
-            {/* Baskets/Boxes at Bottom */}
-            <div style={{ position: 'absolute', bottom: '2rem', left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: '8rem', zIndex: 2 }}>
+            {/* Drop Zones */}
+            <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-20 px-10 z-0 text-center">
               {categories.map(cat => (
                 <div
                   key={cat.id}
@@ -269,28 +227,17 @@ function ManagementGameInner() {
                     const itemId = e.dataTransfer.getData('text/plain')
                     handleDropItemToCategory(itemId, cat.id)
                   }}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '1rem',
-                    transition: 'transform 0.2s'
-                  }}
+                  className="flex flex-col items-center gap-2 transition-transform duration-200"
                 >
-                  <div style={{ width: '160px', height: '140px', display: 'flex', justifyContent: 'center', alignItems: 'flex-end', position: 'relative' }}>
-                    {cat.boxImageUrl ? (
-                      <img src={cat.boxImageUrl} alt={cat.title} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', filter: 'drop-shadow(0px 10px 15px rgba(0,0,0,0.2))' }} />
-                    ) : (
-                      <div style={{ fontSize: '7rem', filter: 'drop-shadow(0px 10px 10px rgba(0,0,0,0.3))' }}>📦</div>
-                    )}
+                  <div className="relative w-40 h-32 flex items-center justify-center">
+                    <span className="text-8xl drop-shadow-lg transition-transform duration-500 hover:scale-110">📦</span>
                   </div>
-                  <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#4b5563' }}>
+                  <div className="text-2xl font-black text-slate-500 uppercase tracking-tighter">
                     {cat.title}
                   </div>
                 </div>
               ))}
             </div>
-
           </div>
         </div>
       )}
