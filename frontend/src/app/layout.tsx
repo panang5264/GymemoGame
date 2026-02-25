@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import CheatOverlay from '@/components/CheatOverlay'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -21,6 +23,9 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        <Suspense fallback={null}>
+          <CheatOverlay />
+        </Suspense>
       </body>
     </html>
   )

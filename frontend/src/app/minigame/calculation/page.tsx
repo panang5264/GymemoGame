@@ -16,7 +16,7 @@ import { useState, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { CALC_LEVELS, CalcQuestion } from '@/lib/calculationLevels'
-import { recordPlay } from '@/lib/levelSystem'
+import { recordPlay, markDailyMode } from '@/lib/levelSystem'
 import Timer from '@/components/Timer'
 
 // ─── Inner component (needs useSearchParams inside Suspense) ──────────────────
@@ -72,6 +72,7 @@ function CalculationGameInner() {
         `gymemo_calc_daily_${seed}`,
         JSON.stringify({ score, total })
       )
+      markDailyMode(seed, 'calculation')
     }
   }, [phase, mode, seed, score, total])
 
@@ -109,13 +110,24 @@ function CalculationGameInner() {
       setLastCorrect(null)
       setAnswer('')
       setQuestion(level.generate_problem())
-    }, 400)
-  }, [answer, isTimeUp, level, question])
+    }, 500)
+  }, [answer, question, isTimeUp, level])
+
+  // ── Cheat Mode ─────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const handleCheat = () => {
+      setScore(100)
+      setTotal(100)
+      setPhase('done')
+    }
+    window.addEventListener('gymemo:cheat_complete', handleCheat)
+    return () => window.removeEventListener('gymemo:cheat_complete', handleCheat)
+  }, [])
 
   // ── Render: intro ─────────────────────────────────────────────────────────
   if (phase === 'intro') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4">
         <h1 className="text-4xl md:text-6xl font-black mb-8 text-white drop-shadow-xl animate-fadeUp">
           🔢 Calculation
         </h1>
@@ -163,7 +175,7 @@ function CalculationGameInner() {
 
   if (phase === 'countdown') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-[calc(100vh-140px)] flex items-center justify-center">
         <div className="text-[10rem] md:text-[15rem] font-black text-white drop-shadow-[0_10px_50px_rgba(0,0,0,0.3)] animate-ping">
           {countdown > 0 ? countdown : 'GO!'}
         </div>
@@ -174,7 +186,7 @@ function CalculationGameInner() {
   // ── Render: play ──────────────────────────────────────────────────────────
   if (phase === 'play' && question) {
     return (
-      <div className="min-h-screen flex flex-col items-center p-4">
+      <div className="min-h-[calc(100vh-140px)] flex flex-col items-center p-4">
         {/* Responsive Header */}
         <div className="w-full max-w-3xl flex justify-between items-center mb-6 mt-2 md:mt-8 px-2 md:px-0">
           <h1 className="text-xl md:text-2xl font-black text-white drop-shadow-md">🔢 ด่าน {level.level}</h1>
@@ -198,30 +210,55 @@ function CalculationGameInner() {
             <div className="min-h-[120px] md:min-h-[180px] flex items-center justify-center mb-8 md:mb-12">
               <div className="flex justify-center gap-4 md:gap-8 items-center flex-wrap">
                 {level.level === 8 ? (
-                  <div className="flex items-center gap-3 md:gap-6 scale-110 md:scale-150">
-                    <span className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight">{typeof question.operands[0] === 'number' ? question.operands[0] : '?'}</span>
+                  /* Special UI for Level 8: A + B = C + ? */
+                  <div className="flex items-center gap-3 md:gap-6 scale-110 md:scale-125 lg:scale-150">
+                    <span className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight">{String(question.operands[0])}</span>
                     <span className="text-3xl md:text-4xl font-black text-blue-500">{question.operators[0].name}</span>
-                    <div className="w-10 h-10 md:w-14 md:h-14 flex items-center justify-center bg-slate-50 border-3 border-dashed border-slate-200 rounded-xl text-3xl text-indigo-600 font-black">?</div>
-                    <span className="text-3xl md:text-4xl font-black text-blue-500">=</span>
-                    <span className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight">{typeof question.operands[1] === 'number' ? question.operands[1] : '?'}</span>
+                    <span className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight">{String(question.operands[1])}</span>
+                    <span className="text-3xl md:text-4xl font-black text-indigo-400">=</span>
+                    <span className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight">{String(question.operands[2])}</span>
+                    <span className="text-3xl md:text-4xl font-black text-blue-500">{question.operators[1].name}</span>
+                    <div className="w-10 h-10 md:w-14 md:h-14 flex items-center justify-center bg-blue-50 border-3 border-dashed border-blue-200 rounded-xl text-3xl text-blue-600 font-black">?</div>
                   </div>
                 ) : (
-                  question.operands.map((value, index) => (
-                    <div key={`op-${index}`} className="flex items-center gap-3 md:gap-8">
-                      {level.level === 10 && question.messing_index === index ? (
-                        <span className="text-5xl md:text-7xl animate-bounce">🤡</span>
-                      ) : typeof value === 'number' ? (
-                        <span className="text-5xl md:text-7xl font-black text-slate-800 tracking-tighter">{value}</span>
-                      ) : (
-                        <div className="p-2 md:p-3 bg-white rounded-2xl border border-slate-100 shadow-md flex items-center justify-center w-[80px] h-[60px] md:w-[120px] md:h-[90px]">
-                          <Image src={value.path} width={100} height={70} className="rounded-lg object-contain w-full h-full" alt={value.name} />
-                        </div>
-                      )}
-                      {index < question.operators.length && (
-                        <span className="text-3xl md:text-5xl font-black text-indigo-400">{question.operators[index].name}</span>
-                      )}
-                    </div>
-                  ))
+                  /* Generic rendering for other levels */
+                  <div className="flex justify-center gap-4 md:gap-8 items-center flex-wrap">
+                    {question.operands.map((value, index) => (
+                      <div key={`op-${index}`} className="flex items-center gap-3 md:gap-8">
+                        {/* 1. Missing Index (The one to answer) */}
+                        {question.hidden_index === index ? (
+                          <div className="w-14 h-14 md:w-20 md:h-20 flex items-center justify-center bg-blue-50 border-4 border-dashed border-blue-200 rounded-2xl text-4xl text-blue-600 font-black animate-pulse">?</div>
+                        ) : question.messing_index === index ? (
+                          /* 2. Messing Index (The distractor / clown) */
+                          <div className="relative group">
+                            <span className="text-5xl md:text-7xl animate-bounce inline-block">🤡</span>
+                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">ตัวแปรส่วนเกิน!</div>
+                          </div>
+                        ) : typeof value === 'number' ? (
+                          /* 3. Normal Number */
+                          <span className="text-5xl md:text-7xl font-black text-slate-800 tracking-tighter">{value}</span>
+                        ) : (
+                          /* 4. Dice Image */
+                          <div className="p-2 md:p-3 bg-white rounded-2xl border border-slate-100 shadow-md flex items-center justify-center w-[80px] h-[60px] md:w-[120px] md:h-[90px]">
+                            <Image src={(value as any).path} width={100} height={70} className="rounded-lg object-contain w-full h-full" alt={(value as any).name} />
+                          </div>
+                        )}
+
+                        {/* Operator between operands */}
+                        {index < question.operators.length && (
+                          <span className="text-3xl md:text-5xl font-black text-indigo-400">{question.operators[index].name}</span>
+                        )}
+
+                        {/* Show equals sign at the end if it's not a missing variable level or if it's Level 10 */}
+                        {index === question.operands.length - 1 && question.hidden_index === undefined && (
+                          <div className="flex items-center gap-3 md:gap-8 ml-2 md:ml-4">
+                            <span className="text-3xl md:text-5xl font-black text-indigo-400">=</span>
+                            <div className="w-14 h-14 md:w-20 md:h-20 flex items-center justify-center bg-blue-50 border-4 border-dashed border-blue-200 rounded-2xl text-4xl text-blue-600 font-black">?</div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
@@ -232,7 +269,7 @@ function CalculationGameInner() {
                   autoFocus
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  className={`w-full bg-slate-50 border-[6px] rounded-[1.5rem] py-4 md:py-6 px-6 md:px-10 text-4xl md:text-5xl font-black text-center outline-none transition-all ${lastCorrect === true ? 'border-green-500 text-green-600 bg-green-50/50' : lastCorrect === false ? 'border-red-500 text-red-600 animate-shake bg-red-50/50' : 'border-slate-100 focus:border-blue-400'}`}
+                  className={`w-full bg-slate-50 border-[6px] rounded-[1.5rem] py-4 md:py-6 px-6 md:px-10 text-4xl md:text-5xl font-black text-center outline-none transition-all ${lastCorrect === true ? 'border-green-500 text-green-600 bg-green-50/50' : lastCorrect === false ? 'border-red-500 text-red-600 animate-shake bg-red-50/50' : 'border-slate-100 focus:border-blue-400 text-blue-700'}`}
                   placeholder="?"
                   value={answer}
                   disabled={isTimeUp}
@@ -258,7 +295,7 @@ function CalculationGameInner() {
   if (phase === 'done') {
     const pct = total > 0 ? Math.round((score / total) * 100) : 0
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4">
         <div className="bg-white/90 backdrop-blur-xl border border-white/20 p-8 md:p-12 rounded-[3rem] shadow-2xl max-w-sm md:max-w-md w-full text-center animate-in zoom-in duration-500">
           <div className="text-7xl md:text-8xl mb-6">
             {pct >= 75 ? '🏆' : pct >= 50 ? '🥈' : '🥉'}
@@ -297,8 +334,11 @@ function CalculationGameInner() {
                 </Link>
               </>
             ) : mode === 'daily' ? (
-              <Link href="/daily-challenge" className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-[1.5rem] font-black text-xl shadow-lg transition-all text-center active:scale-95">
-                กลับภารกิจรายวัน 🌟
+              <Link
+                href={`/minigame/spatial?mode=daily&villageId=${villageId}&level=${levelParam}&seed=${seed}`}
+                className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-[1.5rem] font-black text-xl shadow-lg transition-all text-center active:scale-95"
+              >
+                ด่านถัดไป: 🗺️ พื้นที่
               </Link>
             ) : (
               <Link href="/minigame" className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-[1.5rem] font-black text-lg transition-all text-center">
