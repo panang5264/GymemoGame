@@ -10,6 +10,14 @@ export default function CheatOverlay() {
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
+    const [targetGame, setTargetGame] = useState<'management' | 'calculation' | 'spatial'>('management')
+
+    useEffect(() => {
+        if (pathname.includes('/minigame/calculation')) setTargetGame('calculation')
+        else if (pathname.includes('/minigame/spatial')) setTargetGame('spatial')
+        else setTargetGame('management')
+    }, [pathname])
+
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.shiftKey && e.altKey && e.key.toLowerCase() === 'c') {
@@ -24,12 +32,10 @@ export default function CheatOverlay() {
         const p = loadProgress()
         p.unlockedVillages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         for (let i = 1; i <= 10; i++) {
-            if (!p.villages[String(i)]) {
-                p.villages[String(i)] = { playsCompleted: 0, expTubeFilled: false }
-            }
+            p.villages[String(i)] = { playsCompleted: 12, expTubeFilled: true }
         }
         saveProgress(p)
-        alert('เดอะแฟลช! ปลดล็อกทุกด่านให้แล้วครับ ⚡')
+        alert('เดอะแฟลช! ปลดล็อกและเคลียร์ทุกด่านให้แล้วครับ ⚡')
         window.location.reload()
     }
 
@@ -48,12 +54,7 @@ export default function CheatOverlay() {
         const mode = searchParams.get('mode') || 'practice'
         params.set('mode', mode)
 
-        // Determine which minigame based on current path or default to management
-        let target = '/minigame/management'
-        if (pathname.includes('/minigame/calculation')) target = '/minigame/calculation'
-        if (pathname.includes('/minigame/spatial')) target = '/minigame/spatial'
-
-        router.push(`${target}?${params.toString()}`)
+        router.push(`/minigame/${targetGame}?${params.toString()}`)
         setIsOpen(false)
     }
 
@@ -95,7 +96,20 @@ export default function CheatOverlay() {
                 </div>
 
                 <div className="mb-6">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-4">Jump to Level (In Current Game)</label>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Target Minigame</label>
+                    <div className="flex gap-2 mb-4">
+                        {(['management', 'calculation', 'spatial'] as const).map(gm => (
+                            <button
+                                key={gm}
+                                onClick={() => setTargetGame(gm)}
+                                className={`flex-1 py-2 rounded-xl text-xs font-black uppercase transition-all ${targetGame === gm ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                            >
+                                {gm}
+                            </button>
+                        ))}
+                    </div>
+
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-4">Jump to Level (Practice Mode)</label>
                     <div className="grid grid-cols-5 gap-2">
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(lv => (
                             <button key={lv} onClick={() => goToLevel(lv)} className="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-black text-sm transition-all border border-slate-200">
@@ -106,8 +120,8 @@ export default function CheatOverlay() {
                 </div>
 
                 <div className="space-y-2">
-                    <button onClick={() => router.push('/world')} className="w-full py-4 text-slate-500 font-bold hover:text-indigo-600 transition-colors">Go to World Map 🗺️</button>
-                    <button onClick={() => router.push('/daily-challenge')} className="w-full py-4 text-slate-500 font-bold hover:text-indigo-600 transition-colors">Go to Daily 🌟</button>
+                    <button onClick={() => { router.push('/world'); setIsOpen(false); }} className="w-full py-4 text-slate-500 font-bold hover:text-indigo-600 transition-colors">Go to World Map 🗺️</button>
+                    <button onClick={() => { router.push('/daily-challenge'); setIsOpen(false); }} className="w-full py-4 text-slate-500 font-bold hover:text-indigo-600 transition-colors">Go to Daily 🌟</button>
                 </div>
 
                 <p className="text-[10px] text-center text-slate-300 mt-6 font-bold uppercase tracking-widest">Gymemo Test Mode Only</p>
