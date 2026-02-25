@@ -194,6 +194,20 @@ export default function WorldPage() {
           >
             📖 บทนำ
           </button>
+          <button
+            className={styles.actionBtn}
+            onClick={() => {
+              window.dispatchEvent(new KeyboardEvent('keydown', {
+                key: 'c',
+                altKey: true,
+                shiftKey: true,
+                bubbles: true
+              }))
+            }}
+            style={{ borderColor: '#667eea', color: '#818cf8', background: 'rgba(255,255,255,0.9)' }}
+          >
+            🛠️ Debug Cheat
+          </button>
           <button className={styles.actionBtn} onClick={resetProgress}>
             🔄 รีเซ็ต
           </button>

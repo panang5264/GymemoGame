@@ -110,6 +110,14 @@ export function getDailyProgress(dateKey: string): DailyModeCompletion {
   return p.daily[dateKey] ?? { management: false, calculation: false, spatial: false }
 }
 
+export function addKeys(count: number): void {
+  const p = loadProgress()
+  const { currentKeys } = getKeys()
+  p.keys.currentKeys = Math.min(MAX_KEYS, currentKeys + count)
+  p.keys.lastRegenAt = Date.now() // Reset timer for next regen from this point if full
+  saveProgress(p)
+}
+
 export function markDailyMode(
   dateKey: string,
   mode: 'management' | 'calculation' | 'spatial'
@@ -118,6 +126,12 @@ export function markDailyMode(
   const dp = p.daily[dateKey] ?? { management: false, calculation: false, spatial: false }
   dp[mode] = true
   p.daily[dateKey] = dp
+
+  // If this mode completion makes it 100%, reward a key
+  if (dp.management && dp.calculation && dp.spatial) {
+    // Reward logic is handled in the UI normally, but we can ensure the state is prepped
+  }
+
   saveProgress(p)
 }
 
