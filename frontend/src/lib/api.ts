@@ -67,3 +67,32 @@ export async function getUserProfile(token: string) {
   if (!res.ok) throw new Error(data.message || 'Failed to fetch profile')
   return data
 }
+
+// --- Sync API ---
+
+export async function fetchSyncProgress(token: string) {
+  const res = await fetch(`${API_BASE_URL}/api/progression/sync`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Failed to fetch sync progress')
+  return data
+}
+
+export async function updateSyncProgress(token: string, progressData: any) {
+  const res = await fetch(`${API_BASE_URL}/api/progression/sync`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ progressData }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Failed to update sync progress')
+  return data
+}

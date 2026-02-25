@@ -5,6 +5,17 @@ const {
   completeSubLevel,
   unlockVillage,
 } = require('../services/progressionService')
+const {
+  getSyncProgress,
+  updateSyncProgress
+} = require('../controllers/syncController')
+const { protect } = require('../middleware/authMiddleware')
+
+// GET /api/progression/sync
+router.get('/sync', protect, getSyncProgress)
+
+// POST /api/progression/sync
+router.post('/sync', protect, updateSyncProgress)
 
 // GET /api/progression/:guestId
 router.get('/:guestId', async (req, res, next) => {

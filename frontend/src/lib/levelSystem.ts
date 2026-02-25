@@ -29,6 +29,9 @@ export interface GymemoProgressV2 {
   totalScore: number
 }
 
+import Cookies from 'js-cookie'
+import { fetchSyncProgress, updateSyncProgress } from './api'
+
 export function getDefaultProgress(): GymemoProgressV2 {
   return {
     introSeen: false,
@@ -55,6 +58,30 @@ export function loadProgress(): GymemoProgressV2 {
 export function saveProgress(p: GymemoProgressV2): void {
   if (typeof window === 'undefined') return
   localStorage.setItem(STORAGE_KEY, JSON.stringify(p))
+
+  // Background sync if logged in
+  const token = Cookies.get('token')
+  if (token) {
+    updateSyncProgress(token, p).catch(err => {
+      console.error('Failed to sync progress to server:', err)
+    })
+  }
+}
+
+export async function fetchAndMergeProgress(token: string): Promise<GymemoProgressV2> {
+  try {
+    const res = await fetchSyncProgress(token)
+    if (res.success && res.data && Object.keys(res.data).length > 0) {
+      const merged = { ...getDefaultProgress(), ...res.data }
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged))
+      }
+      return merged
+    }
+  } catch (err) {
+    console.error('Error fetching sync progress on login:', err)
+  }
+  return loadProgress()
 }
 
 export function getVillageProgress(villageId: number): VillageProgress {

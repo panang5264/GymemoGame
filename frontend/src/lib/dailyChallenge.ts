@@ -28,6 +28,8 @@ export function getNextMidnight(now?: Date): Date {
   return midnight
 }
 
+import { isDailyComplete } from './levelSystem'
+
 /**
  * Returns true if the player has not yet completed the Daily Challenge today.
  * Returns false when called outside a browser (SSR); client components should
@@ -35,23 +37,7 @@ export function getNextMidnight(now?: Date): Date {
  */
 export function canPlayDailyChallenge(now?: Date): boolean {
   if (typeof window === 'undefined') return false
-  const raw = localStorage.getItem(STORAGE_KEY)
-  if (!raw) return true
-  try {
-    const { date } = JSON.parse(raw) as { date: string }
-    return date !== getDateKey(now)
-  } catch {
-    return true
-  }
-}
-
-/**
- * Records that the Daily Challenge was completed today.
- * Call this after all 3 stages are finished.
- */
-export function markDailyChallengeCompleted(now?: Date): void {
-  if (typeof window === 'undefined') return
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ date: getDateKey(now) }))
+  return !isDailyComplete(getDateKey(now))
 }
 
 /**
