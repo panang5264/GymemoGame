@@ -14,16 +14,16 @@ export default function Page() {
   const mode = searchParams.get('mode')
 
   const levelTexts = [
-    'จับคู่รอยแหว่งกับชิ้นส่วน 1',
-    'จับคู่รอยแหว่งกับชิ้นส่วน 2',
-    'เลือกภาพที่ต้นไม้อยู่หลังเก้าอี้',
-    'เลือกภาพที่แก้วกาแฟอยู่ใต้โต๊ะ',
-    'เลือกสิ่งของที่ใช้กับทะเล',
-    'เลือกของใช้ในห้องน้ำ (คล้ายกันมากขึ้น)',
-    'เลือกเครื่องใช้ในครัว (โทนสีเดียวกัน, มีซ้ำ)',
-    'ทายวัตถุจากภาพเงาซ้อนกัน (4 ชิ้น)',
-    'ทายวัตถุจากภาพเงาซ้อนกัน (6 ชิ้น)',
-    'ทายวัตถุจากภาพเงาซ้อนกัน (ซับซ้อนขึ้น)'
+    'จับคู่รูปทรงต้นแบบที่มีรอยแหว่งกับชิ้นส่วนที่หายไป 1',
+    'จับคู่รูปทรงต้นแบบที่มีรอยแหว่งกับชิ้นส่วนที่หายไป 2',
+    'การมองภาพตามหัวลูกศร (2 ตัวเลือก)',
+    'การมองภาพตามหัวลูกศร (2 ตัวเลือก)',
+    'การมองภาพตามหัวลูกศร (2 ตัวเลือก)',
+    'การมองภาพตามหัวลูกศร (3 ตัวเลือก)',
+    'การมองภาพตามหัวลูกศร (3 ตัวเลือก)',
+    'การมองภาพตามหัวลูกศร (3 ตัวเลือก)',
+    'การมองภาพตามหัวลูกศร (4 ตัวเลือก)',
+    'การมองภาพตามหัวลูกศร (4 ตัวเลือก)'
   ]
   const diffDesc = levelTexts[Math.min(Math.max(levelParam - 1, 0), 9)]
 
@@ -60,15 +60,14 @@ export default function Page() {
       })
       setQuestionText('เลือกรูปที่เหมือนกับภาพตัวอย่างด้านบน 🎯')
     } else {
-      // Level 3-10: View from Arrow
-      // More complexity as level increases (larger grid or more abstract emojis)
+      // Level 3-10: View from Arrow (3D Box image placeholder)
       const gridSize = levelParam > 7 ? 3 : 2
-      const fruitEmojis = ['🍎', '🍌', '🍇', '🍊', '🍍', '🍓', '🍒', '🥭', '🍐', '🥝']
+      const blockEmojis = ['📦', '🟫', '🟧', '🟦', '🟩', '🟥']
       const grid: string[][] = []
       for (let r = 0; r < gridSize; r++) {
         grid[r] = []
         for (let c = 0; c < gridSize; c++) {
-          grid[r][c] = fruitEmojis[Math.floor(Math.random() * fruitEmojis.length)]
+          grid[r][c] = blockEmojis[Math.floor(Math.random() * blockEmojis.length)]
         }
       }
 
@@ -81,13 +80,31 @@ export default function Page() {
       else if (arrow === 'W') correctView = grid.map(row => row[0])
       else if (arrow === 'E') correctView = grid.map(row => row[gridSize - 1])
 
+      // Determine number of choices based on level
+      let numOptions = 4;
+      if (levelParam >= 3 && levelParam <= 5) numOptions = 2;
+      else if (levelParam >= 6 && levelParam <= 8) numOptions = 3;
+      else if (levelParam >= 9 && levelParam <= 10) numOptions = 4;
+
       // Generate wrong options
       const options = [correctView]
-      while (options.length < 4) {
-        const wrongView = [...correctView].sort(() => Math.random() - 0.5)
+      let maxAttempts = 100
+      while (options.length < numOptions && maxAttempts > 0) {
+        let wrongView = [];
+        if (Math.random() > 0.5) {
+          // Shuffle correct view
+          wrongView = [...correctView].sort(() => Math.random() - 0.5)
+        } else {
+          // Generate completely random blocks
+          for (let i = 0; i < gridSize; i++) {
+            wrongView.push(blockEmojis[Math.floor(Math.random() * blockEmojis.length)])
+          }
+        }
+
         if (!options.some(opt => JSON.stringify(opt) === JSON.stringify(wrongView))) {
           options.push(wrongView)
         }
+        maxAttempts--;
       }
 
       const shuffledOptions = [...options].sort(() => Math.random() - 0.5)
@@ -189,9 +206,14 @@ export default function Page() {
                   {levelParam <= 2 ? (
                     <div className="text-9xl drop-shadow-2xl animate-bounce">{questionData.targetView}</div>
                   ) : (
-                    <div className="relative">
+                    <div className="relative flex flex-col items-center">
+                      <div className="absolute -top-6 left-0 right-0 text-center">
+                        <span className="bg-yellow-300 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                          Image URL Placeholder (3D Box)
+                        </span>
+                      </div>
                       {/* Grid Display */}
-                      <div className={`grid gap-2 p-4 bg-slate-800 rounded-3xl shadow-2xl border-8 border-slate-700`}
+                      <div className={`grid gap-2 p-4 bg-slate-800 rounded-3xl shadow-2xl border-8 border-slate-700 mt-4`}
                         style={{ gridTemplateColumns: `repeat(${questionData.displayGrid?.length || 2}, minmax(0, 1fr))` }}>
                         {questionData.displayGrid?.map((row, ri) =>
                           row.map((cell, ci) => (
@@ -203,16 +225,19 @@ export default function Page() {
                       </div>
 
                       {/* Arrow Indicators */}
-                      {questionData.arrow === 'N' && <div className="absolute -top-16 left-1/2 -translate-x-1/2 text-6xl animate-bounce">⬇️</div>}
-                      {questionData.arrow === 'S' && <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 text-6xl animate-bounce">⬆️</div>}
-                      {questionData.arrow === 'W' && <div className="absolute -left-16 top-1/2 -translate-y-1/2 text-6xl animate-bounce">➡️</div>}
-                      {questionData.arrow === 'E' && <div className="absolute -right-16 top-1/2 -translate-y-1/2 text-6xl animate-bounce">⬅️</div>}
+                      {questionData.arrow === 'N' && <div className="absolute top-[-3rem] left-1/2 -translate-x-1/2 text-6xl animate-bounce drop-shadow-lg">⬇️</div>}
+                      {questionData.arrow === 'S' && <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 text-6xl animate-bounce drop-shadow-lg">⬆️</div>}
+                      {questionData.arrow === 'W' && <div className="absolute -left-16 top-1/2 -translate-y-1/2 text-6xl animate-bounce drop-shadow-lg">➡️</div>}
+                      {questionData.arrow === 'E' && <div className="absolute -right-16 top-1/2 -translate-y-1/2 text-6xl animate-bounce drop-shadow-lg">⬅️</div>}
                     </div>
                   )}
                 </div>
 
                 {/* 2. Options Area */}
-                <div className="grid grid-cols-2 gap-6 w-full max-w-2xl px-4 pb-20">
+                <div className={`grid gap-6 w-full max-w-2xl px-4 pb-20 ${questionData.options.length === 2 ? 'grid-cols-2' :
+                    questionData.options.length === 3 ? 'grid-cols-1 md:grid-cols-3' :
+                      'grid-cols-2'
+                  }`}>
                   {questionData.options.map((opt, idx) => (
                     <button
                       key={idx}
