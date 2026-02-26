@@ -3,6 +3,7 @@
 import { Suspense, useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { recordPlay, markDailyMode } from '@/lib/levelSystem'
+import ClockIntro from '@/components/ClockIntro'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -71,13 +72,32 @@ function generateMaze(rows: number, cols: number, hasKey: boolean, hasBombs: boo
   walk(1, 1)
   maze[rows - 2][cols - 2] = 2 // Exit (Flag)
 
+  // Reachability check (BFS)
+  function canReach(startR: number, startC: number, endR: number, endC: number, currentMaze: number[][]) {
+    const q = [[startR, startC]]
+    const v = Array.from({ length: rows }, () => Array(cols).fill(false))
+    v[startR][startC] = true
+    while (q.length > 0) {
+      const [r, c] = q.shift()!
+      if (r === endR && c === endC) return true
+      for (const [dr, dc] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
+        const nr = r + dr, nc = c + dc
+        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && currentMaze[nr][nc] !== 1 && currentMaze[nr][nc] !== 4 && !v[nr][nc]) {
+          v[nr][nc] = true
+          q.push([nr, nc])
+        }
+      }
+    }
+    return false
+  }
+
   if (hasKey) {
     // Place key at a random path (not start/end)
     let placed = false
     while (!placed) {
       const kr = Math.floor(Math.random() * (rows - 2)) + 1
       const kc = Math.floor(Math.random() * (cols - 2)) + 1
-      if (maze[kr][kc] === 0 && (kr !== 1 || kc !== 1)) {
+      if (maze[kr][kc] === 0 && (kr !== 1 || kc !== 1) && (kr !== rows - 2 || kc !== cols - 2)) {
         maze[kr][kc] = 3
         placed = true
       }
@@ -85,10 +105,32 @@ function generateMaze(rows: number, cols: number, hasKey: boolean, hasBombs: boo
   }
 
   if (hasBombs) {
-    for (let i = 0; i < 3; i++) {
-      const br = Math.floor(Math.random() * (rows - 2)) + 1
-      const bc = Math.floor(Math.random() * (cols - 2)) + 1
-      if (maze[br][bc] === 0 && (br !== 1 || bc !== 1)) maze[br][bc] = 4
+    let bombAttempts = 0
+    while (bombAttempts < 50) { // Try placing bombs up to 50 times to ensure reachability
+      const tempMaze = maze.map(row => [...row]) // Create a temporary maze for bomb placement
+      const keyPos = hasKey ? (() => {
+        for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) if (tempMaze[r][c] === 3) return { r, c };
+        return null;
+      })() : null;
+
+      // Place bombs randomly on the temporary maze
+      for (let i = 0; i < 3; i++) {
+        const br = Math.floor(Math.random() * (rows - 2)) + 1
+        const bc = Math.floor(Math.random() * (cols - 2)) + 1
+        if (tempMaze[br][bc] === 0 && (br !== 1 || bc !== 1) && (br !== rows - 2 || bc !== cols - 2)) tempMaze[br][bc] = 4
+      }
+
+      // Check if start -> key (if exists) -> exit is still possible with the new bombs
+      const startToExit = canReach(1, 1, rows - 2, cols - 2, tempMaze)
+      const startToKey = keyPos ? canReach(1, 1, keyPos.r, keyPos.c, tempMaze) : true
+      const keyToExit = keyPos ? canReach(keyPos.r, keyPos.c, rows - 2, cols - 2, tempMaze) : true
+
+      if (startToExit && startToKey && keyToExit) {
+        // If reachable, commit the bomb placement
+        for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) maze[r][c] = tempMaze[r][c];
+        break // Exit the bomb placement loop
+      }
+      bombAttempts++
     }
   }
 
@@ -218,7 +260,11 @@ function ManagementGameInner() {
   const villageId = parseInt(searchParams.get('villageId') || '1', 10)
   const modeParam = searchParams.get('mode')
 
-  const [phase, setPhase] = useState<'intro' | 'play' | 'done'>('intro')
+  const [phase, setPhase] = useState<'intro' | 'clock' | 'play' | 'done'>('intro')
+  const [clockTarget] = useState(() => ({
+    h: Math.floor(Math.random() * 12) + 1,
+    m: [0, 15, 30, 45][Math.floor(Math.random() * 4)]
+  }))
   const [score, setScore] = useState(0)
   const [feedback, setFeedback] = useState<{ type: 'correct' | 'wrong', message: string } | null>(null)
 
@@ -392,10 +438,15 @@ function ManagementGameInner() {
   }
 
   // Maze Handlers
-  const handleMazeMove = (dr: number, dc: number) => {
+  const playerPosRef = useRef(playerPos)
+  useEffect(() => { playerPosRef.current = playerPos }, [playerPos])
+
+  const handleMazeMove = useCallback((dr: number, dc: number) => {
     if (phase !== 'play') return
     setLastMoveTime(Date.now())
     setIsMazeHidden(false)
+
+    const currentPos = playerPosRef.current
 
     // Hide bombs after first move for level 8 & 9
     if ((levelParam === 8 || levelParam === 9) && showBombs) {
@@ -404,10 +455,11 @@ function ManagementGameInner() {
 
     const moveR = levelParam === 9 ? -dr : dr
     const moveC = levelParam === 9 ? -dc : dc
-    const nr = playerPos.r + moveR
-    const nc = playerPos.c + moveC
+    const nr = currentPos.r + moveR
+    const nc = currentPos.c + moveC
 
-    if (maze[nr][nc] === 1) return
+    if (nr < 0 || nr >= maze.length || nc < 0 || nc >= maze[0].length || maze[nr][nc] === 1) return
+
     if (maze[nr][nc] === 4) {
       setFeedback({ type: 'wrong', message: '💣 ตูม! เริ่มใหม่นะ' })
       setPlayerPos({ r: 1, c: 1 })
@@ -433,7 +485,22 @@ function ManagementGameInner() {
       return
     }
     setPlayerPos({ r: nr, c: nc })
-  }
+  }, [phase, maze, levelParam, showBombs, hasKey])
+
+  // Keyboard controls for Maze
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (config.mode !== 'maze' || phase !== 'play') return
+      switch (e.key) {
+        case 'ArrowUp': case 'w': e.preventDefault(); handleMazeMove(-1, 0); break
+        case 'ArrowDown': case 's': e.preventDefault(); handleMazeMove(1, 0); break
+        case 'ArrowLeft': case 'a': e.preventDefault(); handleMazeMove(0, -1); break
+        case 'ArrowRight': case 'd': e.preventDefault(); handleMazeMove(0, 1); break
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [config.mode, phase, handleMazeMove])
 
   // Matching Handlers
   const handleMatchClick = (side: 'left' | 'right', id: number) => {
@@ -526,7 +593,10 @@ function ManagementGameInner() {
                 <h3 className="text-2xl font-black text-slate-800 mb-2 uppercase tracking-tighter">Level {levelParam}</h3>
                 <p className="text-slate-500 font-bold mb-10 text-lg">{config.instruction}</p>
                 <button
-                  onClick={() => setPhase('play')}
+                  onClick={() => {
+                    if (levelParam === 1) setPhase('clock')
+                    else setPhase('play')
+                  }}
                   className="w-full py-5 bg-slate-800 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95"
                 >
                   เริ่มภารกิจ 🚀
@@ -535,25 +605,61 @@ function ManagementGameInner() {
             </div>
           )}
 
+          {phase === 'clock' && (
+            <ClockIntro
+              targetHour={clockTarget.h}
+              targetMinute={clockTarget.m}
+              onComplete={() => setPhase('play')}
+            />
+          )}
+
           {phase === 'done' && (
             <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-md p-6">
               <div className="max-w-[400px] w-full bg-white rounded-[48px] p-10 md:p-12 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] border border-white text-center animate-in zoom-in">
-                <div className="relative mb-8 flex justify-center">
+                <div className="relative mb-4 flex justify-center">
                   <div className="absolute inset-0 bg-yellow-400 blur-3xl opacity-20 animate-pulse" />
-                  <div className="text-9xl relative drop-shadow-2xl">🎖️</div>
+                  <div className="text-8xl relative drop-shadow-2xl">🎯</div>
                 </div>
-                <h3 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">สำเร็จภารกิจ!</h3>
-                <p className="text-slate-400 font-bold mb-8 uppercase tracking-[0.2em] text-xs">เลเวล {levelParam} ยอดเยี่ยมมาก</p>
-                <div className="bg-indigo-50/50 rounded-[32px] p-8 mb-10 border border-indigo-100/50">
-                  <span className="text-indigo-400 font-black text-[10px] uppercase tracking-widest block mb-2">สรุปคะแนน</span>
-                  <div className="text-7xl font-black text-indigo-600 drop-shadow-sm tabular-nums">{score}</div>
+                <h3 className="text-3xl font-black text-slate-800 mb-1 tracking-tight">
+                  ประเมินผล: <span className="text-indigo-600 underline">
+                    {score >= 100 ? 'ดี' : score >= 70 ? 'โอเค' : score >= 50 ? 'ไม่แย่' : 'อาจจะไม่ดี'}
+                  </span>
+                </h3>
+                <p className="text-slate-400 font-bold mb-8 uppercase tracking-[0.2em] text-[10px]">เลเวล {levelParam} — คะแนนสะสม {score}</p>
+                <div className="flex flex-col gap-3">
+                  {modeParam === 'village' ? (
+                    <>
+                      {subId < 12 ? (
+                        <button
+                          onClick={() => router.push(`/world/${villageId}/sublevel/${subId + 1}`)}
+                          className="w-full py-5 bg-green-500 hover:bg-green-600 text-white rounded-[24px] font-black text-2xl shadow-xl transition-all active:scale-95"
+                        >
+                          ด่านต่อไป 🚀
+                        </button>
+                      ) : villageId < 10 ? (
+                        <button
+                          onClick={() => router.push(`/world/${villageId + 1}`)}
+                          className="w-full py-5 bg-orange-500 hover:bg-orange-600 text-white rounded-[24px] font-black text-2xl shadow-xl transition-all active:scale-95"
+                        >
+                          หมู่บ้านต่อไป 🏘️
+                        </button>
+                      ) : null}
+                      <button
+                        onClick={() => router.push(`/world/${villageId}`)}
+                        className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-[24px] font-black text-lg transition-all"
+                      >
+                        กลับสู่แผนที่ 🗺️
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => router.push(modeParam === 'daily' ? '/daily-challenge' : '/world')}
+                      className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[24px] font-black text-2xl shadow-[0_12px_24px_-6px_rgba(79,70,229,0.4)] transition-all hover:-translate-y-1 active:scale-95 active:translate-y-0"
+                    >
+                      ตกลง ✨
+                    </button>
+                  )}
                 </div>
-                <button
-                  onClick={() => router.push(modeParam === 'daily' ? '/daily-challenge' : `/world/${villageId}`)}
-                  className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[24px] font-black text-2xl shadow-[0_12px_24px_-6px_rgba(79,70,229,0.4)] transition-all hover:-translate-y-1 active:scale-95 active:translate-y-0"
-                >
-                  ตกลง ✨
-                </button>
               </div>
             </div>
           )}

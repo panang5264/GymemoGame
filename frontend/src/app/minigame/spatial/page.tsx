@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useState, useEffect, use } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { recordPlay, markDailyMode } from '@/lib/levelSystem'
+import ClockIntro from '@/components/ClockIntro'
 
 export default function Page() {
   const router = useRouter()
@@ -12,6 +13,12 @@ export default function Page() {
   const subId = parseInt(searchParams.get('subId') || '1', 10)
   const villageId = parseInt(searchParams.get('villageId') || '1', 10)
   const mode = searchParams.get('mode')
+
+  const [phase, setPhase] = useState<'intro' | 'clock' | 'play'>('intro')
+  const [clockTarget] = useState(() => ({
+    h: Math.floor(Math.random() * 12) + 1,
+    m: [0, 15, 30, 45][Math.floor(Math.random() * 4)]
+  }))
 
   const levelTexts = [
     'จับคู่รูปทรงต้นแบบที่มีรอยแหว่งกับชิ้นส่วนที่หายไป 1',
@@ -140,6 +147,34 @@ export default function Page() {
     return () => window.removeEventListener('gymemo:cheat_complete', handleCheat)
   }, [])
 
+  if (phase === 'intro' && levelParam === 1) {
+    return (
+      <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-[40px] p-10 shadow-2xl border border-slate-100 text-center animate-in zoom-in">
+          <div className="text-9xl mb-8 animate-bounce">🗺️</div>
+          <h2 className="text-3xl font-black text-slate-800 mb-2 uppercase tracking-tighter">มิติจำลอง</h2>
+          <p className="text-slate-500 font-bold mb-10 text-lg">{diffDesc}</p>
+          <button
+            onClick={() => setPhase('clock')}
+            className="w-full py-5 bg-indigo-600 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95"
+          >
+            เริ่มเลย! 🚀
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (phase === 'clock') {
+    return (
+      <ClockIntro
+        targetHour={clockTarget.h}
+        targetMinute={clockTarget.m}
+        onComplete={() => setPhase('play')}
+      />
+    )
+  }
+
   return (
     <div className='min-h-[calc(100vh-140px)] py-6 flex flex-col items-center relative overflow-hidden'>
 
@@ -154,10 +189,10 @@ export default function Page() {
         </div>
 
         {isComplete ? (
-          <div className="bg-white/95 backdrop-blur-md border-2 border-white/20 p-12 rounded-[3rem] shadow-2xl text-center max-w-xl mx-auto animate-in zoom-in duration-500">
-            <div className="text-8xl mb-6">🏆</div>
-            <h2 className="text-3xl font-black text-slate-800 mb-4">ยอดเยี่ยมที่สุด!</h2>
-            <p className="text-slate-500 mb-10 text-lg">คุณมีความสามารถในการมองเห็นพื้นที่ได้ดีเยี่ยม</p>
+          <div className="bg-white/95 backdrop-blur-md border-2 border-white/20 p-12 rounded-[3.5rem] shadow-2xl text-center max-w-xl mx-auto animate-in zoom-in duration-500">
+            <div className="text-8xl mb-6">🎯</div>
+            <h2 className="text-3xl font-black text-slate-800 mb-4">ประเมินผล: <span className="text-blue-600 underline">ดี</span></h2>
+            <p className="text-slate-500 mb-10 text-lg">คุณผ่านความท้าทายนี้ได้อย่างยอดเยี่ยม!</p>
             <div className="grid grid-cols-1 gap-4">
               {mode === 'daily' ? (
                 <button
@@ -235,8 +270,8 @@ export default function Page() {
 
                 {/* 2. Options Area */}
                 <div className={`grid gap-6 w-full max-w-2xl px-4 pb-20 ${questionData.options.length === 2 ? 'grid-cols-2' :
-                    questionData.options.length === 3 ? 'grid-cols-1 md:grid-cols-3' :
-                      'grid-cols-2'
+                  questionData.options.length === 3 ? 'grid-cols-1 md:grid-cols-3' :
+                    'grid-cols-2'
                   }`}>
                   {questionData.options.map((opt, idx) => (
                     <button

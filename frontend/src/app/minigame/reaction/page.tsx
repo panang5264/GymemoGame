@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { recordPlay } from '@/lib/levelSystem'
+import { recordPlay, markDailyMode } from '@/lib/levelSystem'
 
 // ─── Maze Generation Logic (Recursive Backtracker) ──────────────────────────
 
@@ -41,10 +41,10 @@ function generateMaze(rows: number, cols: number) {
 function MazeGameInner() {
     const router = useRouter()
     const searchParams = useSearchParams()
-    const villageId = searchParams.get('villageId') || '1'
+    const villageIdParam = searchParams.get('villageId') || '1'
     const subId = parseInt(searchParams.get('subId') || '1', 10)
-    const levelParam = parseInt(searchParams.get('level') || (subId ? Math.min(subId, 10).toString() : '1'), 10)
     const mode = searchParams.get('mode') || 'practice'
+    const levelParam = parseInt(searchParams.get('level') || (mode === 'village' ? villageIdParam : '1'), 10)
 
     const [phase, setPhase] = useState<'intro' | 'play' | 'done'>('intro')
     const [maze, setMaze] = useState<number[][]>([])
@@ -83,7 +83,11 @@ function MazeGameInner() {
             if (mode === 'village') {
                 const timeTaken = (Date.now() - startTime) / 1000
                 const score = Math.max(10, Math.floor(1000 / (timeTaken + 1)))
-                recordPlay(parseInt(villageId), score)
+                recordPlay(parseInt(villageIdParam), score)
+
+                // ถือว่าทำภารกิจรายวันโหมด management ควบคู่ไปด้วย (เนื่องจาก Reaction เป็นส่วนหนึ่งของหมู่บ้าน)
+                const dk = new Date().toLocaleDateString('en-CA')
+                markDailyMode(dk, 'management')
             }
         }
     }
@@ -180,7 +184,7 @@ function MazeGameInner() {
 
                     {phase === 'done' && (
                         <div className="max-w-md w-full bg-white rounded-[40px] p-12 shadow-2xl border border-slate-100 text-center animate-in zoom-in">
-                            <div className="text-8xl mb-8">�️</div>
+                            <div className="text-8xl mb-8">️</div>
                             <h3 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">ทางออกพบแล้ว!</h3>
                             <p className="text-slate-400 font-bold mb-8 uppercase tracking-widest text-xs">คุณจัดการเวลาและเส้นทางได้ดีเยี่ยม</p>
 
@@ -197,12 +201,40 @@ function MazeGameInner() {
                                 </div>
                             </div>
 
-                            <button
-                                onClick={() => router.push('/world')}
-                                className="w-full py-5 bg-indigo-600 text-white rounded-[24px] font-black text-xl shadow-xl transition-all active:scale-95"
-                            >
-                                ตกลง ✨
-                            </button>
+                            <div className="flex flex-col gap-3">
+                                {mode === 'village' ? (
+                                    <>
+                                        {subId < 12 ? (
+                                            <button
+                                                onClick={() => router.push(`/world/${villageIdParam}/sublevel/${subId + 1}`)}
+                                                className="w-full py-5 bg-green-500 hover:bg-green-600 text-white rounded-[24px] font-black text-xl shadow-xl transition-all active:scale-95"
+                                            >
+                                                ด่านต่อไป 🚀
+                                            </button>
+                                        ) : parseInt(villageIdParam) < 10 ? (
+                                            <button
+                                                onClick={() => router.push(`/world/${parseInt(villageIdParam) + 1}`)}
+                                                className="w-full py-5 bg-orange-500 hover:bg-orange-600 text-white rounded-[24px] font-black text-xl shadow-xl transition-all active:scale-95"
+                                            >
+                                                หมู่บ้านต่อไป 🏘️
+                                            </button>
+                                        ) : null}
+                                        <button
+                                            onClick={() => router.push(`/world/${villageIdParam}`)}
+                                            className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-[24px] font-black text-lg transition-all"
+                                        >
+                                            กลับสู่แผนที่ 🗺️
+                                        </button>
+                                    </>
+                                ) : (
+                                    <button
+                                        onClick={() => router.push('/world')}
+                                        className="w-full py-5 bg-indigo-600 text-white rounded-[24px] font-black text-xl shadow-xl transition-all active:scale-95"
+                                    >
+                                        ตกลง ✨
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>
