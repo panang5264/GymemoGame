@@ -180,38 +180,38 @@ export default function WorldPage() {
       {/* Mission Briefing Modal */}
       {selectedVillage && (
         <div className={styles.introOverlay} style={{ zIndex: 10000 }}>
-          <div className={`${styles.introCard} max-w-lg border-t-8 border-indigo-500`}>
+          <div className={`${styles.introCard} max-w-lg`}>
             <div className="flex justify-between items-start mb-6">
               <div>
-                <span className="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Village Mission</span>
-                <h2 className="text-4xl font-black text-slate-800 mt-2">หมู่บ้านที่ {selectedVillage}</h2>
+                <span className="bg-[var(--card-bg)] text-[var(--text-main)] border-2 border-[var(--border-dark)] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Village Mission</span>
+                <h2 className="text-4xl font-black text-[#1a1a1a] mt-2">หมู่บ้านที่ {selectedVillage}</h2>
               </div>
-              <button onClick={() => setSelectedVillage(null)} className="text-slate-300 hover:text-red-500 text-2xl font-black transition-colors">✕</button>
+              <button onClick={() => setSelectedVillage(null)} className="text-[#1a1a1a]/20 hover:text-red-500 text-3xl font-black transition-colors">✕</button>
             </div>
 
-            <div className="bg-slate-50 rounded-3xl p-6 mb-8 border border-slate-100">
+            <div className="bg-white border-3 border-black rounded-[2.5rem] p-6 mb-8 shadow-[6px_6px_0_rgba(0,0,0,0.05)]">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-sm">🚩</div>
-                <div>
-                  <div className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Difficulty</div>
-                  <div className="text-slate-800 font-black">{selectedVillage <= 3 ? 'ระดับเริ่มต้น 🌱' : selectedVillage <= 7 ? 'ระดับกลาง ⚔️' : 'ระดับสูง 🔥'}</div>
+                <div className="w-14 h-14 bg-[#f5e6d3] border-2 border-black rounded-2xl flex items-center justify-center text-3xl shadow-[4px_4px_0_#000]">🚩</div>
+                <div className="text-left">
+                  <div className="text-[#717171] text-[10px] font-black uppercase tracking-widest">Difficulty</div>
+                  <div className="text-[#1a1a1a] font-black text-lg">{selectedVillage <= 3 ? 'ระดับเริ่มต้น 🌱' : selectedVillage <= 7 ? 'ระดับกลาง ⚔️' : 'ระดับสูง 🔥'}</div>
                 </div>
               </div>
-              <p className="text-slate-500 font-bold leading-relaxed">
+              <p className="text-[#717171] font-bold leading-relaxed text-left">
                 หมู่บ้านนี้ต้องการความช่วยเหลือในการจัดการทรัพยากรและการคำนวณที่แม่นยำ
                 {selectedVillage === 10 ? ' นี่คือภารกิจสุดท้ายของเรา ทุกอย่างตัดสินกันที่นี่!' : ' ยิ่งระดับสูงขึ้น โจทย์จะยิ่งท้าทายความสามารถของคุณมากขึ้น'}
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               <button
                 className={`${styles.navBtn} ${styles.navBtnPrimary} w-full`}
                 onClick={() => router.push(`/world/${selectedVillage}`)}
               >
-                เข้าสู่ภารกิจ 🏹
+                เข้าภารกิจ 🏹
               </button>
               <button
-                className="w-full py-4 bg-slate-100 text-slate-500 rounded-2xl font-black hover:bg-slate-200 transition-all"
+                className={styles.navBtn}
                 onClick={() => setSelectedVillage(null)}
               >
                 ย้อนกลับ
@@ -224,30 +224,53 @@ export default function WorldPage() {
       {/* Tutorial Modal */}
       {showTutorial && (
         <div className={styles.introOverlay} style={{ zIndex: 11000 }}>
-          <div className={`${styles.introCard} max-w-2xl`}>
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-black text-slate-800">คู่มือแนะนำการเล่น 🧠</h2>
-              <button onClick={() => setShowTutorial(false)} className="text-slate-300 text-2xl">✕</button>
+          <div className={`${styles.introCard} max-w-4xl`}>
+            <div className="flex justify-between items-center mb-10">
+              <h2 className="text-4xl font-black text-[var(--text-main)] uppercase tracking-tight">คู่มือการเล่น 🧠</h2>
+              <button
+                onClick={() => setShowTutorial(false)}
+                className="w-12 h-12 flex items-center justify-center text-[var(--text-muted)] hover:text-red-500 text-4xl transition-colors"
+              >
+                ✕
+              </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              <div className="bg-blue-50 p-6 rounded-3xl border border-blue-100">
-                <div className="text-4xl mb-4">📦</div>
-                <h4 className="font-black text-blue-800 mb-2">Management</h4>
-                <p className="text-xs font-bold text-blue-600/70 leading-relaxed">แยกแยะหมวดหมู่สิ่งของ และจัดการทรัพยากรให้ถูกต้องตามเงื่อนไข (เช่น สี, รูปทรง)</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <div className="bg-[var(--card-bg)] p-8 rounded-[2.5rem] border-3 border-[var(--border-dark)] text-center shadow-[8px_8px_0_rgba(0,0,0,0.05)] hover:translate-y-[-4px] transition-transform">
+                <div className="text-6xl mb-6">📦</div>
+                <h4 className="font-black text-[var(--text-main)] mb-3 uppercase text-lg tracking-wider">Management</h4>
+                <p className="text-sm font-bold text-[var(--text-muted)] leading-relaxed">
+                  ฝึกทักษะการแยกแยะและจัดหมวดหมู่สิ่งของตามเงื่อนไขที่กำหนดให้ถูกต้อง
+                </p>
               </div>
-              <div className="bg-amber-50 p-6 rounded-3xl border border-amber-100">
-                <div className="text-4xl mb-4">🔢</div>
-                <h4 className="font-black text-amber-800 mb-2">Calculation</h4>
-                <p className="text-xs font-bold text-amber-600/70 leading-relaxed">ฝึกทักษะความไวในการคิดเลข แก้โจทย์คณิตศาสตร์ให้แม่นยำที่สุดภายใต้ความกดดัน</p>
+
+              <div className="bg-[var(--card-bg)] p-8 rounded-[2.5rem] border-3 border-[var(--border-dark)] text-center shadow-[8px_8px_0_rgba(0,0,0,0.05)] hover:translate-y-[-4px] transition-transform">
+                <div className="text-6xl mb-6">🔢</div>
+                <h4 className="font-black text-[var(--text-main)] mb-3 uppercase text-lg tracking-wider">Calculation</h4>
+                <p className="text-sm font-bold text-[var(--text-muted)] leading-relaxed">
+                  ท้าทายความไวในการแก้โจทย์คณิตศาสตร์ภายใต้ความกดดันของเวลา
+                </p>
               </div>
-              <div className="bg-purple-50 p-6 rounded-3xl border border-purple-100">
-                <div className="text-4xl mb-4">🗺️</div>
-                <h4 className="font-black text-purple-800 mb-2">Spatial</h4>
-                <p className="text-xs font-bold text-purple-600/70 leading-relaxed">ฝึกการมองทัศนียภาพในแบบ 3 มิติ จับคู่มุมมองและรอยแหว่งของวัตถุให้ถูกต้อง</p>
+
+              <div className="bg-[var(--card-bg)] p-8 rounded-[2.5rem] border-3 border-[var(--border-dark)] text-center shadow-[8px_8px_0_rgba(0,0,0,0.05)] hover:translate-y-[-4px] transition-transform">
+                <div className="text-6xl mb-6">🗺️</div>
+                <h4 className="font-black text-[var(--text-main)] mb-3 uppercase text-lg tracking-wider">Spatial</h4>
+                <p className="text-sm font-bold text-[var(--text-muted)] leading-relaxed">
+                  ฝึกการวาดภาพในใจ จับคู่มุมมองและรูปทรง 3 มิติให้แม่นยำที่สุด
+                </p>
               </div>
             </div>
-            <button onClick={() => setShowTutorial(false)} className="w-full py-5 bg-slate-900 text-white rounded-3xl font-black text-xl shadow-xl">
-              เข้าใจแล้ว ลุยกันเลย! 🚀
+
+            <div className="bg-[var(--border-dark)]/5 p-6 rounded-3xl mb-10 text-left border-2 border-dashed border-[var(--border-dark)]/20">
+              <p className="text-xs font-black text-[var(--text-muted)] uppercase tracking-widest mb-2">เป้าหมายของคุณ 🎯</p>
+              <p className="text-[#1a1a1a] font-bold">สะสม EXP ในแต่ละหมู่บ้านให้เต็มเพื่อปลดล็อกพื้นที่ถัดไป และกู้คืนความทรงจำที่หายไปกลับคืนมา!</p>
+            </div>
+
+            <button
+              onClick={() => setShowTutorial(false)}
+              className={`${styles.navBtn} ${styles.navBtnPrimary} w-full text-2xl py-6 shadow-[0_10px_0_rgba(0,0,0,0.1)]`}
+            >
+              เข้าใจแล้ว เริ่มผจญภัย! 🚀
             </button>
           </div>
         </div>
@@ -288,7 +311,7 @@ export default function WorldPage() {
       <div className={styles.topBar}>
         <div className="flex flex-col">
           <h1 className={styles.mapTitle}>🗺️ ยินดีต้อนรับ, {userName}</h1>
-          <p className="text-white/60 text-xs font-bold ml-1">เป้าหมาย: ฟื้นฟูให้ครบ 10 หมู่บ้าน</p>
+          <p className="text-[var(--text-muted)] text-xs font-black ml-1 uppercase tracking-widest">เป้าหมาย: ฟื้นฟูให้ครบ 10 หมู่บ้าน</p>
         </div>
         <div className={styles.topActions}>
           <button className={styles.actionBtn} onClick={() => router.push('/leaderboard')}>
@@ -297,20 +320,8 @@ export default function WorldPage() {
           <button className={styles.actionBtn} onClick={() => setShowTutorial(true)}>
             ❓ วิธีเล่น
           </button>
-          <span
-            style={{
-              background: 'rgba(255,255,255,0.2)',
-              border: '2px solid rgba(255,255,255,0.5)',
-              color: '#fff',
-              fontWeight: 700,
-              padding: '0.5rem 1rem',
-              borderRadius: '12px',
-              fontSize: '0.9rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-            }}
-          >
-            {keysLabel}
+          <span className={styles.actionBtn}>
+            🔑 {currentKeys}/{MAX_KEYS} {formatCountdown(nextRegenIn)}
           </span>
           <button
             className={styles.actionBtn}

@@ -40,80 +40,82 @@ export default function LeaderboardPage() {
         .map((entry, index) => ({ ...entry, rank: index + 1 }))
 
     return (
-        <div className="min-h-screen bg-slate-50 p-6 md:p-12">
+        <div className="min-h-screen bg-[var(--bg-warm)] p-4 md:p-12 font-['Outfit']">
             <div className="max-w-3xl mx-auto">
 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-10">
                     <button
                         onClick={() => router.back()}
-                        className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-slate-100 hover:bg-slate-100 transition-all font-black text-xl"
+                        className="w-14 h-14 bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-2xl flex items-center justify-center shadow-[4px_4px_0_var(--border-dark)] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_var(--border-dark)] transition-all font-black text-2xl"
                     >
                         ←
                     </button>
-                    <h1 className="text-3xl font-black text-slate-800">🏆 อันดับผู้เล่น</h1>
-                    <div className="w-12 h-12 invisible" /> {/* Spacer */}
+                    <h1 className="text-4xl font-black text-[var(--text-main)] uppercase tracking-tight">Leaderboard</h1>
+                    <div className="w-14 h-14 invisible" />
                 </div>
 
                 {/* User Card */}
-                <div className="bg-indigo-600 rounded-[32px] p-8 mb-8 text-white shadow-2xl shadow-indigo-200 flex items-center justify-between">
-                    <div>
-                        <p className="text-indigo-200 font-bold uppercase tracking-widest text-xs mb-1">อันดับปัจจุบันของคุณ</p>
-                        <h2 className="text-4xl font-black italic">#{allEntries.find(e => e.isUser)?.rank}</h2>
+                <div className="friendly-card mb-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-[10px_10px_0_rgba(0,0,0,0.05)]">
+                    <div className="text-center md:text-left">
+                        <p className="text-[var(--text-muted)] font-black uppercase tracking-widest text-xs mb-1">Your Rank</p>
+                        <h2 className="text-5xl font-black text-[var(--text-main)] italic uppercase">#{allEntries.find(e => e.isUser)?.rank}</h2>
                     </div>
-                    <div className="text-right">
-                        <p className="text-indigo-200 font-bold uppercase tracking-widest text-xs mb-1">คะแนนรวม</p>
-                        <h2 className="text-4xl font-black">{userScore.toLocaleString()}</h2>
+                    <div className="flex items-center gap-4 bg-[var(--card-bg)] border-3 border-[var(--border-dark)] px-8 py-4 rounded-full shadow-[4px_4px_0_var(--border-dark)]">
+                        <div className="text-right">
+                            <p className="text-[var(--text-muted)] font-black uppercase tracking-widest text-[10px] mb-1">Total Score</p>
+                            <h2 className="text-3xl font-black text-[var(--text-main)]">{userScore.toLocaleString()}</h2>
+                        </div>
+                        <div className="text-4xl">⭐</div>
                     </div>
                 </div>
 
                 {/* Leaderboard Table */}
-                <div className="bg-white rounded-[40px] shadow-xl border border-slate-100 overflow-hidden">
-                    <div className="p-6 bg-slate-50/50 border-b border-slate-100 grid grid-cols-[60px_1fr_100px_80px] font-black text-slate-400 text-[10px] uppercase tracking-widest">
-                        <span>RANK</span>
-                        <span>PLAYER</span>
-                        <span className="text-right">SCORE</span>
-                        <span className="text-right">VILLAGE</span>
+                <div className="bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-[3rem] shadow-[12px_12px_0_rgba(0,0,0,0.03)] overflow-hidden">
+                    <div className="p-6 bg-[var(--bg-accent)]/30 border-b-3 border-[var(--border-dark)] grid grid-cols-[80px_1fr_100px_80px] font-black text-[var(--text-muted)] text-[10px] uppercase tracking-widest">
+                        <span>Rank</span>
+                        <span>Player</span>
+                        <span className="text-right">Score</span>
+                        <span className="text-right">Village</span>
                     </div>
 
-                    <div className="divide-y divide-slate-50">
+                    <div className="divide-y-3 divide-[#1a1a1a]/10">
                         {allEntries.map((entry) => (
                             <div
                                 key={entry.rank}
-                                className={`p-6 grid grid-cols-[60px_1fr_100px_80px] items-center transition-colors ${entry.isUser ? 'bg-indigo-50/50' : 'hover:bg-slate-50'}`}
+                                className={`p-6 grid grid-cols-[80px_1fr_100px_80px] items-center transition-colors ${entry.isUser ? 'bg-orange-50' : 'hover:bg-[#fdf6f0]'}`}
                             >
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black ${entry.rank === 1 ? 'bg-yellow-400 text-white shadow-lg' :
-                                        entry.rank === 2 ? 'bg-slate-300 text-white shadow-md' :
-                                            entry.rank === 3 ? 'bg-amber-600/60 text-white shadow-md' :
-                                                'text-slate-400'
+                                <div className={`w-12 h-12 border-3 border-[#1a1a1a] rounded-2xl flex items-center justify-center font-black text-xl shadow-[3px_3px_0_#1a1a1a] ${entry.rank === 1 ? 'bg-yellow-400' :
+                                    entry.rank === 2 ? 'bg-slate-200' :
+                                        entry.rank === 3 ? 'bg-orange-200' :
+                                            'bg-white'
                                     }`}>
                                     {entry.rank}
                                 </div>
 
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-xl">
+                                <div className="flex items-center gap-4 pl-2">
+                                    <div className="w-12 h-12 bg-[#f5e6d3] border-2 border-[#1a1a1a] rounded-full flex items-center justify-center text-2xl">
                                         {entry.isUser ? '🧑‍🚀' : '👤'}
                                     </div>
-                                    <span className={`font-black tracking-tight ${entry.isUser ? 'text-indigo-600' : 'text-slate-700'}`}>
+                                    <span className={`font-black tracking-tight text-lg ${entry.isUser ? 'text-[#1a1a1a] underline decoration-indigo-500 decoration-4' : 'text-[#1a1a1a]'}`}>
                                         {entry.name}
-                                        {entry.isUser && <span className="ml-2 bg-indigo-100 text-indigo-500 text-[8px] px-2 py-0.5 rounded-full uppercase">You</span>}
                                     </span>
                                 </div>
 
-                                <div className={`text-right font-black ${entry.isUser ? 'text-indigo-600' : 'text-slate-800'}`}>
+                                <div className={`text-right font-black text-xl ${entry.isUser ? 'text-indigo-600' : 'text-[#1a1a1a]'}`}>
                                     {entry.score.toLocaleString()}
                                 </div>
 
-                                <div className="text-right font-bold text-slate-400">
-                                    🏠 {entry.village}
+                                <div className="text-right font-black text-[#717171]">
+                                    V{entry.village}
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <p className="text-center mt-10 text-slate-400 font-bold text-sm">
-                    ท้าทายความจำและทำคะแนนเพื่อไต่อันดับโลก! 🌏
+                <p className="text-center mt-12 text-[#717171] font-black uppercase tracking-[0.2em] text-[10px]">
+                    World Ranking Updates Live 🌏
                 </p>
 
             </div>

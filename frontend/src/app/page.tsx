@@ -48,68 +48,81 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 selection:bg-indigo-500 selection:text-white overflow-hidden">
+    <div className="min-h-screen bg-[var(--bg-warm)] flex items-center justify-center p-4 md:p-6 selection:bg-orange-100 selection:text-orange-900 overflow-hidden font-['Supermarket']">
       {/* Background Decor */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/20 blur-[120px] rounded-full" />
+        <div className="absolute top-[-5%] right-[-5%] w-[30%] h-[30%] bg-orange-100/50 blur-[100px] rounded-full" />
+        <div className="absolute bottom-[-5%] left-[-5%] w-[30%] h-[30%] bg-rose-100/50 blur-[100px] rounded-full" />
       </div>
 
       <div className="w-full max-w-md relative z-10 transition-all duration-700">
 
         {/* Phase 1: Login */}
         {phase === 'login' && (
-          <div className="bg-white/95 backdrop-blur-xl p-10 rounded-[40px] shadow-2xl border border-white/20 animate-in fade-in zoom-in duration-500">
-            <h1 className="text-4xl font-black text-slate-800 mb-2 text-center">🧠 Gymemo</h1>
-            <p className="text-slate-500 font-bold text-center mb-8 uppercase tracking-widest text-xs">Authentication Portal</p>
+          <div className="friendly-card animate-in fade-in zoom-in duration-500">
+            <div className="flex flex-col items-center mb-8">
+              <div className="w-20 h-20 bg-[var(--card-bg)] border-4 border-[var(--border-dark)] rounded-full flex items-center justify-center text-4xl mb-4 shadow-[6px_6px_0_var(--border-dark)]">
+                🧠
+              </div>
+              <h1 className="text-4xl font-black text-[var(--text-main)] tracking-tight uppercase">ยินดีต้อนรับ</h1>
+            </div>
 
-            <form onSubmit={handleLogin} className="space-y-4">
-              <input
-                type="text"
-                placeholder="Username (Placeholder)"
-                className="w-full bg-slate-50 p-4 rounded-2xl border-2 border-slate-100 outline-none focus:border-indigo-500 transition-all font-bold"
-                value={username}
-                onChange={e => setUsername(e.target.value)}
-              />
-              <input
-                type="password"
-                placeholder="Password (Placeholder)"
-                className="w-full bg-slate-50 p-4 rounded-2xl border-2 border-slate-100 outline-none focus:border-indigo-500 transition-all font-bold"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-              />
-              <button className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black text-xl shadow-xl hover:bg-indigo-700 active:scale-95 transition-all mt-4">
-                LOGIN
+            <form onSubmit={handleLogin} className="space-y-5">
+              <div className="relative group">
+                <div className="absolute left-7 top-1/2 -translate-y-1/2 text-xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">👤</div>
+                <input
+                  type="text"
+                  placeholder="USERNAME"
+                  className="pill-input pill-input-icon w-full py-4 text-lg"
+                  value={username}
+                  onChange={e => setUsername(e.target.value)}
+                />
+              </div>
+              <div className="relative group">
+                <div className="absolute left-7 top-1/2 -translate-y-1/2 text-xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">🔒</div>
+                <input
+                  type="password"
+                  placeholder="PASSWORD"
+                  className="pill-input pill-input-icon w-full py-4 text-lg"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                />
+              </div>
+              <button className="pill-button w-full py-5 text-2xl mt-4 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_6px_0_#000] active:shadow-none active:translate-y-[2px]">
+                เข้าสู่ระบบ
               </button>
             </form>
 
-            <button
-              onClick={() => router.push('/leaderboard')}
-              className="w-full mt-6 py-3 bg-slate-50 text-slate-400 rounded-xl font-bold text-sm hover:text-indigo-500 transition-colors uppercase tracking-widest"
-            >
-              🏆 ดูอันดับผู้เล่นอื่น
-            </button>
+            <div className="mt-8 pt-8 border-t-2 border-[#1a1a1a]/10">
+              <p className="text-center text-sm font-bold text-[#717171] mb-6">ล็อกอินโดยเบอร์โทรศัพท์ / เข้าชมทั่วไป</p>
+              <button
+                onClick={() => router.push('/leaderboard')}
+                className="w-full py-4 bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-full font-black text-[var(--text-main)] uppercase tracking-widest hover:bg-[var(--border-dark)] hover:text-[var(--text-on-dark)] transition-all shadow-[4px_4px_0_var(--border-dark)]"
+              >
+                🏆 กระดานผู้นำ
+              </button>
+            </div>
           </div>
         )}
 
         {/* Phase 2: Name Input */}
         {phase === 'name' && (
-          <div className="bg-white/95 backdrop-blur-xl p-10 rounded-[40px] shadow-2xl border border-white/20 animate-in slide-in-from-right duration-500">
-            <div className="text-6xl mb-6 text-center">👋</div>
-            <h2 className="text-3xl font-black text-slate-800 mb-2 text-center">ยินดีที่ได้รู้จัก!</h2>
-            <p className="text-slate-500 font-bold text-center mb-8">เราควรเรียกคุณว่าอะไรดีครับ?</p>
+          <div className="friendly-card animate-in slide-in-from-right duration-500 text-center">
+            <div className="text-7xl mb-6">👋</div>
+            <h2 className="text-3xl font-black text-[#1a1a1a] mb-2">ยินดีที่ได้รู้จัก!</h2>
+            <p className="text-[#717171] font-bold mb-10">เราควรเรียกคุณว่าอะไรดีครับ?</p>
 
-            <form onSubmit={handleSaveName}>
+            <form onSubmit={handleSaveName} className="space-y-6">
               <input
                 autoFocus
                 type="text"
-                placeholder="ใส่ชื่อของคุณที่นี่..."
-                className="w-full bg-slate-50 p-5 rounded-2xl border-2 border-slate-100 outline-none focus:border-blue-500 transition-all font-black text-2xl text-center text-blue-600"
+                placeholder="กรอกชื่อของคุณ..."
+                className="pill-input w-full text-center text-2xl uppercase"
                 value={name}
                 required
                 onChange={e => setName(e.target.value)}
               />
-              <button className="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-xl shadow-xl hover:bg-blue-700 active:scale-95 transition-all mt-6">
+              <button className="pill-button w-full py-5 text-xl">
                 ยืนยันชื่อ ✨
               </button>
             </form>
@@ -118,34 +131,34 @@ export default function Home() {
 
         {/* Phase 3: Character Profile */}
         {phase === 'profile' && (
-          <div className="bg-white/95 backdrop-blur-xl p-8 rounded-[48px] shadow-2xl border border-white/20 animate-in zoom-in duration-500 text-center">
-            <div className="relative mx-auto w-32 h-32 mb-6">
-              <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-blue-400 rounded-full animate-pulse blur-xl opacity-30" />
-              <div className="relative w-full h-full bg-slate-100 rounded-full flex items-center justify-center text-6xl shadow-inner border-4 border-white">
+          <div className="friendly-card animate-in zoom-in duration-500 text-center">
+            <div className="relative mx-auto w-32 h-32 mb-8">
+              <div className="absolute inset-0 bg-orange-200 border-3 border-[#1a1a1a] rounded-full translate-x-1 translate-y-1" />
+              <div className="relative w-full h-full bg-white border-3 border-[#1a1a1a] rounded-full flex items-center justify-center text-6xl">
                 🧑‍🚀
               </div>
             </div>
-            <h2 className="text-3xl font-black text-slate-800 mb-1">{name}</h2>
-            <p className="text-indigo-500 font-bold uppercase tracking-[0.2em] text-xs mb-8">Memory Explorer</p>
+            <h2 className="text-4xl font-black text-[#1a1a1a] mb-1">{name}</h2>
+            <p className="text-[#717171] font-bold uppercase tracking-[0.2em] text-[10px] mb-10">นักสำรวจความจำระดับ 1</p>
 
             <div className="grid grid-cols-2 gap-4 mb-10">
-              <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100">
-                <div className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Level Unlocked</div>
-                <div className="text-2xl font-black text-slate-800">{stats?.unlockedVillages?.length || 1}</div>
+              <div className="bg-white border-3 border-[#1a1a1a] rounded-[2rem] p-4 shadow-[4px_4px_0_#1a1a1a]">
+                <div className="text-[#717171] text-[10px] font-black uppercase tracking-widest mb-1">หมู่บ้าน</div>
+                <div className="text-3xl font-black text-[#1a1a1a]">{stats?.unlockedVillages?.length || 1}</div>
               </div>
-              <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100">
-                <div className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Total Score</div>
-                <div className="text-2xl font-black text-indigo-600">{stats?.totalScore || 0}</div>
+              <div className="bg-white border-3 border-[#1a1a1a] rounded-[2rem] p-4 shadow-[4px_4px_0_#1a1a1a]">
+                <div className="text-[#717171] text-[10px] font-black uppercase tracking-widest mb-1">คะแนน</div>
+                <div className="text-3xl font-black text-[#1a1a1a]">{stats?.totalScore || 0}</div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <button onClick={nextPhase} className="py-5 bg-indigo-600 text-white rounded-[24px] font-black text-xl shadow-xl hover:bg-indigo-700 transition-all active:scale-95">
-                เริ่มผจญภัย 🚀
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <button onClick={nextPhase} className="pill-button w-full py-5 text-xl">
+                ลุยกันเลย! 🚀
               </button>
               <button
                 onClick={() => router.push('/leaderboard')}
-                className="py-5 bg-white text-slate-700 rounded-[24px] font-black text-xl shadow-lg border border-slate-100 hover:bg-slate-50 transition-all active:scale-95"
+                className="w-full py-4 bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-full font-black text-[var(--text-main)] uppercase tracking-widest hover:bg-[var(--border-dark)] hover:text-[var(--text-on-dark)] transition-all shadow-[4px_4px_0_var(--border-dark)]"
               >
                 อันดับ 🏆
               </button>
@@ -157,7 +170,7 @@ export default function Home() {
                 saveProgress(fresh);
                 setPhase('login');
               }}
-              className="mt-8 text-slate-300 font-bold text-xs uppercase tracking-widest hover:text-red-400 transition-colors"
+              className="mt-10 font-black text-[#717171] hover:text-red-500 transition-colors uppercase tracking-[0.1em] text-[10px] underline underline-offset-4"
             >
               ออกจากระบบ / เปลี่ยนชื่อ
             </button>
@@ -167,41 +180,41 @@ export default function Home() {
         {/* Phase 4: Game Intro Narrative */}
         {phase === 'intro' && (
           <div className="text-center animate-in fade-in duration-1000">
-            <div className="inline-block px-4 py-1 bg-indigo-500/20 text-indigo-300 text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-6">
+            <div className="inline-block px-4 py-1 bg-[var(--border-dark)] text-[var(--text-on-dark)] text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-6">
               Story Prologue
             </div>
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">
-              จุดเริ่มต้นของ<br />การเดินทาง
+            <h2 className="text-4xl md:text-6xl font-black text-[var(--text-main)] mb-8 leading-tight uppercase text-center">
+              จุดเริ่มต้นของ<br /><span className="bg-[var(--border-dark)] text-[var(--text-on-dark)] px-2">การเดินทาง</span>
             </h2>
-            <p className="text-indigo-200/80 text-lg font-bold leading-relaxed mb-12">
+            <p className="text-[#717171] text-lg font-bold leading-relaxed mb-12 max-w-xs mx-auto">
               บนโลกที่ความทรงจำเริ่มเลือนหาย...<br />
               อารยธรรมและความผูกพันกำลังถูกลบเลือน<br />
-              มีเพียงการฝึกฝนและฟื้นฟูเท่านั้นที่จะช่วยได้
+              มีเพียงคุณเท่านั้นที่จะช่วยได้
             </p>
-            <button onClick={nextPhase} className="px-12 py-5 bg-white text-indigo-900 rounded-full font-black text-xl shadow-2xl hover:bg-indigo-50 active:scale-95 transition-all group">
-              ต่อไป <span className="inline-block transition-transform group-hover:translate-x-2">→</span>
-            </button>
+            <div className="flex justify-center">
+              <button onClick={nextPhase} className="pill-button px-16 py-6 text-2xl group">
+                ต่อไป <span className="inline-block transition-transform group-hover:translate-x-2">→</span>
+              </button>
+            </div>
           </div>
         )}
 
-        {/* Phase 4: Grandmother Story Placeholder */}
+        {/* Phase 5: Grandmother Story Placeholder */}
         {phase === 'grandmother' && (
-          <div className="bg-white rounded-[48px] p-2 overflow-hidden shadow-2xl animate-in zoom-in duration-700">
-            <div className="relative aspect-video bg-slate-200 overflow-hidden rounded-[40px]">
-              {/* Placeholder for Grandmother Image */}
-              <div className="absolute inset-0 flex items-center justify-center text-8xl grayscale opacity-50 bg-gradient-to-br from-slate-100 to-slate-300">
+          <div className="friendly-card p-4 animate-in zoom-in duration-700">
+            <div className="relative aspect-[4/3] bg-[#f5e6d3] overflow-hidden rounded-[2.5rem] border-3 border-[#1a1a1a] shadow-[8px_8px_0_rgba(0,0,0,0.1)] mb-8">
+              <div className="absolute inset-0 flex items-center justify-center text-9xl">
                 👵
               </div>
-              <div className="absolute bottom-0 inset-x-0 p-8 bg-gradient-to-t from-black/80 to-transparent text-white pt-20">
+              <div className="absolute bottom-0 inset-x-0 p-8 bg-[var(--border-dark)]/80 text-[var(--text-on-dark)] backdrop-blur-md">
                 <p className="text-lg font-black leading-relaxed italic">
-                  "ลูกเอ๋ย... หมู่บ้านทั้ง 10 กำลังตกอยู่ในความเงียบเหงา ความจำที่เคยมีหายไปหมดสิ้น เจ้าต้องนำ 'ยานั้น' กลับมาช่วยพวกเรานะ"
+                  "ช่วยพวกเราทีนะลูก นำความทรงจำกลับคืนมาสู่หมู่บ้านของเรา..."
                 </p>
               </div>
             </div>
-            <div className="p-8 text-center">
-              <p className="text-slate-500 font-bold mb-8">คุณยายเล่าถึงที่มาของภารกิจสำคัญนี้...</p>
-              <button onClick={nextPhase} className="w-full py-5 bg-slate-900 text-white rounded-[24px] font-black text-2xl shadow-xl hover:bg-slate-800 transition-all active:scale-95">
-                เริ่มต้นการเดินทาง 🚀
+            <div className="px-4 text-center">
+              <button onClick={nextPhase} className="pill-button w-full py-6 text-2xl shadow-[6px_6px_0_rgba(0,0,0,0.2)]">
+                เริ่มต้นภารกิจ 🏹
               </button>
             </div>
           </div>
