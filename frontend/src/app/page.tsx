@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import { loadProgress, saveProgress } from '@/lib/levelSystem'
 import TrainingModal from '@/components/TrainingModal'
 
-type AuthPhase = 'login' | 'name' | 'profile' | 'intro' | 'grandmother' | 'tutorial_summary'
+type AuthPhase = 'login' | 'name' | 'profile' | 'intro' | 'grandmother' | 'tutorial_summary' | 'assessment'
+import ClockIntro from '@/components/ClockIntro'
 
 export default function Home() {
   const router = useRouter()
@@ -49,6 +50,9 @@ export default function Home() {
     else if (phase === 'intro') setPhase('grandmother')
     else if (phase === 'grandmother') setPhase('tutorial_summary')
     else if (phase === 'tutorial_summary') {
+      setPhase('assessment')
+    }
+    else if (phase === 'assessment') {
       const p = loadProgress()
       p.introSeen = true
       saveProgress(p)
@@ -319,8 +323,19 @@ export default function Home() {
               onClick={nextPhase}
               className="pill-button w-full py-10 text-4xl shadow-[0_15px_0_#1a1a1a] hover:translate-y-2 hover:shadow-[0_8px_0_#1a1a1a] active:translate-y-4 active:shadow-none transition-all"
             >
-              พร้อมแล้ว! เข้าสู่หมู่บ้านแรก 🗝️
+              พร้อมแล้ว! เข้าสู่ก้าวสำคัญ 🗝️
             </button>
+          </div>
+        )}
+
+        {/* Phase 7: CDT Assessment (Clock Game) */}
+        {phase === 'assessment' && (
+          <div className="animate-in fade-in duration-700 w-full max-w-4xl relative z-[5000]">
+            <ClockIntro
+              targetHour={10}
+              targetMinute={10}
+              onComplete={nextPhase}
+            />
           </div>
         )}
 
@@ -333,6 +348,6 @@ export default function Home() {
         )}
 
       </div>
-    </div>
+    </div >
   )
 }

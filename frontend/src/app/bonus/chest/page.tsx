@@ -17,8 +17,10 @@ function ChestGameInner() {
     const [opened, setOpened] = useState(false)
 
     const handleOpenChest = () => {
-        // ให้เปิดกล่องแล้วได้คะแนนพิเศษ 200 คะแนน (เทียบเท่าประสบการณ์เล่น 1-2 ครั้งได้แบบก้าวกระโดด)
-        recordPlay(villageId, 200)
+        // ให้เปิดกล่องแล้วได้กุญแจ 1 ดอก และคะแนนพิเศษนิดหน่อย
+        const { addKeys } = require('@/lib/levelSystem')
+        addKeys(1)
+        recordPlay(villageId, 50)
         setOpened(true)
     }
 
@@ -49,9 +51,9 @@ function ChestGameInner() {
                     <div style={{ fontSize: '5rem', marginBottom: '1rem' }}>
                         🎉
                     </div>
-                    <h2>ยินดีด้วย! คุณได้รับ EXP พิเศษ!</h2>
-                    <p style={{ marginTop: '1rem', fontSize: '1.2rem', color: '#4ade80', fontWeight: 'bold' }}>
-                        +200 คะแนน!
+                    <h2>ยินดีด้วย! คุณได้รับกุญแจเพิ่ม!</h2>
+                    <p style={{ marginTop: '1rem', fontSize: '1.2rem', color: '#ffd700', fontWeight: 'bold' }}>
+                        🗝️ ได้รับกุญแจเพิ่ม 1 ดอก!
                     </p>
                     <div style={{ padding: '1.5rem', marginTop: '1.5rem', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '12px' }}>
                         <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>

@@ -183,7 +183,7 @@ export default function WorldPage() {
           <div className={`${styles.introCard} max-w-lg`}>
             <div className="flex justify-between items-start mb-6">
               <div>
-                <span className="bg-[var(--card-bg)] text-[var(--text-main)] border-2 border-[var(--border-dark)] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Village Mission</span>
+                <span className="bg-[var(--card-bg)] text-[var(--text-main)] border-2 border-[var(--border-dark)] px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">Village Mission</span>
                 <h2 className="text-4xl font-black text-[#1a1a1a] mt-2">หมู่บ้านที่ {selectedVillage}</h2>
               </div>
               <button onClick={() => setSelectedVillage(null)} className="text-[#1a1a1a]/20 hover:text-red-500 text-3xl font-black transition-colors">✕</button>
@@ -193,7 +193,7 @@ export default function WorldPage() {
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-14 h-14 bg-[#f5e6d3] border-2 border-black rounded-2xl flex items-center justify-center text-3xl shadow-[4px_4px_0_#000]">🚩</div>
                 <div className="text-left">
-                  <div className="text-[#717171] text-[10px] font-black uppercase tracking-widest">Difficulty</div>
+                  <div className="text-[#717171] text-xs font-black uppercase tracking-widest">Difficulty</div>
                   <div className="text-[#1a1a1a] font-black text-lg">{selectedVillage <= 3 ? 'ระดับเริ่มต้น 🌱' : selectedVillage <= 7 ? 'ระดับกลาง ⚔️' : 'ระดับสูง 🔥'}</div>
                 </div>
               </div>
@@ -299,19 +299,19 @@ export default function WorldPage() {
                 ณ แหล่งสร้างยาที่เชื่อว่าเป็นจุดหมายสุดท้าย... คุณได้ค้นพบความจริงว่า <b>"ยาป้องกันสมองเสื่อม"</b> ที่แท้จริงไม่ได้อยู่ในรูปแบบของตัวยา
                 หากแต่คือ <b>ประสบการณ์ การเรียนรู้ และการฝึกสมอง</b> ที่คุณได้ตรากตรำทำมาตลอดเส้นทางนี้เอง
               </p>
-              <p className="text-slate-400 text-[10px] mt-4 font-bold uppercase tracking-widest leading-loose">
+              <p className="text-black/60 text-sm mt-4 font-bold uppercase tracking-widest leading-loose">
                 ความตระหนักรู้นี้ช่วยให้คุณนำสิ่งที่คุณเรียนรู้กลับไปฟื้นฟูหมู่บ้านทั้ง 10 ให้กลับมามีชีวิตชีวาอีกครั้ง!
               </p>
             </div>
             <div className="flex flex-col gap-3 w-full mt-6">
               <button
-                className={`${styles.navBtn} ${styles.navBtnPrimary} w-full shadow-[0_10px_30px_rgba(79,70,229,0.3)]`}
+                className={`${styles.navBtn} ${styles.navBtnPrimary} w-full shadow-[0_10px_30px_rgba(79,70,229,0.3)] text-xl py-4`}
                 onClick={() => setShowEnding(false)}
               >
                 ฟื้นฟูหมู่บ้านด้วยใจ 🏘️
               </button>
               <button
-                className="text-slate-400 font-bold text-[10px] uppercase tracking-widest hover:text-red-500 transition-colors py-2"
+                className="text-red-600/80 font-black text-xs uppercase tracking-widest hover:text-red-600 hover:scale-105 transition-all py-2 mt-2"
                 onClick={() => { if (confirm('ต้องการเริ่มการเดินทางครั้งใหม่เพื่อฝึกฝนอีกรอบใช่หรือไม่?')) { resetProgress(); setShowEnding(false); } }}
               >
                 เริ่มการเดินทางใหม่ 🔄
@@ -324,7 +324,7 @@ export default function WorldPage() {
       <div className={styles.topBar}>
         <div className="flex flex-col">
           <h1 className={styles.mapTitle}>🗺️ ยินดีต้อนรับ, {userName}</h1>
-          <p className="text-[var(--text-muted)] text-xs font-black ml-1 uppercase tracking-widest">เป้าหมาย: ฟื้นฟูให้ครบ 10 หมู่บ้าน</p>
+          <p className="text-[var(--text-muted)] text-sm font-black ml-1 uppercase tracking-widest">เป้าหมาย: ฟื้นฟูให้ครบ 10 หมู่บ้าน</p>
         </div>
         <div className={styles.topActions}>
           <button className={styles.actionBtn} onClick={() => router.push('/leaderboard')}>
@@ -379,7 +379,9 @@ export default function WorldPage() {
               title={state === 'locked' ? 'ล็อก' : `หมู่บ้าน ${stage}`}
             >
               <span className={styles.stageIcon}>
-                {state === 'completed' ? '⭐' : state === 'current' ? '▶' : '🔒'}
+                {state === 'completed'
+                  ? (stage === 10 ? '🏆' : '⭐')
+                  : state === 'current' ? '▶' : '🔒'}
               </span>
               <span className={styles.stageLabel}>ด่าน {stage}</span>
               {state !== 'locked' && (
@@ -413,7 +415,7 @@ export default function WorldPage() {
         <span className={styles.legendItem}>⭐ ผ่านแล้ว</span>
         <span className={styles.legendItem}>🔒 ล็อก</span>
         <span className={styles.legendItem}>
-          EXP {Object.values(villageExp).filter((v) => v >= 100).length}/{TOTAL_STAGES}
+          ด่าน {Object.values(villageExp).filter((v) => v >= 100).length}/{TOTAL_STAGES}
         </span>
       </div>
     </div>

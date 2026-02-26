@@ -376,7 +376,6 @@ function CalculationGameInner() {
       <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4">
         <div className="bg-white/90 backdrop-blur-xl border border-white/20 p-8 md:p-12 rounded-[3rem] shadow-2xl max-w-sm md:max-w-md w-full text-center animate-in zoom-in duration-500">
           <div className="text-7xl md:text-8xl mb-6">🎯</div>
-          <h2 className="text-2xl md:text-3xl font-black text-slate-800 mb-2">ประเมินผล: <span className="text-blue-600 underline">{evaluation}</span></h2>
           <p className="text-slate-500 font-bold mb-8 italic text-sm">แม่นยำ {pct}%</p>
 
           <div className="space-y-3 mb-10">
