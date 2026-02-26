@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getKeys, consumeKey, recordPlay } from '@/lib/levelSystem'
+import { getKeys, consumeKey, recordPlay, markDailyMode } from '@/lib/levelSystem'
 import ConfirmUseKeyModal from '@/components/ConfirmUseKeyModal'
 
 function getMinigameUrl(villageId: number, subId: number): string {
@@ -75,6 +75,16 @@ export default function SubLevelPage({
     setModalOpen(false)
     // ให้ EXP ถือว่าผ่านไปเลย 1 ครั้ง
     recordPlay(villageId, 50) // ให้แต้มข้ามด่านเล็กน้อย
+
+    // เช็คภารกิจรายวัน: ถ้าใช้กุญแจข้าม ก็ให้ถือว่าทำภารกิจโหมดนั้นเสร็จด้วย
+    const modes = ['management', 'calculation', 'spatial']
+    let modeIndex = 0
+    if (subLevelId < 4) modeIndex = (subLevelId - 1) % 3
+    else if (subLevelId < 9) modeIndex = (subLevelId - 5) % 3
+    else modeIndex = (subLevelId - 10) % 3
+    const currentMode = modes[modeIndex] as 'management' | 'calculation' | 'spatial'
+    const dk = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
+    markDailyMode(dk, currentMode)
 
     // กระโดดไปยังด่านถัดไป หรือกลับไปหน้าหน้าหมู่บ้านถ้าเป็นด่านสุดท้าย
     if (subLevelId < 12) {

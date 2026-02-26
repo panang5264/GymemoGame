@@ -27,6 +27,7 @@ export interface GymemoProgressV2 {
   keys: KeyState
   daily: Record<string, DailyModeCompletion>
   totalScore: number
+  userName: string
 }
 
 export function getDefaultProgress(): GymemoProgressV2 {
@@ -37,6 +38,7 @@ export function getDefaultProgress(): GymemoProgressV2 {
     keys: { currentKeys: MAX_KEYS, lastRegenAt: Date.now() },
     daily: {},
     totalScore: 0,
+    userName: '',
   }
 }
 
@@ -72,6 +74,11 @@ export function recordPlay(villageId: number, scoreGained: number): GymemoProgre
   p.totalScore += scoreGained
   if (tubeFilled && villageId < 10 && !p.unlockedVillages.includes(villageId + 1)) {
     p.unlockedVillages = [...p.unlockedVillages, villageId + 1]
+  }
+  if (tubeFilled && villageId === 10) {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('gymemo:game_ending'))
+    }
   }
   saveProgress(p)
   return p

@@ -9,29 +9,45 @@
  */
 
 const STORAGE_KEY = 'gymemo_daily_challenge'
+const RESET_HOUR = 22 // 22:00 or 10 PM
 
-/** Returns a "YYYY-MM-DD" string for the given date in local time. */
+/** 
+ * Returns a "YYYY-MM-DD" string for the "game day".
+ * If it's before 22:00, it's still the "calendar day".
+ * If it's 22:00 or later, it's considered the "next calendar day".
+ */
 export function getDateKey(now?: Date): string {
   const d = now ?? new Date()
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
+  const dEffective = new Date(d)
+
+  // If we are past 22:00, we're effectively in the "next game day"
+  if (d.getHours() >= RESET_HOUR) {
+    dEffective.setDate(dEffective.getDate() + 1)
+  }
+
+  const y = dEffective.getFullYear()
+  const m = String(dEffective.getMonth() + 1).padStart(2, '0')
+  const day = String(dEffective.getDate()).padStart(2, '0')
   return `${y}-${m}-${day}`
 }
 
-/** Returns a Date object representing the next local midnight (00:00:00). */
-export function getNextMidnight(now?: Date): Date {
+/** Returns a Date object representing the next reset time (22:00:00). */
+export function getNextResetTime(now?: Date): Date {
   const d = now ?? new Date()
-  const midnight = new Date(d)
-  midnight.setDate(midnight.getDate() + 1)
-  midnight.setHours(0, 0, 0, 0)
-  return midnight
+  const reset = new Date(d)
+
+  reset.setHours(RESET_HOUR, 0, 0, 0)
+
+  // If it's already past 22:00 today, the next reset is 22:00 tomorrow
+  if (d.getHours() >= RESET_HOUR) {
+    reset.setDate(reset.getDate() + 1)
+  }
+
+  return reset
 }
 
 /**
  * Returns true if the player has not yet completed the Daily Challenge today.
- * Returns false when called outside a browser (SSR); client components should
- * call this inside useEffect to read the accurate value.
  */
 export function canPlayDailyChallenge(now?: Date): boolean {
   if (typeof window === 'undefined') return false
@@ -47,7 +63,6 @@ export function canPlayDailyChallenge(now?: Date): boolean {
 
 /**
  * Records that the Daily Challenge was completed today.
- * Call this after all 3 stages are finished.
  */
 export function markDailyChallengeCompleted(now?: Date): void {
   if (typeof window === 'undefined') return
@@ -55,11 +70,14 @@ export function markDailyChallengeCompleted(now?: Date): void {
 }
 
 /**
- * Returns a "HH:MM:SS" countdown string until the next local midnight reset.
+ * Returns a "HH:MM:SS" countdown string until the next reset time (22:00).
  */
 export function getCountdownToReset(now?: Date): string {
   const current = now ?? new Date()
-  const diff = getNextMidnight(current).getTime() - current.getTime()
+  const diff = getNextResetTime(current).getTime() - current.getTime()
+
+  if (diff <= 0) return "00:00:00"
+
   const h = Math.floor(diff / 3_600_000)
   const m = Math.floor((diff % 3_600_000) / 60_000)
   const s = Math.floor((diff % 60_000) / 1_000)

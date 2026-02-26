@@ -51,8 +51,6 @@ export default function VillagePage({ params }: { params: Promise<{ villageId: s
 
   const expPercent = getExpPercent(playsCompleted)
 
-  const sublevels = Array.from({ length: 14 }, (_, i) => i + 1)
-
   function handlePlay(subId: number) {
     router.push(`/world/${villageId}/sublevel/${subId}`)
   }
@@ -78,73 +76,54 @@ export default function VillagePage({ params }: { params: Promise<{ villageId: s
     <div className={styles.villagePage}>
       <Link href="/world" className={styles.backLink}>← กลับแผนที่</Link>
 
-      <div className={styles.card} style={{ maxWidth: '640px', width: '100%' }}>
+      <div className={styles.card}>
         <div className={styles.cardEmoji}>🏘️</div>
         <h1 className={styles.cardTitle}>หมู่บ้านที่ {villageId}</h1>
 
         {/* EXP tube */}
-        <div style={{ width: '100%', marginBottom: '0.5rem' }}>
-          <p style={{ fontSize: '0.9rem', marginBottom: '0.35rem', opacity: 0.75 }}>
-            EXP: {playsCompleted}/{PLAYS_PER_VILLAGE} ({expPercent}%)
-          </p>
-          <div
-            style={{
-              width: '100%',
-              height: '12px',
-              background: 'rgba(0,0,0,0.1)',
-              borderRadius: '6px',
-              overflow: 'hidden',
-              border: '1px solid rgba(0,0,0,0.15)',
-            }}
-          >
+        <div className="w-full mb-4">
+          <div className="flex justify-between items-end mb-2">
+            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">Experience Points</p>
+            <p className="text-sm font-black text-[var(--text-main)]">
+              {playsCompleted}/{PLAYS_PER_VILLAGE} ({expPercent}%)
+            </p>
+          </div>
+          <div className="w-full h-6 bg-white border-3 border-[var(--border-dark)] rounded-full overflow-hidden shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
             <div
-              style={{
-                width: `${expPercent}%`,
-                height: '100%',
-                background: 'linear-gradient(90deg,#ffd700,#ffed4e)',
-                borderRadius: '6px',
-                transition: 'width 0.4s ease',
-              }}
+              className="h-full bg-yellow-400 border-r-3 border-[var(--border-dark)] transition-all duration-700"
+              style={{ width: `${expPercent}%` }}
             />
           </div>
         </div>
 
         {/* Keys indicator */}
-        <div style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1rem' }}>
-          🗝️ {currentKeys}/{MAX_KEYS} กุญแจ
+        <div className="mb-8 bg-[var(--bg-warm)] border-3 border-[var(--border-dark)] px-6 py-3 rounded-2xl font-black text-xl flex items-center gap-3 shadow-[4px_4px_0_var(--border-dark)]">
+          <span>🗝️</span>
+          <span>{currentKeys}/{MAX_KEYS} กุญแจ</span>
           {currentKeys === 0 && (
-            <span style={{ color: '#e53e3e', marginLeft: '0.5rem', fontSize: '0.9rem' }}>
-              (รอรีเจน 30 นาที)
+            <span className="text-red-600 text-[10px] uppercase ml-2 bg-white px-2 py-0.5 rounded-full border-2 border-red-600">
+              รอรีเจน 30 นาที
             </span>
           )}
         </div>
 
         {/* Sublevel serpentine map */}
-        <div
-          style={{
-            position: 'relative',
-            width: '100%',
-            height: '520px',
-            backgroundColor: '#F6EADB',
-            borderRadius: '16px',
-            border: '2px solid rgba(0,0,0,0.1)',
-            overflow: 'hidden',
-          }}
-        >
-          {/* Dashed line connecting nodes exactly using SVG ViewBox */}
-          <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }}>
+        <div className="relative w-full aspect-square md:aspect-auto md:h-[500px] bg-[#e5e1d3] rounded-[3rem] border-4 border-[var(--border-dark)] overflow-hidden shadow-[inner_0_4px_10px_rgba(0,0,0,0.1)]">
+          {/* Dashed line */}
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full pointer-events-none z-1">
             <path
               d={`M 25 15 L 15 30 L 15 50 L 25 70 L 40 85 L 60 85 L 75 70 L 85 50 L 85 30 L 75 15 L 50 15 L 50 30`}
-              stroke="#666"
-              strokeWidth="4"
-              strokeDasharray="8,8"
+              stroke="var(--border-dark)"
+              strokeWidth="1.5"
+              strokeDasharray="3,3"
               fill="none"
               vectorEffect="non-scaling-stroke"
+              opacity="0.3"
             />
           </svg>
 
-          {/* Center text like diagram */}
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontWeight: 900, textAlign: 'center', opacity: 0.8, color: '#333', fontSize: '1.2rem', zIndex: 1 }}>
+          {/* Center text */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-black text-center text-[var(--text-muted)] text-sm md:text-lg uppercase tracking-widest opacity-40 z-1 leading-tight">
             เมื่อเล่นครบ<br />12 ด่าน
           </div>
 
@@ -163,7 +142,6 @@ export default function VillagePage({ params }: { params: Promise<{ villageId: s
             { id: 12, top: '30%', left: '50%', type: 'star' },
           ].map((node) => {
             const isChest = node.type === 'chest'
-
             const currentSubId = (playsCompleted % 12) + 1
             const loops = Math.floor(playsCompleted / 12)
             const isUnlocked = loops > 0 || node.id <= currentSubId
@@ -175,52 +153,28 @@ export default function VillagePage({ params }: { params: Promise<{ villageId: s
                 onClick={() => {
                   if (isUnlocked) handlePlay(node.id)
                 }}
+                className={`absolute w-12 h-12 md:w-16 md:h-16 flex items-center justify-center cursor-pointer transition-all duration-300 z-10 
+                  ${!isUnlocked
+                    ? 'bg-slate-300 opacity-50 grayscale cursor-not-allowed'
+                    : isCurrent
+                      ? 'bg-white scale-125 z-20 shadow-[0_0_20px_rgba(255,255,255,0.8)]'
+                      : 'bg-[var(--card-bg)] hover:scale-110 active:scale-95'
+                  } 
+                  border-3 border-[var(--border-dark)] rounded-2xl shadow-[4px_4px_0_var(--border-dark)]
+                `}
                 style={{
-                  position: 'absolute',
                   top: node.top,
                   left: node.left,
                   transform: 'translate(-50%, -50%)',
-                  width: isChest ? '60px' : '50px',
-                  height: isChest ? '55px' : '50px',
-                  background: !isUnlocked
-                    ? 'linear-gradient(135deg, #d1d5db, #9ca3af)'
-                    : isChest
-                      ? 'linear-gradient(135deg, #d97706, #f59e0b)'
-                      : 'linear-gradient(135deg, #4ade80, #22c55e)',
-                  border: isCurrent ? '4px solid #fff' : '3px solid #fff',
-                  borderRadius: isChest ? '12px' : '50%',
-                  boxShadow: isCurrent
-                    ? '0 0 15px rgba(74,222,128,0.9), inset 0 2px 4px rgba(255,255,255,0.4)'
-                    : '0 4px 6px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.4)',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  cursor: isUnlocked ? 'pointer' : 'not-allowed',
-                  fontSize: isChest ? '1.8rem' : '1.4rem',
-                  zIndex: isCurrent ? 10 : 2,
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  color: '#fff',
-                  opacity: !isUnlocked ? 0.8 : 1,
-                  filter: !isUnlocked ? 'grayscale(0.6)' : 'none',
                 }}
                 title={!isUnlocked ? '🔒 ยังไม่ถึงด่านนี้' : `ด่านที่ ${node.id}`}
-                onMouseEnter={(e) => {
-                  if (isUnlocked) {
-                    e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.15)';
-                    e.currentTarget.style.boxShadow = '0 6px 10px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.4)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (isUnlocked) {
-                    e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1)';
-                    e.currentTarget.style.boxShadow = isCurrent
-                      ? '0 0 15px rgba(74,222,128,0.9), inset 0 2px 4px rgba(255,255,255,0.4)'
-                      : '0 4px 6px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.4)';
-                  }
-                }}
               >
-                {!isUnlocked ? '🔒' :
-                  isChest ? '🎁' : '⭐'}
+                <div className="text-2xl md:text-3xl">
+                  {!isUnlocked ? '🔒' : isChest ? '🎁' : '⭐'}
+                </div>
+                {isCurrent && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[var(--border-dark)] animate-ping" />
+                )}
               </div>
             )
           })}
@@ -229,4 +183,3 @@ export default function VillagePage({ params }: { params: Promise<{ villageId: s
     </div>
   )
 }
-

@@ -65,9 +65,14 @@ export default function WorldPage() {
   const [mounted, setMounted] = useState(false)
   const [currentKeys, setCurrentKeys] = useState(MAX_KEYS)
   const [nextRegenIn, setNextRegenIn] = useState(0)
+  const [showEnding, setShowEnding] = useState(false)
+  const [selectedVillage, setSelectedVillage] = useState<number | null>(null)
+  const [showTutorial, setShowTutorial] = useState(false)
+  const [userName, setUserName] = useState('')
 
   const refreshProgress = useCallback(() => {
     const p = loadProgress()
+    setUserName(p.userName || 'นักเดินทาง')
     setUnlockedVillages(p.unlockedVillages)
     const expMap: Record<number, number> = {}
     for (let i = 1; i <= TOTAL_STAGES; i++) {
@@ -76,6 +81,11 @@ export default function WorldPage() {
     }
     setVillageExp(expMap)
     if (!p.introSeen) setShowIntro(true)
+
+    // Ending check
+    if (expMap[10] >= 100) {
+      setShowEnding(true)
+    }
   }, [])
 
   useEffect(() => {
@@ -117,7 +127,7 @@ export default function WorldPage() {
 
   function handleStageClick(stage: number) {
     if (isVillageUnlocked(stage)) {
-      router.push(`/world/${stage}`)
+      setSelectedVillage(stage)
     }
   }
 
@@ -167,23 +177,151 @@ export default function WorldPage() {
         </div>
       )}
 
+      {/* Mission Briefing Modal */}
+      {selectedVillage && (
+        <div className={styles.introOverlay} style={{ zIndex: 10000 }}>
+          <div className={`${styles.introCard} max-w-lg`}>
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <span className="bg-[var(--card-bg)] text-[var(--text-main)] border-2 border-[var(--border-dark)] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Village Mission</span>
+                <h2 className="text-4xl font-black text-[#1a1a1a] mt-2">หมู่บ้านที่ {selectedVillage}</h2>
+              </div>
+              <button onClick={() => setSelectedVillage(null)} className="text-[#1a1a1a]/20 hover:text-red-500 text-3xl font-black transition-colors">✕</button>
+            </div>
+
+            <div className="bg-white border-3 border-black rounded-[2.5rem] p-6 mb-8 shadow-[6px_6px_0_rgba(0,0,0,0.05)]">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-14 h-14 bg-[#f5e6d3] border-2 border-black rounded-2xl flex items-center justify-center text-3xl shadow-[4px_4px_0_#000]">🚩</div>
+                <div className="text-left">
+                  <div className="text-[#717171] text-[10px] font-black uppercase tracking-widest">Difficulty</div>
+                  <div className="text-[#1a1a1a] font-black text-lg">{selectedVillage <= 3 ? 'ระดับเริ่มต้น 🌱' : selectedVillage <= 7 ? 'ระดับกลาง ⚔️' : 'ระดับสูง 🔥'}</div>
+                </div>
+              </div>
+              <p className="text-[#717171] font-bold leading-relaxed text-left">
+                หมู่บ้านนี้ต้องการความช่วยเหลือในการจัดการทรัพยากรและการคำนวณที่แม่นยำ
+                {selectedVillage === 10 ? ' นี่คือภารกิจสุดท้ายของเรา ทุกอย่างตัดสินกันที่นี่!' : ' ยิ่งระดับสูงขึ้น โจทย์จะยิ่งท้าทายความสามารถของคุณมากขึ้น'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                className={`${styles.navBtn} ${styles.navBtnPrimary} w-full`}
+                onClick={() => router.push(`/world/${selectedVillage}`)}
+              >
+                เข้าภารกิจ 🏹
+              </button>
+              <button
+                className={styles.navBtn}
+                onClick={() => setSelectedVillage(null)}
+              >
+                ย้อนกลับ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tutorial Modal */}
+      {showTutorial && (
+        <div className={styles.introOverlay} style={{ zIndex: 11000 }}>
+          <div className={`${styles.introCard} max-w-4xl`}>
+            <div className="flex justify-between items-center mb-10">
+              <h2 className="text-4xl font-black text-[var(--text-main)] uppercase tracking-tight">คู่มือการเล่น 🧠</h2>
+              <button
+                onClick={() => setShowTutorial(false)}
+                className="w-12 h-12 flex items-center justify-center text-[var(--text-muted)] hover:text-red-500 text-4xl transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <div className="bg-[var(--card-bg)] p-8 rounded-[2.5rem] border-3 border-[var(--border-dark)] text-center shadow-[8px_8px_0_rgba(0,0,0,0.05)] hover:translate-y-[-4px] transition-transform">
+                <div className="text-6xl mb-6">📦</div>
+                <h4 className="font-black text-[var(--text-main)] mb-3 uppercase text-lg tracking-wider">Management</h4>
+                <p className="text-sm font-bold text-[var(--text-muted)] leading-relaxed">
+                  ฝึกทักษะการแยกแยะและจัดหมวดหมู่สิ่งของตามเงื่อนไขที่กำหนดให้ถูกต้อง
+                </p>
+              </div>
+
+              <div className="bg-[var(--card-bg)] p-8 rounded-[2.5rem] border-3 border-[var(--border-dark)] text-center shadow-[8px_8px_0_rgba(0,0,0,0.05)] hover:translate-y-[-4px] transition-transform">
+                <div className="text-6xl mb-6">🔢</div>
+                <h4 className="font-black text-[var(--text-main)] mb-3 uppercase text-lg tracking-wider">Calculation</h4>
+                <p className="text-sm font-bold text-[var(--text-muted)] leading-relaxed">
+                  ท้าทายความไวในการแก้โจทย์คณิตศาสตร์ภายใต้ความกดดันของเวลา
+                </p>
+              </div>
+
+              <div className="bg-[var(--card-bg)] p-8 rounded-[2.5rem] border-3 border-[var(--border-dark)] text-center shadow-[8px_8px_0_rgba(0,0,0,0.05)] hover:translate-y-[-4px] transition-transform">
+                <div className="text-6xl mb-6">🗺️</div>
+                <h4 className="font-black text-[var(--text-main)] mb-3 uppercase text-lg tracking-wider">Spatial</h4>
+                <p className="text-sm font-bold text-[var(--text-muted)] leading-relaxed">
+                  ฝึกการวาดภาพในใจ จับคู่มุมมองและรูปทรง 3 มิติให้แม่นยำที่สุด
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-[var(--border-dark)]/5 p-6 rounded-3xl mb-10 text-left border-2 border-dashed border-[var(--border-dark)]/20">
+              <p className="text-xs font-black text-[var(--text-muted)] uppercase tracking-widest mb-2">เป้าหมายของคุณ 🎯</p>
+              <p className="text-[#1a1a1a] font-bold">สะสม EXP ในแต่ละหมู่บ้านให้เต็มเพื่อปลดล็อกพื้นที่ถัดไป และกู้คืนความทรงจำที่หายไปกลับคืนมา!</p>
+            </div>
+
+            <button
+              onClick={() => setShowTutorial(false)}
+              className={`${styles.navBtn} ${styles.navBtnPrimary} w-full text-2xl py-6 shadow-[0_10px_0_rgba(0,0,0,0.1)]`}
+            >
+              เข้าใจแล้ว เริ่มผจญภัย! 🚀
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showEnding && (
+        <div className={styles.introOverlay} style={{ zIndex: 99999 }}>
+          <div className={styles.introCard} style={{ borderColor: '#FFD700', borderWidth: '6px' }}>
+            <div className={styles.slideContent}>
+              <div className={styles.slideEmoji}>🏥 ✨</div>
+              <h2 className={styles.slideTitle}>ความจริงที่ค้นพบ</h2>
+              <p className={styles.slideDesc}>
+                ณ แหล่งสร้างยาที่เชื่อว่าเป็นจุดหมายสุดท้าย... คุณได้ค้นพบความจริงว่า <b>"ยาป้องกันสมองเสื่อม"</b> ที่แท้จริงไม่ได้อยู่ในรูปแบบของตัวยา
+                หากแต่คือ <b>ประสบการณ์ การเรียนรู้ และการฝึกสมอง</b> ที่คุณได้ตรากตรำทำมาตลอดเส้นทางนี้เอง
+              </p>
+              <p className="text-slate-400 text-[10px] mt-4 font-bold uppercase tracking-widest leading-loose">
+                ความตระหนักรู้นี้ช่วยให้คุณนำสิ่งที่คุณเรียนรู้กลับไปฟื้นฟูหมู่บ้านทั้ง 10 ให้กลับมามีชีวิตชีวาอีกครั้ง!
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 w-full mt-6">
+              <button
+                className={`${styles.navBtn} ${styles.navBtnPrimary} w-full shadow-[0_10px_30px_rgba(79,70,229,0.3)]`}
+                onClick={() => setShowEnding(false)}
+              >
+                ฟื้นฟูหมู่บ้านด้วยใจ 🏘️
+              </button>
+              <button
+                className="text-slate-400 font-bold text-[10px] uppercase tracking-widest hover:text-red-500 transition-colors py-2"
+                onClick={() => { if (confirm('ต้องการเริ่มการเดินทางครั้งใหม่เพื่อฝึกฝนอีกรอบใช่หรือไม่?')) { resetProgress(); setShowEnding(false); } }}
+              >
+                เริ่มการเดินทางใหม่ 🔄
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className={styles.topBar}>
-        <h1 className={styles.mapTitle}>🗺️ แผนที่โลก</h1>
+        <div className="flex flex-col">
+          <h1 className={styles.mapTitle}>🗺️ ยินดีต้อนรับ, {userName}</h1>
+          <p className="text-[var(--text-muted)] text-xs font-black ml-1 uppercase tracking-widest">เป้าหมาย: ฟื้นฟูให้ครบ 10 หมู่บ้าน</p>
+        </div>
         <div className={styles.topActions}>
-          <span
-            style={{
-              background: 'rgba(255,255,255,0.2)',
-              border: '2px solid rgba(255,255,255,0.5)',
-              color: '#fff',
-              fontWeight: 700,
-              padding: '0.5rem 1rem',
-              borderRadius: '12px',
-              fontSize: '0.9rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-            }}
-          >
-            {keysLabel}
+          <button className={styles.actionBtn} onClick={() => router.push('/leaderboard')}>
+            🏆 อันดับ
+          </button>
+          <button className={styles.actionBtn} onClick={() => setShowTutorial(true)}>
+            ❓ วิธีเล่น
+          </button>
+          <span className={styles.actionBtn}>
+            🔑 {currentKeys}/{MAX_KEYS} {formatCountdown(nextRegenIn)}
           </span>
           <button
             className={styles.actionBtn}

@@ -59,7 +59,10 @@ export interface CalcQuestion {
   operands: calGame.Operand[]
   operators: calGame.Operator[]
   expect_result: number
-  messing_index?: number
+  final_result?: number // The result of the whole equation (e.g. A + B = C, final_result is C)
+  messing_index?: number // Legacy, for backward compatibility
+  messing_indices?: number[] // For multiple distractors
+  custom_messing?: Record<number, string | number> // Map index to custom content (emoji/symbol/number)
   hidden_index?: number
 }
 
@@ -291,29 +294,84 @@ export const CALC_LEVELS: CalcLevel[] = [
   // ── Level 10: สมการมีตัวกวน + หาตัวเลขที่หายไป ──────────────────────────────────
   {
     level: 10,
-    name: 'สมการตัวกวน (ผลลัพธ์ 2 หลัก)',
-    description: 'หาตัวเลขที่หายไปท่ามกลางตัวรบกวน โดยผลลัพธ์สุดท้ายเป็นเลข 2 หลัก',
-    maxNumber: 20,
+    name: 'สมการตัวกวน (Interference)',
+    description: 'ดูให้ดี มีตัวกวน! คำนวณบวกหรือลบเฉพาะตัวเลขและลูกเต๋าเท่านั้น ห้ามสนใจสัญลักษณ์หลอก ○ ▲ ★ ♥︎ ◼︎ ◯ △',
+    maxNumber: 50,
     generate_problem(): CalcQuestion {
-      // (A + B) - Interference = Result (2 digits)
-      const A = calGame.RandomValue(30, 10)
-      const B = calGame.RandomValue(20, 5)
-      const interference = calGame.RandomValue(9, 1)
-      const op1 = calGame.GetOperator("+")
-      const op2 = calGame.GetOperator("-")
+      const rng = Math.random
+      const numSlots = 4
+      const slots: { val: number; isReal: boolean }[] = []
 
-      const [finalResult] = calGame.Calculate({ operands: [A, B, interference], operators: [op1, op2] })
+      const distractorIdx = Math.floor(rng() * 4)
+      const realIndices = [0, 1, 2, 3].filter(i => i !== distractorIdx)
+      const hiddenIdx = realIndices[Math.floor(rng() * 3)]
 
-      const missingIndex = Math.floor(Math.random() * 2) // 0 or 1
-      const operands: calGame.Operand[] = [A, B, interference]
-      const missingValue = operands[missingIndex] as number
+      for (let i = 0; i < numSlots; i++) {
+        const isDist = i === distractorIdx
+        let val = 0
+        if (i === hiddenIdx) {
+          val = Math.floor(rng() * 11) + 10 // 10-20
+        } else if (isDist) {
+          val = Math.floor(rng() * 15) + 1
+        } else {
+          val = Math.floor(rng() * 12) + 2
+        }
+        slots.push({ val, isReal: !isDist })
+      }
+
+      // 3 operators for 4 slots
+      const ops = [calGame.RandomOperator(), calGame.RandomOperator(), calGame.RandomOperator()]
+
+      // Calculate Truth
+      let runningTotal = 0
+      let firstReal = true
+      for (let i = 0; i < numSlots; i++) {
+        if (slots[i].isReal) {
+          if (firstReal) {
+            runningTotal = slots[i].val
+            firstReal = false
+          } else {
+            // Operator before this slot is ops[i-1]
+            let operator = ops[i - 1]
+            // Safety: avoid negative results by flipping - to + if needed
+            if (operator.name === "-" && runningTotal < slots[i].val) {
+              operator = calGame.GetOperator("+")
+              ops[i - 1] = operator
+            }
+            runningTotal = (operator.name === "+") ? runningTotal + slots[i].val : runningTotal - slots[i].val
+          }
+        }
+      }
+
+      const distractors = ['○', '▲', '★', '♥︎', '◼︎', '◯', '△']
+      const finalOperands: calGame.Operand[] = []
+      const messingIndices: number[] = []
+      const customMessing: Record<number, string | number> = {}
+
+      for (let i = 0; i < numSlots; i++) {
+        const slot = slots[i]
+        if (slot.isReal) {
+          if (slot.val <= 6 && rng() > 0.4) {
+            finalOperands.push({ ...calGame.RandomDice(), value: slot.val, name: `dice${slot.val}` } as calGame.Dice)
+          } else {
+            finalOperands.push(slot.val)
+          }
+        } else {
+          const mIdx = finalOperands.length
+          messingIndices.push(mIdx)
+          customMessing[mIdx] = distractors[Math.floor(rng() * distractors.length)] + " " + slot.val
+          finalOperands.push(0)
+        }
+      }
 
       return {
-        operands: [A, B, interference, finalResult],
-        operators: [op1, op2],
-        expect_result: missingValue,
-        messing_index: 2, // Distractor clown
-        hidden_index: missingIndex
+        operands: finalOperands,
+        operators: ops,
+        expect_result: slots[hiddenIdx].val,
+        final_result: runningTotal,
+        messing_indices: messingIndices,
+        custom_messing: customMessing,
+        hidden_index: hiddenIdx
       }
     },
   },

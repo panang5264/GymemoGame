@@ -10,11 +10,12 @@ export default function CheatOverlay() {
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
-    const [targetGame, setTargetGame] = useState<'management' | 'calculation' | 'spatial'>('management')
+    const [targetGame, setTargetGame] = useState<'management' | 'calculation' | 'spatial' | 'reaction'>('management')
 
     useEffect(() => {
         if (pathname.includes('/minigame/calculation')) setTargetGame('calculation')
         else if (pathname.includes('/minigame/spatial')) setTargetGame('spatial')
+        else if (pathname.includes('/minigame/reaction')) setTargetGame('reaction')
         else setTargetGame('management')
     }, [pathname])
 
@@ -48,11 +49,15 @@ export default function CheatOverlay() {
         window.location.reload()
     }
 
-    const goToLevel = (level: number) => {
+    const goToLevel = (level: number, mode: 'practice' | 'village' = 'practice') => {
         const params = new URLSearchParams(searchParams.toString())
         params.set('level', level.toString())
-        const mode = searchParams.get('mode') || 'practice'
         params.set('mode', mode)
+
+        if (mode === 'village') {
+            params.set('villageId', level.toString())
+            params.set('subId', '1')
+        }
 
         router.push(`/minigame/${targetGame}?${params.toString()}`)
         setIsOpen(false)
@@ -98,24 +103,39 @@ export default function CheatOverlay() {
                 <div className="mb-6">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Target Minigame</label>
                     <div className="flex gap-2 mb-4">
-                        {(['management', 'calculation', 'spatial'] as const).map(gm => (
+                        {(['management', 'calculation', 'spatial', 'reaction'] as const).map(gm => (
                             <button
                                 key={gm}
                                 onClick={() => setTargetGame(gm)}
-                                className={`flex-1 py-2 rounded-xl text-xs font-black uppercase transition-all ${targetGame === gm ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                                className={`flex-1 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${targetGame === gm ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
                             >
                                 {gm}
                             </button>
                         ))}
                     </div>
 
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-4">Jump to Level (Practice Mode)</label>
-                    <div className="grid grid-cols-5 gap-2">
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(lv => (
-                            <button key={lv} onClick={() => goToLevel(lv)} className="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-black text-sm transition-all border border-slate-200">
-                                {lv}
-                            </button>
-                        ))}
+                    <div className="space-y-4">
+                        <div>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Jump to Main (Sublevel 1)</label>
+                            <div className="grid grid-cols-5 gap-2">
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(lv => (
+                                    <button key={lv} onClick={() => goToLevel(lv, 'village')} className="w-10 h-10 flex items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl font-black text-xs transition-all border border-indigo-100">
+                                        V{lv}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Jump to Difficulty (Practice)</label>
+                            <div className="grid grid-cols-5 gap-2">
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(lv => (
+                                    <button key={lv} onClick={() => goToLevel(lv, 'practice')} className="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-black text-xs transition-all border border-slate-200">
+                                        Lv{lv}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
