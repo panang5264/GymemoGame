@@ -203,6 +203,12 @@
   text-align: center;
 }
 
+.tutorialCard {
+  max-width: 1000px !important;
+  background: linear-gradient(135deg, var(--bg-warm) 0%, #e8e4d8 100%);
+  padding: 4rem;
+}
+
 .skipBtn {
   position: absolute;
   top: 1.5rem;

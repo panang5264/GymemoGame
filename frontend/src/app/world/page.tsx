@@ -224,51 +224,64 @@ export default function WorldPage() {
       {/* Tutorial Modal */}
       {showTutorial && (
         <div className={styles.introOverlay} style={{ zIndex: 11000 }}>
-          <div className={`${styles.introCard} max-w-4xl`}>
-            <div className="flex justify-between items-center mb-10">
-              <h2 className="text-4xl font-black text-[var(--text-main)] uppercase tracking-tight">คู่มือการเล่น 🧠</h2>
+          <div className={`${styles.introCard} ${styles.tutorialCard}`}>
+            <div className="flex justify-between items-center mb-12">
+              <div className="text-left">
+                <h2 className="text-5xl font-black text-black tracking-tighter mb-2">คู่มือการเล่น 🧠</h2>
+                <div className="h-2 w-32 bg-black rounded-full"></div>
+              </div>
               <button
                 onClick={() => setShowTutorial(false)}
-                className="w-12 h-12 flex items-center justify-center text-[var(--text-muted)] hover:text-red-500 text-4xl transition-colors"
+                className="w-14 h-14 rounded-2xl bg-black/5 hover:bg-red-500 hover:text-white flex items-center justify-center text-4xl transition-all duration-300 shadow-[4px_4px_0_rgba(0,0,0,0.1)] hover:translate-y-[-2px]"
               >
                 ✕
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-              <div className="bg-[var(--card-bg)] p-8 rounded-[2.5rem] border-3 border-[var(--border-dark)] text-center shadow-[8px_8px_0_rgba(0,0,0,0.05)] hover:translate-y-[-4px] transition-transform">
-                <div className="text-6xl mb-6">📦</div>
-                <h4 className="font-black text-[var(--text-main)] mb-3 uppercase text-lg tracking-wider">Management</h4>
-                <p className="text-sm font-bold text-[var(--text-muted)] leading-relaxed">
-                  ฝึกทักษะการแยกแยะและจัดหมวดหมู่สิ่งของตามเงื่อนไขที่กำหนดให้ถูกต้อง
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              {/* Management */}
+              <div className="group relative bg-[#fcfaf2] p-8 rounded-[3.5rem] border-4 border-black text-center shadow-[12px_12px_0_#000] hover:translate-y-[-10px] transition-all duration-500">
+                <div className="w-24 h-24 bg-orange-50 border-3 border-black rounded-[2rem] flex items-center justify-center text-5xl mx-auto mb-8 shadow-[6px_6px_0_#000] group-hover:rotate-6 transition-transform">📦</div>
+                <h4 className="font-black text-2xl text-black mb-4 tracking-tighter">MANAGEMENT</h4>
+                <div className="h-1 w-12 bg-orange-400 mx-auto mb-6 rounded-full"></div>
+                <p className="text-lg font-bold text-black/70 leading-relaxed">
+                  ฝึกทักษะการแยกแยะและจัดหมวดหมู่สิ่งของตามเงื่อนไขที่กำหนด
                 </p>
               </div>
 
-              <div className="bg-[var(--card-bg)] p-8 rounded-[2.5rem] border-3 border-[var(--border-dark)] text-center shadow-[8px_8px_0_rgba(0,0,0,0.05)] hover:translate-y-[-4px] transition-transform">
-                <div className="text-6xl mb-6">🔢</div>
-                <h4 className="font-black text-[var(--text-main)] mb-3 uppercase text-lg tracking-wider">Calculation</h4>
-                <p className="text-sm font-bold text-[var(--text-muted)] leading-relaxed">
+              {/* Calculation */}
+              <div className="group relative bg-[#fcfaf2] p-8 rounded-[3.5rem] border-4 border-black text-center shadow-[12px_12px_0_#000] hover:translate-y-[-10px] transition-all duration-500">
+                <div className="w-24 h-24 bg-blue-50 border-3 border-black rounded-[2rem] flex items-center justify-center text-5xl mx-auto mb-8 shadow-[6px_6px_0_#000] group-hover:rotate-6 transition-transform">🔢</div>
+                <h4 className="font-black text-2xl text-black mb-4 tracking-tighter">CALCULATION</h4>
+                <div className="h-1 w-12 bg-blue-400 mx-auto mb-6 rounded-full"></div>
+                <p className="text-lg font-bold text-black/70 leading-relaxed">
                   ท้าทายความไวในการแก้โจทย์คณิตศาสตร์ภายใต้ความกดดันของเวลา
                 </p>
               </div>
 
-              <div className="bg-[var(--card-bg)] p-8 rounded-[2.5rem] border-3 border-[var(--border-dark)] text-center shadow-[8px_8px_0_rgba(0,0,0,0.05)] hover:translate-y-[-4px] transition-transform">
-                <div className="text-6xl mb-6">🗺️</div>
-                <h4 className="font-black text-[var(--text-main)] mb-3 uppercase text-lg tracking-wider">Spatial</h4>
-                <p className="text-sm font-bold text-[var(--text-muted)] leading-relaxed">
-                  ฝึกการวาดภาพในใจ จับคู่มุมมองและรูปทรง 3 มิติให้แม่นยำที่สุด
+              {/* Spatial */}
+              <div className="group relative bg-[#fcfaf2] p-8 rounded-[3.5rem] border-4 border-black text-center shadow-[12px_12px_0_#000] hover:translate-y-[-10px] transition-all duration-500">
+                <div className="w-24 h-24 bg-green-50 border-3 border-black rounded-[2rem] flex items-center justify-center text-5xl mx-auto mb-8 shadow-[6px_6px_0_#000] group-hover:rotate-6 transition-transform">🗺️</div>
+                <h4 className="font-black text-2xl text-black mb-4 tracking-tighter">SPATIAL</h4>
+                <div className="h-1 w-12 bg-green-400 mx-auto mb-6 rounded-full"></div>
+                <p className="text-lg font-bold text-black/70 leading-relaxed">
+                  ฝึกการวาดภาพในใจ จับคู่มุมมองและรูปทรงให้แม่นยำที่สุด
                 </p>
               </div>
             </div>
 
-            <div className="bg-[var(--border-dark)]/5 p-6 rounded-3xl mb-10 text-left border-2 border-dashed border-[var(--border-dark)]/20">
-              <p className="text-xs font-black text-[var(--text-muted)] uppercase tracking-widest mb-2">เป้าหมายของคุณ 🎯</p>
-              <p className="text-[#1a1a1a] font-bold">สะสม EXP ในแต่ละหมู่บ้านให้เต็มเพื่อปลดล็อกพื้นที่ถัดไป และกู้คืนความทรงจำที่หายไปกลับคืนมา!</p>
+            <div className="bg-white/60 backdrop-blur-md p-10 rounded-[3rem] mb-12 text-left border-4 border-black shadow-[8px_8px_0_rgba(0,0,0,0.05)] relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10 text-8xl rotate-12">🎯</div>
+              <p className="text-xs font-black text-black/40 uppercase tracking-[0.2em] mb-3">Our Mission Objective</p>
+              <p className="text-2xl font-black text-black leading-tight">
+                สะสม <span className="text-orange-500 underline decoration-4 underline-offset-4">EXP</span> ในแต่ละหมู่บ้านให้เต็มเพื่อปลดล็อกพื้นที่ถัดไป <br className="hidden md:block" />
+                และภารกิจสำคัญคือ <span className="bg-yellow-200 px-2 py-1 rounded-lg">กู้คืนความทรงจำที่หายไป</span> กลับคืนมา!
+              </p>
             </div>
 
             <button
               onClick={() => setShowTutorial(false)}
-              className={`${styles.navBtn} ${styles.navBtnPrimary} w-full text-2xl py-6 shadow-[0_10px_0_rgba(0,0,0,0.1)]`}
+              className={`${styles.navBtn} ${styles.navBtnPrimary} w-full text-3xl py-8 rounded-[2.5rem] border-4 border-black shadow-[0_12px_0_#1a1a1a] hover:translate-y-2 hover:shadow-[0_4px_0_#1a1a1a] transition-all duration-200 active:translate-y-3 active:shadow-none`}
             >
               เข้าใจแล้ว เริ่มผจญภัย! 🚀
             </button>
