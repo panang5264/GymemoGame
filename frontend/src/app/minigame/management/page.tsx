@@ -282,6 +282,8 @@ function ManagementGameInner() {
   const [correctCount, setCorrectCount] = useState(0)
   const [errorCount, setErrorCount] = useState(0)
   const [startTime] = useState(Date.now())
+  const [playedRounds, setPlayedRounds] = useState(1)
+  const [accumulatedScore, setAccumulatedScore] = useState(0)
 
   // Cooking State
   const [dishIndex, setDishIndex] = useState(0)
@@ -562,46 +564,101 @@ function ManagementGameInner() {
     }
   }, [activePool, spawnQueue, phase, config.mode])
 
-  // Persistence
-  useEffect(() => {
-    let active = true
-    if (phase === 'done' && !hasSavedRef.current) {
-      hasSavedRef.current = true
-      const accuracy = (correctCount + errorCount) > 0 ? (correctCount / (correctCount + errorCount)) * 100 : 100
-      const timeTaken = (Date.now() - startTime) / 1000
-      if (modeParam === 'village') recordPlay(villageId, score, 'management', subId, accuracy, timeTaken)
-      else if (modeParam === 'daily') {
-        const dk = getDateKey()
+  // Navigation and Saving
+  const handleNext = (path: string) => {
+    if (hasSavedRef.current) {
+      router.push(path)
+      return
+    }
+    hasSavedRef.current = true
 
-        if (progress && active) {
-          import('@/lib/levelSystem').then(({ saveDailyScore: rawSaveDailyScore, markDailyMode: rawMarkDailyMode }) => {
-            let nextP = { ...progress }
-            nextP = rawSaveDailyScore(nextP, dk, 'management', score)
-            nextP = rawMarkDailyMode(nextP, dk, 'management')
-            saveProgress(nextP)
+    const finalAverage = Math.round((accumulatedScore + score) / playedRounds)
+    const accuracy = (correctCount + errorCount) > 0 ? (correctCount / (correctCount + errorCount)) * 100 : 100
+    const timeTaken = (Date.now() - startTime) / 1000
+
+    if (modeParam === 'village') recordPlay(villageId, finalAverage, 'management', subId, accuracy, timeTaken)
+    else if (modeParam === 'daily') {
+      const dk = getDateKey()
+
+      if (progress) {
+        import('@/lib/levelSystem').then(({ saveDailyScore: rawSaveDailyScore, markDailyMode: rawMarkDailyMode }) => {
+          let nextP = { ...progress }
+          nextP = rawSaveDailyScore(nextP, dk, 'management', finalAverage)
+          nextP = rawMarkDailyMode(nextP, dk, 'management')
+          saveProgress(nextP)
+        })
+      }
+
+      if (progress?.guestId) {
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
+        fetch(`${API_BASE_URL}/api/analysis/record`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            guestId: progress.guestId,
+            gameType: 'management',
+            level: 0, // Daily level 0
+            subLevelId: 0,
+            score: finalAverage,
+            accuracy,
+            timeTaken
           })
-        }
-
-        if (progress?.guestId && active) {
-          const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
-          fetch(`${API_BASE_URL}/api/analysis/record`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              guestId: progress.guestId,
-              gameType: 'management',
-              level: 0, // Daily level 0
-              subLevelId: 0,
-              score,
-              accuracy,
-              timeTaken
-            })
-          }).catch(err => console.error('Failed to log daily analytics:', err))
-        }
+        }).catch(err => console.error('Failed to log daily analytics:', err))
       }
     }
-    return () => { active = false }
-  }, [phase, modeParam, villageId, score, subId, correctCount, errorCount, startTime, progress, saveProgress])
+
+    router.push(path)
+  }
+
+  const handleReplay = () => {
+    setAccumulatedScore(prev => prev + score)
+    setPlayedRounds(r => r + 1)
+
+    // reset scores and trackers
+    setScore(0)
+    setCorrectCount(0)
+    setErrorCount(0)
+    setPhase('intro')
+    hasSavedRef.current = false
+
+    // reset config
+    const c = getLevelConfig(levelParam)
+    setConfig(c)
+    setSpawnQueue(c.items)
+    setActivePool([])
+
+    if (c.mode === 'maze') {
+      const rows = 9 + (levelParam > 7 ? 2 : 0)
+      const cols = 9 + (levelParam > 7 ? 2 : 0)
+      const needsKey = levelParam >= 7
+      const needsBombs = levelParam >= 8
+      const mazeLayout = generateMaze(rows, cols, needsKey, needsBombs)
+      setMaze(mazeLayout)
+      setPlayerPos({ r: 1, c: 1 })
+      setHasKey(false)
+      setShowBombs(needsBombs)
+      setLastMoveTime(Date.now())
+    }
+
+    if (c.mode === 'cooking') {
+      setDishIndex(0)
+      startNewCookingDish(0)
+    }
+
+    if (c.mode === 'matching') {
+      const phrases = [
+        { left: 'สวัสดีครับ', right: 'การทักทาย' },
+        { left: 'ขอบคุณมากนะครับ', right: 'การขอบคุณ' },
+        { left: 'ผมขอโทษจริงๆ ครับ', right: 'การขออภัย' },
+        { left: 'ยินดีที่ได้รู้จักครับ', right: 'การทำความรู้จัก' },
+        { left: 'ขอให้โชคดีนะ', right: 'การอวยพร' },
+      ]
+      const pairs = phrases.map((p, idx) => ({ ...p, id: idx, matched: false }))
+      setMatchingPairs(pairs)
+      const shuffled = pairs.map(p => ({ text: p.right, id: p.id })).sort(() => Math.random() - 0.5)
+      setShuffledRight(shuffled)
+    }
+  }
 
   // ─── Render Components ──────────────────────────────────────────────────────
 
@@ -673,30 +730,43 @@ function ManagementGameInner() {
                   <div className="absolute inset-0 bg-yellow-400 blur-3xl opacity-20 animate-pulse" />
                   <div className="text-8xl relative drop-shadow-2xl">🎯</div>
                 </div>
-                <h3 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">
-                  คะแนนที่ทำได้
+                <h3 className="text-4xl font-black text-slate-800 tracking-tight">
+                  คะแนนรอบนี้: {score}
                 </h3>
-                <p className="text-slate-400 font-bold mb-8 uppercase tracking-[0.2em] text-[10px]">เลเวล {levelParam} — คะแนนสะสม {score}</p>
+                {playedRounds > 1 && (
+                  <p className="text-3xl font-black text-indigo-600 mb-2 mt-4">
+                    คะแนนเฉลี่ย ({playedRounds} รอบ): {Math.round((accumulatedScore + score) / playedRounds)}
+                  </p>
+                )}
+                <p className="text-slate-400 font-bold mt-4 mb-8 uppercase tracking-[0.2em] text-[10px]">เลเวล {levelParam}</p>
                 <div className="flex flex-col gap-3">
+                  {playedRounds < 3 && (
+                    <button
+                      onClick={handleReplay}
+                      className="w-full py-4 bg-sky-100 hover:bg-sky-200 text-sky-700 rounded-[24px] font-black text-xl shadow-md transition-all active:scale-95 border-2 border-sky-300"
+                    >
+                      เล่นซ้ำ (รอบที่ {playedRounds}/3) 🔄
+                    </button>
+                  )}
                   {modeParam === 'village' ? (
                     <>
                       {subId < 12 ? (
                         <button
-                          onClick={() => router.push(`/world/${villageId}/sublevel/${subId + 1}`)}
+                          onClick={() => handleNext(`/world/${villageId}/sublevel/${subId + 1}`)}
                           className="w-full py-5 bg-green-500 hover:bg-green-600 text-white rounded-[24px] font-black text-2xl shadow-xl transition-all active:scale-95"
                         >
                           ด่านต่อไป 🚀
                         </button>
                       ) : villageId < 10 ? (
                         <button
-                          onClick={() => router.push(`/world/${villageId + 1}`)}
+                          onClick={() => handleNext(`/world/${villageId + 1}`)}
                           className="w-full py-5 bg-orange-500 hover:bg-orange-600 text-white rounded-[24px] font-black text-2xl shadow-xl transition-all active:scale-95"
                         >
                           หมู่บ้านต่อไป 🏘️
                         </button>
                       ) : null}
                       <button
-                        onClick={() => router.push(`/world/${villageId}?showSummary=1`)}
+                        onClick={() => handleNext(`/world/${villageId}?showSummary=1`)}
                         className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-[24px] font-black text-lg transition-all"
                       >
                         กลับสู่แผนที่ 🗺️
@@ -704,7 +774,7 @@ function ManagementGameInner() {
                     </>
                   ) : (
                     <button
-                      onClick={() => router.push(modeParam === 'daily' ? '/daily-challenge' : '/world')}
+                      onClick={() => handleNext(modeParam === 'daily' ? '/daily-challenge' : '/world')}
                       className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[24px] font-black text-2xl shadow-[0_12px_24px_-6px_rgba(79,70,229,0.4)] transition-all hover:-translate-y-1 active:scale-95 active:translate-y-0"
                     >
                       ตกลง ✨

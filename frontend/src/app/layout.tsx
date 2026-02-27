@@ -4,7 +4,6 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { ProgressProvider } from '@/contexts/ProgressContext'
-import CheatOverlay from '@/components/CheatOverlay'
 import localFont from 'next/font/local'
 import './globals.css'
 
@@ -35,7 +34,6 @@ export default function RootLayout({
             </main>
             <Footer />
             <Suspense fallback={null}>
-              <CheatOverlay />
             </Suspense>
           </ProgressProvider>
         </AuthProvider>

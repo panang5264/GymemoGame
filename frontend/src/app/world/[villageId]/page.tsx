@@ -234,12 +234,20 @@ function VillagePageInner({ params }: { params: Promise<{ villageId: string }> }
               <span className="text-4xl font-black text-blue-600">{subLevelModal.score}</span>
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mt-1">Points</span>
             </div>
-            <button
-              onClick={() => setSubLevelModal(null)}
-              className="w-full py-4 bg-[var(--border-dark)] text-white rounded-2xl font-black text-xl hover:scale-105 active:scale-95 transition-all"
-            >
-              รับทราบ ✨
-            </button>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => router.push(`/world/${villageId}/sublevel/${subLevelModal.subId}`)}
+                className="w-full py-4 bg-sky-100 text-sky-700 border-2 border-sky-300 rounded-2xl font-black text-xl hover:scale-105 active:scale-95 transition-all"
+              >
+                เล่นซ้ำ 🔄
+              </button>
+              <button
+                onClick={() => setSubLevelModal(null)}
+                className="w-full py-4 bg-[var(--border-dark)] text-white rounded-2xl font-black text-xl hover:scale-105 active:scale-95 transition-all"
+              >
+                รับทราบ ✨
+              </button>
+            </div>
           </div>
         </div>
       )}
