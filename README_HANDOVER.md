@@ -32,7 +32,6 @@
 - **Village Map Decor**: เตรียมรูปหมู่บ้านที่เป็น Unique Icons สำหรับทั้ง 10 หมู่บ้านในหน้า World Map
 
 ### 2. UI Polish & Feel
-- [ ] **Audio & SFX**: ใส่เสียงคลิก เสียงเวลาตอบถูก (Success) และเสียงตอนทำผิด (Failure)
 - [ ] **Animations**: ปรับปรุงหน้าสรุปผล (Village Summary) ให้มีการเคลื่อนไหวของกราฟรังสีที่ลื่นกว่านี้
 - [ ] **Ending Sequence**: ออกแบบหน้าจบเกมเมื่อปลดล็อกครบ 10 หมู่บ้าน (Trigger จาก event `gymemo:game_ending`)
 
@@ -46,4 +45,4 @@
 - `frontend/src/app/page.tsx`: หน้าแรกและการเล่าเรื่อง (Frontend)
 - `frontend/src/components/BrainRadarChart.tsx`: Component กราฟรังสี (Frontend)
 
-**Happy Coding!** ฝั่ง Backend ฝากเพื่อนลุย ส่วน Frontend คุณ Nick จัดการภาพลักษณ์ระดับพรีเมียมต่อได้เลย!
+**Happy Coding!** ฝั่ง Backend ฝากเพื่อนลุย ส่วน Frontend คุณ Nick จัดการ!
