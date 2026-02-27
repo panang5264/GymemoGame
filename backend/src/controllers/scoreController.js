@@ -10,9 +10,9 @@ const submitScore = async (req, res) => {
 
     // ตรวจสอบข้อมูล
     if (score === undefined || moves === undefined || timeTaken === undefined) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'กรุณากรอกข้อมูลให้ครบถ้วน' 
+      return res.status(400).json({
+        success: false,
+        message: 'กรุณากรอกข้อมูลให้ครบถ้วน'
       })
     }
 
@@ -38,9 +38,9 @@ const submitScore = async (req, res) => {
     })
   } catch (error) {
     console.error(error)
-    res.status(500).json({ 
-      success: false, 
-      message: 'เกิดข้อผิดพลาดในการบันทึกคะแนน' 
+    res.status(500).json({
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการบันทึกคะแนน'
     })
   }
 }
@@ -52,20 +52,31 @@ const getLeaderboard = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10
 
-    const scores = await Score.find()
-      .sort({ score: -1, timeTaken: 1 })
+    // Fetch the top users ranked by their highScore
+    const topUsers = await User.find({ highScore: { $gt: 0 } })
+      .select('name phone highScore')
+      .sort({ highScore: -1 })
       .limit(limit)
-      .populate('user', 'name phone')
+
+    // Format the response to match the expected frontend format
+    const formattedScores = topUsers.map(user => ({
+      user: {
+        _id: user._id,
+        name: user.name,
+        phone: user.phone
+      },
+      score: user.highScore
+    }))
 
     res.json({
       success: true,
-      data: scores
+      data: formattedScores
     })
   } catch (error) {
     console.error(error)
-    res.status(500).json({ 
-      success: false, 
-      message: 'เกิดข้อผิดพลาดในการดึงข้อมูล' 
+    res.status(500).json({
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการดึงข้อมูลกระดานผู้นำ'
     })
   }
 }
@@ -85,9 +96,9 @@ const getMyScores = async (req, res) => {
     })
   } catch (error) {
     console.error(error)
-    res.status(500).json({ 
-      success: false, 
-      message: 'เกิดข้อผิดพลาดในการดึงข้อมูล' 
+    res.status(500).json({
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการดึงข้อมูล'
     })
   }
 }

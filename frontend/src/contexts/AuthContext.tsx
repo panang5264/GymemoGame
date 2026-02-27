@@ -17,7 +17,7 @@ interface AuthContextType {
     user: User | null
     token: string | null
     loading: boolean
-    login: (token: string, userData: User) => void
+    login: (token: string, userData: User) => Promise<void>
     logout: () => void
 }
 
@@ -25,7 +25,7 @@ const AuthContext = createContext<AuthContextType>({
     user: null,
     token: null,
     loading: true,
-    login: () => { },
+    login: async () => { },
     logout: () => { },
 })
 

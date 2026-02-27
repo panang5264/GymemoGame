@@ -45,6 +45,7 @@ const updateSyncProgress = async (req, res) => {
 
         if (userProgress) {
             userProgress.progressData = progressData
+            userProgress.markModified('progressData')
             await userProgress.save()
         } else {
             userProgress = await UserProgress.create({

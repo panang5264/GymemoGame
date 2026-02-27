@@ -26,7 +26,7 @@ export default function Header() {
             </>
           ) : (
             <>
-              <Link href="/login" className="nav-link">เข้าสู่ระบบ</Link>
+              <Link href="/" className="nav-link">เข้าสู่ระบบ</Link>
               <Link href="/register" className="nav-link">สมัครสมาชิก</Link>
             </>
           )}

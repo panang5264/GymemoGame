@@ -26,11 +26,13 @@ export interface GymemoProgressV2 {
   unlockedVillages: number[]
   keys: KeyState
   daily: Record<string, DailyModeCompletion>
+  dailyScores: Record<string, { management: number, calculation: number, spatial: number }>
   totalScore: number
+  username: string
 }
 
 import Cookies from 'js-cookie'
-import { fetchSyncProgress, updateSyncProgress } from './api'
+import { fetchSyncProgress, updateSyncProgress, submitScore } from './api'
 
 export function getDefaultProgress(): GymemoProgressV2 {
   return {
@@ -39,7 +41,9 @@ export function getDefaultProgress(): GymemoProgressV2 {
     unlockedVillages: [1],
     keys: { currentKeys: MAX_KEYS, lastRegenAt: Date.now() },
     daily: {},
+    dailyScores: {},
     totalScore: 0,
+    username: '',
   }
 }
 
@@ -100,7 +104,21 @@ export function recordPlay(villageId: number, scoreGained: number): GymemoProgre
   if (tubeFilled && villageId < 10 && !p.unlockedVillages.includes(villageId + 1)) {
     p.unlockedVillages = [...p.unlockedVillages, villageId + 1]
   }
+  if (tubeFilled && villageId === 10) {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('gymemo:game_ending'))
+    }
+  }
   saveProgress(p)
+
+  // Sync to Leaderboard
+  const token = Cookies.get('token')
+  if (token) {
+    submitScore(token, p.totalScore, 0, 0).catch((err: any) => {
+      console.error('Failed to submit score to leaderboard:', err)
+    })
+  }
+
   return p
 }
 
@@ -137,6 +155,16 @@ export function getDailyProgress(dateKey: string): DailyModeCompletion {
   return p.daily[dateKey] ?? { management: false, calculation: false, spatial: false }
 }
 
+export function addKeys(count: number): void {
+  const p = loadProgress()
+  const { currentKeys } = getKeys()
+  p.keys.currentKeys = Math.min(MAX_KEYS, currentKeys + count)
+  if (p.keys.currentKeys >= MAX_KEYS) {
+    p.keys.lastRegenAt = Date.now() // Reset timer for next regen from this point if full
+  }
+  saveProgress(p)
+}
+
 export function markDailyMode(
   dateKey: string,
   mode: 'management' | 'calculation' | 'spatial'
@@ -145,6 +173,22 @@ export function markDailyMode(
   const dp = p.daily[dateKey] ?? { management: false, calculation: false, spatial: false }
   dp[mode] = true
   p.daily[dateKey] = dp
+
+  // If this mode completion makes it 100%, reward a key
+  if (dp.management && dp.calculation && dp.spatial) {
+    // Reward logic is handled in the UI normally, but we can ensure the state is prepped
+  }
+
+  saveProgress(p)
+}
+
+export function saveDailyScore(seed: string, minigame: 'management' | 'calculation' | 'spatial', score: number, total: number = 0): void {
+  const p = loadProgress()
+  if (!p.dailyScores) p.dailyScores = {} // Handle legacy data
+  if (!p.dailyScores[seed]) {
+    p.dailyScores[seed] = { management: 0, calculation: 0, spatial: 0 }
+  }
+  p.dailyScores[seed][minigame] = score // Keep the highest score, maybe? For now just overwrite.
   saveProgress(p)
 }
 

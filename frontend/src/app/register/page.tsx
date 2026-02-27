@@ -37,7 +37,7 @@ export default function RegisterPage() {
             const res = await registerUser(formData.name, formData.phone, formData.password)
             if (res.success) {
                 // Log the user in with the token
-                login(res.data.token, res.data)
+                await login(res.data.token, res.data)
                 router.push('/')
             }
         } catch (err: any) {
@@ -48,72 +48,93 @@ export default function RegisterPage() {
     }
 
     return (
-        <div className="container" style={{ maxWidth: '400px', margin: '4rem auto', padding: '2.5rem', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '20px', backdropFilter: 'blur(10px)', boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
-            <h2 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1.5rem', textAlign: 'center', color: '#fff', textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)' }}>สมัครสมาชิก</h2>
+        <div className="min-h-screen bg-[var(--bg-warm)] flex items-center justify-center p-4 md:p-6 selection:bg-orange-100 selection:text-orange-900 overflow-hidden font-['Supermarket']">
+            {/* Background Decor */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-[-5%] left-[-5%] w-[30%] h-[30%] bg-orange-100/50 blur-[100px] rounded-full" />
+                <div className="absolute bottom-[-5%] right-[-5%] w-[30%] h-[30%] bg-rose-100/50 blur-[100px] rounded-full" />
+            </div>
 
-            {error && <div style={{ backgroundColor: 'rgba(254, 226, 226, 0.9)', color: '#dc2626', padding: '0.75rem', borderRadius: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>{error}</div>}
+            <div className="w-full max-w-md relative z-10 transition-all duration-700">
+                <div className="friendly-card animate-in fade-in zoom-in duration-500">
+                    <div className="flex flex-col items-center mb-6">
+                        <div className="w-20 h-20 bg-[var(--card-bg)] border-4 border-[var(--border-dark)] rounded-full flex items-center justify-center text-4xl mb-4 shadow-[6px_6px_0_var(--border-dark)]">
+                            📝
+                        </div>
+                        <h1 className="text-4xl font-black text-[var(--text-main)] tracking-tight uppercase">สมัครสมาชิก</h1>
+                    </div>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#eee', fontWeight: '500' }}>ชื่อ-นามสกุล</label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.3)', outline: 'none', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#000', fontSize: '1rem' }}
-                    />
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        {error && (
+                            <div className="bg-red-100 text-red-600 p-3 rounded-2xl text-sm font-bold text-center mb-4">
+                                {error}
+                            </div>
+                        )}
+                        <div className="relative group">
+                            <div className="absolute left-7 top-1/2 -translate-y-1/2 text-xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">👤</div>
+                            <input
+                                type="text"
+                                name="name"
+                                placeholder="ชื่อ-นามสกุล"
+                                className="pill-input pill-input-icon w-full py-4 text-lg"
+                                value={formData.name}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+
+                        <div className="relative group">
+                            <div className="absolute left-7 top-1/2 -translate-y-1/2 text-xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">📞</div>
+                            <input
+                                type="tel"
+                                name="phone"
+                                placeholder="เบอร์โทรศัพท์"
+                                className="pill-input pill-input-icon w-full py-4 text-lg"
+                                value={formData.phone}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+
+                        <div className="relative group">
+                            <div className="absolute left-7 top-1/2 -translate-y-1/2 text-xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">🔒</div>
+                            <input
+                                type="password"
+                                name="password"
+                                placeholder="รหัสผ่าน"
+                                className="pill-input pill-input-icon w-full py-4 text-lg"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+
+                        <div className="relative group">
+                            <div className="absolute left-7 top-1/2 -translate-y-1/2 text-xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">🔒</div>
+                            <input
+                                type="password"
+                                name="confirmPassword"
+                                placeholder="ยืนยันรหัสผ่าน"
+                                className="pill-input pill-input-icon w-full py-4 text-lg"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="pill-button w-full py-5 text-2xl mt-6 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_6px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70"
+                        >
+                            {loading ? 'กำลังสมัครสมาชิก...' : 'สมัครสมาชิก!'}
+                        </button>
+                    </form>
+
+                    <div className="mt-6 pt-6 border-t-2 border-[#1a1a1a]/10 text-center text-sm font-bold text-[#717171]">
+                        มีบัญชีอยู่แล้ว? <Link href="/" className="text-blue-600 underline hover:text-blue-800 ml-1">เข้าสู่ระบบ</Link>
+                    </div>
                 </div>
-
-                <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#eee', fontWeight: '500' }}>เบอร์โทรศัพท์</label>
-                    <input
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        required
-                        style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.3)', outline: 'none', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#000', fontSize: '1rem' }}
-                    />
-                </div>
-
-                <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#eee', fontWeight: '500' }}>รหัสผ่าน</label>
-                    <input
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                        style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.3)', outline: 'none', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#000', fontSize: '1rem' }}
-                    />
-                </div>
-
-                <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#eee', fontWeight: '500' }}>ยืนยันรหัสผ่าน</label>
-                    <input
-                        type="password"
-                        name="confirmPassword"
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        required
-                        style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.3)', outline: 'none', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#000', fontSize: '1rem' }}
-                    />
-                </div>
-
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="start-button"
-                    style={{ width: '100%', padding: '0.75rem', marginTop: '0.5rem', fontSize: '1.1rem' }}
-                >
-                    {loading ? 'กำลังสมัครสมาชิก...' : 'สมัครสมาชิก'}
-                </button>
-            </form>
-
-            <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem', color: '#ddd' }}>
-                มีบัญชีอยู่แล้ว? <Link href="/login" style={{ color: '#ffd700', textDecoration: 'none', fontWeight: 'bold', marginLeft: '0.5rem' }}>เข้าสู่ระบบ</Link>
             </div>
         </div>
     )

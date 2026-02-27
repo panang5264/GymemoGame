@@ -1,147 +1,32 @@
 'use client'
 
-/**
- * Daily Challenge page
- *
- * Flow:
- *  1. Check isDailyComplete(dateKey) – shows countdown if all modes done today.
- *  2. On start: run 3 × 60-second stages in order:
- *       Stage 1 – Management  (📋 จัดการ)    : remember items, pick correct ones
- *       Stage 2 – Calculation (🧮 คำนวณ)     : answer as many as possible
- *       Stage 3 – Spatial     (🗺️ พื้นที่)   : remember grid pattern, reproduce it
- *  3. After each stage: call markDailyMode(dateKey, mode).
- *  4. After stage 3: show results.
- *
- * Reset: every day at local midnight (00:00). See src/lib/dailyChallenge.ts.
- */
-
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import {
   getCountdownToReset,
   getDateKey,
 } from '@/lib/dailyChallenge'
-import { CALC_LEVELS, type CalcQuestion } from '@/lib/calculationLevels'
 import {
   isDailyComplete,
   getDailyProgress,
-  markDailyMode,
+  loadProgress,
+  addKeys,
+  getKeys
 } from '@/lib/levelSystem'
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const STAGE_DURATION = 60 // seconds per stage
-const STAGES = ['📋 การจัดการ', '🧮 การคำนวณ', '🗺️ พื้นที่'] as const
-
-// ─── Stage 1 – Management ────────────────────────────────────────────────────
-
-const ITEM_POOL = [
-  '🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🥝',
-  '🍑', '🍍', '🥭', '🍒', '🥕', '🌽', '🥦', '🥑',
-]
-
-function buildManagementRound() {
-  const shuffled = [...ITEM_POOL].sort(() => Math.random() - 0.5)
-  const target = shuffled.slice(0, 6)
-  const distractors = shuffled.slice(6, 12)
-  const choices = [...target, ...distractors].sort(() => Math.random() - 0.5)
-  return { target, choices }
-}
-
-// ─── Stage 2 – Calculation ───────────────────────────────────────────────────
-
-function buildCalcQuestion(): CalcQuestion {
-  return CALC_LEVELS[0].generate_problem()
-}
-
-// ─── Stage 3 – Spatial ───────────────────────────────────────────────────────
-
-const GRID_SIZE = 5
-const HIGHLIGHT_COUNT = 7
-
-function buildSpatialPattern(): boolean[][] {
-  const grid: boolean[][] = Array.from({ length: GRID_SIZE }, () =>
-    Array(GRID_SIZE).fill(false)
-  )
-  let count = 0
-  while (count < HIGHLIGHT_COUNT) {
-    const r = Math.floor(Math.random() * GRID_SIZE)
-    const c = Math.floor(Math.random() * GRID_SIZE)
-    if (!grid[r][c]) {
-      grid[r][c] = true
-      count++
-    }
-  }
-  return grid
-}
-
-// ─── Countdown hook ───────────────────────────────────────────────────────────
-
-function useCountdown(initial: number, running: boolean, onExpire: () => void) {
-  const [remaining, setRemaining] = useState(initial)
-  const expiredRef = useRef(false)
-
-  useEffect(() => {
-    setRemaining(initial)
-    expiredRef.current = false
-  }, [initial])
-
-  useEffect(() => {
-    if (!running) return
-    if (remaining <= 0) {
-      if (!expiredRef.current) {
-        expiredRef.current = true
-        onExpire()
-      }
-      return
-    }
-    const id = setTimeout(() => setRemaining(r => r - 1), 1000)
-    return () => clearTimeout(id)
-  }, [running, remaining, onExpire])
-
-  return remaining
-}
-
-// ─── Main Component ───────────────────────────────────────────────────────────
-
-type AppPhase =
-  | 'locked_daily'
-  | 'ready'
-  | 'stage1_memorize'
-  | 'stage1_test'
-  | 'stage2_test'
-  | 'stage3_memorize'
-  | 'stage3_test'
-  | 'completed'
-
 export default function DailyChallengePage() {
-  const [phase, setPhase] = useState<AppPhase>('ready')
+  const router = useRouter()
   const [countdown, setCountdown] = useState('')
-  const [stageScore, setStageScore] = useState([0, 0, 0])
   const [dateKey] = useState(() => getDateKey())
+  const [userRank, setUserRank] = useState(1)
+  const [isDone, setIsDone] = useState(false)
+  const [rewardClaimed, setRewardClaimed] = useState(false)
 
-  // Stage timers (running flag)
-  const [timerRunning, setTimerRunning] = useState(false)
+  // Results from localStorage
+  const [scores, setScores] = useState({ management: 0, calculation: 0, spatial: 0 })
+  const [todayModes, setTodayModes] = useState({ management: false, calculation: false, spatial: false })
 
-  // ── Stage 1 state ──────────────────────────────────────────────────────────
-  const [mgmtRound, setMgmtRound] = useState(() => buildManagementRound())
-  const [mgmtSelected, setMgmtSelected] = useState<string[]>([])
-  const [mgmtMemorizeLeft, setMgmtMemorizeLeft] = useState(8)
-
-  // ── Stage 2 state ──────────────────────────────────────────────────────────
-  const [calcQuestion, setCalcQuestion] = useState<CalcQuestion | null>(null)
-  const [calcAnswer, setCalcAnswer] = useState('')
-  const [calcLastCorrect, setCalcLastCorrect] = useState<boolean | null>(null)
-  const [calcScore, setCalcScore] = useState(0)
-  const [calcTotal, setCalcTotal] = useState(0)
-
-  // ── Stage 3 state ──────────────────────────────────────────────────────────
-  const [spatialPattern, setSpatialPattern] = useState<boolean[][]>([])
-  const [userPattern, setUserPattern] = useState<boolean[][]>([])
-  const [spatialMemorizeLeft, setSpatialMemorizeLeft] = useState(5)
-
-  // ── Daily countdown ────────────────────────────────────────────────────────
   useEffect(() => {
     const tick = () => setCountdown(getCountdownToReset())
     tick()
@@ -149,397 +34,171 @@ export default function DailyChallengePage() {
     return () => clearInterval(id)
   }, [])
 
-  // ── Initial phase detection ────────────────────────────────────────────────
   useEffect(() => {
     const dk = getDateKey()
-    if (isDailyComplete(dk)) {
-      setPhase('locked_daily')
-    } else {
-      setPhase('ready')
+    const progress = loadProgress()
+    const maxUnlocked = Math.max(...progress.unlockedVillages, 1)
+    setUserRank(maxUnlocked)
+
+    const modes = getDailyProgress(dk)
+    setTodayModes(modes)
+
+    const done = isDailyComplete(dk)
+    setIsDone(done)
+
+    // Check if reward already claimed for today
+    const claimed = localStorage.getItem(`gymemo_daily_reward_${dk}`) === 'true'
+    setRewardClaimed(claimed)
+
+    if (done) {
+      const dailyScores = progress.dailyScores?.[dk] || { management: 0, calculation: 0, spatial: 0 }
+      setScores({
+        management: dailyScores.management || 0,
+        calculation: dailyScores.calculation || 0,
+        spatial: dailyScores.spatial || 0
+      })
     }
-  }, [])
+  }, [dateKey])
 
-  // ── Stage timer (60 s per stage) ───────────────────────────────────────────
-  const handleStageExpire = useCallback(() => {
-    setTimerRunning(false)
-    if (phase === 'stage1_test') {
-      // Score stage 1
-      const score = mgmtSelected.filter(s => mgmtRound.target.includes(s)).length
-      setStageScore(prev => { const n = [...prev]; n[0] = score; return n })
-      markDailyMode(dateKey, 'management')
-      // Start stage 2
-      setCalcQuestion(buildCalcQuestion())
-      setCalcAnswer('')
-      setCalcLastCorrect(null)
-      setCalcScore(0)
-      setCalcTotal(0)
-      setPhase('stage2_test')
-      setTimerRunning(true)
-    } else if (phase === 'stage2_test') {
-      setStageScore(prev => { const n = [...prev]; n[1] = calcScore; return n })
-      markDailyMode(dateKey, 'calculation')
-      setPhase('stage3_memorize')
-      const p = buildSpatialPattern()
-      setSpatialPattern(p)
-      setUserPattern(Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(false)))
-      setSpatialMemorizeLeft(5)
-    } else if (phase === 'stage3_test') {
-      // Score stage 3
-      let correct = 0
-      for (let r = 0; r < GRID_SIZE; r++)
-        for (let c = 0; c < GRID_SIZE; c++)
-          if (userPattern[r][c] === spatialPattern[r][c]) correct++
-      const score = correct
-      setStageScore(prev => { const n = [...prev]; n[2] = score; return n })
-      markDailyMode(dateKey, 'spatial')
-      setPhase('completed')
+  const handleClaimReward = () => {
+    if (rewardClaimed) return
+    addKeys(1)
+    localStorage.setItem(`gymemo_daily_reward_${dateKey}`, 'true')
+    setRewardClaimed(true)
+    alert('คุณได้รับกุญแจ 🔑 1 ดอก เป็นรางวัลสำหรับความพยายามวันนี้!')
+  }
+
+  const startNextMode = () => {
+    if (!todayModes.management) {
+      router.push(`/minigame/management?mode=daily&villageId=${userRank}&level=${userRank}&subId=1`)
+    } else if (!todayModes.calculation) {
+      router.push(`/minigame/calculation?mode=daily&villageId=${userRank}&level=${userRank}&subId=1`)
+    } else if (!todayModes.spatial) {
+      router.push(`/minigame/spatial?mode=daily&villageId=${userRank}&level=${userRank}&subId=1`)
     }
-  }, [phase, mgmtSelected, mgmtRound, userPattern, spatialPattern, dateKey, calcScore])
-
-  const stageRemaining = useCountdown(STAGE_DURATION, timerRunning, handleStageExpire)
-
-  // ── Memorize countdowns ────────────────────────────────────────────────────
-  useEffect(() => {
-    if (phase !== 'stage1_memorize') return
-    if (mgmtMemorizeLeft <= 0) {
-      setPhase('stage1_test')
-      setMgmtSelected([])
-      setTimerRunning(true)
-      return
-    }
-    const id = setTimeout(() => setMgmtMemorizeLeft(t => t - 1), 1000)
-    return () => clearTimeout(id)
-  }, [phase, mgmtMemorizeLeft])
-
-  useEffect(() => {
-    if (phase !== 'stage3_memorize') return
-    if (spatialMemorizeLeft <= 0) {
-      setPhase('stage3_test')
-      setTimerRunning(true)
-      return
-    }
-    const id = setTimeout(() => setSpatialMemorizeLeft(t => t - 1), 1000)
-    return () => clearTimeout(id)
-  }, [phase, spatialMemorizeLeft])
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Handlers
-  // ─────────────────────────────────────────────────────────────────────────
-
-  const handleStart = () => {
-    const round = buildManagementRound()
-    setMgmtRound(round)
-    setMgmtSelected([])
-    setMgmtMemorizeLeft(8)
-    setStageScore([0, 0, 0])
-    setPhase('stage1_memorize')
   }
 
-  const toggleMgmtItem = (item: string) => {
-    setMgmtSelected(prev =>
-      prev.includes(item) ? prev.filter(x => x !== item) : [...prev, item]
-    )
-  }
+  const { currentKeys } = getKeys()
 
-  const submitMgmtAnswer = () => {
-    setTimerRunning(false)
-    const score = mgmtSelected.filter(s => mgmtRound.target.includes(s)).length
-    setStageScore(prev => { const n = [...prev]; n[0] = score; return n })
-    markDailyMode(dateKey, 'management')
-    setCalcQuestion(buildCalcQuestion())
-    setCalcAnswer('')
-    setCalcLastCorrect(null)
-    setCalcScore(0)
-    setCalcTotal(0)
-    setPhase('stage2_test')
-    setTimerRunning(true)
-  }
+  return (
+    <div className="min-h-[calc(100vh-140px)] flex flex-col items-center py-10 px-4">
+      <div className="w-full max-w-2xl bg-white/95 backdrop-blur-xl rounded-[40px] shadow-2xl overflow-hidden border border-white/20 p-8 md:p-12 relative">
 
-  const handleCalcSubmit = () => {
-    if (!calcQuestion) return
-    if (calcAnswer.trim() === '') return
-    const parsed = Number(calcAnswer)
-    if (Number.isNaN(parsed)) return
+        {/* Header Section */}
+        <div className="text-center mb-10">
+          <div className="inline-block px-6 py-2 bg-indigo-50 text-indigo-600 rounded-full font-black text-sm uppercase tracking-widest mb-4">
+            Today's Mission
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight mb-2">
+            🌟 ภารกิจรายวัน
+          </h1>
+          <p className="text-slate-500 font-bold">ฝึกฝนทักษะให้ครบ 3 ด้าน เพื่อรับรางวัลพิเศษ</p>
+        </div>
 
-    const correct = parsed === calcQuestion.expect_result
-    setCalcLastCorrect(correct)
-    setCalcScore(s => s + (correct ? 1 : 0))
-    setCalcTotal(t => t + 1)
+        {/* Progress Checklist Area */}
+        <div className="bg-slate-50/50 rounded-[32px] p-6 md:p-8 mb-8 border border-slate-100">
+          <h2 className="text-slate-400 font-black text-[10px] uppercase tracking-widest mb-6 px-2">Checkpoint Checklist</h2>
 
-    setTimeout(() => {
-      setCalcLastCorrect(null)
-      setCalcAnswer('')
-      setCalcQuestion(buildCalcQuestion())
-    }, 400)
-  }
+          <div className="grid gap-4">
+            {/* Management Task */}
+            <div className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all ${todayModes.management ? 'bg-green-50 border-green-200' : 'bg-white border-slate-100'}`}>
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${todayModes.management ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                  {todayModes.management ? '✅' : '📦'}
+                </div>
+                <div>
+                  <h3 className={`font-black ${todayModes.management ? 'text-green-700' : 'text-slate-700'}`}>📋 การจัดการ</h3>
+                  <p className="text-xs text-slate-400 font-bold uppercase tracking-tighter">Management Challenge</p>
+                </div>
+              </div>
+              {todayModes.management && <span className="text-green-500 font-black text-sm">DONE</span>}
+            </div>
 
-  const toggleCell = (r: number, c: number) => {
-    setUserPattern(prev => {
-      const next = prev.map(row => [...row])
-      next[r][c] = !next[r][c]
-      return next
-    })
-  }
+            {/* Calculation Task */}
+            <div className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all ${todayModes.calculation ? 'bg-green-50 border-green-200' : 'bg-white border-slate-100'}`}>
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${todayModes.calculation ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                  {todayModes.calculation ? '✅' : '🧮'}
+                </div>
+                <div>
+                  <h3 className={`font-black ${todayModes.calculation ? 'text-green-700' : 'text-slate-700'}`}>🧮 การคำนวณ</h3>
+                  <p className="text-xs text-slate-400 font-bold uppercase tracking-tighter">Calculation Challenge</p>
+                </div>
+              </div>
+              {todayModes.calculation && <span className="text-green-500 font-black text-sm">DONE</span>}
+            </div>
 
-  const submitSpatial = () => {
-    setTimerRunning(false)
-    let correct = 0
-    for (let r = 0; r < GRID_SIZE; r++)
-      for (let c = 0; c < GRID_SIZE; c++)
-        if (userPattern[r][c] === spatialPattern[r][c]) correct++
-    setStageScore(prev => { const n = [...prev]; n[2] = correct; return n })
-    markDailyMode(dateKey, 'spatial')
-    setPhase('completed')
-  }
+            {/* Spatial Task */}
+            <div className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all ${todayModes.spatial ? 'bg-green-50 border-green-200' : 'bg-white border-slate-100'}`}>
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${todayModes.spatial ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                  {todayModes.spatial ? '✅' : '🧭'}
+                </div>
+                <div>
+                  <h3 className={`font-black ${todayModes.spatial ? 'text-green-700' : 'text-slate-700'}`}>🧭 พื้นที่</h3>
+                  <p className="text-xs text-slate-400 font-bold uppercase tracking-tighter">Spatial Challenge</p>
+                </div>
+              </div>
+              {todayModes.spatial && <span className="text-green-500 font-black text-sm">DONE</span>}
+            </div>
+          </div>
+        </div>
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Render helpers
-  // ─────────────────────────────────────────────────────────────────────────
+        {/* Reward Area */}
+        {isDone ? (
+          <div className="text-center animate-in zoom-in">
+            {!rewardClaimed ? (
+              <div className="bg-indigo-600 rounded-[28px] p-8 text-white shadow-xl">
+                <div className="text-6xl mb-4">🔑</div>
+                <h4 className="text-2xl font-black mb-2 italic">Congratulation!</h4>
+                <p className="opacity-80 font-bold mb-6">คุณทำสำเร็จครบทุกภารกิจแล้ว! รับกุญแจรางวัลของคุณเลย</p>
+                <button
+                  onClick={handleClaimReward}
+                  className="w-full bg-white text-indigo-600 py-4 rounded-xl font-black text-xl hover:scale-105 transition-all shadow-lg active:scale-95"
+                >
+                  รับกุญแจ 🗝️ (+1 Key)
+                </button>
+              </div>
+            ) : (
+              <div className="bg-slate-800 rounded-[28px] p-8 text-white">
+                <div className="text-5xl mb-4">✨</div>
+                <h4 className="text-xl font-black mb-2">ภารกิจวันนี้เสร็จสิ้น</h4>
+                <p className="text-slate-400 text-sm mb-6">คุณได้รับรางวัลของวันไปแล้ว พักผ่อนและกลับมาใหม่ในวันถัดไป!</p>
+                <div className="flex items-center justify-center gap-2 text-yellow-400 font-black">
+                  <span className="text-sm uppercase tracking-widest opacity-60">Resetting In</span>
+                  <span className="text-2xl tabular-nums">{countdown}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            <button
+              onClick={startNextMode}
+              className="w-full py-6 bg-indigo-600 text-white rounded-[24px] font-black text-2xl shadow-xl transition-all hover:-translate-y-1 active:scale-95"
+            >
+              เริ่มภารกิจต่อไป 🚀
+            </button>
+            <div className="flex items-center justify-center gap-3 text-slate-400 py-4">
+              <span className="w-12 h-[1px] bg-slate-200"></span>
+              <span className="text-xs font-bold uppercase tracking-widest">Village {userRank} Difficulty</span>
+              <span className="w-12 h-[1px] bg-slate-200"></span>
+            </div>
+          </div>
+        )}
 
-  const StageHeader = ({ stageNum }: { stageNum: number }) => (
-    <div className="dc-stage-header">
-      <span className="dc-stage-label">ด่านที่ {stageNum}/3: {STAGES[stageNum - 1]}</span>
-      {timerRunning && (
-        <span className={`dc-timer ${stageRemaining <= 10 ? 'dc-timer-warn' : ''}`}>
-          ⏱ {stageRemaining}s
-        </span>
-      )}
+        <div className="mt-8 pt-8 border-t border-slate-50 flex items-center justify-between px-2">
+          <div className="flex flex-col">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Current Keys</span>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-black text-slate-800">{currentKeys}</span>
+              <span className="text-xl">🔑</span>
+            </div>
+          </div>
+          <Link href="/world" className="text-indigo-600 font-black text-sm hover:underline">ไปยังแผนที่โลก 🌏</Link>
+        </div>
+
+      </div>
     </div>
   )
-
-  // ── Locked: already played today ──────────────────────────────────────────
-  if (phase === 'locked_daily') {
-    return (
-      <div className="game-page">
-        <h1 className="game-title">🌟 ภารกิจรายวัน</h1>
-        <div className="dc-card">
-          <div className="dc-lock-icon">✅</div>
-          <h2>เล่นแล้ววันนี้!</h2>
-          <p className="dc-subtitle">คุณได้เล่นภารกิจรายวันแล้วในวันนี้</p>
-          <p className="dc-subtitle">รีเซ็ตครั้งถัดไปเมื่อ 00:00 เที่ยงคืน</p>
-          <div className="dc-countdown">{countdown}</div>
-          <p className="dc-countdown-label">เวลาที่เหลือจนถึงการรีเซ็ต</p>
-        </div>
-      </div>
-    )
-  }
-
-  // ── Ready: can play ────────────────────────────────────────────────────────
-  if (phase === 'ready') {
-    const todaySeed = getDateKey()
-    const todayModes = getDailyProgress(dateKey)
-    return (
-      <div className="game-page">
-        <h1 className="game-title">🌟 ภารกิจรายวัน</h1>
-        <div className="dc-card">
-          <div className="dc-available-badge">✅ พร้อมเล่นวันนี้!</div>
-          <p className="dc-subtitle">
-            3 ด่าน × 60 วินาที
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', margin: '0.75rem 0', flexWrap: 'wrap' }}>
-            <span>{todayModes.management ? '✅' : '⬜'} 📋 การจัดการ</span>
-            <span>{todayModes.calculation ? '✅' : '⬜'} 🧮 การคำนวณ</span>
-            <span>{todayModes.spatial ? '✅' : '⬜'} 🗺️ พื้นที่</span>
-          </div>
-          <p className="dc-note">ไม่ใช้กุญแจ &nbsp;|&nbsp; เล่นได้ 1 ครั้งต่อวัน</p>
-          <button className="start-button" onClick={handleStart}>
-            เริ่มภารกิจรายวัน 🚀
-          </button>
-          <p className="dc-note" style={{ marginTop: '1rem' }}>
-            หรือฝึกเฉพาะโหมดคำนวณ:{' '}
-            <Link
-              href={`/minigame/calculation?mode=daily&seed=${todaySeed}&level=1`}
-              style={{ color: '#ffd700', textDecoration: 'underline' }}
-            >
-              🔢 เปิดมินิเกมคำนวณ
-            </Link>
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  // ── Stage 1 – memorize ─────────────────────────────────────────────────────
-  if (phase === 'stage1_memorize') {
-    return (
-      <div className="game-page">
-        <StageHeader stageNum={1} />
-        <div className="dc-card">
-          <h2>จำสิ่งของเหล่านี้ไว้! ({mgmtMemorizeLeft}s)</h2>
-          <div className="dc-item-grid">
-            {mgmtRound.target.map(item => (
-              <div key={item} className="dc-item dc-item-show">{item}</div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // ── Stage 1 – test ─────────────────────────────────────────────────────────
-  if (phase === 'stage1_test') {
-    return (
-      <div className="game-page">
-        <StageHeader stageNum={1} />
-        <div className="dc-card">
-          <h2>เลือกสิ่งของที่คุณเห็น ({mgmtSelected.length}/6)</h2>
-          <div className="dc-item-grid">
-            {mgmtRound.choices.map(item => (
-              <div
-                key={item}
-                className={`dc-item dc-item-choice ${mgmtSelected.includes(item) ? 'dc-item-selected' : ''}`}
-                onClick={() => toggleMgmtItem(item)}
-              >
-                {item}
-              </div>
-            ))}
-          </div>
-          <button className="start-button dc-submit-btn" onClick={submitMgmtAnswer}>
-            ยืนยันคำตอบ ✔️
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  // ── Stage 2 – test ─────────────────────────────────────────────────────────
-  if (phase === 'stage2_test' && calcQuestion) {
-    return (
-      <div className="game-page">
-        <StageHeader stageNum={2} />
-        <div className="dc-card">
-          <div className="dc-calc-question" style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            {calcQuestion.operands.map((value, index) => (
-              <span key={`op-${index}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}>
-                {typeof value === 'number' ? (
-                  <span className="game-title">{value}</span>
-                ) : (
-                  <Image
-                    src={value.path}
-                    width={75}
-                    height={50}
-                    style={{ width: 'auto', height: 'auto' }}
-                    alt={value.name}
-                  />
-                )}
-                {index < calcQuestion.operators.length && (
-                  <span className="game-title">{calcQuestion.operators[index].name}</span>
-                )}
-              </span>
-            ))}
-          </div>
-          {calcLastCorrect !== null && (
-            <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: calcLastCorrect ? '#4ade80' : '#f87171' }}>
-              {calcLastCorrect ? '✅ ถูกต้อง!' : '❌ ผิด'}
-            </div>
-          )}
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.25rem', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <label className="game-title" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              Answer:
-              <input
-                className="border-4 border-white-500"
-                name="calcAnswerDaily"
-                placeholder="พิมพ์คำตอบ..."
-                value={calcAnswer}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') handleCalcSubmit()
-                }}
-                onChange={(e) => setCalcAnswer(e.target.value)}
-              />
-            </label>
-            <button className="cta-button" onClick={handleCalcSubmit}>
-              ยืนยัน
-            </button>
-          </div>
-          <p style={{ fontSize: '0.9rem', opacity: 0.6, marginTop: '1rem' }}>
-            คะแนน: {calcScore} / {calcTotal}
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  // ── Stage 3 – memorize ─────────────────────────────────────────────────────
-  if (phase === 'stage3_memorize') {
-    return (
-      <div className="game-page">
-        <StageHeader stageNum={3} />
-        <div className="dc-card">
-          <h2>จำตำแหน่งที่ไฮไลต์ไว้! ({spatialMemorizeLeft}s)</h2>
-          <div className="dc-spatial-grid">
-            {spatialPattern.map((row, r) =>
-              row.map((cell, c) => (
-                <div
-                  key={`${r}-${c}`}
-                  className={`dc-spatial-cell ${cell ? 'dc-spatial-on' : ''}`}
-                />
-              ))
-            )}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // ── Stage 3 – test ─────────────────────────────────────────────────────────
-  if (phase === 'stage3_test') {
-    return (
-      <div className="game-page">
-        <StageHeader stageNum={3} />
-        <div className="dc-card">
-          <h2>คลิกตำแหน่งที่คุณจำได้</h2>
-          <div className="dc-spatial-grid">
-            {userPattern.map((row, r) =>
-              row.map((cell, c) => (
-                <div
-                  key={`${r}-${c}`}
-                  className={`dc-spatial-cell dc-spatial-clickable ${cell ? 'dc-spatial-user' : ''}`}
-                  onClick={() => toggleCell(r, c)}
-                />
-              ))
-            )}
-          </div>
-          <button className="start-button dc-submit-btn" onClick={submitSpatial}>
-            ยืนยันคำตอบ ✔️
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  // ── Completed ──────────────────────────────────────────────────────────────
-  if (phase === 'completed') {
-    const total = stageScore[0] + stageScore[1] + stageScore[2]
-    return (
-      <div className="game-page">
-        <h1 className="game-title">🌟 ภารกิจรายวัน – สำเร็จ!</h1>
-        <div className="dc-card">
-          <div className="dc-complete-icon">🏆</div>
-          <h2>ยอดเยี่ยม!</h2>
-          <div className="dc-score-table">
-            <div className="dc-score-row">
-              <span>📋 การจัดการ</span>
-              <span>{stageScore[0]} / 6</span>
-            </div>
-            <div className="dc-score-row">
-              <span>🧮 การคำนวณ</span>
-              <span>{stageScore[1]} / {calcTotal}</span>
-            </div>
-            <div className="dc-score-row">
-              <span>🗺️ พื้นที่</span>
-              <span>{stageScore[2]} / {GRID_SIZE * GRID_SIZE}</span>
-            </div>
-          </div>
-          <p className="dc-subtitle">กลับมาใหม่พรุ่งนี้!</p>
-          <div className="dc-countdown">{countdown}</div>
-          <p className="dc-countdown-label">รีเซ็ตใน</p>
-          <Link href="/" className="cta-button" style={{ marginTop: '1.5rem', display: 'inline-block' }}>
-            กลับหน้าแรก 🏠
-          </Link>
-        </div>
-      </div>
-    )
-  }
-
-  return null
 }

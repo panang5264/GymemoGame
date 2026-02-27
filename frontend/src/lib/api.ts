@@ -96,3 +96,31 @@ export async function updateSyncProgress(token: string, progressData: any) {
   if (!res.ok) throw new Error(data.message || 'Failed to update sync progress')
   return data
 }
+
+// --- Scores API ---
+
+export async function submitScore(token: string, score: number, moves: number, timeTaken: number) {
+  const res = await fetch(`${API_BASE_URL}/api/scores`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ score, moves, timeTaken }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Failed to submit score')
+  return data
+}
+
+export async function getLeaderboard(limit: number = 10) {
+  const res = await fetch(`${API_BASE_URL}/api/scores/leaderboard?limit=${limit}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Failed to fetch leaderboard')
+  return data
+}

@@ -23,14 +23,18 @@ export function middleware(request: NextRequest) {
 
     // Redirect to login if accessing a protected route without token
     if (isProtectedPath && !token) {
-        const loginUrl = new URL('/login', request.url)
+        const loginUrl = new URL('/', request.url)
         return NextResponse.redirect(loginUrl)
     }
 
     // Redirect away from login/register if already authenticated
-    const isAuthPath = request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register'
+    const isAuthPath = request.nextUrl.pathname === '/register' || request.nextUrl.pathname === '/'
     if (isAuthPath && token) {
-        return NextResponse.redirect(new URL('/', request.url))
+        // Only redirect from exactly '/' if they have a token, but in our app page.tsx handles the UI.
+        // Actually since page.tsx now holds both auth and profile logic, we shouldn't redirect away from '/' unconditionally. 
+        if (request.nextUrl.pathname === '/register') {
+            return NextResponse.redirect(new URL('/', request.url))
+        }
     }
 
     return NextResponse.next()

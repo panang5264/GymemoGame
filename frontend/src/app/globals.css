@@ -1,6 +1,16 @@
 @import "tailwindcss";
 
 @layer base {
+  :root {
+    --bg-warm: #d2cebd;
+    --bg-accent: #c4c0ae;
+    --border-dark: #000000;
+    --text-main: #000000;
+    --text-muted: #333333;
+    --card-bg: #f2efe4;
+    --text-on-dark: #f2efe4;
+  }
+
   * {
     margin: 0;
     padding: 0;
@@ -8,25 +18,75 @@
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: var(--font-supermarket), 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-warm);
     min-height: 100vh;
-    color: #fff;
+    color: var(--text-main);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
 }
 
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+.pill-container {
+  background-color: var(--card-bg);
+  border: 3px solid var(--border-dark);
+  border-radius: 9999px;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
 }
 
-/* Header */
-.header {
-  background: rgba(0, 0, 0, 0.3);
-  padding: 1rem 0;
-  backdrop-filter: blur(10px);
+.pill-input {
+  background-color: var(--card-bg);
+  border: 3px solid var(--border-dark);
+  border-radius: 9999px;
+  padding: 1rem 1.5rem;
+  outline: none;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.pill-input:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 var(--border-dark);
+}
+
+.pill-input-icon {
+  padding-left: 4.5rem !important;
+}
+
+.pill-button {
+  background-color: var(--border-dark);
+  color: var(--text-on-dark);
+  border: 3px solid var(--border-dark);
+  border-radius: 9999px;
+  padding: 1rem 2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pill-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 #000;
+}
+
+.pill-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.friendly-card {
+  background-color: var(--card-bg);
+  border: 4px solid var(--border-dark);
+  border-radius: 3rem;
+  padding: 2.5rem;
+  box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
 .header .container {
@@ -38,7 +98,7 @@
 .logo {
   font-size: 1.8rem;
   font-weight: bold;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .nav {
@@ -47,7 +107,7 @@
 }
 
 .nav-link {
-  color: #fff;
+  color: var(--text-main);
   text-decoration: none;
   font-size: 1.1rem;
   transition: color 0.3s;

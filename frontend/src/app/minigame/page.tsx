@@ -14,6 +14,9 @@ export default function MinigamePage() {
         <li>
           <Link href="/minigame/calculation">🔢 Calculation – โหมดคำนวณ</Link>
         </li>
+        <li>
+          <Link href="/minigame/reaction">🧭 Maze Runner — ทดสอบการวางแผน</Link>
+        </li>
       </ul>
     </div>
   )
