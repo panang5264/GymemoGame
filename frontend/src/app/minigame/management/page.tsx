@@ -151,20 +151,20 @@ function getLevelConfig(level: number) {
     case 1:
       instruction = 'จงแยกวัตถุที่มีสีแดง และวัตถุทรงกลม'
       categories = [
-        { id: 'red', title: 'สีแดง 🔴', emoji: '📦', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/ตะกร้า.png", accepts: i => i.tags.includes('red') },
-        { id: 'sphere', title: 'ทรงกลม 🔵', emoji: '📦', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/ตะกร้า.png", accepts: i => i.tags.includes('sphere') },
+        { id: 'red', title: 'สีแดง 🔴', emoji: '📦', accepts: i => i.tags.includes('red') },
+        { id: 'sphere', title: 'ทรงกลม 🔵', emoji: '📦', accepts: i => i.tags.includes('sphere') },
       ]
       items = [
-        { id: 'r1', label: 'รถดับเพลิง', emoji: '🚒', tags: ['red'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่1/S__3686404.jpg" },
-        { id: 'r2', label: 'ป้ายหยุด', emoji: '🛑', tags: ['red'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่1/S__3686405.jpg" },
-        { id: 'r3', label: 'พริก', emoji: '�️', tags: ['red'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่1/S__3686407.jpg" },
-        { id: 'r4', label: 'ตู้ไปรษณีย์', emoji: '📮', tags: ['red'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่1/S__3686408.jpg" },
-        { id: 'r5', label: 'ดอกกุหลาบ', emoji: '🌹', tags: ['red'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่1/S__3702788.jpg" },
-        { id: 's1', label: 'บาสเกตบอล', emoji: '🏀', tags: ['sphere'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่2/S__3702790.jpg" },
-        { id: 's2', label: 'โลก', emoji: '�', tags: ['sphere'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่2/S__3702791.jpg" },
-        { id: 's3', label: 'ลูกกอล์ฟ', emoji: '⛳', tags: ['sphere'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่2/S__3702792.jpg" },
-        { id: 's4', label: 'ลูกแก้ว', emoji: '🔮', tags: ['sphere'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่2/S__3702793.jpg" },
-        { id: 's5', label: 'พระจันทร์', emoji: '🌙', tags: ['sphere'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่2/S__3702794.jpg" },
+        { id: 'r1', label: 'รถดับเพลิง', emoji: '🚒', tags: ['red'] },
+        { id: 'r2', label: 'ป้ายหยุด', emoji: '🛑', tags: ['red'] },
+        { id: 'r3', label: 'พริก', emoji: '🌶️', tags: ['red'] },
+        { id: 'r4', label: 'ตู้ไปรษณีย์', emoji: '📮', tags: ['red'] },
+        { id: 'r5', label: 'ดอกกุหลาบ', emoji: '🌹', tags: ['red'] },
+        { id: 's1', label: 'บาสเกตบอล', emoji: '🏀', tags: ['sphere'] },
+        { id: 's2', label: 'โลก', emoji: '🌍', tags: ['sphere'] },
+        { id: 's3', label: 'ลูกกอล์ฟ', emoji: '⛳', tags: ['sphere'] },
+        { id: 's4', label: 'ลูกแก้ว', emoji: '🔮', tags: ['sphere'] },
+        { id: 's5', label: 'พระจันทร์', emoji: '🌙', tags: ['sphere'] },
         { id: 'o1', label: 'กล้วย', emoji: '🍌', tags: [] },
         { id: 'o2', label: 'บรอกโคลี', emoji: '🥦', tags: [] },
         { id: 'o3', label: 'จักรยาน', emoji: '🚲', tags: [] },
@@ -176,20 +176,20 @@ function getLevelConfig(level: number) {
     case 2:
       instruction = 'แยกสัตว์ที่เดิน 4 ขา และวัตถุที่ใช้ขัด/แปรง'
       categories = [
-        { id: 'animal4', title: 'สัตว์ 4 ขา 🐕', emoji: '📦', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/ตะกร้า.png", accepts: i => i.tags.includes('animal4') },
-        { id: 'scrubber', title: 'วัตถุขัด/แปรง 🧽', emoji: '📦', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/ตะกร้า.png", accepts: i => i.tags.includes('scrubber') },
+        { id: 'animal4', title: 'สัตว์ 4 ขา 🐕', emoji: '📦', accepts: i => i.tags.includes('animal4') },
+        { id: 'scrubber', title: 'วัตถุขัด/แปรง 🧽', emoji: '📦', accepts: i => i.tags.includes('scrubber') },
       ]
       items = [
-        { id: 'a1', label: 'จระเข้', emoji: '🐕', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/จรเข้.png", tags: ['animal4'] },
-        { id: 'a2', label: 'ช้าง', emoji: '🐘', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/ช้าง.png", tags: ['animal4'] },
-        { id: 'a3', label: 'ม้าลาย', emoji: '🦓', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/ม้าลาย.png", tags: ['animal4'] },
-        { id: 'a4', label: 'ยีราฟ', emoji: '🦒', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/ยีราฟ.png", tags: ['animal4'] },
-        { id: 'a5', label: 'หมู', emoji: '🐷', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/หมู.png", tags: ['animal4'] },
-        { id: 'sc1', label: 'แปรงสีฟัน', emoji: '🪥', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/แปรงสีฟัน.png", tags: ['scrubber'] },
-        { id: 'sc2', label: 'ฟองน้ำ', emoji: '🧽', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/ฟองน้ำ.png", tags: ['scrubber'] },
-        { id: 'sc3', label: 'ฝอยขัดหม้อ', emoji: '🧼', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/ฝอยขัดหม้อ.png", tags: ['scrubber'] },
-        { id: 'sc4', label: 'แปรงขัดส้วม', emoji: '🧹', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/แปรงขัดส้วม.png", tags: ['scrubber'] },
-        { id: 'sc5', label: 'ไม้ถูพื้น', emoji: '🧹', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/ไม้ถู.png", tags: ['scrubber'] },
+        { id: 'a1', label: 'จระเข้', emoji: '🐊', tags: ['animal4'] },
+        { id: 'a2', label: 'ช้าง', emoji: '🐘', tags: ['animal4'] },
+        { id: 'a3', label: 'ม้าลาย', emoji: '🦓', tags: ['animal4'] },
+        { id: 'a4', label: 'ยีราฟ', emoji: '🦒', tags: ['animal4'] },
+        { id: 'a5', label: 'หมู', emoji: '🐷', tags: ['animal4'] },
+        { id: 'sc1', label: 'แปรงสีฟัน', emoji: '🪥', tags: ['scrubber'] },
+        { id: 'sc2', label: 'ฟองน้ำ', emoji: '🧽', tags: ['scrubber'] },
+        { id: 'sc3', label: 'ฝอยขัดหม้อ', emoji: '🧼', tags: ['scrubber'] },
+        { id: 'sc4', label: 'แปรงขัดส้วม', emoji: '🧹', tags: ['scrubber'] },
+        { id: 'sc5', label: 'ไม้ถูพื้น', emoji: '🧹', tags: ['scrubber'] },
       ]
       break
 
@@ -794,11 +794,11 @@ function ManagementGameInner() {
                         style={{ left: `${item.x}%`, top: `${item.y}%`, transform: 'translate(-50%, -50%)' }}
                       >
                         {item.imageUrl ? (
-                          <img src={item.imageUrl} className="w-24 h-24 object-contain drop-shadow-2xl" alt={item.label} />
+                          <img src={item.imageUrl} className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-2xl" alt={item.label} />
                         ) : (
-                          <span className="text-7xl drop-shadow-2xl">{item.emoji}</span>
+                          <span className="text-5xl md:text-6xl drop-shadow-2xl">{item.emoji}</span>
                         )}
-                        <div className="mt-2 bg-white/90 px-3 py-1 rounded-xl shadow-lg text-xs font-black text-slate-600">
+                        <div className="mt-1 bg-white/90 px-2 py-0.5 md:px-3 md:py-1 rounded-xl shadow-lg text-[10px] md:text-xs font-black text-slate-600">
                           {item.label}
                         </div>
                         <div className="absolute -bottom-4 left-4 right-4 h-2 bg-slate-100 rounded-full overflow-hidden border border-white">
@@ -810,11 +810,11 @@ function ManagementGameInner() {
                   <div className="h-44 w-full flex justify-center gap-12 md:gap-24 px-10 pb-8">
                     {config.categories.map(cat => (
                       <div key={cat.id} onDragOver={(e) => e.preventDefault()} onDrop={(e) => handleSortItem(e.dataTransfer.getData('itemId'), cat.id)} className="flex flex-col items-center group">
-                        <div className="w-32 h-24 md:w-48 md:h-32 bg-white rounded-[40px] border-4 border-dashed border-slate-200 shadow-2xl flex items-center justify-center group-hover:border-blue-300 transition-all">
+                        <div className="w-24 h-16 md:w-36 md:h-24 bg-white rounded-[24px] md:rounded-[32px] border-4 border-dashed border-slate-200 shadow-2xl flex items-center justify-center group-hover:border-blue-300 transition-all relative">
                           {cat.imageUrl ? (
-                            <img src={cat.imageUrl} className="w-[80%] h-[80%] object-contain transition-transform duration-500 group-hover:scale-110" alt={cat.title} />
+                            <img src={cat.imageUrl} className="w-[70%] h-[70%] object-contain transition-transform duration-500 group-hover:scale-110" alt={cat.title} />
                           ) : (
-                            <span className="text-7xl md:text-8xl drop-shadow-xl transition-transform duration-500 group-hover:scale-110">📦</span>
+                            <span className="text-5xl md:text-6xl drop-shadow-xl transition-transform duration-500 group-hover:scale-110">📦</span>
                           )}
                         </div>
                         <div className="mt-2 bg-white px-6 py-2 rounded-2xl shadow-xl border-b-4 border-slate-200 text-sm font-black text-slate-700 uppercase tracking-tighter">
@@ -843,9 +843,9 @@ function ManagementGameInner() {
                         <div className="w-16 h-16 rounded-full border-4 border-dashed border-slate-300 flex items-center justify-center text-slate-300 text-3xl font-black">?</div>
                       )}
                     </div>
-                    <div className="grid grid-cols-4 md:grid-cols-7 gap-4">
+                    <div className="grid grid-cols-4 md:grid-cols-7 gap-3">
                       {cookingItems.map((ing, i) => (
-                        <button key={i} onClick={() => handleCookIngredient(ing)} className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-3xl shadow-xl flex items-center justify-center text-4xl hover:scale-110 active:scale-90 border-b-4 border-slate-200">{ing}</button>
+                        <button key={i} onClick={() => handleCookIngredient(ing)} className="w-12 h-12 md:w-16 md:h-16 bg-white rounded-2xl md:rounded-3xl shadow-xl flex items-center justify-center text-2xl md:text-3xl hover:scale-110 active:scale-90 border-b-4 border-slate-200">{ing}</button>
                       ))}
                     </div>
                   </div>
@@ -857,40 +857,28 @@ function ManagementGameInner() {
                   <div className="bg-slate-800 p-4 rounded-[40px] shadow-2xl border-8 border-slate-700">
                     <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${maze[0]?.length || 0}, minmax(0, 1fr))` }}>
                       {maze.map((row, r) => row.map((cell, c) => (
-                        <div key={`${r}-${c}`} className={`w-8 h-8 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-2xl ${cell === 1 ? 'bg-slate-700' : 'bg-slate-900/40'}`}>
+                        <div key={`${r}-${c}`} className={`w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-xl md:text-2xl ${cell === 1 ? 'bg-slate-700' : 'bg-slate-900/40'}`}>
                           {playerPos.r === r && playerPos.c === c && <span className="animate-pulse">🧍</span>}
                           {cell === 2 && (
                             <div className={`relative w-full h-full flex items-center justify-center ${levelParam >= 7 && !hasKey ? 'grayscale opacity-30 brightness-50' : ''}`}>
-                              <img
-                                src="/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/เกมเขาวงกต/ICON อื่นๆ/แม่กุญแจ.png"
-                                className="w-[80%] h-[80%] object-contain drop-shadow-lg"
-                                onError={(e) => (e.currentTarget.style.display = 'none')}
-                              />
+                              <span className="drop-shadow-lg">🚪</span>
                             </div>
                           )}
                           {cell === 3 && (
-                            <img
-                              src="/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/เกมเขาวงกต/ICON อื่นๆ/กุญแจ.png"
-                              className="w-[80%] h-[80%] object-contain"
-                              onError={(e) => (e.currentTarget.style.display = 'none')}
-                            />
+                            <span>🔑</span>
                           )}
                           {cell === 4 && showBombs && (
-                            <img
-                              src="/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/เกมเขาวงกต/ICON อื่นๆ/ลูกระเบิด.png"
-                              className="w-[80%] h-[80%] object-contain"
-                              onError={(e) => (e.currentTarget.style.display = 'none')}
-                            />
+                            <span>💣</span>
                           )}
                         </div>
                       )))}
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-3 mt-8">
-                    <div /><button onClick={() => handleMazeMove(-1, 0)} className="w-16 h-16 bg-white rounded-3xl shadow-xl flex items-center justify-center text-3xl border-b-8 border-slate-200">🔼</button><div />
-                    <button onClick={() => handleMazeMove(0, -1)} className="w-16 h-16 bg-white rounded-3xl shadow-xl flex items-center justify-center text-3xl border-b-8 border-slate-200">◀️</button>
-                    <button onClick={() => handleMazeMove(1, 0)} className="w-16 h-16 bg-white rounded-3xl shadow-xl flex items-center justify-center text-3xl border-b-8 border-slate-200">🔽</button>
-                    <button onClick={() => handleMazeMove(0, 1)} className="w-16 h-16 bg-white rounded-3xl shadow-xl flex items-center justify-center text-3xl border-b-8 border-slate-200">▶️</button>
+                  <div className="grid grid-cols-3 gap-2 mt-6">
+                    <div /><button onClick={() => handleMazeMove(-1, 0)} className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">🔼</button><div />
+                    <button onClick={() => handleMazeMove(0, -1)} className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">◀️</button>
+                    <button onClick={() => handleMazeMove(1, 0)} className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">🔽</button>
+                    <button onClick={() => handleMazeMove(0, 1)} className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">▶️</button>
                   </div>
                 </div>
               )}
@@ -901,7 +889,7 @@ function ManagementGameInner() {
                     <div className="flex flex-col gap-3">
                       <span className="text-center font-black text-slate-400 text-xs mb-2 uppercase tracking-widest">วลี/คำพูด</span>
                       {matchingPairs.map((pair) => (
-                        <button key={pair.id} onClick={() => handleMatchClick('left', pair.id)} disabled={pair.matched} className={`p-4 rounded-3xl shadow-md font-black text-sm md:text-lg transition-all ${pair.matched ? 'bg-green-50 text-green-300 opacity-40' : selectedLeft === pair.id ? 'bg-blue-600 text-white' : 'bg-white text-slate-700'}`}>
+                        <button key={pair.id} onClick={() => handleMatchClick('left', pair.id)} disabled={pair.matched} className={`p-3 rounded-2xl shadow-md font-black text-xs md:text-base transition-all ${pair.matched ? 'bg-green-50 text-green-300 opacity-40' : selectedLeft === pair.id ? 'bg-blue-600 text-white' : 'bg-white text-slate-700'}`}>
                           {pair.left}
                         </button>
                       ))}
@@ -910,7 +898,7 @@ function ManagementGameInner() {
                       <span className="text-center font-black text-slate-400 text-xs mb-2 uppercase tracking-widest">หมวดหมู่</span>
                       {shuffledRight.map((item, idx) => {
                         const isMatched = matchingPairs.find(p => p.id === item.id)?.matched
-                        return (<button key={idx} onClick={() => handleMatchClick('right', item.id)} disabled={isMatched} className={`p-4 rounded-3xl shadow-md font-black text-sm md:text-lg transition-all ${isMatched ? 'opacity-20' : 'bg-white text-slate-600 border-2 border-dashed'}`}>{item.text}</button>)
+                        return (<button key={idx} onClick={() => handleMatchClick('right', item.id)} disabled={isMatched} className={`p-3 rounded-2xl shadow-md font-black text-xs md:text-base transition-all ${isMatched ? 'opacity-20' : 'bg-white text-slate-600 border-2 border-dashed'}`}>{item.text}</button>)
                       })}
                     </div>
                   </div>

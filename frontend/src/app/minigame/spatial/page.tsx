@@ -46,6 +46,7 @@ function SpatialGameInner() {
 
   const [questionData, setQuestionData] = useState<{
     targetView?: string[] | string;
+    targetImage?: string;
     options: (string[] | string)[];
     correctIndex: number;
     arrow?: 'N' | 'S' | 'E' | 'W';
@@ -61,73 +62,58 @@ function SpatialGameInner() {
     setIsGameOver(false)
 
     if (levelParam <= 2) {
-      // Level 1-2: Matching Shapes/Emojis
-      const emojis = ['🍄', '🌻', '🌵', '🎄', '🎁', '🎈', '🎨', '🎠']
-      const target = emojis[Math.floor(Math.random() * emojis.length)]
-      const others = emojis.filter(e => e !== target).sort(() => Math.random() - 0.5).slice(0, 3)
-      const options = [target, ...others].sort(() => Math.random() - 0.5)
+      // Level 1-2: Box folding / Unfolding (Using custom assets)
+      // โจทย์ข้อ 1 เป็นกล่องคลี่
+      const targetImage = "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/โจทย์ข้อ 1.png"
+      const options = [
+        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/ช้อยข้อ 1.png",
+        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/ช้อยข้อ 2.png",
+        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/ช้อยข้อ 3.jpeg",
+        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/ช้อยท์ข้อ 4.png"
+      ]
+
+      const shuffledOptions = [...options].sort(() => Math.random() - 0.5)
 
       setQuestionData({
-        targetView: target,
-        options: options,
-        correctIndex: options.indexOf(target)
+        targetImage,
+        options: shuffledOptions,
+        correctIndex: shuffledOptions.indexOf(options[0]) // สมมติว่าไฟล์แรกคือข้อที่ถูกที่สุด
       })
-      setQuestionText('เลือกรูปที่เหมือนกับภาพตัวอย่างด้านบน 🎯')
+      setQuestionText('เลือกรูปกล่องที่ประกอบแล้วตรงกับภาพคลี่ด้านบน 📦')
     } else {
-      // Level 3-10: View from Arrow (3D Box image placeholder)
-      const gridSize = levelParam > 7 ? 3 : 2
-      const blockEmojis = ['📦', '🟫', '🟧', '🟦', '🟩', '🟥']
-      const grid: string[][] = []
-      for (let r = 0; r < gridSize; r++) {
-        grid[r] = []
-        for (let c = 0; c < gridSize; c++) {
-          grid[r][c] = blockEmojis[Math.floor(Math.random() * blockEmojis.length)]
-        }
-      }
+      // Level 3-10: 3D Box views (Using custom assets)
+      const targetImages = [
+        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/โจทย์ข้อ 2.png",
+        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/โจทย์ข้อ3.png",
+        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/โจทย์ข้อ 4.png",
+        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/โจทย์ข้อ 5.png",
+        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/โจทย์ข้อ 6.png",
+        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/โจทย์ข้อ 7.png",
+        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/โจทย์ข้อ 8.png"
+      ]
+      const choiceImages = [
+        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/ช้อย 5.jpg",
+        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/ช้อย 6.png",
+        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/ช้อย 7.PNG",
+        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/ช้อย 8.jpg"
+      ]
 
-      const directions: ('N' | 'S' | 'E' | 'W')[] = ['N', 'S', 'E', 'W']
-      const arrow = directions[Math.floor(Math.random() * directions.length)]
+      const targetImage = targetImages[Math.floor(Math.random() * targetImages.length)]
+      const correctChoice = choiceImages[Math.floor(Math.random() * choiceImages.length)] // สมมติว่าอันที่สุ่มมาคือคำตอบ
+      const wrongChoices = choiceImages.filter(img => img !== correctChoice).sort(() => Math.random() - 0.5)
 
-      let correctView: string[] = []
-      if (arrow === 'N') correctView = grid[0]
-      else if (arrow === 'S') correctView = grid[gridSize - 1]
-      else if (arrow === 'W') correctView = grid.map(row => row[0])
-      else if (arrow === 'E') correctView = grid.map(row => row[gridSize - 1])
-
-      // Determine number of choices based on level
       let numOptions = 4;
       if (levelParam >= 3 && levelParam <= 5) numOptions = 2;
       else if (levelParam >= 6 && levelParam <= 8) numOptions = 3;
       else if (levelParam >= 9 && levelParam <= 10) numOptions = 4;
 
-      // Generate wrong options
-      const options = [correctView]
-      let maxAttempts = 100
-      while (options.length < numOptions && maxAttempts > 0) {
-        let wrongView: string[] = [];
-        if (Math.random() > 0.5) {
-          // Shuffle correct view
-          wrongView = [...correctView].sort(() => Math.random() - 0.5)
-        } else {
-          // Generate completely random blocks
-          for (let i = 0; i < gridSize; i++) {
-            wrongView.push(blockEmojis[Math.floor(Math.random() * blockEmojis.length)])
-          }
-        }
-
-        if (!options.some(opt => JSON.stringify(opt) === JSON.stringify(wrongView))) {
-          options.push(wrongView)
-        }
-        maxAttempts--;
-      }
-
+      const options = [correctChoice, ...wrongChoices.slice(0, numOptions - 1)]
       const shuffledOptions = [...options].sort(() => Math.random() - 0.5)
 
       setQuestionData({
-        displayGrid: grid,
-        arrow,
+        targetImage,
         options: shuffledOptions,
-        correctIndex: shuffledOptions.findIndex(opt => JSON.stringify(opt) === JSON.stringify(correctView))
+        correctIndex: shuffledOptions.indexOf(correctChoice)
       })
       setQuestionText('มองจากทิศทางของลูกศร คุณจะเห็นภาพใด? 👁️')
     }
@@ -281,35 +267,10 @@ function SpatialGameInner() {
 
             {questionData && (
               <div className="w-full flex flex-col items-center">
-                {/* 1. Target Area (Grid or Single Emoji) */}
-                <div className="mb-12 relative p-8 bg-white/40 backdrop-blur-md rounded-[3rem] border-4 border-white/50 shadow-xl">
-                  {levelParam <= 2 ? (
-                    <div className="text-9xl drop-shadow-2xl animate-bounce">{questionData.targetView}</div>
-                  ) : (
-                    <div className="relative flex flex-col items-center">
-                      <div className="absolute -top-6 left-0 right-0 text-center">
-                        <span className="bg-yellow-300 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
-                          Image URL Placeholder (3D Box)
-                        </span>
-                      </div>
-                      {/* Grid Display */}
-                      <div className={`grid gap-2 p-4 bg-slate-800 rounded-3xl shadow-2xl border-8 border-slate-700 mt-4`}
-                        style={{ gridTemplateColumns: `repeat(${questionData.displayGrid?.length || 2}, minmax(0, 1fr))` }}>
-                        {questionData.displayGrid?.map((row, ri) =>
-                          row.map((cell, ci) => (
-                            <div key={`${ri}-${ci}`} className="w-16 h-16 md:w-24 md:h-24 bg-white/10 rounded-2xl flex items-center justify-center text-4xl md:text-6xl shadow-inner">
-                              {cell}
-                            </div>
-                          ))
-                        )}
-                      </div>
-
-                      {/* Arrow Indicators */}
-                      {questionData.arrow === 'N' && <div className="absolute top-[-3rem] left-1/2 -translate-x-1/2 text-6xl animate-bounce drop-shadow-lg">⬇️</div>}
-                      {questionData.arrow === 'S' && <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 text-6xl animate-bounce drop-shadow-lg">⬆️</div>}
-                      {questionData.arrow === 'W' && <div className="absolute -left-16 top-1/2 -translate-y-1/2 text-6xl animate-bounce drop-shadow-lg">➡️</div>}
-                      {questionData.arrow === 'E' && <div className="absolute -right-16 top-1/2 -translate-y-1/2 text-6xl animate-bounce drop-shadow-lg">⬅️</div>}
-                    </div>
+                {/* 1. Target Area (Image) */}
+                <div className="mb-12 relative p-4 md:p-8 bg-white/40 backdrop-blur-md rounded-[3rem] border-4 border-white/50 shadow-xl flex items-center justify-center min-h-[200px] min-w-[200px] w-full max-w-md">
+                  {questionData.targetImage && (
+                    <img src={questionData.targetImage} className="w-full h-[300px] object-contain drop-shadow-md" alt="target" />
                   )}
                 </div>
 
@@ -333,8 +294,10 @@ function SpatialGameInner() {
                       }}
                       className="group relative p-6 bg-white hover:bg-blue-50 border-b-8 border-slate-200 hover:border-blue-200 rounded-[2rem] shadow-lg transition-all active:scale-95 flex flex-col items-center justify-center min-h-[140px]"
                     >
-                      <div className="flex gap-2">
-                        {Array.isArray(opt) ? opt.map((emoji, i) => (
+                      <div className="flex gap-2 w-full h-full items-center justify-center">
+                        {typeof opt === 'string' && opt.startsWith('/') ? (
+                          <img src={opt as string} className="max-w-[120px] max-h-[120px] object-contain drop-shadow-sm group-hover:scale-110 transition-transform" alt={`option ${idx}`} />
+                        ) : Array.isArray(opt) ? opt.map((emoji, i) => (
                           <span key={i} className="text-4xl md:text-6xl drop-shadow-md group-hover:scale-110 transition-transform">{emoji}</span>
                         )) : (
                           <span className="text-6xl md:text-8xl drop-shadow-md group-hover:scale-110 transition-transform">{opt}</span>

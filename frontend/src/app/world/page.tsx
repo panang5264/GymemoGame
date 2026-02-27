@@ -324,7 +324,10 @@ export default function WorldPage() {
         </div>
       </div>
 
-      <div className={styles.mapContainer}>
+      <div
+        className={styles.mapContainer}
+        style={{ backgroundImage: `url("/assets/Assets'Employer/Background/แผนที่ 10 หมู่บ้าน/ปลดล็อก ${Math.max(1, Math.min(10, Math.max(...(unlockedVillages.length ? unlockedVillages : [1]))))} .PNG"), radial-gradient(rgba(18, 18, 18, 0.05) 1px, transparent 1px)` }}
+      >
         {Array.from({ length: TOTAL_STAGES }, (_, i) => i + 1).map((stage) => {
           const exp = villageExp[stage] ?? 0
           const state = getStageState(stage, unlockedVillages, exp)

@@ -173,28 +173,20 @@ function MazeGameInner() {
                                             }`}
                                     >
                                         {playerPos.r === r && playerPos.c === c && (
-                                            <img
-                                                src="/assets/Assets'Employer/ตัวละคร/คุณตา.png"
-                                                className="w-[85%] h-[85%] object-contain drop-shadow-md animate-pulse"
-                                                alt="player"
-                                            />
+                                            <span className="animate-pulse">🧍</span>
                                         )}
                                         {cell === 2 && (
-                                            <img
-                                                src="/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/เกมเขาวงกต/ICON อื่นๆ/แม่กุญแจ.png"
-                                                className="w-[75%] h-[75%] object-contain drop-shadow-xl animate-bounce"
-                                                alt="exit"
-                                            />
+                                            <span className="drop-shadow-xl animate-bounce">🚪</span>
                                         )}
                                     </div>
                                 )))}
                             </div>
 
-                            <div className="grid grid-cols-3 gap-3 mt-8 md:hidden">
-                                <div /><button onClick={() => movePlayer(-1, 0)} className="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-3xl border-b-4 border-slate-200">⬆️</button><div />
-                                <button onClick={() => movePlayer(0, -1)} className="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-3xl border-b-4 border-slate-200">◀️</button>
-                                <button onClick={() => movePlayer(1, 0)} className="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-3xl border-b-4 border-slate-200">🔽</button>
-                                <button onClick={() => movePlayer(0, 1)} className="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-3xl border-b-4 border-slate-200">▶️</button>
+                            <div className="grid grid-cols-3 gap-2 mt-6 md:hidden">
+                                <div /><button onClick={() => movePlayer(-1, 0)} className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">🔼</button><div />
+                                <button onClick={() => movePlayer(0, -1)} className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">◀️</button>
+                                <button onClick={() => movePlayer(1, 0)} className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">🔽</button>
+                                <button onClick={() => movePlayer(0, 1)} className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">▶️</button>
                             </div>
                         </div>
                     )}

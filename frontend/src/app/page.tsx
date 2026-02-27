@@ -160,7 +160,7 @@ export default function Home() {
         <div className="absolute bottom-[-5%] left-[-5%] w-[30%] h-[30%] bg-rose-100/50 blur-[100px] rounded-full" />
       </div>
 
-      <div className={`w-full relative z-10 transition-all duration-700 ${(phase === 'tutorial_summary' || phase === 'profile') ? 'max-w-5xl' : 'max-w-md'}`}>
+      <div className={`w-full relative z-10 transition-all duration-700 ${(phase === 'tutorial_summary' || phase === 'profile' || phase === 'intro') ? 'max-w-5xl' : 'max-w-md'}`}>
 
         {/* Phase 1: Login */}
         {phase === 'login' && (
@@ -426,23 +426,17 @@ export default function Home() {
           </div>
         )}
 
-        {/* Phase 4: Game Intro Narrative */}
+        {/* Phase 4: Game Intro Narrative (Using Employer's PDF) */}
         {phase === 'intro' && (
-          <div className="text-center animate-in fade-in duration-1000 max-w-md mx-auto">
-            <div className="inline-block px-4 py-1 bg-[var(--border-dark)] text-[var(--text-on-dark)] text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-6">
-              Story Prologue
-            </div>
-            <h2 className="text-4xl md:text-6xl font-black text-[var(--text-main)] mb-8 leading-tight uppercase text-center">
-              จุดเริ่มต้นของ<br /><span className="bg-[var(--border-dark)] text-[var(--text-on-dark)] px-2">การเดินทาง</span>
-            </h2>
-            <p className="text-[#717171] text-lg font-bold leading-relaxed mb-12">
-              บนโลกที่ความทรงจำเริ่มเลือนหาย...<br />
-              อารยธรรมและความผูกพันกำลังถูกลบเลือน<br />
-              มีเพียงคุณเท่านั้นที่จะช่วยได้
-            </p>
-            <div className="flex justify-center">
-              <button onClick={nextPhase} className="pill-button px-16 py-6 text-2xl group">
-                ต่อไป <span className="inline-block transition-transform group-hover:translate-x-2">→</span>
+          <div className="text-center animate-in fade-in duration-1000 max-w-4xl mx-auto w-full h-[80vh] flex flex-col items-center">
+            <iframe
+              src="/assets/Assets'Employer/Background/INTRO.pdf#toolbar=0"
+              className="w-full h-full rounded-[2rem] border-4 border-black shadow-[10px_10px_0_#1a1a1a] bg-white"
+              title="Game Intro"
+            />
+            <div className="mt-8 w-full max-w-md">
+              <button onClick={nextPhase} className="pill-button w-full py-6 text-2xl group shadow-xl">
+                เริ่มต้นการเดินทาง <span className="inline-block transition-transform group-hover:translate-x-2">→</span>
               </button>
             </div>
           </div>
