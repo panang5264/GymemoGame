@@ -127,14 +127,14 @@ const claimDailyReward = async (req, res) => {
         await daily.save()
 
         try {
-            // Attempt to give keys if guestId is a valid ObjectId, otherwise it might be local guest.
-            const user = await User.findById(guestId)
+            // Attempt to give keys if guestId is a valid ObjectId, otherwise it might be local phone number/guest.
+            const user = await User.findById(guestId) || await User.findOne({ phoneNumber: guestId });
             if (user) {
-                user.totalKeys = (user.totalKeys || 0) + 3 // Award 3 keys
-                await user.save()
+                user.totalKeys = Math.min(9, (user.totalKeys || 0) + 3); // Award 3 keys, cap at 9
+                await user.save();
             }
         } catch (e) {
-            console.log('User not found for guestId, skipping key reward for local guest.')
+            console.log('User not found for guestId or invalid ID format, skipping key reward for local guest.');
         }
 
         res.json({

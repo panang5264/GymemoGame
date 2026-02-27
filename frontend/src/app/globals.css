@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@theme {
+  --breakpoint-sm: 480px;
+  --breakpoint-md: 600px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1440px;
+  --breakpoint-2xl: 1920px;
+}
+
 @layer base {
   :root {
     --bg-warm: #d2cebd;
@@ -425,55 +433,85 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   html {
-    font-size: 26px;
-    /* Increased from 22px to 26px */
+    font-size: 22px;
   }
+}
 
-  .hero-title {
-    font-size: 3.5rem;
+@media (min-width: 600px) and (max-width: 768px) {
+  html {
+    font-size: 24px;
   }
+}
 
-  .hero-subtitle {
-    font-size: 2rem;
-  }
+/* Responsive Scales */
 
-  .game-board {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.5rem;
-    padding: 1rem;
-  }
-
-  .card-front,
-  .card-back {
-    font-size: 2.2rem;
-  }
-
-  .features {
-    grid-template-columns: 1fr;
+/* Mobile: 320–480px (Standard for Samsung/iPhone) */
+@media (max-width: 480px) {
+  html {
+    font-size: 20px;
   }
 
   .friendly-card {
-    padding: 2.5rem 1.75rem;
-    border-radius: 2.5rem;
+    padding: 1.5rem;
+    border-radius: 2rem;
   }
 
-  .pill-button {
-    padding: 1.25rem 2rem;
-  }
-
-  /* Increase specific text sizes for mobile in common components */
   h1 {
-    font-size: 3rem !important;
+    font-size: 2.2rem !important;
   }
 
   h2 {
-    font-size: 2.5rem !important;
+    font-size: 1.8rem !important;
   }
 
   p {
-    font-size: 1.3rem !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* Tablet: 600–768px */
+@media (min-width: 600px) and (max-width: 1023px) {
+  html {
+    font-size: 24px;
+  }
+
+  .friendly-card {
+    padding: 2.5rem;
+  }
+}
+
+/* Laptop: 1024–1366px */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  html {
+    font-size: 18px;
+  }
+
+  .friendly-card {
+    padding: 2.5rem;
+  }
+}
+
+/* Desktop: 1440px+ (Standard Desktop) */
+@media (min-width: 1440px) {
+  html {
+    font-size: 20px;
+  }
+
+  .friendly-card {
+    padding: 3rem;
+  }
+}
+
+/* Large screen: 1920px+ (Full HD / Ultrawide) */
+@media (min-width: 1920px) {
+  html {
+    font-size: 22px;
+  }
+
+  .friendly-card {
+    padding: 3.5rem;
   }
 }
 

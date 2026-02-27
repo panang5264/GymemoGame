@@ -139,9 +139,52 @@ async function calculateWeeklyAverages(guestId) {
 }
 
 async function getProfile(guestId) {
-    const profile = await CognitiveProfile.findOne({ guestId });
-    if (!profile) return null;
+    let profile = await CognitiveProfile.findOne({ guestId });
+    if (!profile) {
+        // Initialize empty profile if requested but not exists
+        profile = new CognitiveProfile({ guestId });
+        await profile.save();
+    }
     return profile;
+}
+
+// New Goal: Weekly Summary for Charts
+async function getWeeklySummary(guestId) {
+    const today = new Date();
+    const l7days = [];
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        d.setHours(0, 0, 0, 0);
+        const end = new Date(d);
+        end.setHours(23, 59, 59, 999);
+        l7days.push({ start: d, end: end, label: d.toLocaleDateString('th-TH', { weekday: 'short' }) });
+    }
+
+    const datasets = await Promise.all(l7days.map(async (day) => {
+        const sessions = await GameAnalysis.find({
+            guestId,
+            createdAt: { $gte: day.start, $lte: day.end }
+        });
+
+        if (sessions.length === 0) return { label: day.label, management: 0, calculation: 0, spatial: 0 };
+
+        const sums = sessions.reduce((acc, s) => ({
+            m: acc.m + (s.domainMetrics?.executive || 0),
+            c: acc.c + (s.domainMetrics?.calculation || 0),
+            s: acc.s + (s.domainMetrics?.memory || 0),
+            count: acc.count + 1
+        }), { m: 0, c: 0, s: 0, count: 0 });
+
+        return {
+            label: day.label,
+            management: Math.round(sums.m / sums.count),
+            calculation: Math.round(sums.c / sums.count),
+            spatial: Math.round(sums.s / sums.count)
+        };
+    }));
+
+    return datasets;
 }
 
 async function getHistoricalData(guestId, startDate, endDate) {
@@ -161,4 +204,4 @@ async function getHistoricalData(guestId, startDate, endDate) {
     return history;
 }
 
-module.exports = { recordGameSession, getProfile, getHistoricalData };
+module.exports = { recordGameSession, getProfile, getHistoricalData, getWeeklySummary };

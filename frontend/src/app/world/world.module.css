@@ -15,7 +15,7 @@
   padding: 0 1rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 600px) {
   .topBar {
     flex-direction: row;
     justify-content: space-between;
@@ -65,9 +65,9 @@
 .mapContainer {
   position: relative;
   width: 100%;
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
-  height: 600px;
+  height: 650px;
   background-color: #e5e2d5;
   background-image:
     /* Placeholder Map Image - replace world-map.png with your actual map file */
@@ -320,7 +320,7 @@
   color: var(--text-on-dark);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 480px) {
   .mapContainer {
     height: 480px;
     border-radius: 2.5rem;

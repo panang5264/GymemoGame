@@ -17,16 +17,16 @@ import { useProgress } from '@/contexts/ProgressContext'
 const TOTAL_STAGES = 10
 
 const STAGE_POSITIONS: Array<{ x: number; y: number }> = [
-  { x: 10, y: 70 },
-  { x: 20, y: 55 },
-  { x: 30, y: 65 },
-  { x: 40, y: 50 },
-  { x: 50, y: 60 },
-  { x: 60, y: 45 },
-  { x: 70, y: 55 },
-  { x: 80, y: 40 },
-  { x: 85, y: 60 },
-  { x: 90, y: 45 },
+  { x: 15, y: 85 }, // 1: Bottom Left
+  { x: 45, y: 82 }, // 2: Bottom Middle-Left
+  { x: 75, y: 85 }, // 3: Bottom Middle-Right
+  { x: 88, y: 65 }, // 4: Right Side Middle-Down
+  { x: 65, y: 55 }, // 5: Middle Center
+  { x: 35, y: 60 }, // 6: Middle Left
+  { x: 12, y: 45 }, // 7: Left Side Middle-Up
+  { x: 30, y: 25 }, // 8: Top Left
+  { x: 60, y: 20 }, // 9: Top Middle
+  { x: 88, y: 15 }, // 10: Top Right
 ]
 
 const INTRO_SLIDES: Array<{ emoji: string; title: string; desc: string }> = [

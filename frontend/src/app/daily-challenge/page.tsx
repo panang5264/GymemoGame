@@ -91,7 +91,7 @@ export default function DailyChallengePage() {
 
   const handleClaimReward = () => {
     if (rewardClaimed) return
-    addKeys(1)
+    addKeys(3) // Match backend reward (3 keys)
     setRewardClaimed(true)
 
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
@@ -103,7 +103,7 @@ export default function DailyChallengePage() {
       }).catch(err => console.error(err))
     }
 
-    alert('คุณได้รับกุญแจ 🔑 1 ดอก เป็นรางวัลสำหรับความพยายามวันนี้!')
+    alert('ยินดีด้วย! คุณได้รับกุญแจ 🗝️ 3 ดอก เป็นรางวัลสำหรับภารกิจวันนี้!')
   }
 
 

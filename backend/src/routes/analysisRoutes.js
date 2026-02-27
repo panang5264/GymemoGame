@@ -23,6 +23,16 @@ router.get('/profile/:guestId', async (req, res, next) => {
     }
 });
 
+// GET /api/analysis/weekly/:guestId
+router.get('/weekly/:guestId', async (req, res, next) => {
+    try {
+        const summary = await analysisService.getWeeklySummary(req.params.guestId);
+        res.json({ success: true, data: summary });
+    } catch (err) {
+        next(err);
+    }
+});
+
 // GET /api/analysis/history/:guestId
 router.get('/history/:guestId', async (req, res, next) => {
     try {

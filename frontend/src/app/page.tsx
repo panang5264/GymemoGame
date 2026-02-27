@@ -7,6 +7,7 @@ import { loginUser, API_BASE_URL } from '@/lib/api'
 import TrainingModal from '@/components/TrainingModal'
 import { useAuth } from '@/contexts/AuthContext'
 import BrainRadarChart from '@/components/BrainRadarChart'
+import WeeklySummaryChart from '@/components/WeeklySummaryChart'
 import { useProgress } from '@/contexts/ProgressContext'
 
 type AuthPhase = 'login' | 'name' | 'profile' | 'intro' | 'grandmother' | 'tutorial_summary' | 'assessment' | 'edit_profile'
@@ -159,7 +160,7 @@ export default function Home() {
         <div className="absolute bottom-[-5%] left-[-5%] w-[30%] h-[30%] bg-rose-100/50 blur-[100px] rounded-full" />
       </div>
 
-      <div className={`w-full relative z-10 transition-all duration-700 ${phase === 'tutorial_summary' ? 'max-w-6xl' : 'max-w-md'}`}>
+      <div className={`w-full relative z-10 transition-all duration-700 ${(phase === 'tutorial_summary' || phase === 'profile') ? 'max-w-5xl' : 'max-w-md'}`}>
 
         {/* Phase 1: Login */}
         {phase === 'login' && (
@@ -246,114 +247,124 @@ export default function Home() {
 
         {/* Phase 3: Character Profile */}
         {phase === 'profile' && (
-          <div className="friendly-card animate-in zoom-in duration-500 text-center">
-            <div className="relative mx-auto w-32 h-32 mb-8 group cursor-pointer" onClick={() => setPhase('edit_profile')}>
-              <div className="absolute inset-0 bg-orange-200 border-4 border-[#1a1a1a] rounded-full translate-x-1 translate-y-1 group-hover:translate-x-0 group-hover:translate-y-0 transition-all" />
-              <div className="relative w-full h-full bg-white border-4 border-[#1a1a1a] rounded-full flex items-center justify-center text-6xl shadow-inner overflow-hidden">
-                {AVATARS.find(a => a.id === (user?.avatar || 'avatar-1'))?.emoji || '🧑‍🚀'}
-                <div className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[10px] py-1 opacity-0 group-hover:opacity-100 transition-opacity">EDIT</div>
-              </div>
-            </div>
-            <h2 className="text-5xl font-black text-[#1a1a1a] mb-2">{name}</h2>
-            <p className="text-[#717171] font-black uppercase tracking-[0.2em] text-[12px] mb-10">นักสำรวจความจำ | ปลดล็อก {progress?.unlockedVillages?.length || 1}/10 หมู่บ้าน</p>
+          <div className="friendly-card animate-in zoom-in duration-500">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
 
-            {/* Brain Development Section (Visual Graph) */}
-            <div className="bg-white border-3 border-[#1a1a1a] rounded-[3rem] p-8 shadow-[10px_10px_0_#1a1a1a] mb-12 text-center">
-              <h3 className="text-xl font-black text-[#1a1a1a] mb-2 uppercase tracking-tight flex items-center justify-center gap-2">
-                <span>🧠</span> พัฒนาการสมอง
-              </h3>
-              <p className="text-sm font-black text-[#717171] uppercase tracking-[0.2em] mb-8 opacity-60">วิเคราะห์ทักษะสมอง</p>
-
-              <BrainRadarChart
-                data={[
-                  { label: 'การจัดการ', value: cognitiveData?.averages?.executiveFunction || 0, color: '#4f46e5' },
-                  { label: 'การคำนวณ', value: cognitiveData?.averages?.processingSpeed || 0, color: '#3b82f6' },
-                  { label: 'มิติสัมพันธ์', value: cognitiveData?.averages?.workingMemory || 0, color: '#10b981' },
-                  { label: 'การตอบสนอง', value: cognitiveData?.averages?.attention || 0, color: '#f59e0b' },
-                ]}
-                size={260}
-              />
-
-              <div className="mt-10 grid grid-cols-1 gap-4">
-                <div className="p-5 bg-indigo-50 rounded-3xl border-2 border-indigo-200 flex items-center justify-between">
-                  <div className="text-left">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[11px] font-black text-indigo-400 uppercase tracking-widest">การบริหารจัดการ</span>
-                      <div className="w-5 h-5 rounded-full border-2 border-indigo-200 flex items-center justify-center text-[11px] font-black text-indigo-400 cursor-help bg-white shadow-sm" title="ทักษะการตัดสินใจ การวางแผน และจัดลำดับความสำคัญ">i</div>
-                    </div>
-                    <div className="text-2xl font-black text-indigo-900 leading-tight">โหมดจัดการ</div>
+              {/* ── Left Column: Avatar + Stats + Buttons ── */}
+              <div className="flex flex-col items-center text-center">
+                <div className="relative mx-auto w-32 h-32 mb-8 group cursor-pointer" onClick={() => setPhase('edit_profile')}>
+                  <div className="absolute inset-0 bg-orange-200 border-4 border-[#1a1a1a] rounded-full translate-x-1 translate-y-1 group-hover:translate-x-0 group-hover:translate-y-0 transition-all" />
+                  <div className="relative w-full h-full bg-white border-4 border-[#1a1a1a] rounded-full flex items-center justify-center text-6xl shadow-inner overflow-hidden">
+                    {AVATARS.find(a => a.id === (user?.avatar || 'avatar-1'))?.emoji || '🧑‍🚀'}
+                    <div className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[10px] py-1 opacity-0 group-hover:opacity-100 transition-opacity">EDIT</div>
                   </div>
-                  <div className="text-4xl font-black text-indigo-700 tabular-nums">{Math.round(cognitiveData?.averages?.executiveFunction || 0)}%</div>
+                </div>
+                <h2 className="text-5xl font-black text-[#1a1a1a] mb-2">{name}</h2>
+                <p className="text-[#717171] font-black uppercase tracking-[0.2em] text-[12px] mb-10">นักสำรวจความจำ | ปลดล็อก {progress?.unlockedVillages?.length || 1}/10 หมู่บ้าน</p>
+
+                <div className="w-full grid grid-cols-2 gap-4 mb-10">
+                  <div className="bg-white border-3 border-[#1a1a1a] rounded-[2rem] p-4 shadow-[4px_4px_0_#1a1a1a]">
+                    <div className="text-[#717171] text-[12px] font-black uppercase tracking-widest mb-1">หมู่บ้าน</div>
+                    <div className="text-4xl font-black text-[#1a1a1a]">{progress?.unlockedVillages?.length || 1}</div>
+                  </div>
+                  <div className="bg-white border-3 border-[#1a1a1a] rounded-[2rem] p-4 shadow-[4px_4px_0_#1a1a1a]">
+                    <div className="text-[#717171] text-[12px] font-black uppercase tracking-widest mb-1">คะแนนรวม</div>
+                    <div className="text-4xl font-black text-[#1a1a1a]">{progress?.totalScore || 0}</div>
+                  </div>
                 </div>
 
-                <div className="p-5 bg-emerald-50 rounded-3xl border-2 border-emerald-200 flex items-center justify-between">
-                  <div className="text-left">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest">ความจำขณะทำงาน</span>
-                      <div className="w-5 h-5 rounded-full border-2 border-emerald-200 flex items-center justify-center text-[11px] font-black text-emerald-400 cursor-help bg-white shadow-sm" title="ความสามารถในการประมวลผลข้อมูลควบคู่กับการมองภาพมิติในใจ">i</div>
-                    </div>
-                    <div className="text-2xl font-black text-emerald-900 leading-tight">โหมดมิติสัมพันธ์</div>
+                <div className="w-full flex flex-col gap-4">
+                  <button
+                    onClick={nextPhase}
+                    className="pill-button w-full py-6 text-3xl shadow-[0_8px_0_#000] hover:translate-y-[-2px] hover:shadow-[0_10px_0_#000] active:translate-y-1 active:shadow-none transition-all"
+                  >
+                    เริ่มผจญภัย! 🚀
+                  </button>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      onClick={() => router.push('/leaderboard')}
+                      className="py-4 bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-full font-black text-[var(--text-main)] uppercase tracking-widest hover:bg-[var(--border-dark)] hover:text-[var(--text-on-dark)] transition-all shadow-[6px_6px_0_var(--border-dark)] text-lg"
+                    >
+                      อันดับ 🏆
+                    </button>
+                    <button
+                      onClick={() => setPhase('edit_profile')}
+                      className="py-4 bg-white border-3 border-orange-500 rounded-full font-black text-orange-600 uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all shadow-[6px_6px_0_#f97316] text-lg"
+                    >
+                      แก้ไขโปรไฟล์ ✏️
+                    </button>
                   </div>
-                  <div className="text-4xl font-black text-emerald-700 tabular-nums">{Math.round(cognitiveData?.averages?.workingMemory || 0)}%</div>
                 </div>
 
-                <div className="p-5 bg-blue-50 rounded-3xl border-2 border-blue-200 flex items-center justify-between">
-                  <div className="text-left">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[11px] font-black text-blue-400 uppercase tracking-widest">ความรวดเร็วในการคิด</span>
-                      <div className="w-5 h-5 rounded-full border-2 border-blue-200 flex items-center justify-center text-[11px] font-black text-blue-400 cursor-help bg-white shadow-sm" title="ความไวในการตีความโจทย์และหาคำตอบอย่างแม่นยำ">i</div>
-                    </div>
-                    <div className="text-2xl font-black text-blue-900 leading-tight">โหมดคำนวณ</div>
-                  </div>
-                  <div className="text-4xl font-black text-blue-700 tabular-nums">{Math.round(cognitiveData?.averages?.processingSpeed || 0)}%</div>
-                </div>
-              </div>
-            </div>
-
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
-              <div className="bg-white border-3 border-[#1a1a1a] rounded-[2rem] p-4 shadow-[4px_4px_0_#1a1a1a]">
-                <div className="text-[#717171] text-[12px] font-black uppercase tracking-widest mb-1">หมู่บ้าน</div>
-                <div className="text-4xl font-black text-[#1a1a1a]">{progress?.unlockedVillages?.length || 1}</div>
-              </div>
-              <div className="bg-white border-3 border-[#1a1a1a] rounded-[2rem] p-4 shadow-[4px_4px_0_#1a1a1a]">
-                <div className="text-[#717171] text-[12px] font-black uppercase tracking-widest mb-1">คะแนนรวม</div>
-                <div className="text-4xl font-black text-[#1a1a1a]">{progress?.totalScore || 0}</div>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-4">
-              <button
-                onClick={nextPhase}
-                className="pill-button w-full py-6 text-3xl shadow-[0_8px_0_#000] hover:translate-y-[-2px] hover:shadow-[0_10px_0_#000] active:translate-y-1 active:shadow-none transition-all"
-              >
-                เริ่มผจญภัย! 🚀
-              </button>
-
-              <div className="grid grid-cols-2 gap-4">
                 <button
-                  onClick={() => router.push('/leaderboard')}
-                  className="py-4 bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-full font-black text-[var(--text-main)] uppercase tracking-widest hover:bg-[var(--border-dark)] hover:text-[var(--text-on-dark)] transition-all shadow-[6px_6px_0_var(--border-dark)] text-lg"
+                  onClick={() => { logout(); }}
+                  className="mt-10 text-rose-500 font-black text-sm uppercase tracking-widest hover:text-rose-700 transition-colors flex items-center gap-2 mx-auto bg-rose-50 px-6 py-2 rounded-full border-2 border-rose-100"
                 >
-                  อันดับ 🏆
-                </button>
-                <button
-                  onClick={() => setPhase('edit_profile')}
-                  className="py-4 bg-white border-3 border-orange-500 rounded-full font-black text-orange-600 uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all shadow-[6px_6px_0_#f97316] text-lg"
-                >
-                  แก้ไขโปรไฟล์ ✏️
+                  ล็อคเอาท์ 👋
                 </button>
               </div>
-            </div>
 
-            <button
-              onClick={() => {
-                logout();
-              }}
-              className="mt-10 text-rose-500 font-black text-sm uppercase tracking-widest hover:text-rose-700 transition-colors flex items-center gap-2 mx-auto bg-rose-50 px-6 py-2 rounded-full border-2 border-rose-100"
-            >
-              ล็อคเอาท์ 👋
-            </button>
+              {/* ── Right Column: Brain Development ── */}
+              <div className="bg-white border-3 border-[#1a1a1a] rounded-[3rem] p-8 shadow-[10px_10px_0_#1a1a1a] text-center">
+                <h3 className="text-xl font-black text-[#1a1a1a] mb-2 uppercase tracking-tight flex items-center justify-center gap-2">
+                  <span>🧠</span> พัฒนาการสมอง
+                </h3>
+                <p className="text-sm font-black text-[#717171] uppercase tracking-[0.2em] mb-8 opacity-60">วิเคราะห์ทักษะสมอง</p>
+
+                <BrainRadarChart
+                  data={[
+                    { label: 'การจัดการ', value: cognitiveData?.averages?.executiveFunction || 0, color: '#4f46e5' },
+                    { label: 'การคำนวณ', value: cognitiveData?.averages?.processingSpeed || 0, color: '#3b82f6' },
+                    { label: 'มิติสัมพันธ์', value: cognitiveData?.averages?.workingMemory || 0, color: '#10b981' },
+                    { label: 'การตอบสนอง', value: cognitiveData?.averages?.attention || 0, color: '#f59e0b' },
+                  ]}
+                  size={260}
+                />
+
+                <div className="mt-10 grid grid-cols-1 gap-4">
+                  <div className="p-5 bg-indigo-50 rounded-3xl border-2 border-indigo-200 flex items-center justify-between">
+                    <div className="text-left">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[11px] font-black text-indigo-400 uppercase tracking-widest">การบริหารจัดการ</span>
+                        <div className="w-5 h-5 rounded-full border-2 border-indigo-200 flex items-center justify-center text-[11px] font-black text-indigo-400 cursor-help bg-white shadow-sm" title="ทักษะการตัดสินใจ การวางแผน และจัดลำดับความสำคัญ">i</div>
+                      </div>
+                      <div className="text-2xl font-black text-indigo-900 leading-tight">โหมดจัดการ</div>
+                    </div>
+                    <div className="text-4xl font-black text-indigo-700 tabular-nums">{Math.round(cognitiveData?.averages?.executiveFunction || 0)}%</div>
+                  </div>
+
+                  <div className="p-5 bg-emerald-50 rounded-3xl border-2 border-emerald-200 flex items-center justify-between">
+                    <div className="text-left">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest">ความจำขณะทำงาน</span>
+                        <div className="w-5 h-5 rounded-full border-2 border-emerald-200 flex items-center justify-center text-[11px] font-black text-emerald-400 cursor-help bg-white shadow-sm" title="ความสามารถในการประมวลผลข้อมูลควบคู่กับการมองภาพมิติในใจ">i</div>
+                      </div>
+                      <div className="text-2xl font-black text-emerald-900 leading-tight">โหมดมิติสัมพันธ์</div>
+                    </div>
+                    <div className="text-4xl font-black text-emerald-700 tabular-nums">{Math.round(cognitiveData?.averages?.workingMemory || 0)}%</div>
+                  </div>
+
+                  <div className="p-5 bg-blue-50 rounded-3xl border-2 border-blue-200 flex items-center justify-between">
+                    <div className="text-left">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[11px] font-black text-blue-400 uppercase tracking-widest">ความรวดเร็วในการคิด</span>
+                        <div className="w-5 h-5 rounded-full border-2 border-blue-200 flex items-center justify-center text-[11px] font-black text-blue-400 cursor-help bg-white shadow-sm" title="ความไวในการตีความโจทย์และหาคำตอบอย่างแม่นยำ">i</div>
+                      </div>
+                      <div className="text-2xl font-black text-blue-900 leading-tight">โหมดคำนวณ</div>
+                    </div>
+                    <div className="text-4xl font-black text-blue-700 tabular-nums">{Math.round(cognitiveData?.averages?.processingSpeed || 0)}%</div>
+                  </div>
+                </div>
+
+                {/* Weekly Trends Aggregation */}
+                {progress.guestId && (
+                  <div className="animate-in slide-in-from-bottom-8 duration-700 delay-300">
+                    <WeeklySummaryChart guestId={progress.guestId} />
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
