@@ -183,9 +183,8 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
 
                 {isDone && (
                     <div className="mt-6 p-6 bg-white/10 rounded-3xl border border-white/20 animate-in zoom-in duration-500">
-                        <p className="text-white/60 text-xs font-black uppercase tracking-widest mb-1">ผลประเมินเบื้องต้น (CDT)</p>
-                        <h3 className="text-3xl font-black text-white">ประเมินผล: <span className={evalResult.color}>{evalResult.text}</span></h3>
-                        <p className="text-white/40 text-[10px] mt-2 font-bold italic">วิเคราะห์จากความแม่นยำและการตัดสินใจ</p>
+                        <h3 className="text-3xl font-black text-white">ยอดเยี่ยม! เตรียมตัวให้พร้อม</h3>
+                        <p className="text-white/40 text-[10px] mt-2 font-bold italic">ความแม่นยำและการตัดสินใจของคุณอยู่ในเกณฑ์ดี</p>
                     </div>
                 )}
                 {/* Dynamic Hint */}
@@ -210,12 +209,12 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
                     }}
                     disabled={(!hasMovedHour && !hasMovedMinute && !isDone)}
                     className={`mt-4 w-full py-5 rounded-[2rem] font-black text-2xl transition-all shadow-2xl ${isDone
-                            ? 'bg-green-500 text-white scale-105 hover:bg-green-400'
-                            : activeHand
-                                ? 'bg-amber-500 text-white hover:scale-105 shadow-amber-500/50 border-b-8 border-amber-700 active:border-b-0'
-                                : (!hasMovedHour || !hasMovedMinute)
-                                    ? 'bg-slate-700 text-slate-500 cursor-not-allowed border-2 border-slate-600'
-                                    : 'bg-gradient-to-r from-indigo-600 to-blue-700 text-white hover:shadow-indigo-500/50 animate-pulse-gentle shadow-[0_0_20px_rgba(79,70,229,0.4)] border-b-8 border-indigo-900 active:border-b-0'
+                        ? 'bg-green-500 text-white scale-105 hover:bg-green-400'
+                        : activeHand
+                            ? 'bg-amber-500 text-white hover:scale-105 shadow-amber-500/50 border-b-8 border-amber-700 active:border-b-0'
+                            : (!hasMovedHour || !hasMovedMinute)
+                                ? 'bg-slate-700 text-slate-500 cursor-not-allowed border-2 border-slate-600'
+                                : 'bg-gradient-to-r from-indigo-600 to-blue-700 text-white hover:shadow-indigo-500/50 animate-pulse-gentle shadow-[0_0_20px_rgba(79,70,229,0.4)] border-b-8 border-indigo-900 active:border-b-0'
                         }`}
                 >
                     {isDone

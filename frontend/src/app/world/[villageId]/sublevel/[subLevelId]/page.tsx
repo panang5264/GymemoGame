@@ -74,7 +74,7 @@ export default function SubLevelPage({
     }
     setModalOpen(false)
     // ให้ EXP ถือว่าผ่านไปเลย 1 ครั้ง
-    recordPlay(villageId, 50) // ให้แต้มข้ามด่านเล็กน้อย
+    recordPlay(villageId, 50, undefined, subLevelId) // ให้แต้มข้ามด่านเล็กน้อย
 
     // เช็คภารกิจรายวัน: ถ้าใช้กุญแจข้าม ก็ให้ถือว่าทำภารกิจโหมดนั้นเสร็จด้วย
     const modes = ['management', 'calculation', 'spatial']

@@ -56,8 +56,8 @@ export default function PreviousRunPreview({ villageId, onStart, onBack }: Previ
                     {hasHistory && lastRun && (
                         <>
                             {/* Best Score */}
-                            <div className="flex items-center justify-between bg-amber-50 border-2 border-amber-200 rounded-2xl p-4">
-                                <span className="text-sm font-black text-amber-700">🏆 คะแนนสูงสุด</span>
+                            <div className="flex items-center justify-between bg-amber-100/50 border-2 border-amber-300 rounded-2xl p-4">
+                                <span className="text-sm font-black text-amber-800">🏆 คะแนนสูงสุด</span>
                                 <span className="text-2xl font-black text-amber-600 tabular-nums">{bestScore.toLocaleString()}</span>
                             </div>
 

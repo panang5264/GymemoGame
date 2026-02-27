@@ -23,10 +23,15 @@ export default function Home() {
     if (p.userName) {
       setName(p.userName)
       setStats(p)
+      // If intro already seen, go directly to world
+      if (p.introSeen) {
+        router.replace('/world')
+        return
+      }
       setPhase('profile')
     }
     setIsReady(true)
-  }, [])
+  }, [router])
 
   if (!isReady) return null
 
@@ -46,7 +51,12 @@ export default function Home() {
   }
 
   const nextPhase = () => {
-    if (phase === 'profile') setPhase('intro')
+    if (phase === 'profile') {
+      const p = loadProgress()
+      p.introSeen = true
+      saveProgress(p)
+      router.push('/world')
+    }
     else if (phase === 'intro') setPhase('grandmother')
     else if (phase === 'grandmother') setPhase('tutorial_summary')
     else if (phase === 'tutorial_summary') {

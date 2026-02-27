@@ -26,13 +26,16 @@ function VillagePageInner({ params }: { params: Promise<{ villageId: string }> }
   const [playsCompleted, setPlaysCompleted] = useState(0)
   const [unlocked, setUnlocked] = useState(false)
   const [currentKeys, setCurrentKeys] = useState(MAX_KEYS)
+  const [subLevelScores, setSubLevelScores] = useState<Record<number, number>>({})
   const [showSummary, setShowSummary] = useState(false)
+  const [subLevelModal, setSubLevelModal] = useState<{ subId: number; score: number } | null>(null)
   const searchParams = useSearchParams()
 
   useEffect(() => {
     if (!isValid) return
     const vp = getVillageProgress(villageId)
     setPlaysCompleted(vp.playsCompleted)
+    setSubLevelScores(vp.subLevelScores || {})
     setUnlocked(isVillageUnlocked(villageId))
     const { currentKeys: ck } = getKeys()
     setCurrentKeys(ck)
@@ -163,21 +166,34 @@ function VillagePageInner({ params }: { params: Promise<{ villageId: string }> }
             const isChest = node.type === 'chest'
             const currentSubId = (playsCompleted % 12) + 1
             const loops = Math.floor(playsCompleted / 12)
+            const isPassed = loops > 0 || node.id < currentSubId
             const isUnlocked = loops > 0 || node.id <= currentSubId
             const isCurrent = node.id === currentSubId
+            const score = subLevelScores[node.id]
 
             return (
               <div
                 key={node.id}
                 onClick={() => {
+                  if (isPassed && !isChest) {
+                    setSubLevelModal({ subId: node.id, score: score || 0 })
+                    return
+                  }
+                  if (isChest && isPassed) {
+                    return // Chest passed can't click again
+                  }
                   if (isUnlocked) handlePlay(node.id)
                 }}
                 className={`absolute w-12 h-12 md:w-16 md:h-16 flex items-center justify-center cursor-pointer transition-all duration-300 z-10 
                   ${!isUnlocked
                     ? 'bg-slate-300 opacity-50 grayscale cursor-not-allowed'
-                    : isCurrent
-                      ? 'bg-white scale-125 z-20 shadow-[0_0_20px_rgba(255,255,255,0.8)]'
-                      : 'bg-[var(--card-bg)] hover:scale-110 active:scale-95'
+                    : (isChest && isPassed)
+                      ? 'bg-green-100 opacity-80 cursor-default'
+                      : isCurrent
+                        ? 'bg-white scale-125 z-20 shadow-[0_0_20px_rgba(255,255,255,0.8)]'
+                        : isPassed
+                          ? 'bg-blue-50 hover:scale-110 active:scale-95'
+                          : 'bg-[var(--card-bg)] hover:scale-110 active:scale-95'
                   } 
                   border-3 border-[var(--border-dark)] rounded-2xl shadow-[4px_4px_0_var(--border-dark)]
                 `}
@@ -189,8 +205,13 @@ function VillagePageInner({ params }: { params: Promise<{ villageId: string }> }
                 title={!isUnlocked ? '🔒 ยังไม่ถึงด่านนี้' : `ด่านที่ ${node.id}`}
               >
                 <div className="text-2xl md:text-3xl">
-                  {!isUnlocked ? '🔒' : isChest ? '🎁' : '⭐'}
+                  {!isUnlocked ? '🔒' : (isChest && isPassed) ? '✅' : isChest ? '🎁' : isPassed ? '✅' : '⭐'}
                 </div>
+                {isPassed && !isChest && score !== undefined && (
+                  <div className="absolute -top-2 -left-2 bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black border-2 border-white shadow-sm z-30">
+                    {score}
+                  </div>
+                )}
                 {isCurrent && (
                   <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[var(--border-dark)] animate-ping" />
                 )}
@@ -199,6 +220,27 @@ function VillagePageInner({ params }: { params: Promise<{ villageId: string }> }
           })}
         </div>
       </div>
+
+      {/* Sub-level Score Modal */}
+      {subLevelModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-white rounded-[3rem] p-8 max-w-sm w-full border-4 border-[var(--border-dark)] shadow-[8px_8px_0_var(--border-dark)] animate-in zoom-in text-center">
+            <div className="text-6xl mb-4">🏆</div>
+            <h2 className="text-2xl font-black text-[var(--text-main)] mb-2">ด่านที่ {subLevelModal.subId}</h2>
+            <p className="text-[var(--text-muted)] font-bold mb-6 italic">คะแนนที่คุณทำได้</p>
+            <div className="bg-[var(--bg-warm)] border-3 border-[var(--border-dark)] py-4 rounded-2xl mb-8 flex flex-col items-center">
+              <span className="text-4xl font-black text-blue-600">{subLevelModal.score}</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mt-1">Points</span>
+            </div>
+            <button
+              onClick={() => setSubLevelModal(null)}
+              className="w-full py-4 bg-[var(--border-dark)] text-white rounded-2xl font-black text-xl hover:scale-105 active:scale-95 transition-all"
+            >
+              รับทราบ ✨
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

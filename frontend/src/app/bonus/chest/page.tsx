@@ -37,7 +37,7 @@ function ChestGameInner() {
         }
 
         // Record play once to mark level completion and add score
-        recordPlay(villageId, scoreBase)
+        recordPlay(villageId, scoreBase, undefined, subId)
         setOpened(true)
     }
 

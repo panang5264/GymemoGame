@@ -129,14 +129,14 @@ export default function Page() {
   useEffect(() => {
     if (isComplete) {
       if (mode === 'village') {
-        recordPlay(villageId, 100, 'spatial')
+        recordPlay(villageId, 100, 'spatial', subId)
       } else if (mode === 'daily') {
         const dateKey = new Date().toISOString().split('T')[0]
         localStorage.setItem(`gymemo_spatial_daily_${dateKey}`, JSON.stringify({ score: 100 }))
         markDailyMode(dateKey, 'spatial')
       }
     }
-  }, [isComplete, mode, villageId])
+  }, [isComplete, mode, villageId, subId])
 
   // ── Cheat Mode ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -149,13 +149,16 @@ export default function Page() {
 
   if (phase === 'intro' && levelParam === 1) {
     return (
-      <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4">
+      <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4 font-['Supermarket']">
         <div className="max-w-md w-full bg-white rounded-[40px] p-10 shadow-2xl border border-slate-100 text-center animate-in zoom-in">
           <div className="text-9xl mb-8 animate-bounce">🗺️</div>
-          <h2 className="text-3xl font-black text-slate-800 mb-2 uppercase tracking-tighter">มิติจำลอง</h2>
-          <p className="text-slate-500 font-bold mb-10 text-lg">{diffDesc}</p>
+          <h2 className="text-3xl font-black text-slate-800 mb-4 uppercase tracking-tighter">มิติจำลอง</h2>
+          <p className="text-slate-500 font-bold mb-12 text-lg">{diffDesc}</p>
           <button
-            onClick={() => setPhase('clock')}
+            onClick={() => {
+              if (mode === 'village') setPhase('play')
+              else setPhase('clock')
+            }}
             className="w-full py-5 bg-indigo-600 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95"
           >
             เริ่มเลย! 🚀
@@ -176,7 +179,7 @@ export default function Page() {
   }
 
   return (
-    <div className='min-h-[calc(100vh-140px)] py-6 flex flex-col items-center relative overflow-hidden'>
+    <div className="min-h-[calc(100vh-140px)] py-6 flex flex-col items-center relative overflow-hidden font-['Supermarket']">
 
       <div className="max-w-4xl w-full px-4 relative z-10">
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 mb-8">
@@ -191,7 +194,7 @@ export default function Page() {
         {isComplete ? (
           <div className="bg-white/95 backdrop-blur-md border-2 border-white/20 p-12 rounded-[3.5rem] shadow-2xl text-center max-w-xl mx-auto animate-in zoom-in duration-500">
             <div className="text-8xl mb-6">🎯</div>
-            <h2 className="text-3xl font-black text-slate-800 mb-4">ประเมินผล: <span className="text-blue-600 underline">ดี</span></h2>
+            <h2 className="text-4xl font-black text-slate-800 mb-4">คะแนนที่ทำได้</h2>
             <p className="text-slate-500 mb-10 text-lg">คุณผ่านความท้าทายนี้ได้อย่างยอดเยี่ยม!</p>
             <div className="grid grid-cols-1 gap-4">
               {mode === 'daily' ? (

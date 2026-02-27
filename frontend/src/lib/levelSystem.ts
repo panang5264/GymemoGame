@@ -11,6 +11,7 @@ export interface VillageRunRecord {
   calculationScore: number
   spatialScore: number
   completedAt: number // timestamp
+  subLevelScores?: Record<number, number>
 }
 
 export interface VillageProgress {
@@ -23,6 +24,7 @@ export interface VillageProgress {
     calculation: number
     spatial: number
   }
+  subLevelScores?: Record<number, number>
 }
 
 interface KeyState {
@@ -80,7 +82,12 @@ export function getVillageProgress(villageId: number): VillageProgress {
   return p.villages[String(villageId)] ?? { playsCompleted: 0, expTubeFilled: false }
 }
 
-export function recordPlay(villageId: number, scoreGained: number, gameType?: 'management' | 'calculation' | 'spatial'): GymemoProgressV2 {
+export function recordPlay(
+  villageId: number,
+  scoreGained: number,
+  gameType?: 'management' | 'calculation' | 'spatial',
+  subId?: number
+): GymemoProgressV2 {
   const p = loadProgress()
   const key = String(villageId)
   const vp = p.villages[key] ?? { playsCompleted: 0, expTubeFilled: false }
@@ -94,8 +101,27 @@ export function recordPlay(villageId: number, scoreGained: number, gameType?: 'm
     vp.currentRunScore = current
   }
 
+  // Save sub-level score
+  if (subId) {
+    if (subId === 1 && vp.playsCompleted % PLAYS_PER_VILLAGE === 0) {
+      vp.subLevelScores = {}
+    }
+    const scores = vp.subLevelScores ?? {}
+    scores[subId] = scoreGained
+    vp.subLevelScores = scores
+  }
+
   // Preserve extended fields when updating village progress
   p.villages[key] = { ...vp, playsCompleted: newPlays, expTubeFilled: tubeFilled }
+
+  // Special logic: if this was the last level (12), we might want to archive later, 
+  // but for now let's just keep the scores until the next run starts.
+  // Actually, if playsCompleted reached a multiple of 12, it's the end of a run.
+  if (newPlays % PLAYS_PER_VILLAGE === 0 && newPlays > 0) {
+    // End of run - but we might want to keep subLevelScores for the summary view
+    // until the user starts a new sub-level in the next run.
+  }
+
   p.totalScore += scoreGained
 
   if (tubeFilled && villageId < 10 && !p.unlockedVillages.includes(villageId + 1)) {
@@ -129,7 +155,8 @@ export function recordVillageRun(
     managementScore: scores.management,
     calculationScore: scores.calculation,
     spatialScore: scores.spatial,
-    completedAt: Date.now()
+    completedAt: Date.now(),
+    subLevelScores: vp.subLevelScores
   }
   vp.runHistory = [...(vp.runHistory ?? []).slice(-4), newRecord] // Keep last 5 runs
   if (!vp.bestScore || total > vp.bestScore) vp.bestScore = total

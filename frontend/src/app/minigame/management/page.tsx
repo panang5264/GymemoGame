@@ -392,7 +392,7 @@ function ManagementGameInner() {
         return newCount
       })
     } else {
-      if (levelParam === 1) setScore(s => s - 1)
+      setScore(s => s - 1)
       setFeedback({ type: 'wrong', message: '❌ ผิดหมวด!' })
     }
     setActivePool(prev => prev.filter(i => i.id !== itemId))
@@ -541,19 +541,19 @@ function ManagementGameInner() {
   // Persistence
   useEffect(() => {
     if (phase === 'done') {
-      if (modeParam === 'village') recordPlay(villageId, score, 'management')
+      if (modeParam === 'village') recordPlay(villageId, score, 'management', subId)
       else if (modeParam === 'daily') {
         const dk = new Date().toISOString().split('T')[0]
         localStorage.setItem(`gymemo_mgmt_daily_${dk}`, JSON.stringify({ score }))
         markDailyMode(dk, 'management')
       }
     }
-  }, [phase, modeParam, villageId, score])
+  }, [phase, modeParam, villageId, score, subId])
 
   // ─── Render Components ──────────────────────────────────────────────────────
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 selection:bg-indigo-100 h-full w-full">
+    <div className="flex flex-col items-center justify-center p-4 selection:bg-indigo-100 h-full w-full font-['Supermarket']">
       <div className="w-full max-w-5xl bg-white rounded-[32px] md:rounded-[40px] shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-140px)] min-h-[550px] max-h-[850px] relative border border-slate-100">
 
         {/* Header Bar */}
@@ -590,11 +590,11 @@ function ManagementGameInner() {
                 <div className="text-9xl mb-8 animate-bounce">
                   {levelParam <= 3 ? '📦' : levelParam <= 5 ? '🍳' : levelParam <= 9 ? '🧭' : '📝'}
                 </div>
-                <h3 className="text-2xl font-black text-slate-800 mb-2 uppercase tracking-tighter">Level {levelParam}</h3>
-                <p className="text-slate-500 font-bold mb-10 text-lg">{config.instruction}</p>
+                <h3 className="text-2xl font-black text-slate-800 mb-4 uppercase tracking-tighter">Level {levelParam}</h3>
+                <p className="text-slate-500 font-bold mb-12 text-lg">{config.instruction}</p>
                 <button
                   onClick={() => {
-                    if (levelParam === 1) setPhase('clock')
+                    if (levelParam === 1 && modeParam !== 'village') setPhase('clock')
                     else setPhase('play')
                   }}
                   className="w-full py-5 bg-slate-800 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95"
@@ -620,10 +620,8 @@ function ManagementGameInner() {
                   <div className="absolute inset-0 bg-yellow-400 blur-3xl opacity-20 animate-pulse" />
                   <div className="text-8xl relative drop-shadow-2xl">🎯</div>
                 </div>
-                <h3 className="text-3xl font-black text-slate-800 mb-1 tracking-tight">
-                  ประเมินผล: <span className="text-indigo-600 underline">
-                    {score >= 100 ? 'ดี' : score >= 70 ? 'โอเค' : score >= 50 ? 'ไม่แย่' : 'อาจจะไม่ดี'}
-                  </span>
+                <h3 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">
+                  คะแนนที่ทำได้
                 </h3>
                 <p className="text-slate-400 font-bold mb-8 uppercase tracking-[0.2em] text-[10px]">เลเวล {levelParam} — คะแนนสะสม {score}</p>
                 <div className="flex flex-col gap-3">

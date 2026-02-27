@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const subLevelSchema = new mongoose.Schema({
   subLevelId: { type: Number, required: true },
   completed: { type: Boolean, default: false },
+  score: { type: Number, default: 0 },
 })
 
 const villageProgressSchema = new mongoose.Schema({

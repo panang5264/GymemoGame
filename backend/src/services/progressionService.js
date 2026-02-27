@@ -31,7 +31,7 @@ async function getProgression(guestId) {
   return { progress, keys: keyState.keys }
 }
 
-async function completeSubLevel(guestId, villageId, subLevelId) {
+async function completeSubLevel(guestId, villageId, subLevelId, score = 0) {
   const progress = await getOrCreateProgress(guestId)
 
   // Only allow playing in the current village
@@ -47,9 +47,12 @@ async function completeSubLevel(guestId, villageId, subLevelId) {
 
   let sub = village.subLevels.find((s) => s.subLevelId === subLevelId)
   if (!sub) {
-    village.subLevels.push({ subLevelId, completed: true })
+    village.subLevels.push({ subLevelId, completed: true, score })
   } else {
     sub.completed = true
+    sub.score = Math.max(sub.score || 0, score) // Keep best score? Or update to latest? 
+    // User said "อ้างอิงตามจำนวนรอบ" (Based on rounds/runs). 
+    // For now let's just update it.
   }
 
   await progress.save()

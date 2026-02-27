@@ -72,9 +72,9 @@ function CalculationGameInner() {
   // ── Record Play for Village Mode ──────────────────────────────────────────
   useEffect(() => {
     if (phase === 'done' && mode === 'village' && villageId) {
-      recordPlay(parseInt(villageId, 10), score * 25, 'calculation')
+      recordPlay(parseInt(villageId, 10), score * 25, 'calculation', subId)
     }
-  }, [phase, mode, villageId, score])
+  }, [phase, mode, villageId, score, subId])
 
   useEffect(() => {
     if (phase === 'done' && mode === 'daily') {
@@ -88,7 +88,7 @@ function CalculationGameInner() {
 
   // ── Start game ────────────────────────────────────────────────────────────
   const startGame = useCallback(() => {
-    if (levelParam === 1) {
+    if (levelParam === 1 && mode !== 'village') {
       setPhase('clock')
     } else {
       setPhase('countdown')
@@ -159,16 +159,16 @@ function CalculationGameInner() {
 
         <div className="bg-white/95 backdrop-blur-md border border-white/20 p-6 md:p-10 rounded-[2.5rem] shadow-2xl max-w-lg w-full text-center animate-in zoom-in duration-500">
           <div className="text-6xl md:text-7xl mb-6">🧮</div>
-          <h2 className="text-xl md:text-2xl font-black mb-2 text-slate-800">ระดับ {level.level}: {level.name}</h2>
-          <p className="text-slate-500 mb-8 text-base md:text-lg px-2">{level.description}</p>
+          <h2 className="text-xl md:text-2xl font-black mb-4 text-slate-800">ระดับ {level.level}: {level.name}</h2>
+          <p className="text-slate-500 mb-10 text-base md:text-lg px-2">{level.description}</p>
 
-          <div className={`${level.level === 10 ? 'bg-amber-50 border-amber-200' : 'bg-blue-50/50 border-blue-100/50'} p-5 rounded-3xl mb-10 border-2 border-dashed`}>
+          <div className={`${level.level === 10 ? 'bg-amber-100 border-amber-300' : 'bg-blue-50/50 border-blue-100/50'} p-5 rounded-3xl mb-10 border-2 border-dashed`}>
             <p className="text-slate-600 font-bold flex items-center justify-center gap-2">
               <span className={`text-2xl ${level.level === 10 ? 'animate-bounce' : ''}`}>⏱️</span>
               <span>
                 <span className={`${level.level === 10 ? 'text-amber-600' : 'text-blue-600'} font-black`}>ภารกิจ:</span> {level.level === 10 ? 'ระวังตัวกวน! ' : ''}ตอบให้ได้มากที่สุดใน <span className="text-slate-900 font-black">1 นาที</span>
               </span>
-              {mode === 'daily' && <span className="px-2 py-1 bg-yellow-400 text-yellow-900 rounded-lg text-xs font-black shrink-0">🌟 DAILY</span>}
+              {mode === 'daily' && <span className="px-2 py-1 bg-yellow-400 text-yellow-950 rounded-lg text-xs font-black shrink-0 shadow-[2px_2px_0_#000] border border-black/10">🌟 DAILY</span>}
             </p>
           </div>
 
@@ -214,7 +214,7 @@ function CalculationGameInner() {
   // ── Render: play ──────────────────────────────────────────────────────────
   if (phase === 'play' && question) {
     return (
-      <div className="min-h-[calc(100vh-140px)] flex flex-col items-center p-4">
+      <div className="min-h-[calc(100vh-140px)] flex flex-col items-center p-4 font-['Supermarket']">
         {/* Responsive Header */}
         <div className="w-full max-w-3xl flex justify-between items-center mb-6 mt-2 md:mt-8 px-2 md:px-0">
           <div className="flex items-center gap-3">
@@ -373,7 +373,7 @@ function CalculationGameInner() {
     else if (pct >= 50) evaluation = "ไม่แย่"
 
     return (
-      <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4">
+      <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4 font-['Supermarket']">
         <div className="bg-white/90 backdrop-blur-xl border border-white/20 p-8 md:p-12 rounded-[3rem] shadow-2xl max-w-sm md:max-w-md w-full text-center animate-in zoom-in duration-500">
           <div className="text-7xl md:text-8xl mb-6">🎯</div>
           <p className="text-slate-500 font-bold mb-8 italic text-sm">แม่นยำ {pct}%</p>

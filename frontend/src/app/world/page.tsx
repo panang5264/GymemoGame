@@ -48,10 +48,11 @@ function formatCountdown(ms: number): string {
 
 function getStageState(
   stage: number,
-  unlockedVillages: number[]
+  unlockedVillages: number[],
+  exp: number
 ): 'completed' | 'current' | 'locked' {
   if (!unlockedVillages.includes(stage)) return 'locked'
-  // "current" = highest unlocked stage that isn't exp-tube-filled
+  if (exp >= 100) return 'completed'
   const maxUnlocked = Math.max(...unlockedVillages)
   if (stage === maxUnlocked) return 'current'
   return 'completed'
@@ -241,7 +242,7 @@ export default function WorldPage() {
               <p className="text-xs font-black text-black/40 uppercase tracking-[0.2em] mb-3">Our Mission Objective</p>
               <p className="text-2xl font-black text-black leading-tight">
                 สะสม <span className="text-orange-500 underline decoration-4 underline-offset-4">EXP</span> ในแต่ละหมู่บ้านให้เต็มเพื่อปลดล็อกพื้นที่ถัดไป <br className="hidden md:block" />
-                และภารกิจสำคัญคือ <span className="bg-yellow-200 px-2 py-1 rounded-lg">กู้คืนความทรงจำที่หายไป</span> กลับคืนมา!
+                และภารกิจสำคัญคือ <span className="bg-yellow-300 px-2 py-0.5 rounded-lg border-2 border-yellow-400/20 shadow-sm inline-block translate-y-1">กู้คืนความทรงจำที่หายไป</span> กลับคืนมา!
               </p>
             </div>
 
@@ -333,9 +334,9 @@ export default function WorldPage() {
 
       <div className={styles.mapContainer}>
         {Array.from({ length: TOTAL_STAGES }, (_, i) => i + 1).map((stage) => {
-          const state = getStageState(stage, unlockedVillages)
-          const pos = STAGE_POSITIONS[stage - 1]
           const exp = villageExp[stage] ?? 0
+          const state = getStageState(stage, unlockedVillages, exp)
+          const pos = STAGE_POSITIONS[stage - 1]
           return (
             <button
               key={stage}
@@ -346,7 +347,7 @@ export default function WorldPage() {
             >
               <span className={styles.stageIcon}>
                 {state === 'completed'
-                  ? (stage === 10 ? '🏆' : '⭐')
+                  ? '⭐'
                   : state === 'current' ? '▶' : '🔒'}
               </span>
               <span className={styles.stageLabel}>ด่าน {stage}</span>

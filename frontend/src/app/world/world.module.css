@@ -69,12 +69,33 @@
   margin: 0 auto;
   height: 600px;
   background-color: #e5e2d5;
-  background-image: radial-gradient(rgba(18, 18, 18, 0.05) 1px, transparent 1px);
-  background-size: 32px 32px;
+  background-image:
+    /* Placeholder Map Image - replace world-map.png with your actual map file */
+    url('/world-map.png'),
+    radial-gradient(rgba(18, 18, 18, 0.05) 1px, transparent 1px);
+  background-size: cover, 32px 32px;
+  background-position: center;
+  background-blend-mode: overlay;
   border-radius: 4rem;
   border: 4px solid var(--border-dark);
   box-shadow: 15px 15px 0 rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  position: relative;
+}
+
+/* Background Placeholder overlay when image is missing */
+.mapContainer::before {
+  content: "WORLD MAP AREA";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  font-weight: 900;
+  color: rgba(0, 0, 0, 0.03);
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* Stage nodes */
