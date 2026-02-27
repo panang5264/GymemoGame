@@ -541,7 +541,7 @@ function ManagementGameInner() {
   // Persistence
   useEffect(() => {
     if (phase === 'done') {
-      if (modeParam === 'village') recordPlay(villageId, score)
+      if (modeParam === 'village') recordPlay(villageId, score, 'management')
       else if (modeParam === 'daily') {
         const dk = new Date().toISOString().split('T')[0]
         localStorage.setItem(`gymemo_mgmt_daily_${dk}`, JSON.stringify({ score }))
@@ -645,7 +645,7 @@ function ManagementGameInner() {
                         </button>
                       ) : null}
                       <button
-                        onClick={() => router.push(`/world/${villageId}`)}
+                        onClick={() => router.push(`/world/${villageId}?showSummary=1`)}
                         className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-[24px] font-black text-lg transition-all"
                       >
                         กลับสู่แผนที่ 🗺️

@@ -72,7 +72,7 @@ function CalculationGameInner() {
   // ── Record Play for Village Mode ──────────────────────────────────────────
   useEffect(() => {
     if (phase === 'done' && mode === 'village' && villageId) {
-      recordPlay(parseInt(villageId, 10), score * 25)
+      recordPlay(parseInt(villageId, 10), score * 25, 'calculation')
     }
   }, [phase, mode, villageId, score])
 
@@ -405,7 +405,7 @@ function CalculationGameInner() {
                     หมู่บ้านต่อไป 🏘️
                   </Link>
                 ) : null}
-                <Link href={`/world/${villageId}`} className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-[1.5rem] font-black text-lg transition-all text-center">
+                <Link href={`/world/${villageId}?showSummary=1`} className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-[1.5rem] font-black text-lg transition-all text-center">
                   กลับสู่แผนที่ 🗺️
                 </Link>
               </>

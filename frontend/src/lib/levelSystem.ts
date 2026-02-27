@@ -4,9 +4,25 @@ export const PLAYS_PER_VILLAGE = 12
 export const MAX_KEYS = 9
 export const REGEN_INTERVAL_MS = 30 * 60 * 1000
 
-interface VillageProgress {
+export interface VillageRunRecord {
+  runNumber: number
+  totalScore: number
+  managementScore: number
+  calculationScore: number
+  spatialScore: number
+  completedAt: number // timestamp
+}
+
+export interface VillageProgress {
   playsCompleted: number
   expTubeFilled: boolean
+  bestScore?: number
+  runHistory?: VillageRunRecord[]
+  currentRunScore?: {
+    management: number
+    calculation: number
+    spatial: number
+  }
 }
 
 interface KeyState {
@@ -64,14 +80,24 @@ export function getVillageProgress(villageId: number): VillageProgress {
   return p.villages[String(villageId)] ?? { playsCompleted: 0, expTubeFilled: false }
 }
 
-export function recordPlay(villageId: number, scoreGained: number): GymemoProgressV2 {
+export function recordPlay(villageId: number, scoreGained: number, gameType?: 'management' | 'calculation' | 'spatial'): GymemoProgressV2 {
   const p = loadProgress()
   const key = String(villageId)
   const vp = p.villages[key] ?? { playsCompleted: 0, expTubeFilled: false }
-  const newPlays = Math.min(vp.playsCompleted + 1, PLAYS_PER_VILLAGE)
+  const newPlays = Math.min(vp.playsCompleted + 1, PLAYS_PER_VILLAGE * 99) // allow replaying beyond max
   const tubeFilled = newPlays >= PLAYS_PER_VILLAGE
-  p.villages[key] = { playsCompleted: newPlays, expTubeFilled: tubeFilled }
+
+  // Accumulate score per game type if provided
+  if (gameType) {
+    const current = vp.currentRunScore ?? { management: 0, calculation: 0, spatial: 0 }
+    current[gameType] = Math.max(current[gameType] || 0, scoreGained)
+    vp.currentRunScore = current
+  }
+
+  // Preserve extended fields when updating village progress
+  p.villages[key] = { ...vp, playsCompleted: newPlays, expTubeFilled: tubeFilled }
   p.totalScore += scoreGained
+
   if (tubeFilled && villageId < 10 && !p.unlockedVillages.includes(villageId + 1)) {
     p.unlockedVillages = [...p.unlockedVillages, villageId + 1]
   }
@@ -82,6 +108,56 @@ export function recordPlay(villageId: number, scoreGained: number): GymemoProgre
   }
   saveProgress(p)
   return p
+}
+
+/**
+ * Records a completed village run with per-game-type scores.
+ * Call this when all 3 sub-games in a village are done.
+ */
+export function recordVillageRun(
+  villageId: number,
+  scores: { management: number; calculation: number; spatial: number }
+): void {
+  const p = loadProgress()
+  const key = String(villageId)
+  const vp = p.villages[key] ?? { playsCompleted: 0, expTubeFilled: false }
+  const total = scores.management + scores.calculation + scores.spatial
+  const runNum = ((vp.runHistory ?? []).length) + 1
+  const newRecord: VillageRunRecord = {
+    runNumber: runNum,
+    totalScore: total,
+    managementScore: scores.management,
+    calculationScore: scores.calculation,
+    spatialScore: scores.spatial,
+    completedAt: Date.now()
+  }
+  vp.runHistory = [...(vp.runHistory ?? []).slice(-4), newRecord] // Keep last 5 runs
+  if (!vp.bestScore || total > vp.bestScore) vp.bestScore = total
+  p.villages[key] = vp
+  saveProgress(p)
+}
+
+/**
+ * Accumulates score for a specific game type within the current run of a village.
+ */
+export function accumulateRunScore(
+  villageId: number,
+  gameType: 'management' | 'calculation' | 'spatial',
+  score: number
+): void {
+  const p = loadProgress()
+  const key = String(villageId)
+  const vp = p.villages[key] ?? { playsCompleted: 0, expTubeFilled: false }
+  const current = vp.currentRunScore ?? { management: 0, calculation: 0, spatial: 0 }
+  current[gameType] = Math.max(current[gameType] || 0, score)
+  vp.currentRunScore = current
+  p.villages[key] = vp
+  saveProgress(p)
+}
+
+export function getVillageRunHistory(villageId: number): VillageRunRecord[] {
+  const p = loadProgress()
+  return p.villages[String(villageId)]?.runHistory ?? []
 }
 
 export function getKeys(now?: number): { currentKeys: number; nextRegenIn: number } {

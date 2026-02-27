@@ -1,8 +1,8 @@
 'use client'
 
-import { use, useState, useEffect } from 'react'
+import { use, useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import styles from './village.module.css'
 import {
   getVillageProgress,
@@ -12,10 +12,11 @@ import {
   MAX_KEYS,
 } from '@/lib/levelSystem'
 import { getExpPercent } from '@/lib/scoring'
+import VillageSummary from '@/components/VillageSummary'
 
 const TOTAL_VILLAGES = 10
 
-export default function VillagePage({ params }: { params: Promise<{ villageId: string }> }) {
+function VillagePageInner({ params }: { params: Promise<{ villageId: string }> }) {
   const router = useRouter()
   const { villageId: villageIdStr } = use(params)
   const villageId = parseInt(villageIdStr, 10)
@@ -25,6 +26,8 @@ export default function VillagePage({ params }: { params: Promise<{ villageId: s
   const [playsCompleted, setPlaysCompleted] = useState(0)
   const [unlocked, setUnlocked] = useState(false)
   const [currentKeys, setCurrentKeys] = useState(MAX_KEYS)
+  const [showSummary, setShowSummary] = useState(false)
+  const searchParams = useSearchParams()
 
   useEffect(() => {
     if (!isValid) return
@@ -34,7 +37,11 @@ export default function VillagePage({ params }: { params: Promise<{ villageId: s
     const { currentKeys: ck } = getKeys()
     setCurrentKeys(ck)
     setMounted(true)
-  }, [isValid, villageId])
+    // If returned from a minigame with summary param, show summary modal
+    if (searchParams.get('showSummary') === '1') {
+      setShowSummary(true)
+    }
+  }, [isValid, villageId, searchParams])
 
   if (!isValid) {
     return (
@@ -75,6 +82,18 @@ export default function VillagePage({ params }: { params: Promise<{ villageId: s
   return (
     <div className={styles.villagePage}>
       <Link href="/world" className={styles.backLink}>← กลับแผนที่</Link>
+
+      {/* Village Summary Modal – shown after completing a sublevel */}
+      {showSummary && (
+        <VillageSummary
+          villageId={villageId}
+          onContinue={() => {
+            setShowSummary(false)
+            // Remove showSummary from URL cleanly
+            router.replace(`/world/${villageId}`)
+          }}
+        />
+      )}
 
       <div className={styles.card}>
         <div className={styles.cardEmoji}>🏘️</div>
@@ -181,5 +200,13 @@ export default function VillagePage({ params }: { params: Promise<{ villageId: s
         </div>
       </div>
     </div>
+  )
+}
+
+export default function VillagePage({ params }: { params: Promise<{ villageId: string }> }) {
+  return (
+    <Suspense fallback={<div className="game-page"><p className="dc-subtitle">กำลังโหลด...</p></div>}>
+      <VillagePageInner params={params} />
+    </Suspense>
   )
 }

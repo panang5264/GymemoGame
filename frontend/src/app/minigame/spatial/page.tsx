@@ -129,7 +129,7 @@ export default function Page() {
   useEffect(() => {
     if (isComplete) {
       if (mode === 'village') {
-        recordPlay(villageId, 100)
+        recordPlay(villageId, 100, 'spatial')
       } else if (mode === 'daily') {
         const dateKey = new Date().toISOString().split('T')[0]
         localStorage.setItem(`gymemo_spatial_daily_${dateKey}`, JSON.stringify({ score: 100 }))
@@ -212,7 +212,8 @@ export default function Page() {
                       หมู่บ้านถัดไป 🏘️
                     </button>
                   ) : null}
-                  <button className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-black text-lg transition-all" onClick={() => router.push(`/world/${villageId}`)}>
+                  <button className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-black text-lg transition-all" onClick={() => router.push(`/world/${villageId}?showSummary=1`)}>
+
                     กลับสู่แผนที่ 🗺️
                   </button>
                 </>

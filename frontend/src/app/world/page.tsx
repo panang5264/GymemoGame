@@ -14,6 +14,7 @@ import {
   MAX_KEYS,
 } from '@/lib/levelSystem'
 import { getExpPercent } from '@/lib/scoring'
+import PreviousRunPreview from '@/components/PreviousRunPreview'
 
 const TOTAL_STAGES = 10
 
@@ -177,48 +178,13 @@ export default function WorldPage() {
         </div>
       )}
 
-      {/* Mission Briefing Modal */}
+      {/* Previous Run Preview Modal */}
       {selectedVillage && (
-        <div className={styles.introOverlay} style={{ zIndex: 10000 }}>
-          <div className={`${styles.introCard} max-w-lg`}>
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <span className="bg-[var(--card-bg)] text-[var(--text-main)] border-2 border-[var(--border-dark)] px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">Village Mission</span>
-                <h2 className="text-4xl font-black text-[#1a1a1a] mt-2">หมู่บ้านที่ {selectedVillage}</h2>
-              </div>
-              <button onClick={() => setSelectedVillage(null)} className="text-[#1a1a1a]/20 hover:text-red-500 text-3xl font-black transition-colors">✕</button>
-            </div>
-
-            <div className="bg-white border-3 border-black rounded-[2.5rem] p-6 mb-8 shadow-[6px_6px_0_rgba(0,0,0,0.05)]">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-14 h-14 bg-[#f5e6d3] border-2 border-black rounded-2xl flex items-center justify-center text-3xl shadow-[4px_4px_0_#000]">🚩</div>
-                <div className="text-left">
-                  <div className="text-[#717171] text-xs font-black uppercase tracking-widest">Difficulty</div>
-                  <div className="text-[#1a1a1a] font-black text-lg">{selectedVillage <= 3 ? 'ระดับเริ่มต้น 🌱' : selectedVillage <= 7 ? 'ระดับกลาง ⚔️' : 'ระดับสูง 🔥'}</div>
-                </div>
-              </div>
-              <p className="text-[#717171] font-bold leading-relaxed text-left">
-                หมู่บ้านนี้ต้องการความช่วยเหลือในการจัดการทรัพยากรและการคำนวณที่แม่นยำ
-                {selectedVillage === 10 ? ' นี่คือภารกิจสุดท้ายของเรา ทุกอย่างตัดสินกันที่นี่!' : ' ยิ่งระดับสูงขึ้น โจทย์จะยิ่งท้าทายความสามารถของคุณมากขึ้น'}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                className={`${styles.navBtn} ${styles.navBtnPrimary} w-full`}
-                onClick={() => router.push(`/world/${selectedVillage}`)}
-              >
-                เข้าภารกิจ 🏹
-              </button>
-              <button
-                className={styles.navBtn}
-                onClick={() => setSelectedVillage(null)}
-              >
-                ย้อนกลับ
-              </button>
-            </div>
-          </div>
-        </div>
+        <PreviousRunPreview
+          villageId={selectedVillage}
+          onStart={() => router.push(`/world/${selectedVillage}`)}
+          onBack={() => setSelectedVillage(null)}
+        />
       )}
 
       {/* Tutorial Modal */}
