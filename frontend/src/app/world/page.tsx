@@ -116,7 +116,9 @@ export default function WorldPage() {
 
   function resetProgress() {
     const fresh = getDefaultProgress()
+    const current = loadProgress()
     fresh.introSeen = true
+    fresh.username = current.username // Preserve login state
     saveProgress(fresh)
     setUnlockedVillages(fresh.unlockedVillages)
     setVillageExp({})
