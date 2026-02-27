@@ -30,11 +30,11 @@ router.get('/:guestId', async (req, res, next) => {
 // POST /api/progression/complete
 router.post('/complete', async (req, res, next) => {
   try {
-    const { guestId, villageId, subLevelId } = req.body
+    const { guestId, villageId, subLevelId, score } = req.body
     if (!guestId || villageId == null || subLevelId == null) {
       return res.status(400).json({ success: false, message: 'กรุณาระบุ guestId, villageId, subLevelId' })
     }
-    const progress = await completeSubLevel(guestId, Number(villageId), Number(subLevelId))
+    const progress = await completeSubLevel(guestId, Number(villageId), Number(subLevelId), Number(score || 0))
     res.json({ success: true, data: progress })
   } catch (err) {
     if (err.message) {

@@ -17,9 +17,12 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { isVillage1Completed, getVillage1Progress, VILLAGE1_TOTAL_LEVELS } from '@/lib/progression'
-import { canPlayDailyChallenge, getCountdownToReset } from '@/lib/dailyChallenge'
+import { canPlayDailyChallenge, getCountdownToReset, getDateKey } from '@/lib/dailyChallenge'
+import { useProgress } from '@/contexts/ProgressContext'
+import { isDailyComplete } from '@/lib/levelSystem'
 
 export default function DailyChallengeButton() {
+  const { progress } = useProgress()
   const [village1Done, setVillage1Done] = useState(false)
   const [village1Progress, setVillage1Progress] = useState(0)
   const [canPlay, setCanPlay] = useState(false)
@@ -27,11 +30,15 @@ export default function DailyChallengeButton() {
 
   useEffect(() => {
     const update = () => {
-      const done = isVillage1Completed()
+      if (!progress) return
+
+      const done = isVillage1Completed(progress)
       setVillage1Done(done)
-      setVillage1Progress(getVillage1Progress())
+      setVillage1Progress(getVillage1Progress(progress))
+
       if (done) {
-        const available = canPlayDailyChallenge()
+        const completedToday = isDailyComplete(progress, getDateKey())
+        const available = canPlayDailyChallenge(completedToday)
         setCanPlay(available)
         if (!available) setCountdown(getCountdownToReset())
       }
@@ -40,7 +47,7 @@ export default function DailyChallengeButton() {
     // Refresh every second so countdown stays live
     const id = setInterval(update, 1000)
     return () => clearInterval(id)
-  }, [])
+  }, [progress])
 
   return (
     <section className="dc-home-section">

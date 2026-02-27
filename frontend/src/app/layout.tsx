@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { ProgressProvider } from '@/contexts/ProgressContext'
 import CheatOverlay from '@/components/CheatOverlay'
 import localFont from 'next/font/local'
 import './globals.css'
@@ -27,15 +28,17 @@ export default function RootLayout({
     <html lang="th">
       <body className={`${supermarketFont.variable}`}>
         <AuthProvider>
-          <Header />
-          <main className="main">
-            {children}
-          </main>
-          <Footer />
+          <ProgressProvider>
+            <Header />
+            <main className="main">
+              {children}
+            </main>
+            <Footer />
+            <Suspense fallback={null}>
+              <CheatOverlay />
+            </Suspense>
+          </ProgressProvider>
         </AuthProvider>
-        <Suspense fallback={null}>
-          <CheatOverlay />
-        </Suspense>
       </body>
     </html>
   )

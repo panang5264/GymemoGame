@@ -1,9 +1,10 @@
 'use client'
 
 import Image from 'next/image'
-import { useState, useEffect, use, Suspense } from 'react'
+import { useState, useEffect, use, Suspense, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { recordPlay, markDailyMode, saveDailyScore } from '@/lib/levelSystem'
+import { useProgress } from '@/contexts/ProgressContext'
+import { useLevelSystem } from '@/hooks/useLevelSystem'
 import ClockIntro from '@/components/ClockIntro'
 import { getDateKey } from '@/lib/dailyChallenge'
 
@@ -38,6 +39,8 @@ function SpatialGameInner() {
   const [feedback, setFeedback] = useState<{ type: 'correct' | 'wrong', message: string } | null>(null)
   const [questionText, setQuestionText] = useState<string>('')
   const [isGameOver, setIsGameOver] = useState(false)
+  const [errorCount, setErrorCount] = useState(0)
+  const [startTime] = useState(Date.now())
 
   const isComplete = isGameOver
 
@@ -49,7 +52,10 @@ function SpatialGameInner() {
     displayGrid?: string[][];
   } | null>(null)
 
+  const hasSavedRef = useRef(false)
+
   useEffect(() => {
+    hasSavedRef.current = false
     let mode: 'match' | 'select' | 'find' = 'match'
     setFeedback(null)
     setIsGameOver(false)
@@ -127,17 +133,51 @@ function SpatialGameInner() {
     }
   }, [levelParam, subId])
 
+  const { progress, saveProgress } = useProgress()
+  const { recordPlay } = useLevelSystem()
+
   useEffect(() => {
-    if (isComplete) {
+    let active = true
+    if (isComplete && !hasSavedRef.current) {
+      hasSavedRef.current = true
       if (mode === 'village') {
-        recordPlay(villageId, 100)
+        const accuracy = errorCount === 0 ? 100 : Math.max(0, 100 - (errorCount * 25))
+        const duration = (Date.now() - startTime) / 1000
+        recordPlay(villageId, 100, 'spatial', subId, accuracy, duration)
       } else if (mode === 'daily') {
         const dateKey = getDateKey()
-        localStorage.setItem(`gymemo_spatial_daily_${dateKey}`, JSON.stringify({ score: 100 }))
-        markDailyMode(dateKey, 'spatial')
+
+        if (progress && active) {
+          import('@/lib/levelSystem').then(({ saveDailyScore: rawSaveDailyScore, markDailyMode: rawMarkDailyMode }) => {
+            let nextP = { ...progress }
+            nextP = rawSaveDailyScore(nextP, dateKey, 'spatial', 100)
+            nextP = rawMarkDailyMode(nextP, dateKey, 'spatial')
+            saveProgress(nextP)
+          })
+        }
+
+        if (progress?.guestId && active) {
+          const accuracy = errorCount === 0 ? 100 : Math.max(0, 100 - (errorCount * 25))
+          const duration = (Date.now() - startTime) / 1000
+          const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
+          fetch(`${API_BASE_URL}/api/analysis/record`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              guestId: progress.guestId,
+              gameType: 'spatial',
+              level: 0,
+              subLevelId: 0,
+              score: 100,
+              accuracy,
+              timeTaken: duration
+            })
+          }).catch(err => console.error('Failed to log daily analytics:', err))
+        }
       }
     }
-  }, [isComplete, mode, villageId])
+    return () => { active = false }
+  }, [isComplete, mode, villageId, subId, errorCount, startTime, progress, saveProgress])
 
   // ── Cheat Mode ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -150,13 +190,16 @@ function SpatialGameInner() {
 
   if (phase === 'intro' && levelParam === 1) {
     return (
-      <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4">
+      <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4 font-['Supermarket']">
         <div className="max-w-md w-full bg-white rounded-[40px] p-10 shadow-2xl border border-slate-100 text-center animate-in zoom-in">
           <div className="text-9xl mb-8 animate-bounce">🗺️</div>
-          <h2 className="text-3xl font-black text-slate-800 mb-2 uppercase tracking-tighter">มิติจำลอง</h2>
-          <p className="text-slate-500 font-bold mb-10 text-lg">{diffDesc}</p>
+          <h2 className="text-3xl font-black text-slate-800 mb-4 uppercase tracking-tighter">มิติจำลอง</h2>
+          <p className="text-slate-500 font-bold mb-12 text-lg">{diffDesc}</p>
           <button
-            onClick={() => setPhase('clock')}
+            onClick={() => {
+              if (mode === 'village') setPhase('play')
+              else setPhase('clock')
+            }}
             className="w-full py-5 bg-indigo-600 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95"
           >
             เริ่มเลย! 🚀
@@ -177,7 +220,7 @@ function SpatialGameInner() {
   }
 
   return (
-    <div className='min-h-[calc(100vh-140px)] py-6 flex flex-col items-center relative overflow-hidden'>
+    <div className="min-h-[calc(100vh-140px)] py-6 flex flex-col items-center relative overflow-hidden font-['Supermarket']">
 
       <div className="max-w-4xl w-full px-4 relative z-10">
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 mb-8">
@@ -192,7 +235,7 @@ function SpatialGameInner() {
         {isComplete ? (
           <div className="bg-white/95 backdrop-blur-md border-2 border-white/20 p-12 rounded-[3.5rem] shadow-2xl text-center max-w-xl mx-auto animate-in zoom-in duration-500">
             <div className="text-8xl mb-6">🎯</div>
-            <h2 className="text-3xl font-black text-slate-800 mb-4">ประเมินผล: <span className="text-blue-600 underline">ดี</span></h2>
+            <h2 className="text-4xl font-black text-slate-800 mb-4">คะแนนที่ทำได้</h2>
             <p className="text-slate-500 mb-10 text-lg">คุณผ่านความท้าทายนี้ได้อย่างยอดเยี่ยม!</p>
             <div className="grid grid-cols-1 gap-4">
               {mode === 'daily' ? (
@@ -213,7 +256,8 @@ function SpatialGameInner() {
                       หมู่บ้านถัดไป 🏘️
                     </button>
                   ) : null}
-                  <button className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-black text-lg transition-all" onClick={() => router.push(`/world/${villageId}`)}>
+                  <button className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-black text-lg transition-all" onClick={() => router.push(`/world/${villageId}?showSummary=1`)}>
+
                     กลับสู่แผนที่ 🗺️
                   </button>
                 </>
@@ -282,6 +326,7 @@ function SpatialGameInner() {
                           setFeedback({ type: 'correct', message: '✨ ถูกต้องแล้ว! เก่งมาก' })
                           setTimeout(() => setIsGameOver(true), 1200)
                         } else {
+                          setErrorCount(e => e + 1)
                           setFeedback({ type: 'wrong', message: '❌ ยังไม่ใช่นะ ลองดูอีกที' })
                           setTimeout(() => setFeedback(null), 1000)
                         }

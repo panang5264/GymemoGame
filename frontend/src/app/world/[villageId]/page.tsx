@@ -1,8 +1,8 @@
 'use client'
 
-import { use, useState, useEffect } from 'react'
+import { use, useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import styles from './village.module.css'
 import {
   getVillageProgress,
@@ -12,10 +12,12 @@ import {
   MAX_KEYS,
 } from '@/lib/levelSystem'
 import { getExpPercent } from '@/lib/scoring'
+import VillageSummary from '@/components/VillageSummary'
+import { useProgress } from '@/contexts/ProgressContext'
 
 const TOTAL_VILLAGES = 10
 
-export default function VillagePage({ params }: { params: Promise<{ villageId: string }> }) {
+function VillagePageInner({ params }: { params: Promise<{ villageId: string }> }) {
   const router = useRouter()
   const { villageId: villageIdStr } = use(params)
   const villageId = parseInt(villageIdStr, 10)
@@ -25,16 +27,26 @@ export default function VillagePage({ params }: { params: Promise<{ villageId: s
   const [playsCompleted, setPlaysCompleted] = useState(0)
   const [unlocked, setUnlocked] = useState(false)
   const [currentKeys, setCurrentKeys] = useState(MAX_KEYS)
+  const [subLevelScores, setSubLevelScores] = useState<Record<number, number>>({})
+  const [showSummary, setShowSummary] = useState(false)
+  const [subLevelModal, setSubLevelModal] = useState<{ subId: number; score: number } | null>(null)
+  const searchParams = useSearchParams()
+  const { progress, isLoading } = useProgress()
 
   useEffect(() => {
-    if (!isValid) return
-    const vp = getVillageProgress(villageId)
+    if (!isValid || isLoading || !progress) return
+    const vp = getVillageProgress(progress, villageId)
     setPlaysCompleted(vp.playsCompleted)
-    setUnlocked(isVillageUnlocked(villageId))
-    const { currentKeys: ck } = getKeys()
+    setSubLevelScores(vp.subLevelScores || {})
+    setUnlocked(isVillageUnlocked(progress, villageId))
+    const { currentKeys: ck } = getKeys(progress)
     setCurrentKeys(ck)
     setMounted(true)
-  }, [isValid, villageId])
+    // If returned from a minigame with summary param, show summary modal
+    if (searchParams.get('showSummary') === '1') {
+      setShowSummary(true)
+    }
+  }, [isValid, villageId, searchParams, progress, isLoading])
 
   if (!isValid) {
     return (
@@ -75,6 +87,18 @@ export default function VillagePage({ params }: { params: Promise<{ villageId: s
   return (
     <div className={styles.villagePage}>
       <Link href="/world" className={styles.backLink}>← กลับแผนที่</Link>
+
+      {/* Village Summary Modal – shown after completing a sublevel */}
+      {showSummary && (
+        <VillageSummary
+          villageId={villageId}
+          onContinue={() => {
+            setShowSummary(false)
+            // Remove showSummary from URL cleanly
+            router.replace(`/world/${villageId}`)
+          }}
+        />
+      )}
 
       <div className={styles.card}>
         <div className={styles.cardEmoji}>🏘️</div>
@@ -144,21 +168,34 @@ export default function VillagePage({ params }: { params: Promise<{ villageId: s
             const isChest = node.type === 'chest'
             const currentSubId = (playsCompleted % 12) + 1
             const loops = Math.floor(playsCompleted / 12)
+            const isPassed = loops > 0 || node.id < currentSubId
             const isUnlocked = loops > 0 || node.id <= currentSubId
             const isCurrent = node.id === currentSubId
+            const score = subLevelScores[node.id]
 
             return (
               <div
                 key={node.id}
                 onClick={() => {
+                  if (isPassed && !isChest) {
+                    setSubLevelModal({ subId: node.id, score: score || 0 })
+                    return
+                  }
+                  if (isChest && isPassed) {
+                    return // Chest passed can't click again
+                  }
                   if (isUnlocked) handlePlay(node.id)
                 }}
                 className={`absolute w-12 h-12 md:w-16 md:h-16 flex items-center justify-center cursor-pointer transition-all duration-300 z-10 
                   ${!isUnlocked
                     ? 'bg-slate-300 opacity-50 grayscale cursor-not-allowed'
-                    : isCurrent
-                      ? 'bg-white scale-125 z-20 shadow-[0_0_20px_rgba(255,255,255,0.8)]'
-                      : 'bg-[var(--card-bg)] hover:scale-110 active:scale-95'
+                    : (isChest && isPassed)
+                      ? 'bg-green-100 opacity-80 cursor-default'
+                      : isCurrent
+                        ? 'bg-white scale-125 z-20 shadow-[0_0_20px_rgba(255,255,255,0.8)]'
+                        : isPassed
+                          ? 'bg-blue-50 hover:scale-110 active:scale-95'
+                          : 'bg-[var(--card-bg)] hover:scale-110 active:scale-95'
                   } 
                   border-3 border-[var(--border-dark)] rounded-2xl shadow-[4px_4px_0_var(--border-dark)]
                 `}
@@ -170,8 +207,13 @@ export default function VillagePage({ params }: { params: Promise<{ villageId: s
                 title={!isUnlocked ? '🔒 ยังไม่ถึงด่านนี้' : `ด่านที่ ${node.id}`}
               >
                 <div className="text-2xl md:text-3xl">
-                  {!isUnlocked ? '🔒' : isChest ? '🎁' : '⭐'}
+                  {!isUnlocked ? '🔒' : (isChest && isPassed) ? '✅' : isChest ? '🎁' : isPassed ? '✅' : '⭐'}
                 </div>
+                {isPassed && !isChest && score !== undefined && (
+                  <div className="absolute -top-2 -left-2 bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black border-2 border-white shadow-sm z-30">
+                    {score}
+                  </div>
+                )}
                 {isCurrent && (
                   <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[var(--border-dark)] animate-ping" />
                 )}
@@ -180,6 +222,35 @@ export default function VillagePage({ params }: { params: Promise<{ villageId: s
           })}
         </div>
       </div>
+
+      {/* Sub-level Score Modal */}
+      {subLevelModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-white rounded-[3rem] p-8 max-w-sm w-full border-4 border-[var(--border-dark)] shadow-[8px_8px_0_var(--border-dark)] animate-in zoom-in text-center">
+            <div className="text-6xl mb-4">🏆</div>
+            <h2 className="text-2xl font-black text-[var(--text-main)] mb-2">ด่านที่ {subLevelModal.subId}</h2>
+            <p className="text-[var(--text-muted)] font-bold mb-6 italic">คะแนนที่คุณทำได้</p>
+            <div className="bg-[var(--bg-warm)] border-3 border-[var(--border-dark)] py-4 rounded-2xl mb-8 flex flex-col items-center">
+              <span className="text-4xl font-black text-blue-600">{subLevelModal.score}</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mt-1">Points</span>
+            </div>
+            <button
+              onClick={() => setSubLevelModal(null)}
+              className="w-full py-4 bg-[var(--border-dark)] text-white rounded-2xl font-black text-xl hover:scale-105 active:scale-95 transition-all"
+            >
+              รับทราบ ✨
+            </button>
+          </div>
+        </div>
+      )}
     </div>
+  )
+}
+
+export default function VillagePage({ params }: { params: Promise<{ villageId: string }> }) {
+  return (
+    <Suspense fallback={<div className="game-page"><p className="dc-subtitle">กำลังโหลด...</p></div>}>
+      <VillagePageInner params={params} />
+    </Suspense>
   )
 }

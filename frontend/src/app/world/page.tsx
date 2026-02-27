@@ -4,16 +4,15 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './world.module.css'
 import {
-  loadProgress,
-  saveProgress,
   getDefaultProgress,
   getKeys,
   isVillageUnlocked,
-  getVillageProgress,
   PLAYS_PER_VILLAGE,
   MAX_KEYS,
 } from '@/lib/levelSystem'
 import { getExpPercent } from '@/lib/scoring'
+import PreviousRunPreview from '@/components/PreviousRunPreview'
+import { useProgress } from '@/contexts/ProgressContext'
 
 const TOTAL_STAGES = 10
 
@@ -47,10 +46,11 @@ function formatCountdown(ms: number): string {
 
 function getStageState(
   stage: number,
-  unlockedVillages: number[]
+  unlockedVillages: number[],
+  exp: number
 ): 'completed' | 'current' | 'locked' {
   if (!unlockedVillages.includes(stage)) return 'locked'
-  // "current" = highest unlocked stage that isn't exp-tube-filled
+  if (exp >= 100) return 'completed'
   const maxUnlocked = Math.max(...unlockedVillages)
   if (stage === maxUnlocked) return 'current'
   return 'completed'
@@ -70,9 +70,12 @@ export default function WorldPage() {
   const [showTutorial, setShowTutorial] = useState(false)
   const [userName, setUserName] = useState('')
 
+  const { progress, saveProgress, isLoading } = useProgress()
+
   const refreshProgress = useCallback(() => {
-    const p = loadProgress()
-    setUserName(p.username || 'นักเดินทาง')
+    if (isLoading || !progress) return
+    const p = progress
+    setUserName(p.userName || 'นักเดินทาง')
     setUnlockedVillages(p.unlockedVillages)
     const expMap: Record<number, number> = {}
     for (let i = 1; i <= TOTAL_STAGES; i++) {
@@ -86,7 +89,7 @@ export default function WorldPage() {
     if (expMap[10] >= 100) {
       setShowEnding(true)
     }
-  }, [])
+  }, [progress, isLoading])
 
   useEffect(() => {
     refreshProgress()
@@ -95,40 +98,42 @@ export default function WorldPage() {
 
   // Keys ticker
   useEffect(() => {
-    if (!mounted) return
+    if (!mounted || isLoading || !progress) return
     const tick = () => {
-      const { currentKeys: ck, nextRegenIn: nr } = getKeys()
+      const { currentKeys: ck, nextRegenIn: nr } = getKeys(progress)
       setCurrentKeys(ck)
       setNextRegenIn(nr)
     }
     tick()
     const id = setInterval(tick, 1000)
     return () => clearInterval(id)
-  }, [mounted])
+  }, [mounted, progress, isLoading])
 
   function closeIntro() {
+    if (!progress) return
     setShowIntro(false)
     setSlideIndex(0)
-    const p = loadProgress()
+    const p = { ...progress }
     p.introSeen = true
     saveProgress(p)
   }
 
   function resetProgress() {
+    if (!progress) return
     const fresh = getDefaultProgress()
-    const current = loadProgress()
+    const current = progress
     fresh.introSeen = true
-    fresh.username = current.username // Preserve login state
+    fresh.userName = current.userName // Preserve login state
     saveProgress(fresh)
     setUnlockedVillages(fresh.unlockedVillages)
     setVillageExp({})
-    const { currentKeys: ck, nextRegenIn: nr } = getKeys()
+    const { currentKeys: ck, nextRegenIn: nr } = getKeys(fresh)
     setCurrentKeys(ck)
     setNextRegenIn(nr)
   }
 
   function handleStageClick(stage: number) {
-    if (isVillageUnlocked(stage)) {
+    if (progress && isVillageUnlocked(progress, stage)) {
       setSelectedVillage(stage)
     }
   }
@@ -179,48 +184,13 @@ export default function WorldPage() {
         </div>
       )}
 
-      {/* Mission Briefing Modal */}
+      {/* Previous Run Preview Modal */}
       {selectedVillage && (
-        <div className={styles.introOverlay} style={{ zIndex: 10000 }}>
-          <div className={`${styles.introCard} max-w-lg`}>
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <span className="bg-[var(--card-bg)] text-[var(--text-main)] border-2 border-[var(--border-dark)] px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">Village Mission</span>
-                <h2 className="text-4xl font-black text-[#1a1a1a] mt-2">หมู่บ้านที่ {selectedVillage}</h2>
-              </div>
-              <button onClick={() => setSelectedVillage(null)} className="text-[#1a1a1a]/20 hover:text-red-500 text-3xl font-black transition-colors">✕</button>
-            </div>
-
-            <div className="bg-white border-3 border-black rounded-[2.5rem] p-6 mb-8 shadow-[6px_6px_0_rgba(0,0,0,0.05)]">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-14 h-14 bg-[#f5e6d3] border-2 border-black rounded-2xl flex items-center justify-center text-3xl shadow-[4px_4px_0_#000]">🚩</div>
-                <div className="text-left">
-                  <div className="text-[#717171] text-xs font-black uppercase tracking-widest">Difficulty</div>
-                  <div className="text-[#1a1a1a] font-black text-lg">{selectedVillage <= 3 ? 'ระดับเริ่มต้น 🌱' : selectedVillage <= 7 ? 'ระดับกลาง ⚔️' : 'ระดับสูง 🔥'}</div>
-                </div>
-              </div>
-              <p className="text-[#717171] font-bold leading-relaxed text-left">
-                หมู่บ้านนี้ต้องการความช่วยเหลือในการจัดการทรัพยากรและการคำนวณที่แม่นยำ
-                {selectedVillage === 10 ? ' นี่คือภารกิจสุดท้ายของเรา ทุกอย่างตัดสินกันที่นี่!' : ' ยิ่งระดับสูงขึ้น โจทย์จะยิ่งท้าทายความสามารถของคุณมากขึ้น'}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                className={`${styles.navBtn} ${styles.navBtnPrimary} w-full`}
-                onClick={() => router.push(`/world/${selectedVillage}`)}
-              >
-                เข้าภารกิจ 🏹
-              </button>
-              <button
-                className={styles.navBtn}
-                onClick={() => setSelectedVillage(null)}
-              >
-                ย้อนกลับ
-              </button>
-            </div>
-          </div>
-        </div>
+        <PreviousRunPreview
+          villageId={selectedVillage}
+          onStart={() => router.push(`/world/${selectedVillage}`)}
+          onBack={() => setSelectedVillage(null)}
+        />
       )}
 
       {/* Tutorial Modal */}
@@ -277,7 +247,7 @@ export default function WorldPage() {
               <p className="text-xs font-black text-black/40 uppercase tracking-[0.2em] mb-3">Our Mission Objective</p>
               <p className="text-2xl font-black text-black leading-tight">
                 สะสม <span className="text-orange-500 underline decoration-4 underline-offset-4">EXP</span> ในแต่ละหมู่บ้านให้เต็มเพื่อปลดล็อกพื้นที่ถัดไป <br className="hidden md:block" />
-                และภารกิจสำคัญคือ <span className="bg-yellow-200 px-2 py-1 rounded-lg">กู้คืนความทรงจำที่หายไป</span> กลับคืนมา!
+                และภารกิจสำคัญคือ <span className="bg-yellow-300 px-2 py-0.5 rounded-lg border-2 border-yellow-400/20 shadow-sm inline-block translate-y-1">กู้คืนความทรงจำที่หายไป</span> กลับคืนมา!
               </p>
             </div>
 
@@ -369,9 +339,9 @@ export default function WorldPage() {
 
       <div className={styles.mapContainer}>
         {Array.from({ length: TOTAL_STAGES }, (_, i) => i + 1).map((stage) => {
-          const state = getStageState(stage, unlockedVillages)
-          const pos = STAGE_POSITIONS[stage - 1]
           const exp = villageExp[stage] ?? 0
+          const state = getStageState(stage, unlockedVillages, exp)
+          const pos = STAGE_POSITIONS[stage - 1]
           return (
             <button
               key={stage}
@@ -382,7 +352,7 @@ export default function WorldPage() {
             >
               <span className={styles.stageIcon}>
                 {state === 'completed'
-                  ? (stage === 10 ? '🏆' : '⭐')
+                  ? '⭐'
                   : state === 'current' ? '▶' : '🔒'}
               </span>
               <span className={styles.stageLabel}>ด่าน {stage}</span>

@@ -4,9 +4,27 @@ export const PLAYS_PER_VILLAGE = 12
 export const MAX_KEYS = 9
 export const REGEN_INTERVAL_MS = 30 * 60 * 1000
 
-interface VillageProgress {
+export interface VillageRunRecord {
+  runNumber: number
+  totalScore: number
+  managementScore: number
+  calculationScore: number
+  spatialScore: number
+  completedAt: number // timestamp
+  subLevelScores?: Record<number, number>
+}
+
+export interface VillageProgress {
   playsCompleted: number
   expTubeFilled: boolean
+  bestScore?: number
+  runHistory?: VillageRunRecord[]
+  currentRunScore?: {
+    management: number
+    calculation: number
+    spatial: number
+  }
+  subLevelScores?: Record<number, number>
 }
 
 interface KeyState {
@@ -14,7 +32,7 @@ interface KeyState {
   lastRegenAt: number
 }
 
-interface DailyModeCompletion {
+export interface DailyModeCompletion {
   management: boolean
   calculation: boolean
   spatial: boolean
@@ -28,11 +46,9 @@ export interface GymemoProgressV2 {
   daily: Record<string, DailyModeCompletion>
   dailyScores: Record<string, { management: number, calculation: number, spatial: number }>
   totalScore: number
-  username: string
+  userName: string
+  guestId?: string
 }
-
-import Cookies from 'js-cookie'
-import { fetchSyncProgress, updateSyncProgress, submitScore } from './api'
 
 export function getDefaultProgress(): GymemoProgressV2 {
   return {
@@ -43,161 +59,184 @@ export function getDefaultProgress(): GymemoProgressV2 {
     daily: {},
     dailyScores: {},
     totalScore: 0,
-    username: '',
+    userName: '',
+    guestId: typeof window !== 'undefined' ? crypto.randomUUID() : undefined
   }
 }
 
-export function loadProgress(): GymemoProgressV2 {
-  if (typeof window === 'undefined') return getDefaultProgress()
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) {
-      const parsed = JSON.parse(raw) as Partial<GymemoProgressV2>
-      return { ...getDefaultProgress(), ...parsed }
-    }
-  } catch { }
-  return getDefaultProgress()
-}
-
-export function saveProgress(p: GymemoProgressV2): void {
-  if (typeof window === 'undefined') return
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(p))
-
-  // Background sync if logged in
-  const token = Cookies.get('token')
-  if (token) {
-    updateSyncProgress(token, p).catch(err => {
-      console.error('Failed to sync progress to server:', err)
-    })
-  }
-}
-
-export async function fetchAndMergeProgress(token: string): Promise<GymemoProgressV2> {
-  try {
-    const res = await fetchSyncProgress(token)
-    if (res.success && res.data && Object.keys(res.data).length > 0) {
-      const merged = { ...getDefaultProgress(), ...res.data }
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged))
-      }
-      return merged
-    }
-  } catch (err) {
-    console.error('Error fetching sync progress on login:', err)
-  }
-  return loadProgress()
-}
-
-export function getVillageProgress(villageId: number): VillageProgress {
-  const p = loadProgress()
+export function getVillageProgress(p: GymemoProgressV2, villageId: number): VillageProgress {
   return p.villages[String(villageId)] ?? { playsCompleted: 0, expTubeFilled: false }
 }
 
-export function recordPlay(villageId: number, scoreGained: number): GymemoProgressV2 {
-  const p = loadProgress()
+export function recordPlay(
+  p: GymemoProgressV2,
+  villageId: number,
+  scoreGained: number,
+  gameType?: 'management' | 'calculation' | 'spatial',
+  subId?: number,
+  accuracy?: number,
+  timeTaken?: number
+): GymemoProgressV2 {
+  const nextP = { ...p, villages: { ...p.villages } }
   const key = String(villageId)
-  const vp = p.villages[key] ?? { playsCompleted: 0, expTubeFilled: false }
-  const newPlays = Math.min(vp.playsCompleted + 1, PLAYS_PER_VILLAGE)
+  const vp = { ...(nextP.villages[key] ?? { playsCompleted: 0, expTubeFilled: false }) }
+  const newPlays = Math.min(vp.playsCompleted + 1, PLAYS_PER_VILLAGE * 99)
   const tubeFilled = newPlays >= PLAYS_PER_VILLAGE
-  p.villages[key] = { playsCompleted: newPlays, expTubeFilled: tubeFilled }
-  p.totalScore += scoreGained
-  if (tubeFilled && villageId < 10 && !p.unlockedVillages.includes(villageId + 1)) {
-    p.unlockedVillages = [...p.unlockedVillages, villageId + 1]
+
+  if (gameType) {
+    const current = { ...(vp.currentRunScore ?? { management: 0, calculation: 0, spatial: 0 }) }
+    current[gameType] = Math.max(current[gameType] || 0, scoreGained)
+    vp.currentRunScore = current
   }
+
+  if (subId) {
+    if (subId === 1 && vp.playsCompleted % PLAYS_PER_VILLAGE === 0) {
+      vp.subLevelScores = {}
+    }
+    const scores = { ...(vp.subLevelScores ?? {}) }
+    scores[subId] = scoreGained
+    vp.subLevelScores = scores
+  }
+
+  vp.playsCompleted = newPlays
+  vp.expTubeFilled = tubeFilled
+  nextP.villages[key] = vp
+  nextP.totalScore += scoreGained
+
+  if (tubeFilled && villageId < 10 && !nextP.unlockedVillages.includes(villageId + 1)) {
+    nextP.unlockedVillages = [...nextP.unlockedVillages, villageId + 1]
+  }
+
   if (tubeFilled && villageId === 10) {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('gymemo:game_ending'))
     }
   }
-  saveProgress(p)
 
-  // Sync to Leaderboard
-  const token = Cookies.get('token')
-  if (token) {
-    submitScore(token, p.totalScore, 0, 0).catch((err: any) => {
-      console.error('Failed to submit score to leaderboard:', err)
-    })
-  }
-
-  return p
+  return nextP
 }
 
-export function getKeys(now?: number): { currentKeys: number; nextRegenIn: number } {
-  const p = loadProgress()
+export function recordVillageRun(
+  p: GymemoProgressV2,
+  villageId: number,
+  scores: { management: number; calculation: number; spatial: number }
+): GymemoProgressV2 {
+  const nextP = { ...p, villages: { ...p.villages } }
+  const key = String(villageId)
+  const vp = { ...(nextP.villages[key] ?? { playsCompleted: 0, expTubeFilled: false }) }
+  const total = scores.management + scores.calculation + scores.spatial
+  const runNum = ((vp.runHistory ?? []).length) + 1
+  const newRecord: VillageRunRecord = {
+    runNumber: runNum,
+    totalScore: total,
+    managementScore: scores.management,
+    calculationScore: scores.calculation,
+    spatialScore: scores.spatial,
+    completedAt: Date.now(),
+    subLevelScores: vp.subLevelScores
+  }
+  vp.runHistory = [...(vp.runHistory ?? []).slice(-4), newRecord]
+  if (!vp.bestScore || total > vp.bestScore) vp.bestScore = total
+  nextP.villages[key] = vp
+  return nextP
+}
+
+export function accumulateRunScore(
+  p: GymemoProgressV2,
+  villageId: number,
+  gameType: 'management' | 'calculation' | 'spatial',
+  score: number
+): GymemoProgressV2 {
+  const nextP = { ...p, villages: { ...p.villages } }
+  const key = String(villageId)
+  const vp = { ...(nextP.villages[key] ?? { playsCompleted: 0, expTubeFilled: false }) }
+  const current = { ...(vp.currentRunScore ?? { management: 0, calculation: 0, spatial: 0 }) }
+  current[gameType] = Math.max(current[gameType] || 0, score)
+  vp.currentRunScore = current
+  nextP.villages[key] = vp
+  return nextP
+}
+
+export function getVillageRunHistory(p: GymemoProgressV2, villageId: number): VillageRunRecord[] {
+  return p.villages[String(villageId)]?.runHistory ?? []
+}
+
+export function getKeys(p: GymemoProgressV2, now?: number): { currentKeys: number; nextRegenIn: number; updatedProgress?: GymemoProgressV2 } {
   const currentTime = now ?? Date.now()
   const elapsed = currentTime - p.keys.lastRegenAt
   const regenCount = Math.floor(elapsed / REGEN_INTERVAL_MS)
   const newKeys = Math.min(MAX_KEYS, p.keys.currentKeys + regenCount)
 
-  if (regenCount > 0) {
-    p.keys.currentKeys = newKeys
-    p.keys.lastRegenAt = p.keys.lastRegenAt + regenCount * REGEN_INTERVAL_MS
-    saveProgress(p)
+  let updatedProgress
+  if (regenCount > 0 && newKeys > p.keys.currentKeys) {
+    updatedProgress = {
+      ...p,
+      keys: {
+        currentKeys: newKeys,
+        lastRegenAt: p.keys.lastRegenAt + regenCount * REGEN_INTERVAL_MS
+      }
+    }
   }
 
-  const nextRegenIn =
-    newKeys < MAX_KEYS ? REGEN_INTERVAL_MS - (elapsed % REGEN_INTERVAL_MS) : 0
-
-  return { currentKeys: newKeys, nextRegenIn }
+  const nextRegenIn = newKeys < MAX_KEYS ? REGEN_INTERVAL_MS - (elapsed % REGEN_INTERVAL_MS) : 0
+  return { currentKeys: newKeys, nextRegenIn, updatedProgress }
 }
 
-export function consumeKey(): boolean {
-  const { currentKeys } = getKeys()
+export function consumeKey(p: GymemoProgressV2): GymemoProgressV2 | false {
+  const { currentKeys } = getKeys(p)
   if (currentKeys <= 0) return false
-  const p = loadProgress()
-  p.keys.currentKeys = currentKeys - 1
-  saveProgress(p)
-  return true
+  const nextP = { ...p, keys: { ...p.keys, currentKeys: currentKeys - 1 } }
+  return nextP
 }
 
-export function getDailyProgress(dateKey: string): DailyModeCompletion {
-  const p = loadProgress()
+export function getDailyProgress(p: GymemoProgressV2, dateKey: string): DailyModeCompletion {
   return p.daily[dateKey] ?? { management: false, calculation: false, spatial: false }
 }
 
-export function addKeys(count: number): void {
-  const p = loadProgress()
-  const { currentKeys } = getKeys()
-  p.keys.currentKeys = Math.min(MAX_KEYS, currentKeys + count)
-  if (p.keys.currentKeys >= MAX_KEYS) {
-    p.keys.lastRegenAt = Date.now() // Reset timer for next regen from this point if full
+export function addKeys(p: GymemoProgressV2, count: number): GymemoProgressV2 {
+  const { currentKeys } = getKeys(p)
+  const nextP = { ...p, keys: { ...p.keys } }
+  nextP.keys.currentKeys = Math.min(MAX_KEYS, currentKeys + count)
+  if (nextP.keys.currentKeys >= MAX_KEYS) {
+    nextP.keys.lastRegenAt = Date.now()
   }
-  saveProgress(p)
+  return nextP
 }
 
 export function markDailyMode(
+  p: GymemoProgressV2,
   dateKey: string,
   mode: 'management' | 'calculation' | 'spatial'
-): void {
-  const p = loadProgress()
-  const dp = p.daily[dateKey] ?? { management: false, calculation: false, spatial: false }
+): GymemoProgressV2 {
+  const nextP = { ...p, daily: { ...p.daily } }
+  const dp = { ...(nextP.daily[dateKey] ?? { management: false, calculation: false, spatial: false }) }
   dp[mode] = true
-  p.daily[dateKey] = dp
-
-  // If this mode completion makes it 100%, reward a key
-  if (dp.management && dp.calculation && dp.spatial) {
-    // Reward logic is handled in the UI normally, but we can ensure the state is prepped
-  }
-
-  saveProgress(p)
+  nextP.daily[dateKey] = dp
+  return nextP
 }
 
-export function saveDailyScore(seed: string, minigame: 'management' | 'calculation' | 'spatial', score: number, total: number = 0): void {
-  const p = loadProgress()
-  if (!p.dailyScores) p.dailyScores = {} // Handle legacy data
-  if (!p.dailyScores[seed]) {
-    p.dailyScores[seed] = { management: 0, calculation: 0, spatial: 0 }
+export function saveDailyScore(
+  p: GymemoProgressV2,
+  seed: string,
+  minigame: 'management' | 'calculation' | 'spatial',
+  score: number,
+  total: number = 0
+): GymemoProgressV2 {
+  const nextP = { ...p, dailyScores: { ...(p.dailyScores || {}) } }
+  if (!nextP.dailyScores[seed]) {
+    nextP.dailyScores[seed] = { management: 0, calculation: 0, spatial: 0 }
+  } else {
+    nextP.dailyScores[seed] = { ...nextP.dailyScores[seed] }
   }
-  p.dailyScores[seed][minigame] = score // Keep the highest score, maybe? For now just overwrite.
-  saveProgress(p)
+  nextP.dailyScores[seed][minigame] = score
+  return nextP
 }
 
-export function isDailyComplete(dateKey: string): boolean {
-  const dp = getDailyProgress(dateKey)
+export function isDailyComplete(p: GymemoProgressV2, dateKey: string): boolean {
+  const dp = getDailyProgress(p, dateKey)
   return dp.management && dp.calculation && dp.spatial
 }
 
-export function isVillageUnlocked(villageId: number): boolean {
-  const p = loadProgress()
+export function isVillageUnlocked(p: GymemoProgressV2, villageId: number): boolean {
   return p.unlockedVillages.includes(villageId)
 }

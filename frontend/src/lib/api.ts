@@ -10,12 +10,13 @@ export async function getProgression(guestId: string) {
 export async function completeSubLevel(
   guestId: string,
   villageId: number,
-  subLevelId: number
+  subLevelId: number,
+  score: number = 0
 ) {
   const res = await fetch(`${API_BASE_URL}/api/progression/complete`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ guestId, villageId, subLevelId }),
+    body: JSON.stringify({ guestId, villageId, subLevelId, score }),
   })
   if (!res.ok) throw new Error('Failed to complete sublevel')
   return res.json()

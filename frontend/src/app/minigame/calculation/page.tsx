@@ -12,14 +12,15 @@
  */
 
 import { useSearchParams } from 'next/navigation'
-import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useState, useEffect, useCallback, Suspense, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { CALC_LEVELS, CalcQuestion } from '@/lib/calculationLevels'
-import { recordPlay, markDailyMode, saveDailyScore } from '@/lib/levelSystem'
 import Timer from '@/components/Timer'
 import ClockIntro from '@/components/ClockIntro'
 import { getDateKey } from '@/lib/dailyChallenge'
+import { useProgress } from '@/contexts/ProgressContext'
+import { useLevelSystem } from '@/hooks/useLevelSystem'
 
 // ─── Inner component (needs useSearchParams inside Suspense) ──────────────────
 
@@ -35,6 +36,9 @@ function CalculationGameInner() {
   const levelIndex = Math.min(Math.max(levelParam - 1, 0), CALC_LEVELS.length - 1)
   const level = CALC_LEVELS[levelIndex]
 
+  const { progress, saveProgress } = useProgress()
+  const { recordPlay } = useLevelSystem()
+
   type Phase = 'intro' | 'clock' | 'countdown' | 'play' | 'done'
   const [phase, setPhase] = useState<Phase>('intro')
   const [countdown, setCountdown] = useState(3)
@@ -44,6 +48,7 @@ function CalculationGameInner() {
   const [lastCorrect, setLastCorrect] = useState<boolean | null>(null)
   const [answer, setAnswer] = useState('')
   const [showInfo, setShowInfo] = useState(false)
+  const [startTime] = useState(Date.now())
 
   // Results from localStorage
   const [isTimeUp, setIsTimeUp] = useState(false)
@@ -54,6 +59,9 @@ function CalculationGameInner() {
     h: Math.floor(Math.random() * 12) + 1,
     m: [0, 15, 30, 45][Math.floor(Math.random() * 4)]
   }))
+
+  const hasSavedVillageRef = useRef(false)
+  const hasSavedDailyRef = useRef(false)
 
   // ── Countdown logic ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -72,21 +80,54 @@ function CalculationGameInner() {
 
   // ── Record Play for Village Mode ──────────────────────────────────────────
   useEffect(() => {
-    if (phase === 'done' && mode === 'village' && villageId) {
-      recordPlay(parseInt(villageId, 10), score * 25)
+    if (phase === 'done' && mode === 'village' && villageId && !hasSavedVillageRef.current) {
+      hasSavedVillageRef.current = true
+      const accuracy = total > 0 ? (score / total) * 100 : 100
+      const duration = (Date.now() - startTime) / 1000
+      recordPlay(parseInt(villageId, 10), score * 25, 'calculation', subId, accuracy, duration)
     }
-  }, [phase, mode, villageId, score])
+  }, [phase, mode, villageId, score, subId, total, startTime, recordPlay])
 
   useEffect(() => {
-    if (phase === 'done' && mode === 'daily') {
-      saveDailyScore(seed, 'calculation', score, total)
-      markDailyMode(seed, 'calculation')
+    let active = true
+    if (phase === 'done' && mode === 'daily' && !hasSavedDailyRef.current) {
+      hasSavedDailyRef.current = true
+      if (progress && active) {
+        import('@/lib/levelSystem').then(({ saveDailyScore: rawSaveDailyScore, markDailyMode: rawMarkDailyMode }) => {
+          let nextP = { ...progress }
+          nextP = rawSaveDailyScore(nextP, seed, 'calculation', score, total)
+          nextP = rawMarkDailyMode(nextP, seed, 'calculation')
+          saveProgress(nextP)
+        })
+      }
+
+      if (progress?.guestId && active) {
+        const accuracy = total > 0 ? (score / total) * 100 : 100
+        const duration = (Date.now() - startTime) / 1000
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
+        fetch(`${API_BASE_URL}/api/analysis/record`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            guestId: progress.guestId,
+            gameType: 'calculation',
+            level: 0,
+            subLevelId: 0,
+            score,
+            accuracy,
+            timeTaken: duration
+          })
+        }).catch(err => console.error('Failed to log daily analytics:', err))
+      }
     }
-  }, [phase, mode, seed, score, total])
+    return () => { active = false }
+  }, [phase, mode, seed, score, total, startTime, progress, saveProgress])
 
   // ── Start game ────────────────────────────────────────────────────────────
   const startGame = useCallback(() => {
-    if (levelParam === 1) {
+    hasSavedVillageRef.current = false
+    hasSavedDailyRef.current = false
+    if (levelParam === 1 && mode !== 'village') {
       setPhase('clock')
     } else {
       setPhase('countdown')
@@ -157,16 +198,16 @@ function CalculationGameInner() {
 
         <div className="bg-white/95 backdrop-blur-md border border-white/20 p-6 md:p-10 rounded-[2.5rem] shadow-2xl max-w-lg w-full text-center animate-in zoom-in duration-500">
           <div className="text-6xl md:text-7xl mb-6">🧮</div>
-          <h2 className="text-xl md:text-2xl font-black mb-2 text-slate-800">ระดับ {level.level}: {level.name}</h2>
-          <p className="text-slate-500 mb-8 text-base md:text-lg px-2">{level.description}</p>
+          <h2 className="text-xl md:text-2xl font-black mb-4 text-slate-800">ระดับ {level.level}: {level.name}</h2>
+          <p className="text-slate-500 mb-10 text-base md:text-lg px-2">{level.description}</p>
 
-          <div className={`${level.level === 10 ? 'bg-amber-50 border-amber-200' : 'bg-blue-50/50 border-blue-100/50'} p-5 rounded-3xl mb-10 border-2 border-dashed`}>
+          <div className={`${level.level === 10 ? 'bg-amber-100 border-amber-300' : 'bg-blue-50/50 border-blue-100/50'} p-5 rounded-3xl mb-10 border-2 border-dashed`}>
             <p className="text-slate-600 font-bold flex items-center justify-center gap-2">
               <span className={`text-2xl ${level.level === 10 ? 'animate-bounce' : ''}`}>⏱️</span>
               <span>
                 <span className={`${level.level === 10 ? 'text-amber-600' : 'text-blue-600'} font-black`}>ภารกิจ:</span> {level.level === 10 ? 'ระวังตัวกวน! ' : ''}ตอบให้ได้มากที่สุดใน <span className="text-slate-900 font-black">1 นาที</span>
               </span>
-              {mode === 'daily' && <span className="px-2 py-1 bg-yellow-400 text-yellow-900 rounded-lg text-xs font-black shrink-0">🌟 DAILY</span>}
+              {mode === 'daily' && <span className="px-2 py-1 bg-yellow-400 text-yellow-950 rounded-lg text-xs font-black shrink-0 shadow-[2px_2px_0_#000] border border-black/10">🌟 DAILY</span>}
             </p>
           </div>
 
@@ -212,7 +253,7 @@ function CalculationGameInner() {
   // ── Render: play ──────────────────────────────────────────────────────────
   if (phase === 'play' && question) {
     return (
-      <div className="min-h-[calc(100vh-140px)] flex flex-col items-center p-4">
+      <div className="min-h-[calc(100vh-140px)] flex flex-col items-center p-4 font-['Supermarket']">
         {/* Responsive Header */}
         <div className="w-full max-w-3xl flex justify-between items-center mb-6 mt-2 md:mt-8 px-2 md:px-0">
           <div className="flex items-center gap-3">
@@ -371,7 +412,7 @@ function CalculationGameInner() {
     else if (pct >= 50) evaluation = "ไม่แย่"
 
     return (
-      <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4">
+      <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4 font-['Supermarket']">
         <div className="bg-white/90 backdrop-blur-xl border border-white/20 p-8 md:p-12 rounded-[3rem] shadow-2xl max-w-sm md:max-w-md w-full text-center animate-in zoom-in duration-500">
           <div className="text-7xl md:text-8xl mb-6">🎯</div>
           <p className="text-slate-500 font-bold mb-8 italic text-sm">แม่นยำ {pct}%</p>
@@ -403,7 +444,7 @@ function CalculationGameInner() {
                     หมู่บ้านต่อไป 🏘️
                   </Link>
                 ) : null}
-                <Link href={`/world/${villageId}`} className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-[1.5rem] font-black text-lg transition-all text-center">
+                <Link href={`/world/${villageId}?showSummary=1`} className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-[1.5rem] font-black text-lg transition-all text-center">
                   กลับสู่แผนที่ 🗺️
                 </Link>
               </>

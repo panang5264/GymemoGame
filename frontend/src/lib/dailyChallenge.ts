@@ -1,14 +1,12 @@
 /**
  * Daily Challenge service module
  *
- * Persistence: uses localStorage key "gymemo_daily_challenge".
  * Reset logic: one play allowed per calendar day (local time).
  *   A "day" is identified by the YYYY-MM-DD string in the user's locale.
  *   When the clock ticks past 00:00 local time, getDateKey() returns a new
  *   string, so canPlayDailyChallenge() automatically becomes true again.
  */
 
-const STORAGE_KEY = 'gymemo_daily_challenge'
 const RESET_HOUR = 22 // 22:00 or 10 PM
 
 /** 
@@ -46,22 +44,11 @@ export function getNextResetTime(now?: Date): Date {
   return reset
 }
 
-import { isDailyComplete } from './levelSystem'
-
 /**
  * Returns true if the player has not yet completed the Daily Challenge today.
  */
-export function canPlayDailyChallenge(now?: Date): boolean {
-  if (typeof window === 'undefined') return false
-  return !isDailyComplete(getDateKey(now))
-}
-
-/**
- * Records that the Daily Challenge was completed today.
- */
-export function markDailyChallengeCompleted(now?: Date): void {
-  if (typeof window === 'undefined') return
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ date: getDateKey(now) }))
+export function canPlayDailyChallenge(isCompletedPattern: boolean): boolean {
+  return !isCompletedPattern
 }
 
 /**

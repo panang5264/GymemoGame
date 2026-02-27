@@ -2,9 +2,10 @@
 
 import { Suspense, useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { recordPlay, markDailyMode, saveDailyScore } from '@/lib/levelSystem'
 import ClockIntro from '@/components/ClockIntro'
 import { getDateKey } from '@/lib/dailyChallenge'
+import { useLevelSystem } from '@/hooks/useLevelSystem'
+import { useProgress } from '@/contexts/ProgressContext'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -261,6 +262,7 @@ function ManagementGameInner() {
   const villageId = parseInt(searchParams.get('villageId') || '1', 10)
   const modeParam = searchParams.get('mode')
 
+  // Phase State
   const [phase, setPhase] = useState<'intro' | 'clock' | 'play' | 'done'>('intro')
   const [clockTarget] = useState(() => ({
     h: Math.floor(Math.random() * 12) + 1,
@@ -269,11 +271,17 @@ function ManagementGameInner() {
   const [score, setScore] = useState(0)
   const [feedback, setFeedback] = useState<{ type: 'correct' | 'wrong', message: string } | null>(null)
 
+  // Context Hooks
+  const { progress, saveProgress } = useProgress()
+  const { recordPlay } = useLevelSystem()
+
   // Sorting State
   const [config, setConfig] = useState(() => getLevelConfig(levelParam))
   const [spawnQueue, setSpawnQueue] = useState<Item[]>([])
   const [activePool, setActivePool] = useState<Item[]>([])
   const [correctCount, setCorrectCount] = useState(0)
+  const [errorCount, setErrorCount] = useState(0)
+  const [startTime] = useState(Date.now())
 
   // Cooking State
   const [dishIndex, setDishIndex] = useState(0)
@@ -295,8 +303,12 @@ function ManagementGameInner() {
   const [selectedLeft, setSelectedLeft] = useState<number | null>(null)
   const [shuffledRight, setShuffledRight] = useState<{ text: string, id: number }[]>([])
 
+  // Persistence Guard
+  const hasSavedRef = useRef(false)
+
   // Initialization
   useEffect(() => {
+    hasSavedRef.current = false
     const c = getLevelConfig(levelParam)
     setConfig(c)
     setSpawnQueue(c.items)
@@ -393,8 +405,9 @@ function ManagementGameInner() {
         return newCount
       })
     } else {
-      if (levelParam === 1) setScore(s => s - 1)
-      setFeedback({ type: 'wrong', message: '❌ ผิดหมวด!' })
+      setScore(s => s - 1)
+      setErrorCount(e => e + 1)
+      setFeedback({ type: 'correct', message: '❌ ผิดหมวด!' })
     }
     setActivePool(prev => prev.filter(i => i.id !== itemId))
     setTimeout(() => setFeedback(null), 1000)
@@ -541,20 +554,49 @@ function ManagementGameInner() {
 
   // Persistence
   useEffect(() => {
-    if (phase === 'done') {
-      if (modeParam === 'village') recordPlay(villageId, score * 25)
+    let active = true
+    if (phase === 'done' && !hasSavedRef.current) {
+      hasSavedRef.current = true
+      const accuracy = (correctCount + errorCount) > 0 ? (correctCount / (correctCount + errorCount)) * 100 : 100
+      const timeTaken = (Date.now() - startTime) / 1000
+      if (modeParam === 'village') recordPlay(villageId, score, 'management', subId, accuracy, timeTaken)
       else if (modeParam === 'daily') {
         const dk = getDateKey()
-        saveDailyScore(dk, 'management', score)
-        markDailyMode(dk, 'management')
+
+        if (progress && active) {
+          import('@/lib/levelSystem').then(({ saveDailyScore: rawSaveDailyScore, markDailyMode: rawMarkDailyMode }) => {
+            let nextP = { ...progress }
+            nextP = rawSaveDailyScore(nextP, dk, 'management', score)
+            nextP = rawMarkDailyMode(nextP, dk, 'management')
+            saveProgress(nextP)
+          })
+        }
+
+        if (progress?.guestId && active) {
+          const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
+          fetch(`${API_BASE_URL}/api/analysis/record`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              guestId: progress.guestId,
+              gameType: 'management',
+              level: 0, // Daily level 0
+              subLevelId: 0,
+              score,
+              accuracy,
+              timeTaken
+            })
+          }).catch(err => console.error('Failed to log daily analytics:', err))
+        }
       }
     }
-  }, [phase, modeParam, villageId, score])
+    return () => { active = false }
+  }, [phase, modeParam, villageId, score, subId, correctCount, errorCount, startTime, progress, saveProgress])
 
   // ─── Render Components ──────────────────────────────────────────────────────
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 selection:bg-indigo-100 h-full w-full">
+    <div className="flex flex-col items-center justify-center p-4 selection:bg-indigo-100 h-full w-full font-['Supermarket']">
       <div className="w-full max-w-5xl bg-white rounded-[32px] md:rounded-[40px] shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-140px)] min-h-[550px] max-h-[850px] relative border border-slate-100">
 
         {/* Header Bar */}
@@ -591,11 +633,11 @@ function ManagementGameInner() {
                 <div className="text-9xl mb-8 animate-bounce">
                   {levelParam <= 3 ? '📦' : levelParam <= 5 ? '🍳' : levelParam <= 9 ? '🧭' : '📝'}
                 </div>
-                <h3 className="text-2xl font-black text-slate-800 mb-2 uppercase tracking-tighter">Level {levelParam}</h3>
-                <p className="text-slate-500 font-bold mb-10 text-lg">{config.instruction}</p>
+                <h3 className="text-2xl font-black text-slate-800 mb-4 uppercase tracking-tighter">Level {levelParam}</h3>
+                <p className="text-slate-500 font-bold mb-12 text-lg">{config.instruction}</p>
                 <button
                   onClick={() => {
-                    if (levelParam === 1) setPhase('clock')
+                    if (levelParam === 1 && modeParam !== 'village') setPhase('clock')
                     else setPhase('play')
                   }}
                   className="w-full py-5 bg-slate-800 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95"
@@ -621,10 +663,8 @@ function ManagementGameInner() {
                   <div className="absolute inset-0 bg-yellow-400 blur-3xl opacity-20 animate-pulse" />
                   <div className="text-8xl relative drop-shadow-2xl">🎯</div>
                 </div>
-                <h3 className="text-3xl font-black text-slate-800 mb-1 tracking-tight">
-                  ประเมินผล: <span className="text-indigo-600 underline">
-                    {score >= 100 ? 'ดี' : score >= 70 ? 'โอเค' : score >= 50 ? 'ไม่แย่' : 'อาจจะไม่ดี'}
-                  </span>
+                <h3 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">
+                  คะแนนที่ทำได้
                 </h3>
                 <p className="text-slate-400 font-bold mb-8 uppercase tracking-[0.2em] text-[10px]">เลเวล {levelParam} — คะแนนสะสม {score}</p>
                 <div className="flex flex-col gap-3">
@@ -646,7 +686,7 @@ function ManagementGameInner() {
                         </button>
                       ) : null}
                       <button
-                        onClick={() => router.push(`/world/${villageId}`)}
+                        onClick={() => router.push(`/world/${villageId}?showSummary=1`)}
                         className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-[24px] font-black text-lg transition-all"
                       >
                         กลับสู่แผนที่ 🗺️

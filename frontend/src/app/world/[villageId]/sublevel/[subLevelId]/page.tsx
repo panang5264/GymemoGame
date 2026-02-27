@@ -2,9 +2,10 @@
 
 import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getKeys, consumeKey, recordPlay, markDailyMode } from '@/lib/levelSystem'
 import ConfirmUseKeyModal from '@/components/ConfirmUseKeyModal'
 import { getDateKey } from '@/lib/dailyChallenge'
+import { useProgress } from '@/contexts/ProgressContext'
+import { getKeys, recordPlay as rawRecordPlay, markDailyMode as rawMarkDailyMode } from '@/lib/levelSystem'
 
 function getMinigameUrl(villageId: number, subId: number): string {
   // ด่านที่ 4 และ ด่านที่ 9 เป็นกล่องสมบัติ
@@ -49,9 +50,11 @@ export default function SubLevelPage({
   const [modalOpen, setModalOpen] = useState(false)
   const [keysLeft, setKeysLeft] = useState(0)
 
+  const { progress, saveProgress, isLoading } = useProgress()
+
   useEffect(() => {
-    if (isNaN(villageId) || isNaN(subLevelId) || subLevelId < 1) {
-      router.replace('/world')
+    if (isNaN(villageId) || isNaN(subLevelId) || subLevelId < 1 || isLoading || !progress) {
+      if (isNaN(villageId) || isNaN(subLevelId) || subLevelId < 1) router.replace('/world')
       return
     }
 
@@ -60,22 +63,24 @@ export default function SubLevelPage({
       return;
     }
 
-    const { currentKeys } = getKeys()
+    const { currentKeys } = getKeys(progress)
     setKeysLeft(currentKeys)
     setModalOpen(true)
-  }, [villageId, subLevelId, router])
+  }, [villageId, subLevelId, router, progress, isLoading])
 
   const handleConfirm = () => {
     // ผู้เล่นเลือกใช้กุญแจข้ามด่าน
-    const consumed = consumeKey()
-    if (!consumed) {
+    if (!progress) return
+    const { currentKeys } = getKeys(progress)
+    if (currentKeys <= 0) {
       setModalOpen(false)
       router.back()
       return
     }
-    setModalOpen(false)
+    let nextP = { ...progress, keys: { ...progress.keys, currentKeys: currentKeys - 1 } }
+
     // ให้ EXP ถือว่าผ่านไปเลย 1 ครั้ง
-    recordPlay(villageId, 50) // ให้แต้มข้ามด่านเล็กน้อย
+    nextP = rawRecordPlay(nextP, villageId, 50, undefined, subLevelId) // ให้แต้มข้ามด่านเล็กน้อย
 
     // เช็คภารกิจรายวัน: ถ้าใช้กุญแจข้าม ก็ให้ถือว่าทำภารกิจโหมดนั้นเสร็จด้วย
     const modes = ['management', 'calculation', 'spatial']
@@ -85,7 +90,10 @@ export default function SubLevelPage({
     else modeIndex = (subLevelId - 10) % 3
     const currentMode = modes[modeIndex] as 'management' | 'calculation' | 'spatial'
     const dk = getDateKey() // YYYY-MM-DD
-    markDailyMode(dk, currentMode)
+    nextP = rawMarkDailyMode(nextP, dk, currentMode)
+
+    saveProgress(nextP)
+    setModalOpen(false)
 
     // กระโดดไปยังด่านถัดไป หรือกลับไปหน้าหน้าหมู่บ้านถ้าเป็นด่านสุดท้าย
     if (subLevelId < 12) {

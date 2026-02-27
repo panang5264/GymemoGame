@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import { loadProgress, saveProgress, addKeys, MAX_KEYS } from '@/lib/levelSystem'
+import { MAX_KEYS } from '@/lib/levelSystem'
+import { useProgress } from '@/contexts/ProgressContext'
 
 export default function CheatOverlay() {
     const [isOpen, setIsOpen] = useState(false)
@@ -11,6 +12,8 @@ export default function CheatOverlay() {
     const searchParams = useSearchParams()
 
     const [targetGame, setTargetGame] = useState<'management' | 'calculation' | 'spatial' | 'reaction'>('management')
+
+    const { progress, saveProgress, isLoading } = useProgress()
 
     useEffect(() => {
         if (pathname.includes('/minigame/calculation')) setTargetGame('calculation')
@@ -30,23 +33,21 @@ export default function CheatOverlay() {
     }, [])
 
     const unlockAll = () => {
-        const p = loadProgress()
+        if (isLoading || !progress) return
+        const p = { ...progress }
         p.unlockedVillages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         for (let i = 1; i <= 10; i++) {
-            p.villages[String(i)] = { playsCompleted: 12, expTubeFilled: true }
+            p.villages[String(i)] = { playsCompleted: 12, expTubeFilled: true, runHistory: [] }
         }
         saveProgress(p)
         alert('เดอะแฟลช! ปลดล็อกและเคลียร์ทุกด่านให้แล้วครับ ⚡')
-        window.location.reload()
     }
 
     const fillKeys = () => {
-        const p = loadProgress()
-        p.keys.currentKeys = MAX_KEYS
-        p.keys.lastRegenAt = Date.now()
+        if (isLoading || !progress) return
+        const p = { ...progress, keys: { currentKeys: MAX_KEYS, lastRegenAt: Date.now() } }
         saveProgress(p)
         alert('เติมกุญแจให้เต็มแม็กซ์! 🔑')
-        window.location.reload()
     }
 
     const goToLevel = (level: number, mode: 'practice' | 'village' = 'practice') => {

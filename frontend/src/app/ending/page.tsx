@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { loadProgress, getVillageProgress, PLAYS_PER_VILLAGE } from '@/lib/levelSystem'
+import { PLAYS_PER_VILLAGE } from '@/lib/levelSystem'
+import { useProgress } from '@/contexts/ProgressContext'
 
 const FINAL_VILLAGE_ID = 10
 
@@ -11,17 +12,18 @@ export default function EndingPage() {
   const router = useRouter()
   const [totalScore, setTotalScore] = useState(0)
   const [mounted, setMounted] = useState(false)
+  const { progress, isLoading } = useProgress()
 
   useEffect(() => {
-    const vp10 = getVillageProgress(FINAL_VILLAGE_ID)
+    if (isLoading || !progress) return
+    const vp10 = progress.villages[String(FINAL_VILLAGE_ID)] || { playsCompleted: 0 }
     if (vp10.playsCompleted < PLAYS_PER_VILLAGE) {
       router.replace('/world')
       return
     }
-    const p = loadProgress()
-    setTotalScore(p.totalScore)
+    setTotalScore(progress.totalScore || 0)
     setMounted(true)
-  }, [router])
+  }, [router, progress, isLoading])
 
   if (!mounted) return null
 

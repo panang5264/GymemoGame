@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { recordPlay, markDailyMode } from '@/lib/levelSystem'
 import { getDateKey } from '@/lib/dailyChallenge'
+import { useProgress } from '@/contexts/ProgressContext'
+import { useLevelSystem } from '@/hooks/useLevelSystem'
 
 // ─── Maze Generation Logic (Recursive Backtracker) ──────────────────────────
 
@@ -54,6 +55,9 @@ function MazeGameInner() {
     const [endTime, setEndTime] = useState(0)
     const [moves, setMoves] = useState(0)
 
+    const { progress } = useProgress()
+    const { recordPlay, markDailyMode } = useLevelSystem()
+
     // Maze sizing based on level
     const rows = 11 + Math.min(levelParam, 5) * 2
     const cols = 11 + Math.min(levelParam, 5) * 2
@@ -84,7 +88,7 @@ function MazeGameInner() {
             if (mode === 'village') {
                 const timeTaken = (Date.now() - startTime) / 1000
                 const score = Math.max(10, Math.floor(1000 / (timeTaken + 1)))
-                recordPlay(parseInt(villageIdParam), score)
+                recordPlay(parseInt(villageIdParam), score, undefined, subId)
 
                 // ถือว่าทำภารกิจรายวันโหมด management ควบคู่ไปด้วย (เนื่องจาก Reaction เป็นส่วนหนึ่งของหมู่บ้าน)
                 const dk = getDateKey()
@@ -119,7 +123,7 @@ function MazeGameInner() {
     }, [])
 
     return (
-        <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4">
+        <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4 font-['Supermarket']">
             <div className="w-full max-w-4xl bg-white rounded-[40px] shadow-2xl overflow-hidden flex flex-col min-h-[600px] relative border border-slate-100">
 
                 {/* Header Bar */}
@@ -140,8 +144,8 @@ function MazeGameInner() {
                     {phase === 'intro' && (
                         <div className="text-center animate-in zoom-in">
                             <div className="text-9xl mb-8 animate-jiggle">🧭</div>
-                            <h2 className="text-3xl font-black text-slate-800 mb-4 uppercase tracking-tighter">เขาวงกตพรีเมียม</h2>
-                            <p className="text-slate-500 font-bold mb-10 text-lg max-w-sm">ใช้ปุ่มลูกศรหรือ WASD เพื่อหาทางออกให้เร็วที่สุด!</p>
+                            <h2 className="text-3xl font-black text-slate-800 mb-6 uppercase tracking-tighter">เขาวงกตพรีเมียม</h2>
+                            <p className="text-slate-500 font-bold mb-12 text-lg max-w-sm">ใช้ปุ่มลูกศรหรือ WASD เพื่อหาทางออกให้เร็วที่สุด!</p>
                             <button
                                 onClick={initGame}
                                 className="px-16 py-5 bg-indigo-600 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95"
@@ -185,7 +189,7 @@ function MazeGameInner() {
 
                     {phase === 'done' && (
                         <div className="max-w-md w-full bg-white rounded-[40px] p-12 shadow-2xl border border-slate-100 text-center animate-in zoom-in">
-                            <div className="text-8xl mb-8">️</div>
+                            <div className="text-8xl mb-8">🎯</div>
                             <h3 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">ทางออกพบแล้ว!</h3>
                             <p className="text-slate-400 font-bold mb-8 uppercase tracking-widest text-xs">คุณจัดการเวลาและเส้นทางได้ดีเยี่ยม</p>
 

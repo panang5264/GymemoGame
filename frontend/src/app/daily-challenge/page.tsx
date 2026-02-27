@@ -7,13 +7,8 @@ import {
   getCountdownToReset,
   getDateKey,
 } from '@/lib/dailyChallenge'
-import {
-  isDailyComplete,
-  getDailyProgress,
-  loadProgress,
-  addKeys,
-  getKeys
-} from '@/lib/levelSystem'
+import { useProgress } from '@/contexts/ProgressContext'
+import { useLevelSystem } from '@/hooks/useLevelSystem'
 
 export default function DailyChallengePage() {
   const router = useRouter()
@@ -22,8 +17,12 @@ export default function DailyChallengePage() {
   const [userRank, setUserRank] = useState(1)
   const [isDone, setIsDone] = useState(false)
   const [rewardClaimed, setRewardClaimed] = useState(false)
+  const [hasSynced, setHasSynced] = useState(false)
 
-  // Results from localStorage
+  const { progress, isLoading } = useProgress()
+  const { saveProgress, getDailyProgress, isDailyComplete, addKeys, getKeys } = useLevelSystem()
+
+  // Results from Context/Backend
   const [scores, setScores] = useState({ management: 0, calculation: 0, spatial: 0 })
   const [todayModes, setTodayModes] = useState({ management: false, calculation: false, spatial: false })
 
@@ -35,20 +34,18 @@ export default function DailyChallengePage() {
   }, [])
 
   useEffect(() => {
+    if (isLoading || !progress) return
+
     const dk = getDateKey()
-    const progress = loadProgress()
-    const maxUnlocked = Math.max(...progress.unlockedVillages, 1)
+    const maxUnlocked = Math.max(...(progress.unlockedVillages || [1]), 1)
     setUserRank(maxUnlocked)
 
+    // 1. Load from Context
     const modes = getDailyProgress(dk)
     setTodayModes(modes)
 
     const done = isDailyComplete(dk)
     setIsDone(done)
-
-    // Check if reward already claimed for today
-    const claimed = localStorage.getItem(`gymemo_daily_reward_${dk}`) === 'true'
-    setRewardClaimed(claimed)
 
     if (done) {
       const dailyScores = progress.dailyScores?.[dk] || { management: 0, calculation: 0, spatial: 0 }
@@ -58,15 +55,48 @@ export default function DailyChallengePage() {
         spatial: dailyScores.spatial || 0
       })
     }
-  }, [dateKey])
+
+    // 2. Asynchronous Sync with Backend Source of Truth (only once per mount)
+    if (progress.guestId && !hasSynced) {
+      setHasSynced(true)
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
+      fetch(`${API_BASE_URL}/api/daily/status/${progress.guestId}?date=${dk}`)
+        .then(res => res.json())
+        .then(res => {
+          if (res.success && res.data) {
+            const dbModes = res.data.completedModes
+            setTodayModes(dbModes)
+            setIsDone(res.data.allDone)
+            if (res.data.rewardClaimed) setRewardClaimed(true)
+
+            // Sync back to context if they differ
+            if (JSON.stringify(modes) !== JSON.stringify(dbModes)) {
+              const nextP = { ...progress, daily: { ...progress.daily, [dk]: dbModes } }
+              saveProgress(nextP)
+            }
+          }
+        })
+        .catch(err => console.error('Failed to sync daily status with backend', err))
+    }
+  }, [dateKey, progress, isLoading, hasSynced, getDailyProgress, isDailyComplete, saveProgress])
 
   const handleClaimReward = () => {
     if (rewardClaimed) return
     addKeys(1)
-    localStorage.setItem(`gymemo_daily_reward_${dateKey}`, 'true')
     setRewardClaimed(true)
+
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
+    if (progress.guestId) {
+      fetch(`${API_BASE_URL}/api/daily/claim-reward`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ guestId: progress.guestId, dateKey })
+      }).catch(err => console.error(err))
+    }
+
     alert('คุณได้รับกุญแจ 🔑 1 ดอก เป็นรางวัลสำหรับความพยายามวันนี้!')
   }
+
 
   const startNextMode = () => {
     if (!todayModes.management) {

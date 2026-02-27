@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import Cookies from 'js-cookie'
 import { getUserProfile } from '@/lib/api'
-import { fetchAndMergeProgress } from '@/lib/levelSystem'
 
 interface User {
     _id: string
@@ -50,8 +49,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const data = await getUserProfile(authToken)
             if (data.success) {
                 setUser(data.data)
-                // Sync progression data from server
-                await fetchAndMergeProgress(authToken)
             } else {
                 logout()
             }
@@ -67,17 +64,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         Cookies.set('token', authToken, { expires: 7 }) // 7 days
         setToken(authToken)
         setUser(userData)
-        // Sync progression on initial login
-        await fetchAndMergeProgress(authToken)
     }
 
     const logout = () => {
         Cookies.remove('token')
         setToken(null)
         setUser(null)
-        // Ensure log out resets game progress to prevent next guest from seeing it
         if (typeof window !== 'undefined') {
             localStorage.removeItem('gymemo_progress_v2')
+            window.location.href = '/'
         }
     }
 
