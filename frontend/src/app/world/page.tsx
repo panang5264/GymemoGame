@@ -183,7 +183,7 @@ export default function WorldPage() {
           <div className={`${styles.introCard} max-w-lg`}>
             <div className="flex justify-between items-start mb-6">
               <div>
-                <span className="bg-[var(--card-bg)] text-[var(--text-main)] border-2 border-[var(--border-dark)] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Village Mission</span>
+                <span className="bg-[var(--card-bg)] text-[var(--text-main)] border-2 border-[var(--border-dark)] px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">Village Mission</span>
                 <h2 className="text-4xl font-black text-[#1a1a1a] mt-2">หมู่บ้านที่ {selectedVillage}</h2>
               </div>
               <button onClick={() => setSelectedVillage(null)} className="text-[#1a1a1a]/20 hover:text-red-500 text-3xl font-black transition-colors">✕</button>
@@ -193,7 +193,7 @@ export default function WorldPage() {
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-14 h-14 bg-[#f5e6d3] border-2 border-black rounded-2xl flex items-center justify-center text-3xl shadow-[4px_4px_0_#000]">🚩</div>
                 <div className="text-left">
-                  <div className="text-[#717171] text-[10px] font-black uppercase tracking-widest">Difficulty</div>
+                  <div className="text-[#717171] text-xs font-black uppercase tracking-widest">Difficulty</div>
                   <div className="text-[#1a1a1a] font-black text-lg">{selectedVillage <= 3 ? 'ระดับเริ่มต้น 🌱' : selectedVillage <= 7 ? 'ระดับกลาง ⚔️' : 'ระดับสูง 🔥'}</div>
                 </div>
               </div>
@@ -224,51 +224,64 @@ export default function WorldPage() {
       {/* Tutorial Modal */}
       {showTutorial && (
         <div className={styles.introOverlay} style={{ zIndex: 11000 }}>
-          <div className={`${styles.introCard} max-w-4xl`}>
-            <div className="flex justify-between items-center mb-10">
-              <h2 className="text-4xl font-black text-[var(--text-main)] uppercase tracking-tight">คู่มือการเล่น 🧠</h2>
+          <div className={`${styles.introCard} ${styles.tutorialCard}`}>
+            <div className="flex justify-between items-center mb-12">
+              <div className="text-left">
+                <h2 className="text-5xl font-black text-black tracking-tighter mb-2">คู่มือการเล่น 🧠</h2>
+                <div className="h-2 w-32 bg-black rounded-full"></div>
+              </div>
               <button
                 onClick={() => setShowTutorial(false)}
-                className="w-12 h-12 flex items-center justify-center text-[var(--text-muted)] hover:text-red-500 text-4xl transition-colors"
+                className="w-14 h-14 rounded-2xl bg-black/5 hover:bg-red-500 hover:text-white flex items-center justify-center text-4xl transition-all duration-300 shadow-[4px_4px_0_rgba(0,0,0,0.1)] hover:translate-y-[-2px]"
               >
                 ✕
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-              <div className="bg-[var(--card-bg)] p-8 rounded-[2.5rem] border-3 border-[var(--border-dark)] text-center shadow-[8px_8px_0_rgba(0,0,0,0.05)] hover:translate-y-[-4px] transition-transform">
-                <div className="text-6xl mb-6">📦</div>
-                <h4 className="font-black text-[var(--text-main)] mb-3 uppercase text-lg tracking-wider">Management</h4>
-                <p className="text-sm font-bold text-[var(--text-muted)] leading-relaxed">
-                  ฝึกทักษะการแยกแยะและจัดหมวดหมู่สิ่งของตามเงื่อนไขที่กำหนดให้ถูกต้อง
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              {/* Management */}
+              <div className="group relative bg-[#fcfaf2] p-8 rounded-[3.5rem] border-4 border-black text-center shadow-[12px_12px_0_#000] hover:translate-y-[-10px] transition-all duration-500">
+                <div className="w-24 h-24 bg-orange-50 border-3 border-black rounded-[2rem] flex items-center justify-center text-5xl mx-auto mb-8 shadow-[6px_6px_0_#000] group-hover:rotate-6 transition-transform">📦</div>
+                <h4 className="font-black text-2xl text-black mb-4 tracking-tighter">MANAGEMENT</h4>
+                <div className="h-1 w-12 bg-orange-400 mx-auto mb-6 rounded-full"></div>
+                <p className="text-lg font-bold text-black/70 leading-relaxed">
+                  ฝึกทักษะการแยกแยะและจัดหมวดหมู่สิ่งของตามเงื่อนไขที่กำหนด
                 </p>
               </div>
 
-              <div className="bg-[var(--card-bg)] p-8 rounded-[2.5rem] border-3 border-[var(--border-dark)] text-center shadow-[8px_8px_0_rgba(0,0,0,0.05)] hover:translate-y-[-4px] transition-transform">
-                <div className="text-6xl mb-6">🔢</div>
-                <h4 className="font-black text-[var(--text-main)] mb-3 uppercase text-lg tracking-wider">Calculation</h4>
-                <p className="text-sm font-bold text-[var(--text-muted)] leading-relaxed">
+              {/* Calculation */}
+              <div className="group relative bg-[#fcfaf2] p-8 rounded-[3.5rem] border-4 border-black text-center shadow-[12px_12px_0_#000] hover:translate-y-[-10px] transition-all duration-500">
+                <div className="w-24 h-24 bg-blue-50 border-3 border-black rounded-[2rem] flex items-center justify-center text-5xl mx-auto mb-8 shadow-[6px_6px_0_#000] group-hover:rotate-6 transition-transform">🔢</div>
+                <h4 className="font-black text-2xl text-black mb-4 tracking-tighter">CALCULATION</h4>
+                <div className="h-1 w-12 bg-blue-400 mx-auto mb-6 rounded-full"></div>
+                <p className="text-lg font-bold text-black/70 leading-relaxed">
                   ท้าทายความไวในการแก้โจทย์คณิตศาสตร์ภายใต้ความกดดันของเวลา
                 </p>
               </div>
 
-              <div className="bg-[var(--card-bg)] p-8 rounded-[2.5rem] border-3 border-[var(--border-dark)] text-center shadow-[8px_8px_0_rgba(0,0,0,0.05)] hover:translate-y-[-4px] transition-transform">
-                <div className="text-6xl mb-6">🗺️</div>
-                <h4 className="font-black text-[var(--text-main)] mb-3 uppercase text-lg tracking-wider">Spatial</h4>
-                <p className="text-sm font-bold text-[var(--text-muted)] leading-relaxed">
-                  ฝึกการวาดภาพในใจ จับคู่มุมมองและรูปทรง 3 มิติให้แม่นยำที่สุด
+              {/* Spatial */}
+              <div className="group relative bg-[#fcfaf2] p-8 rounded-[3.5rem] border-4 border-black text-center shadow-[12px_12px_0_#000] hover:translate-y-[-10px] transition-all duration-500">
+                <div className="w-24 h-24 bg-green-50 border-3 border-black rounded-[2rem] flex items-center justify-center text-5xl mx-auto mb-8 shadow-[6px_6px_0_#000] group-hover:rotate-6 transition-transform">🗺️</div>
+                <h4 className="font-black text-2xl text-black mb-4 tracking-tighter">SPATIAL</h4>
+                <div className="h-1 w-12 bg-green-400 mx-auto mb-6 rounded-full"></div>
+                <p className="text-lg font-bold text-black/70 leading-relaxed">
+                  ฝึกการวาดภาพในใจ จับคู่มุมมองและรูปทรงให้แม่นยำที่สุด
                 </p>
               </div>
             </div>
 
-            <div className="bg-[var(--border-dark)]/5 p-6 rounded-3xl mb-10 text-left border-2 border-dashed border-[var(--border-dark)]/20">
-              <p className="text-xs font-black text-[var(--text-muted)] uppercase tracking-widest mb-2">เป้าหมายของคุณ 🎯</p>
-              <p className="text-[#1a1a1a] font-bold">สะสม EXP ในแต่ละหมู่บ้านให้เต็มเพื่อปลดล็อกพื้นที่ถัดไป และกู้คืนความทรงจำที่หายไปกลับคืนมา!</p>
+            <div className="bg-white/60 backdrop-blur-md p-10 rounded-[3rem] mb-12 text-left border-4 border-black shadow-[8px_8px_0_rgba(0,0,0,0.05)] relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10 text-8xl rotate-12">🎯</div>
+              <p className="text-xs font-black text-black/40 uppercase tracking-[0.2em] mb-3">Our Mission Objective</p>
+              <p className="text-2xl font-black text-black leading-tight">
+                สะสม <span className="text-orange-500 underline decoration-4 underline-offset-4">EXP</span> ในแต่ละหมู่บ้านให้เต็มเพื่อปลดล็อกพื้นที่ถัดไป <br className="hidden md:block" />
+                และภารกิจสำคัญคือ <span className="bg-yellow-200 px-2 py-1 rounded-lg">กู้คืนความทรงจำที่หายไป</span> กลับคืนมา!
+              </p>
             </div>
 
             <button
               onClick={() => setShowTutorial(false)}
-              className={`${styles.navBtn} ${styles.navBtnPrimary} w-full text-2xl py-6 shadow-[0_10px_0_rgba(0,0,0,0.1)]`}
+              className={`${styles.navBtn} ${styles.navBtnPrimary} w-full text-3xl py-8 rounded-[2.5rem] border-4 border-black shadow-[0_12px_0_#1a1a1a] hover:translate-y-2 hover:shadow-[0_4px_0_#1a1a1a] transition-all duration-200 active:translate-y-3 active:shadow-none`}
             >
               เข้าใจแล้ว เริ่มผจญภัย! 🚀
             </button>
@@ -286,19 +299,19 @@ export default function WorldPage() {
                 ณ แหล่งสร้างยาที่เชื่อว่าเป็นจุดหมายสุดท้าย... คุณได้ค้นพบความจริงว่า <b>"ยาป้องกันสมองเสื่อม"</b> ที่แท้จริงไม่ได้อยู่ในรูปแบบของตัวยา
                 หากแต่คือ <b>ประสบการณ์ การเรียนรู้ และการฝึกสมอง</b> ที่คุณได้ตรากตรำทำมาตลอดเส้นทางนี้เอง
               </p>
-              <p className="text-slate-400 text-[10px] mt-4 font-bold uppercase tracking-widest leading-loose">
+              <p className="text-black/60 text-sm mt-4 font-bold uppercase tracking-widest leading-loose">
                 ความตระหนักรู้นี้ช่วยให้คุณนำสิ่งที่คุณเรียนรู้กลับไปฟื้นฟูหมู่บ้านทั้ง 10 ให้กลับมามีชีวิตชีวาอีกครั้ง!
               </p>
             </div>
             <div className="flex flex-col gap-3 w-full mt-6">
               <button
-                className={`${styles.navBtn} ${styles.navBtnPrimary} w-full shadow-[0_10px_30px_rgba(79,70,229,0.3)]`}
+                className={`${styles.navBtn} ${styles.navBtnPrimary} w-full shadow-[0_10px_30px_rgba(79,70,229,0.3)] text-xl py-4`}
                 onClick={() => setShowEnding(false)}
               >
                 ฟื้นฟูหมู่บ้านด้วยใจ 🏘️
               </button>
               <button
-                className="text-slate-400 font-bold text-[10px] uppercase tracking-widest hover:text-red-500 transition-colors py-2"
+                className="text-red-600/80 font-black text-xs uppercase tracking-widest hover:text-red-600 hover:scale-105 transition-all py-2 mt-2"
                 onClick={() => { if (confirm('ต้องการเริ่มการเดินทางครั้งใหม่เพื่อฝึกฝนอีกรอบใช่หรือไม่?')) { resetProgress(); setShowEnding(false); } }}
               >
                 เริ่มการเดินทางใหม่ 🔄
@@ -311,7 +324,7 @@ export default function WorldPage() {
       <div className={styles.topBar}>
         <div className="flex flex-col">
           <h1 className={styles.mapTitle}>🗺️ ยินดีต้อนรับ, {userName}</h1>
-          <p className="text-[var(--text-muted)] text-xs font-black ml-1 uppercase tracking-widest">เป้าหมาย: ฟื้นฟูให้ครบ 10 หมู่บ้าน</p>
+          <p className="text-[var(--text-muted)] text-sm font-black ml-1 uppercase tracking-widest">เป้าหมาย: ฟื้นฟูให้ครบ 10 หมู่บ้าน</p>
         </div>
         <div className={styles.topActions}>
           <button className={styles.actionBtn} onClick={() => router.push('/leaderboard')}>
@@ -366,7 +379,9 @@ export default function WorldPage() {
               title={state === 'locked' ? 'ล็อก' : `หมู่บ้าน ${stage}`}
             >
               <span className={styles.stageIcon}>
-                {state === 'completed' ? '⭐' : state === 'current' ? '▶' : '🔒'}
+                {state === 'completed'
+                  ? (stage === 10 ? '🏆' : '⭐')
+                  : state === 'current' ? '▶' : '🔒'}
               </span>
               <span className={styles.stageLabel}>ด่าน {stage}</span>
               {state !== 'locked' && (
@@ -400,7 +415,7 @@ export default function WorldPage() {
         <span className={styles.legendItem}>⭐ ผ่านแล้ว</span>
         <span className={styles.legendItem}>🔒 ล็อก</span>
         <span className={styles.legendItem}>
-          EXP {Object.values(villageExp).filter((v) => v >= 100).length}/{TOTAL_STAGES}
+          ด่าน {Object.values(villageExp).filter((v) => v >= 100).length}/{TOTAL_STAGES}
         </span>
       </div>
     </div>

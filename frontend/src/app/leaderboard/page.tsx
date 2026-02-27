@@ -40,7 +40,7 @@ export default function LeaderboardPage() {
         .map((entry, index) => ({ ...entry, rank: index + 1 }))
 
     return (
-        <div className="min-h-screen bg-[var(--bg-warm)] p-4 md:p-12 font-['Outfit']">
+        <div className="min-h-screen bg-[var(--bg-warm)] p-4 md:p-12 font-['Supermarket']">
             <div className="max-w-3xl mx-auto">
 
                 {/* Header */}
