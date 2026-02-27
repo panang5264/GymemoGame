@@ -13,6 +13,7 @@ interface Item {
   id: string
   label: string
   emoji: string
+  imageUrl?: string // New
   tags: string[]
   createdAt?: number
   x?: number
@@ -23,6 +24,7 @@ interface Category {
   id: string
   title: string
   emoji: string
+  imageUrl?: string // New
   accepts: (item: Item) => boolean
 }
 
@@ -149,20 +151,20 @@ function getLevelConfig(level: number) {
     case 1:
       instruction = 'จงแยกวัตถุที่มีสีแดง และวัตถุทรงกลม'
       categories = [
-        { id: 'red', title: 'สีแดง 🔴', emoji: '📦', accepts: i => i.tags.includes('red') },
-        { id: 'sphere', title: 'ทรงกลม 🔵', emoji: '📦', accepts: i => i.tags.includes('sphere') },
+        { id: 'red', title: 'สีแดง 🔴', emoji: '📦', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/ตะกร้า.png", accepts: i => i.tags.includes('red') },
+        { id: 'sphere', title: 'ทรงกลม 🔵', emoji: '📦', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/ตะกร้า.png", accepts: i => i.tags.includes('sphere') },
       ]
       items = [
-        { id: 'r1', label: 'แอปเปิล', emoji: '🍎', tags: ['red'] },
-        { id: 'r2', label: 'พริก', emoji: '🌶️', tags: ['red'] },
-        { id: 'r3', label: 'โคมไฟ', emoji: '🏮', tags: ['red'] },
-        { id: 'r4', label: 'อั่งเปา', emoji: '🧧', tags: ['red'] },
-        { id: 'r5', label: 'กุหลาบ', emoji: '🌹', tags: ['red'] },
-        { id: 's1', label: 'ลูกบอล', emoji: '⚽', tags: ['sphere'] },
-        { id: 's2', label: 'บาสเกตบอล', emoji: '🏀', tags: ['sphere'] },
-        { id: 's3', label: 'ไหมพรม', emoji: '🧶', tags: ['sphere'] },
-        { id: 's4', label: 'ลูกแก้ว', emoji: '🔮', tags: ['sphere'] },
-        { id: 's5', label: 'ฟองสบู่', emoji: '🫧', tags: ['sphere'] },
+        { id: 'r1', label: 'รถดับเพลิง', emoji: '🚒', tags: ['red'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่1/S__3686404.jpg" },
+        { id: 'r2', label: 'ป้ายหยุด', emoji: '🛑', tags: ['red'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่1/S__3686405.jpg" },
+        { id: 'r3', label: 'พริก', emoji: '�️', tags: ['red'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่1/S__3686407.jpg" },
+        { id: 'r4', label: 'ตู้ไปรษณีย์', emoji: '📮', tags: ['red'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่1/S__3686408.jpg" },
+        { id: 'r5', label: 'ดอกกุหลาบ', emoji: '🌹', tags: ['red'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่1/S__3702788.jpg" },
+        { id: 's1', label: 'บาสเกตบอล', emoji: '🏀', tags: ['sphere'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่2/S__3702790.jpg" },
+        { id: 's2', label: 'โลก', emoji: '�', tags: ['sphere'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่2/S__3702791.jpg" },
+        { id: 's3', label: 'ลูกกอล์ฟ', emoji: '⛳', tags: ['sphere'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่2/S__3702792.jpg" },
+        { id: 's4', label: 'ลูกแก้ว', emoji: '🔮', tags: ['sphere'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่2/S__3702793.jpg" },
+        { id: 's5', label: 'พระจันทร์', emoji: '🌙', tags: ['sphere'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่2/S__3702794.jpg" },
         { id: 'o1', label: 'กล้วย', emoji: '🍌', tags: [] },
         { id: 'o2', label: 'บรอกโคลี', emoji: '🥦', tags: [] },
         { id: 'o3', label: 'จักรยาน', emoji: '🚲', tags: [] },
@@ -174,25 +176,20 @@ function getLevelConfig(level: number) {
     case 2:
       instruction = 'แยกสัตว์ที่เดิน 4 ขา และวัตถุที่ใช้ขัด/แปรง'
       categories = [
-        { id: 'animal4', title: 'สัตว์ 4 ขา 🐕', emoji: '📦', accepts: i => i.tags.includes('animal4') },
-        { id: 'scrubber', title: 'วัตถุขัด/แปรง 🧽', emoji: '📦', accepts: i => i.tags.includes('scrubber') },
+        { id: 'animal4', title: 'สัตว์ 4 ขา 🐕', emoji: '📦', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/ตะกร้า.png", accepts: i => i.tags.includes('animal4') },
+        { id: 'scrubber', title: 'วัตถุขัด/แปรง 🧽', emoji: '📦', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/ตะกร้า.png", accepts: i => i.tags.includes('scrubber') },
       ]
       items = [
-        { id: 'a1', label: 'สุนัข', emoji: '🐕', tags: ['animal4'] },
-        { id: 'a2', label: 'แมว', emoji: '🐈', tags: ['animal4'] },
-        { id: 'a3', label: 'ช้าง', emoji: '🐘', tags: ['animal4'] },
-        { id: 'a4', label: 'วัว', emoji: '🐄', tags: ['animal4'] },
-        { id: 'a5', label: 'ม้า', emoji: '🐎', tags: ['animal4'] },
-        { id: 'sc1', label: 'แปรงสีฟัน', emoji: '🪥', tags: ['scrubber'] },
-        { id: 'sc2', label: 'ฟองน้ำ', emoji: '🧽', tags: ['scrubber'] },
-        { id: 'sc3', label: 'ไม้กวาด', emoji: '🧹', tags: ['scrubber'] },
-        { id: 'sc4', label: 'แปรงขัด', emoji: '🧺', tags: ['scrubber'] },
-        { id: 'sc5', label: 'สก๊อตไบร์ท', emoji: '🧼', tags: ['scrubber'] },
-        { id: 'o1', label: 'นก', emoji: '🐦', tags: [] },
-        { id: 'o2', label: 'ปลา', emoji: '🐟', tags: [] },
-        { id: 'o3', label: 'ร่ม', emoji: '☂️', tags: [] },
-        { id: 'o4', label: 'นาฬิกา', emoji: '⏰', tags: [] },
-        { id: 'o5', label: 'โทรศัพท์', emoji: '📱', tags: [] },
+        { id: 'a1', label: 'จระเข้', emoji: '🐕', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/จรเข้.png", tags: ['animal4'] },
+        { id: 'a2', label: 'ช้าง', emoji: '🐘', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/ช้าง.png", tags: ['animal4'] },
+        { id: 'a3', label: 'ม้าลาย', emoji: '🦓', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/ม้าลาย.png", tags: ['animal4'] },
+        { id: 'a4', label: 'ยีราฟ', emoji: '🦒', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/ยีราฟ.png", tags: ['animal4'] },
+        { id: 'a5', label: 'หมู', emoji: '🐷', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/หมู.png", tags: ['animal4'] },
+        { id: 'sc1', label: 'แปรงสีฟัน', emoji: '🪥', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/แปรงสีฟัน.png", tags: ['scrubber'] },
+        { id: 'sc2', label: 'ฟองน้ำ', emoji: '🧽', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/ฟองน้ำ.png", tags: ['scrubber'] },
+        { id: 'sc3', label: 'ฝอยขัดหม้อ', emoji: '🧼', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/ฝอยขัดหม้อ.png", tags: ['scrubber'] },
+        { id: 'sc4', label: 'แปรงขัดส้วม', emoji: '🧹', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/แปรงขัดส้วม.png", tags: ['scrubber'] },
+        { id: 'sc5', label: 'ไม้ถูพื้น', emoji: '🧹', imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/ไม้ถู.png", tags: ['scrubber'] },
       ]
       break
 
@@ -203,21 +200,18 @@ function getLevelConfig(level: number) {
         { id: 'scrubber', title: 'วัตถุขัด/แปรง', emoji: '📦', accepts: i => i.tags.includes('scrubber') },
       ]
       items = [
-        { id: 'a1', label: 'สุนัข', emoji: '🐕', tags: ['animal4'] },
-        { id: 'a2', label: 'แมว', emoji: '🐈', tags: ['animal4'] },
-        { id: 'a3', label: 'ช้าง', emoji: '🐘', tags: ['animal4'] },
-        { id: 'a4', label: 'วัว', emoji: '🐄', tags: ['animal4'] },
-        { id: 'a5', label: 'ม้า', emoji: '🐎', tags: ['animal4'] },
-        { id: 'sc1', label: 'แปรงสีฟัน', emoji: '🪥', tags: ['scrubber'] },
-        { id: 'sc2', label: 'ฟองน้ำ', emoji: '🧽', tags: ['scrubber'] },
-        { id: 'sc3', label: 'ไม้กวาด', emoji: '🧹', tags: ['scrubber'] },
-        { id: 'sc4', label: 'แปรงขัด', emoji: '🧺', tags: ['scrubber'] },
-        { id: 'sc5', label: 'สก๊อตไบร์ท', emoji: '🧼', tags: ['scrubber'] },
+        { id: 'a1', label: 'จรเข้', emoji: '�', tags: ['animal4'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/จรเข้.png" },
+        { id: 'a2', label: 'ช้าง', emoji: '�', tags: ['animal4'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/ช้าง.png" },
+        { id: 'a3', label: 'ม้าลาย', emoji: '🦓', tags: ['animal4'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/ม้าลาย.png" },
+        { id: 'a4', label: 'ยีราฟ', emoji: '🦒', tags: ['animal4'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/ยีราฟ.png" },
+        { id: 'a5', label: 'หมู', emoji: '�', tags: ['animal4'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 3/หมู.png" },
+        { id: 'sc1', label: 'ฝอยขัดหม้อ', emoji: '�', tags: ['scrubber'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/ฝอยขัดหม้อ.png" },
+        { id: 'sc2', label: 'ฟองน้ำ', emoji: '🧽', tags: ['scrubber'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/ฟองน้ำ.png" },
+        { id: 'sc3', label: 'แปรงขัดส้วม', emoji: '🚽', tags: ['scrubber'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/แปรงขัดส้วม.png" },
+        { id: 'sc4', label: 'แปรงสีฟัน', emoji: '�', tags: ['scrubber'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/แปรงสีฟัน.png" },
+        { id: 'sc5', label: 'ไม้ถู', emoji: '🧹', tags: ['scrubber'], imageUrl: "/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/หมวดหมู่ที่ 4/ไม้ถู.png" },
         { id: 'r1', label: 'พริก', emoji: '🌶️', tags: ['red', 'animal4'] },
         { id: 's1', label: 'ลูกบอล', emoji: '⚽', tags: ['sphere', 'scrubber'] },
-        { id: 'a6', label: 'กวาง', emoji: '🦌', tags: ['animal4'] },
-        { id: 'a7', label: 'หมู', emoji: '🐷', tags: ['animal4'] },
-        { id: 'sc6', label: 'ที่เปิดขวด', emoji: '🍾', tags: ['scrubber'] },
       ].sort(() => Math.random() - 0.5)
       break
 
@@ -799,7 +793,11 @@ function ManagementGameInner() {
                         className="absolute w-28 h-28 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing z-10 select-none animate-in fade-in zoom-in"
                         style={{ left: `${item.x}%`, top: `${item.y}%`, transform: 'translate(-50%, -50%)' }}
                       >
-                        <span className="text-7xl drop-shadow-2xl">{item.emoji}</span>
+                        {item.imageUrl ? (
+                          <img src={item.imageUrl} className="w-24 h-24 object-contain drop-shadow-2xl" alt={item.label} />
+                        ) : (
+                          <span className="text-7xl drop-shadow-2xl">{item.emoji}</span>
+                        )}
                         <div className="mt-2 bg-white/90 px-3 py-1 rounded-xl shadow-lg text-xs font-black text-slate-600">
                           {item.label}
                         </div>
@@ -813,7 +811,11 @@ function ManagementGameInner() {
                     {config.categories.map(cat => (
                       <div key={cat.id} onDragOver={(e) => e.preventDefault()} onDrop={(e) => handleSortItem(e.dataTransfer.getData('itemId'), cat.id)} className="flex flex-col items-center group">
                         <div className="w-32 h-24 md:w-48 md:h-32 bg-white rounded-[40px] border-4 border-dashed border-slate-200 shadow-2xl flex items-center justify-center group-hover:border-blue-300 transition-all">
-                          <span className="text-7xl md:text-8xl drop-shadow-xl transition-transform duration-500 group-hover:scale-110">📦</span>
+                          {cat.imageUrl ? (
+                            <img src={cat.imageUrl} className="w-[80%] h-[80%] object-contain transition-transform duration-500 group-hover:scale-110" alt={cat.title} />
+                          ) : (
+                            <span className="text-7xl md:text-8xl drop-shadow-xl transition-transform duration-500 group-hover:scale-110">📦</span>
+                          )}
                         </div>
                         <div className="mt-2 bg-white px-6 py-2 rounded-2xl shadow-xl border-b-4 border-slate-200 text-sm font-black text-slate-700 uppercase tracking-tighter">
                           {cat.title}
@@ -857,9 +859,29 @@ function ManagementGameInner() {
                       {maze.map((row, r) => row.map((cell, c) => (
                         <div key={`${r}-${c}`} className={`w-8 h-8 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-2xl ${cell === 1 ? 'bg-slate-700' : 'bg-slate-900/40'}`}>
                           {playerPos.r === r && playerPos.c === c && <span className="animate-pulse">🧍</span>}
-                          {cell === 2 && <span className={`animate-bounce ${levelParam >= 7 && !hasKey ? 'grayscale opacity-30 brightness-50' : ''}`}>🏁</span>}
-                          {cell === 3 && <span>🔑</span>}
-                          {cell === 4 && showBombs && <span>💣</span>}
+                          {cell === 2 && (
+                            <div className={`relative w-full h-full flex items-center justify-center ${levelParam >= 7 && !hasKey ? 'grayscale opacity-30 brightness-50' : ''}`}>
+                              <img
+                                src="/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/เกมเขาวงกต/ICON อื่นๆ/แม่กุญแจ.png"
+                                className="w-[80%] h-[80%] object-contain drop-shadow-lg"
+                                onError={(e) => (e.currentTarget.style.display = 'none')}
+                              />
+                            </div>
+                          )}
+                          {cell === 3 && (
+                            <img
+                              src="/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/เกมเขาวงกต/ICON อื่นๆ/กุญแจ.png"
+                              className="w-[80%] h-[80%] object-contain"
+                              onError={(e) => (e.currentTarget.style.display = 'none')}
+                            />
+                          )}
+                          {cell === 4 && showBombs && (
+                            <img
+                              src="/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/เกมเขาวงกต/ICON อื่นๆ/ลูกระเบิด.png"
+                              className="w-[80%] h-[80%] object-contain"
+                              onError={(e) => (e.currentTarget.style.display = 'none')}
+                            />
+                          )}
                         </div>
                       )))}
                     </div>

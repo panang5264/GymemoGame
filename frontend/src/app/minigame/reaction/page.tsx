@@ -172,14 +172,26 @@ function MazeGameInner() {
                                         className={`w-6 h-6 md:w-8 md:h-8 rounded-[4px] flex items-center justify-center text-lg ${cell === 1 ? 'bg-slate-700/80 shadow-inner' : 'bg-slate-900/30'
                                             }`}
                                     >
-                                        {playerPos.r === r && playerPos.c === c && <span className="animate-pulse drop-shadow-md">🧍</span>}
-                                        {cell === 2 && <span className="animate-bounce">�</span>}
+                                        {playerPos.r === r && playerPos.c === c && (
+                                            <img
+                                                src="/assets/Assets'Employer/ตัวละคร/คุณตา.png"
+                                                className="w-[85%] h-[85%] object-contain drop-shadow-md animate-pulse"
+                                                alt="player"
+                                            />
+                                        )}
+                                        {cell === 2 && (
+                                            <img
+                                                src="/assets/Assets'Employer/Assess ด้าน/บริหารจัดการ/เกมเขาวงกต/ICON อื่นๆ/แม่กุญแจ.png"
+                                                className="w-[75%] h-[75%] object-contain drop-shadow-xl animate-bounce"
+                                                alt="exit"
+                                            />
+                                        )}
                                     </div>
                                 )))}
                             </div>
 
                             <div className="grid grid-cols-3 gap-3 mt-8 md:hidden">
-                                <div /><button onClick={() => movePlayer(-1, 0)} className="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-3xl border-b-4 border-slate-200">�</button><div />
+                                <div /><button onClick={() => movePlayer(-1, 0)} className="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-3xl border-b-4 border-slate-200">⬆️</button><div />
                                 <button onClick={() => movePlayer(0, -1)} className="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-3xl border-b-4 border-slate-200">◀️</button>
                                 <button onClick={() => movePlayer(1, 0)} className="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-3xl border-b-4 border-slate-200">🔽</button>
                                 <button onClick={() => movePlayer(0, 1)} className="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-3xl border-b-4 border-slate-200">▶️</button>

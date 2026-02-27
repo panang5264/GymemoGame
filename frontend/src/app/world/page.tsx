@@ -337,10 +337,14 @@ export default function WorldPage() {
               onClick={() => handleStageClick(stage)}
               title={state === 'locked' ? 'ล็อก' : `หมู่บ้าน ${stage}`}
             >
-              <span className={styles.stageIcon}>
-                {state === 'completed'
-                  ? '⭐'
-                  : state === 'current' ? '▶' : '🔒'}
+              <span
+                className={styles.stageIcon}
+                style={{
+                  backgroundImage: state === 'locked'
+                    ? `url("/assets/Assets'Employer/Background/แผนที่ 10 หมู่บ้าน/ตัวหมู่บ้าน/ไม่มีสี (ยังไม่ปลดล็อก)/IMG_06${64 + stage}.PNG")`
+                    : `url("/assets/Assets'Employer/Background/แผนที่ 10 หมู่บ้าน/ตัวหมู่บ้าน/มีสี (ปลดล็อกแล้ว)/${stage}.PNG")`
+                }}
+              >
               </span>
               <span className={styles.stageLabel}>ด่าน {stage}</span>
               {state !== 'locked' && (
