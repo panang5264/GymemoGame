@@ -306,6 +306,12 @@ function ManagementGameInner() {
   // Persistence Guard
   const hasSavedRef = useRef(false)
 
+  // Refs for tracking states safely inside intervals
+  const activePoolRef = useRef(activePool)
+  useEffect(() => { activePoolRef.current = activePool }, [activePool])
+  const spawnQueueRef = useRef(spawnQueue)
+  useEffect(() => { spawnQueueRef.current = spawnQueue }, [spawnQueue])
+
   // Initialization
   useEffect(() => {
     hasSavedRef.current = false
@@ -353,17 +359,21 @@ function ManagementGameInner() {
     if (phase !== 'play' || config.mode !== 'sorting') return
 
     const interval = setInterval(() => {
-      setActivePool(prev => {
-        if (prev.length >= MAX_ACTIVE_ITEMS || spawnQueue.length === 0) return prev
-        const nextItem = spawnQueue[0]
+      const currentQueue = spawnQueueRef.current
+      const currentPool = activePoolRef.current
+
+      if (currentPool.length < MAX_ACTIVE_ITEMS && currentQueue.length > 0) {
+        const nextItem = currentQueue[0]
         const { x, y } = getRandomPos()
         const newItem = { ...nextItem, createdAt: Date.now(), x, y }
-        setSpawnQueue(sq => sq.slice(1))
-        return [...prev, newItem]
-      })
+
+        setActivePool([...currentPool, newItem])
+        setSpawnQueue(currentQueue.slice(1))
+      }
     }, 1500)
+
     return () => clearInterval(interval)
-  }, [phase, spawnQueue, config.mode])
+  }, [phase, config.mode])
 
   // Expiration & Fade Logic
   useEffect(() => {
