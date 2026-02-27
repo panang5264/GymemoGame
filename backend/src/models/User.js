@@ -22,13 +22,17 @@ const userSchema = new mongoose.Schema({
   highScore: {
     type: Number,
     default: 0
+  },
+  totalKeys: {
+    type: Number,
+    default: 0
   }
 }, {
   timestamps: true
 })
 
 // Hash password ก่อน save
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     next()
   }
@@ -37,7 +41,7 @@ userSchema.pre('save', async function(next) {
 })
 
 // Method เปรียบเทียบรหัสผ่าน
-userSchema.methods.comparePassword = async function(enteredPassword) {
+userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password)
 }
 

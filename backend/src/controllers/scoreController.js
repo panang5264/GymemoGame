@@ -8,11 +8,27 @@ const submitScore = async (req, res) => {
   try {
     const { score, moves, timeTaken } = req.body
 
-    // ตรวจสอบข้อมูล
+    // ตรวจสอบข้อมูลเบื้องต้น
     if (score === undefined || moves === undefined || timeTaken === undefined) {
       return res.status(400).json({
         success: false,
         message: 'กรุณากรอกข้อมูลให้ครบถ้วน'
+      })
+    }
+
+    // Security & Validation Check
+    if (score < 0 || moves < 0 || timeTaken < 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'ข้อมูลไม่ถูกต้อง (ห้ามติดลบ)'
+      })
+    }
+
+    // แบบสมมติ: ถ้าค่าสูงเกินความเป็นไปได้ อาจจะเกิดจากการแก้โค้ดฝั่ง Client
+    if (score > 1000000 || moves > 100000 || timeTaken > 86400) {
+      return res.status(400).json({
+        success: false,
+        message: 'ข้อมูลผิดปกติ โปรดลองอีกครั้ง'
       })
     }
 

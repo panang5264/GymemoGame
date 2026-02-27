@@ -12,8 +12,11 @@
     "cors": "2.8.5",
     "dotenv": "16.3.1",
     "express": "4.22.1",
+    "express-rate-limit": "^8.2.1",
     "jsonwebtoken": "9.0.2",
-    "mongoose": "8.9.5"
+    "moment-timezone": "^0.6.0",
+    "mongoose": "8.9.5",
+    "node-cron": "^4.2.1"
   },
   "devDependencies": {
     "nodemon": "^1.0.2"

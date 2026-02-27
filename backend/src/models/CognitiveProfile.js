@@ -11,6 +11,14 @@ const playerCognitiveProfileSchema = new mongoose.Schema({
         attention: { type: Number, default: 0 }
     },
 
+    // Weekly Averages
+    weeklyAverages: {
+        executiveFunction: { type: Number, default: 0 },
+        workingMemory: { type: Number, default: 0 },
+        processingSpeed: { type: Number, default: 0 },
+        attention: { type: Number, default: 0 }
+    },
+
     // History of progress over time for charting
     progressHistory: [{
         date: { type: Date, default: Date.now },

@@ -5,17 +5,26 @@ const connectDB = require('./config/db')
 const authRoutes = require('./routes/authRoutes')
 const scoreRoutes = require('./routes/scoreRoutes')
 const progressionRoutes = require('./routes/progressionRoutes')
-
 const analysisRoutes = require('./routes/analysisRoutes')
+const dailyRoutes = require('./routes/dailyRoutes')
+const { errorHandler } = require('./middleware/errorMiddleware')
 
 const app = express()
 
 // เชื่อมต่อ Database
 connectDB()
 
+// Setup Cron Jobs
+const setupCronJobs = require('./services/cronService')
+setupCronJobs()
+
 // Middleware
 app.use(cors())
 app.use(express.json())
+
+// Rate Limiting
+const { apiLimiter } = require('./middleware/rateLimiter')
+app.use('/api', apiLimiter)
 
 // Health check และแสดง endpoints
 app.get('/', (req, res) => {
@@ -51,16 +60,10 @@ app.use('/api/auth', authRoutes)
 app.use('/api/scores', scoreRoutes)
 app.use('/api/progression', progressionRoutes)
 app.use('/api/analysis', analysisRoutes)
+app.use('/api/daily', dailyRoutes)
 
 // Error Handler Middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack)
-  res.status(500).json({
-    success: false,
-    message: 'เกิดข้อผิดพลาดในเซิร์ฟเวอร์',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  })
-})
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 
