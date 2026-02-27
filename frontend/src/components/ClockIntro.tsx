@@ -12,6 +12,10 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
     const [hourAngle, setHourAngle] = useState(0)
     const [minuteAngle, setMinuteAngle] = useState(0)
     const [activeHand, setActiveHand] = useState<'hour' | 'minute' | null>(null)
+    const [hasMovedHour, setHasMovedHour] = useState(false)
+    const [hasMovedMinute, setHasMovedMinute] = useState(false)
+    const [attempts, setAttempts] = useState(0)
+    const [feedback, setFeedback] = useState<string | null>(null)
     const [isDone, setIsDone] = useState(false)
     const clockRef = useRef<SVGSVGElement>(null)
 
@@ -33,20 +37,34 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
         if (activeHand === 'minute') {
             const snappedMinute = Math.round(angle / 6) * 6
             setMinuteAngle(snappedMinute)
+            setHasMovedMinute(true)
         } else {
             const snappedHour = Math.round(angle / 30) * 30
             setHourAngle(snappedHour)
+            setHasMovedHour(true)
         }
+        setFeedback(null)
     }
 
     const checkResult = () => {
+        setAttempts(prev => prev + 1)
         const currentHour = (Math.round(hourAngle / 30) % 12) || 12
         const currentMinute = Math.round(minuteAngle / 6) % 60
         if (currentHour === targetHour && Math.abs(currentMinute - targetMinute) < 2) {
             setIsDone(true)
-            setTimeout(onComplete, 1500)
+            setFeedback('ถูกต้องยอดเยี่ยม!')
+        } else {
+            setFeedback('ยังไม่ถูกต้อง ลองตรวจสอบเข็มนาฬิกาอีกครั้ง')
         }
     }
+
+    const getEvaluation = () => {
+        if (attempts <= 1) return { text: 'ดีมาก', color: 'text-green-400' }
+        if (attempts <= 3) return { text: 'โอเค', color: 'text-blue-400' }
+        return { text: 'ควรฝึกฝน', color: 'text-amber-400' }
+    }
+
+    const evalResult = getEvaluation()
 
     const numbers = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
@@ -150,12 +168,24 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
                     )}
                 </div>
 
+                {feedback && !isDone && (
+                    <p className="mt-4 text-red-400 font-bold animate-shake">{feedback}</p>
+                )}
+
+                {isDone && (
+                    <div className="mt-6 p-6 bg-white/10 rounded-3xl border border-white/20 animate-in zoom-in duration-500">
+                        <p className="text-white/60 text-xs font-black uppercase tracking-widest mb-1">ผลประเมินเบื้องต้น (CDT)</p>
+                        <h3 className="text-3xl font-black text-white">ประเมินผล: <span className={evalResult.color}>{evalResult.text}</span></h3>
+                        <p className="text-white/40 text-[10px] mt-2 font-bold italic">วิเคราะห์จากความแม่นยำและการตัดสินใจ</p>
+                    </div>
+                )}
+
                 <button
-                    onClick={checkResult}
-                    disabled={!activeHand || isDone}
-                    className={`mt-10 w-full py-5 rounded-[2rem] font-black text-2xl transition-all shadow-2xl ${isDone ? 'bg-green-500 text-white' : !activeHand ? 'bg-slate-700 text-slate-500 cursor-not-allowed border-2 border-slate-600' : 'bg-gradient-to-r from-indigo-600 to-blue-700 text-white hover:scale-105 active:scale-95'}`}
+                    onClick={isDone ? onComplete : checkResult}
+                    disabled={(!hasMovedHour && !hasMovedMinute && !isDone)}
+                    className={`mt-8 w-full py-5 rounded-[2rem] font-black text-2xl transition-all shadow-2xl ${isDone ? 'bg-green-500 text-white scale-105 hover:bg-green-400' : (!hasMovedHour && !hasMovedMinute) ? 'bg-slate-700 text-slate-500 cursor-not-allowed border-2 border-slate-600' : 'bg-gradient-to-r from-indigo-600 to-blue-700 text-white hover:scale-105 active:scale-95'}`}
                 >
-                    {isDone ? 'ยอดเยี่ยม! เข้าสู่เกม...' : 'ยืนยันเวลา'}
+                    {isDone ? 'เริ่มการทดสอบถัดไป 🚀' : (!hasMovedHour && !hasMovedMinute) ? 'กรุณาขยับเข็มนาฬิกา' : 'ยืนยันเวลา'}
                 </button>
             </div>
         </div>

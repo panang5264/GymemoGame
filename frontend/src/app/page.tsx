@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { loadProgress, saveProgress } from '@/lib/levelSystem'
 import { loginUser } from '@/lib/api'
+import TrainingModal from '@/components/TrainingModal'
 import { useAuth } from '@/contexts/AuthContext'
 
-type AuthPhase = 'login' | 'name' | 'profile' | 'intro' | 'grandmother'
+type AuthPhase = 'login' | 'name' | 'profile' | 'intro' | 'grandmother' | 'tutorial_summary' | 'assessment'
+import ClockIntro from '@/components/ClockIntro'
 
 export default function Home() {
   const router = useRouter()
@@ -20,6 +22,7 @@ export default function Home() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
+  const [trainingMode, setTrainingMode] = useState<'management' | 'calculation' | 'spatial' | null>(null)
 
   useEffect(() => {
     const p = loadProgress()
@@ -70,13 +73,23 @@ export default function Home() {
     p.username = name
     saveProgress(p)
     setStats(p)
-    setPhase('profile')
+    // Direct link to the story flow after name entry
+    setPhase('intro')
   }
 
   const nextPhase = () => {
     if (phase === 'profile') setPhase('intro')
     else if (phase === 'intro') setPhase('grandmother')
-    else if (phase === 'grandmother') router.push('/world')
+    else if (phase === 'grandmother') setPhase('tutorial_summary')
+    else if (phase === 'tutorial_summary') {
+      setPhase('assessment')
+    }
+    else if (phase === 'assessment') {
+      const p = loadProgress()
+      p.introSeen = true
+      saveProgress(p)
+      router.push('/world')
+    }
   }
 
   return (
@@ -87,7 +100,7 @@ export default function Home() {
         <div className="absolute bottom-[-5%] left-[-5%] w-[30%] h-[30%] bg-rose-100/50 blur-[100px] rounded-full" />
       </div>
 
-      <div className="w-full max-w-md relative z-10 transition-all duration-700">
+      <div className={`w-full relative z-10 transition-all duration-700 ${phase === 'tutorial_summary' ? 'max-w-6xl' : 'max-w-md'}`}>
 
         {/* Phase 1: Login */}
         {phase === 'login' && (
@@ -222,14 +235,14 @@ export default function Home() {
 
         {/* Phase 4: Game Intro Narrative */}
         {phase === 'intro' && (
-          <div className="text-center animate-in fade-in duration-1000">
+          <div className="text-center animate-in fade-in duration-1000 max-w-md mx-auto">
             <div className="inline-block px-4 py-1 bg-[var(--border-dark)] text-[var(--text-on-dark)] text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-6">
               Story Prologue
             </div>
             <h2 className="text-4xl md:text-6xl font-black text-[var(--text-main)] mb-8 leading-tight uppercase text-center">
               จุดเริ่มต้นของ<br /><span className="bg-[var(--border-dark)] text-[var(--text-on-dark)] px-2">การเดินทาง</span>
             </h2>
-            <p className="text-[#717171] text-lg font-bold leading-relaxed mb-12 max-w-xs mx-auto">
+            <p className="text-[#717171] text-lg font-bold leading-relaxed mb-12">
               บนโลกที่ความทรงจำเริ่มเลือนหาย...<br />
               อารยธรรมและความผูกพันกำลังถูกลบเลือน<br />
               มีเพียงคุณเท่านั้นที่จะช่วยได้
@@ -242,28 +255,142 @@ export default function Home() {
           </div>
         )}
 
-        {/* Phase 5: Grandmother Story Placeholder */}
+        {/* Phase 5: Grandmother Story */}
         {phase === 'grandmother' && (
-          <div className="friendly-card p-4 animate-in zoom-in duration-700">
-            <div className="relative aspect-[4/3] bg-[#f5e6d3] overflow-hidden rounded-[2.5rem] border-3 border-[#1a1a1a] shadow-[8px_8px_0_rgba(0,0,0,0.1)] mb-8">
-              <div className="absolute inset-0 flex items-center justify-center text-9xl">
-                👵
+          <div className="max-w-md mx-auto animate-in fade-in zoom-in duration-700">
+            <div className="flex flex-col items-center">
+              <div className="relative w-full aspect-square max-w-[280px] mb-10 group">
+                <div className="absolute inset-0 bg-white border-4 border-black rounded-[3rem] rotate-3 group-hover:rotate-0 transition-transform"></div>
+                <div className="absolute inset-0 bg-[#fefae0] border-4 border-black rounded-[3rem] -rotate-3 group-hover:rotate-0 transition-transform flex items-center justify-center text-[10rem] shadow-[10px_10px_0_rgba(0,0,0,0.1)]">
+                  👵
+                </div>
+                <div className="absolute -bottom-4 -right-4 bg-red-500 text-white w-20 h-20 rounded-full border-4 border-black flex items-center justify-center text-3xl shadow-[4px_4px_0_#000] rotate-12">❤️</div>
               </div>
-              <div className="absolute bottom-0 inset-x-0 p-8 bg-[var(--border-dark)]/80 text-[var(--text-on-dark)] backdrop-blur-md">
-                <p className="text-lg font-black leading-relaxed italic">
-                  "ช่วยพวกเราทีนะลูก นำความทรงจำกลับคืนมาสู่หมู่บ้านของเรา..."
+
+              <div className="bg-white border-4 border-black rounded-[2.5rem] p-8 relative shadow-[10px_10px_0_#000]">
+                {/* Speech bubble arrow */}
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-white border-l-4 border-t-4 border-black rotate-45"></div>
+
+                <h3 className="text-xl font-black text-black mb-4 uppercase tracking-widest text-center">คุณยายผู้ดูแลหมู่บ้าน</h3>
+                <p className="text-2xl font-black leading-relaxed text-[#444] text-center italic">
+                  "ความทรงจำของพวกเราน่ะ...<br />
+                  ซ่อนอยู่ในความกล้าหาญของคนรุ่นใหม่เช่นเจ้า<br />
+                  <span className="text-red-500 underline decoration-wavy decoration-2">ช่วยพาแผนที่นี้กลับมามีชีวิตอีกครั้งนะ</span>"
                 </p>
               </div>
-            </div>
-            <div className="px-4 text-center">
-              <button onClick={nextPhase} className="pill-button w-full py-6 text-2xl shadow-[6px_6px_0_rgba(0,0,0,0.2)]">
-                เริ่มต้นภารกิจ 🏹
-              </button>
+
+              <div className="mt-12 w-full">
+                <button
+                  onClick={nextPhase}
+                  className="pill-button w-full py-6 text-2xl shadow-[0_10px_0_#1a1a1a] hover:translate-y-1 hover:shadow-[0_6px_0_#1a1a1a] active:translate-y-2 active:shadow-none transition-all"
+                >
+                  รับคำท้าและเตรียมตัว 🏹
+                </button>
+                <p className="mt-4 text-[10px] font-black text-[#717171] uppercase tracking-[0.2em] text-center">คำสั่งเสียจากผู้อาวุโส</p>
+              </div>
             </div>
           </div>
         )}
 
+        {/* Phase 6: Tutorial Summary */}
+        {phase === 'tutorial_summary' && (
+          <div className="friendly-card !p-12 animate-in slide-in-from-bottom duration-700 max-w-5xl mx-auto border-[6px]">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
+              <div className="text-left">
+                <div className="inline-block px-4 py-1 bg-yellow-400 border-2 border-black text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-4">Training Mode</div>
+                <h2 className="text-6xl font-black text-black tracking-tighter leading-none mb-4">เรียนรู้วิธีฟื้นฟู 🧠</h2>
+                <p className="text-[#717171] font-bold text-lg">ทดสอบทักษะทั้ง 3 ด้านเพื่อเตรียมความพร้อมสู่การเดินทางจริง</p>
+              </div>
+              <div className="flex -space-x-4">
+                <div className="w-16 h-16 bg-white border-4 border-black rounded-2xl flex items-center justify-center text-3xl shadow-lg -rotate-12">📦</div>
+                <div className="w-16 h-16 bg-white border-4 border-black rounded-2xl flex items-center justify-center text-3xl shadow-lg rotate-0 z-10">🔢</div>
+                <div className="w-16 h-16 bg-white border-4 border-black rounded-2xl flex items-center justify-center text-3xl shadow-lg rotate-12">🗺️</div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-16">
+              {/* Management */}
+              <div
+                onClick={() => setTrainingMode('management')}
+                className="group cursor-pointer relative bg-[#fffcf0] p-10 rounded-[4rem] border-4 border-black text-center shadow-[15px_15px_0_#000] hover:translate-y-[-12px] transition-all duration-500"
+              >
+                <div className="w-28 h-28 bg-orange-100 border-4 border-black rounded-[2.5rem] flex items-center justify-center text-6xl mx-auto mb-10 shadow-[8px_8px_0_#000] group-hover:rotate-12 transition-transform">📦</div>
+                <h4 className="font-black text-3xl text-black mb-6 tracking-tighter uppercase">Management</h4>
+                <p className="text-xl font-bold text-black/60 leading-relaxed">
+                  ฝึกการแยกแยะสิ่งของตามเงื่อนไข
+                </p>
+                <div className="mt-8 py-3 bg-[var(--border-dark)] text-white rounded-2xl text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                  Try Training ⚡
+                </div>
+              </div>
+
+              {/* Calculation */}
+              <div
+                onClick={() => setTrainingMode('calculation')}
+                className="group cursor-pointer relative bg-[#f0f7ff] p-10 rounded-[4rem] border-4 border-black text-center shadow-[15px_15px_0_#000] hover:translate-y-[-12px] transition-all duration-500"
+              >
+                <div className="w-28 h-28 bg-blue-100 border-4 border-black rounded-[2.5rem] flex items-center justify-center text-6xl mx-auto mb-10 shadow-[8px_8px_0_#000] group-hover:rotate-12 transition-transform">🔢</div>
+                <h4 className="font-black text-3xl text-black mb-6 tracking-tighter uppercase">Calculation</h4>
+                <p className="text-xl font-bold text-black/60 leading-relaxed">
+                  ท้าทายความไวการคำนวณเลข
+                </p>
+                <div className="mt-8 py-3 bg-[var(--border-dark)] text-white rounded-2xl text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                  Try Training ⚡
+                </div>
+              </div>
+
+              {/* Spatial */}
+              <div
+                onClick={() => setTrainingMode('spatial')}
+                className="group cursor-pointer relative bg-[#f0fff4] p-10 rounded-[4rem] border-4 border-black text-center shadow-[15px_15px_0_#000] hover:translate-y-[-12px] transition-all duration-500"
+              >
+                <div className="w-28 h-28 bg-green-100 border-4 border-black rounded-[2.5rem] flex items-center justify-center text-6xl mx-auto mb-10 shadow-[8px_8px_0_#000] group-hover:rotate-12 transition-transform">🗺️</div>
+                <h4 className="font-black text-3xl text-black mb-6 tracking-tighter uppercase">Spatial</h4>
+                <p className="text-xl font-bold text-black/60 leading-relaxed">
+                  วาดภาพในใจและจับคู่มุมมอง
+                </p>
+                <div className="mt-8 py-3 bg-[var(--border-dark)] text-white rounded-2xl text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                  Try Training ⚡
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-black text-[var(--text-on-dark)] p-10 rounded-[3.5rem] mb-16 text-center shadow-[0_15px_40px_rgba(0,0,0,0.2)] relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-20 text-9xl -rotate-12 text-yellow-400">⚡</div>
+              <p className="text-3xl font-black leading-tight">
+                "ทุกหมู่บ้านรอคอยให้เจ้าปลดปล่อยความทรงจำกลับคืนมา"
+              </p>
+            </div>
+
+            <button
+              onClick={nextPhase}
+              className="pill-button w-full py-10 text-4xl shadow-[0_15px_0_#1a1a1a] hover:translate-y-2 hover:shadow-[0_8px_0_#1a1a1a] active:translate-y-4 active:shadow-none transition-all"
+            >
+              พร้อมแล้ว! เข้าสู่ก้าวสำคัญ 🗝️
+            </button>
+          </div>
+        )}
+
+        {/* Phase 7: CDT Assessment (Clock Game) */}
+        {phase === 'assessment' && (
+          <div className="animate-in fade-in duration-700 w-full max-w-4xl relative z-[5000]">
+            <ClockIntro
+              targetHour={10}
+              targetMinute={10}
+              onComplete={nextPhase}
+            />
+          </div>
+        )}
+
+        {/* Training Modal Overlay */}
+        {trainingMode && (
+          <TrainingModal
+            mode={trainingMode}
+            onClose={() => setTrainingMode(null)}
+          />
+        )}
+
       </div>
-    </div>
+    </div >
   )
 }
