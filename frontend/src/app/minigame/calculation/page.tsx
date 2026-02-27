@@ -43,6 +43,7 @@ function CalculationGameInner() {
   const [lastCorrect, setLastCorrect] = useState<boolean | null>(null)
   const [answer, setAnswer] = useState('')
   const [showInfo, setShowInfo] = useState(false)
+  const [startTime] = useState(Date.now())
 
   // Results from localStorage
   const [isTimeUp, setIsTimeUp] = useState(false)
@@ -72,9 +73,11 @@ function CalculationGameInner() {
   // ── Record Play for Village Mode ──────────────────────────────────────────
   useEffect(() => {
     if (phase === 'done' && mode === 'village' && villageId) {
-      recordPlay(parseInt(villageId, 10), score * 25, 'calculation', subId)
+      const accuracy = total > 0 ? (score / total) * 100 : 100
+      const duration = (Date.now() - startTime) / 1000
+      recordPlay(parseInt(villageId, 10), score * 25, 'calculation', subId, accuracy, duration)
     }
-  }, [phase, mode, villageId, score, subId])
+  }, [phase, mode, villageId, score, subId, total, startTime])
 
   useEffect(() => {
     if (phase === 'done' && mode === 'daily') {

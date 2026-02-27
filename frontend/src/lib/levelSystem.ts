@@ -46,6 +46,7 @@ export interface GymemoProgressV2 {
   daily: Record<string, DailyModeCompletion>
   totalScore: number
   userName: string
+  guestId?: string
 }
 
 export function getDefaultProgress(): GymemoProgressV2 {
@@ -57,6 +58,7 @@ export function getDefaultProgress(): GymemoProgressV2 {
     daily: {},
     totalScore: 0,
     userName: '',
+    guestId: typeof window !== 'undefined' ? crypto.randomUUID() : undefined
   }
 }
 
@@ -86,22 +88,39 @@ export function recordPlay(
   villageId: number,
   scoreGained: number,
   gameType?: 'management' | 'calculation' | 'spatial',
-  subId?: number
+  subId?: number,
+  accuracy?: number,
+  timeTaken?: number
 ): GymemoProgressV2 {
   const p = loadProgress()
   const key = String(villageId)
   const vp = p.villages[key] ?? { playsCompleted: 0, expTubeFilled: false }
-  const newPlays = Math.min(vp.playsCompleted + 1, PLAYS_PER_VILLAGE * 99) // allow replaying beyond max
+  const newPlays = Math.min(vp.playsCompleted + 1, PLAYS_PER_VILLAGE * 99)
   const tubeFilled = newPlays >= PLAYS_PER_VILLAGE
 
-  // Accumulate score per game type if provided
   if (gameType) {
     const current = vp.currentRunScore ?? { management: 0, calculation: 0, spatial: 0 }
     current[gameType] = Math.max(current[gameType] || 0, scoreGained)
     vp.currentRunScore = current
+
+    // Send to Backend for Detailed Analytics (Fire and Forget)
+    if (p.guestId) {
+      fetch('http://localhost:3001/api/analysis/record', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          guestId: p.guestId,
+          gameType,
+          level: villageId,
+          subLevelId: subId,
+          score: scoreGained,
+          accuracy,
+          timeTaken
+        })
+      }).catch(err => console.error('Failed to log analytics:', err))
+    }
   }
 
-  // Save sub-level score
   if (subId) {
     if (subId === 1 && vp.playsCompleted % PLAYS_PER_VILLAGE === 0) {
       vp.subLevelScores = {}
@@ -111,27 +130,19 @@ export function recordPlay(
     vp.subLevelScores = scores
   }
 
-  // Preserve extended fields when updating village progress
   p.villages[key] = { ...vp, playsCompleted: newPlays, expTubeFilled: tubeFilled }
-
-  // Special logic: if this was the last level (12), we might want to archive later, 
-  // but for now let's just keep the scores until the next run starts.
-  // Actually, if playsCompleted reached a multiple of 12, it's the end of a run.
-  if (newPlays % PLAYS_PER_VILLAGE === 0 && newPlays > 0) {
-    // End of run - but we might want to keep subLevelScores for the summary view
-    // until the user starts a new sub-level in the next run.
-  }
-
   p.totalScore += scoreGained
 
   if (tubeFilled && villageId < 10 && !p.unlockedVillages.includes(villageId + 1)) {
     p.unlockedVillages = [...p.unlockedVillages, villageId + 1]
   }
+
   if (tubeFilled && villageId === 10) {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('gymemo:game_ending'))
     }
   }
+
   saveProgress(p)
   return p
 }

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { loadProgress, saveProgress } from '@/lib/levelSystem'
 import TrainingModal from '@/components/TrainingModal'
+import BrainRadarChart from '@/components/BrainRadarChart'
 
 type AuthPhase = 'login' | 'name' | 'profile' | 'intro' | 'grandmother' | 'tutorial_summary' | 'assessment'
 import ClockIntro from '@/components/ClockIntro'
@@ -14,6 +15,7 @@ export default function Home() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
+  const [cognitiveData, setCognitiveData] = useState<any>(null)
   const [stats, setStats] = useState<any>(null)
   const [isReady, setIsReady] = useState(false)
   const [trainingMode, setTrainingMode] = useState<'management' | 'calculation' | 'spatial' | null>(null)
@@ -29,6 +31,15 @@ export default function Home() {
         return
       }
       setPhase('profile')
+      // Fetch Analysis Data
+      if (p.guestId) {
+        fetch(`http://localhost:3001/api/analysis/profile/${p.guestId}`)
+          .then(res => res.json())
+          .then(res => {
+            if (res.success && res.data) setCognitiveData(res.data)
+          })
+          .catch(err => console.error('Failed to fetch profile analysis:', err))
+      }
     }
     setIsReady(true)
   }, [router])
@@ -162,7 +173,37 @@ export default function Home() {
               </div>
             </div>
             <h2 className="text-4xl font-black text-[#1a1a1a] mb-1">{name}</h2>
-            <p className="text-[#717171] font-bold uppercase tracking-[0.2em] text-[10px] mb-10">นักสำรวจความจำระดับ 1</p>
+            <p className="text-[#717171] font-bold uppercase tracking-[0.2em] text-[10px] mb-10">นักสำรวจความจำ | ปลดล็อก {stats?.unlockedVillages?.length || 1}/10 หมู่บ้าน</p>
+
+            {/* Brain Development Section (Visual Graph) */}
+            <div className="bg-white border-3 border-[#1a1a1a] rounded-[3rem] p-8 shadow-[10px_10px_0_#1a1a1a] mb-12 text-center overflow-hidden">
+              <h3 className="text-xl font-black text-[#1a1a1a] mb-2 uppercase tracking-tight flex items-center justify-center gap-2">
+                <span>🧠</span> พัฒนาการสมอง
+              </h3>
+              <p className="text-[10px] font-black text-[#717171] uppercase tracking-[0.2em] mb-6 opacity-60">Cognitive Profile Analysis</p>
+
+              <BrainRadarChart
+                data={[
+                  { label: 'Management', value: cognitiveData?.averages?.executiveFunction || 65, color: '#4f46e5' },
+                  { label: 'Calculation', value: cognitiveData?.averages?.processingSpeed || 45, color: '#3b82f6' },
+                  { label: 'Spatial', value: cognitiveData?.averages?.workingMemory || 55, color: '#10b981' },
+                  { label: 'Reaction', value: cognitiveData?.averages?.attention || 50, color: '#f59e0b' },
+                ]}
+                size={220}
+              />
+
+              <div className="mt-8 grid grid-cols-2 gap-3">
+                <div className="p-3 bg-indigo-50 rounded-2xl border-2 border-indigo-100">
+                  <div className="text-[8px] font-black text-indigo-400 uppercase">Executive</div>
+                  <div className="text-xl font-black text-indigo-700">{Math.round(cognitiveData?.averages?.executiveFunction || 65)}%</div>
+                </div>
+                <div className="p-3 bg-emerald-50 rounded-2xl border-2 border-emerald-100">
+                  <div className="text-[8px] font-black text-emerald-400 uppercase">Memory</div>
+                  <div className="text-xl font-black text-emerald-700">{Math.round(cognitiveData?.averages?.workingMemory || 55)}%</div>
+                </div>
+              </div>
+            </div>
+
 
             <div className="grid grid-cols-2 gap-4 mb-10">
               <div className="bg-white border-3 border-[#1a1a1a] rounded-[2rem] p-4 shadow-[4px_4px_0_#1a1a1a]">

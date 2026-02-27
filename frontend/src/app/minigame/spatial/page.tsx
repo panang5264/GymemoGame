@@ -37,6 +37,8 @@ export default function Page() {
   const [feedback, setFeedback] = useState<{ type: 'correct' | 'wrong', message: string } | null>(null)
   const [questionText, setQuestionText] = useState<string>('')
   const [isGameOver, setIsGameOver] = useState(false)
+  const [errorCount, setErrorCount] = useState(0)
+  const [startTime] = useState(Date.now())
 
   const isComplete = isGameOver
 
@@ -129,7 +131,9 @@ export default function Page() {
   useEffect(() => {
     if (isComplete) {
       if (mode === 'village') {
-        recordPlay(villageId, 100, 'spatial', subId)
+        const accuracy = errorCount === 0 ? 100 : Math.max(0, 100 - (errorCount * 25))
+        const duration = (Date.now() - startTime) / 1000
+        recordPlay(villageId, 100, 'spatial', subId, accuracy, duration)
       } else if (mode === 'daily') {
         const dateKey = new Date().toISOString().split('T')[0]
         localStorage.setItem(`gymemo_spatial_daily_${dateKey}`, JSON.stringify({ score: 100 }))
@@ -285,6 +289,7 @@ export default function Page() {
                           setFeedback({ type: 'correct', message: '✨ ถูกต้องแล้ว! เก่งมาก' })
                           setTimeout(() => setIsGameOver(true), 1200)
                         } else {
+                          setErrorCount(e => e + 1)
                           setFeedback({ type: 'wrong', message: '❌ ยังไม่ใช่นะ ลองดูอีกที' })
                           setTimeout(() => setFeedback(null), 1000)
                         }

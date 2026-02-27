@@ -6,6 +6,8 @@ const authRoutes = require('./routes/authRoutes')
 const scoreRoutes = require('./routes/scoreRoutes')
 const progressionRoutes = require('./routes/progressionRoutes')
 
+const analysisRoutes = require('./routes/analysisRoutes')
+
 const app = express()
 
 // เชื่อมต่อ Database
@@ -35,6 +37,10 @@ app.get('/', (req, res) => {
         get: 'GET /api/progression/:guestId',
         complete: 'POST /api/progression/complete',
         unlock: 'POST /api/progression/unlock'
+      },
+      analysis: {
+        record: 'POST /api/analysis/record',
+        profile: 'GET /api/analysis/profile/:guestId'
       }
     }
   })
@@ -44,6 +50,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes)
 app.use('/api/scores', scoreRoutes)
 app.use('/api/progression', progressionRoutes)
+app.use('/api/analysis', analysisRoutes)
 
 // Error Handler Middleware
 app.use((err, req, res, next) => {

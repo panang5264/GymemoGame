@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { recordPlay, markDailyMode } from '@/lib/levelSystem'
+import { recordPlay, markDailyMode, loadProgress } from '@/lib/levelSystem'
 import ClockIntro from '@/components/ClockIntro'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -273,6 +273,8 @@ function ManagementGameInner() {
   const [spawnQueue, setSpawnQueue] = useState<Item[]>([])
   const [activePool, setActivePool] = useState<Item[]>([])
   const [correctCount, setCorrectCount] = useState(0)
+  const [errorCount, setErrorCount] = useState(0)
+  const [startTime] = useState(Date.now())
 
   // Cooking State
   const [dishIndex, setDishIndex] = useState(0)
@@ -393,7 +395,8 @@ function ManagementGameInner() {
       })
     } else {
       setScore(s => s - 1)
-      setFeedback({ type: 'wrong', message: '❌ ผิดหมวด!' })
+      setErrorCount(e => e + 1)
+      setFeedback({ type: 'correct', message: '❌ ผิดหมวด!' })
     }
     setActivePool(prev => prev.filter(i => i.id !== itemId))
     setTimeout(() => setFeedback(null), 1000)
@@ -541,14 +544,33 @@ function ManagementGameInner() {
   // Persistence
   useEffect(() => {
     if (phase === 'done') {
-      if (modeParam === 'village') recordPlay(villageId, score, 'management', subId)
+      const accuracy = (correctCount + errorCount) > 0 ? (correctCount / (correctCount + errorCount)) * 100 : 100
+      const timeTaken = (Date.now() - startTime) / 1000
+      if (modeParam === 'village') recordPlay(villageId, score, 'management', subId, accuracy, timeTaken)
       else if (modeParam === 'daily') {
         const dk = new Date().toISOString().split('T')[0]
         localStorage.setItem(`gymemo_mgmt_daily_${dk}`, JSON.stringify({ score }))
         markDailyMode(dk, 'management')
+
+        const p = loadProgress()
+        if (p.guestId) {
+          fetch('http://localhost:3001/api/analysis/record', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              guestId: p.guestId,
+              gameType: 'management',
+              level: 0, // Daily level 0
+              subLevelId: 0,
+              score,
+              accuracy,
+              timeTaken
+            })
+          }).catch(err => console.error('Failed to log daily analytics:', err))
+        }
       }
     }
-  }, [phase, modeParam, villageId, score, subId])
+  }, [phase, modeParam, villageId, score, subId, correctCount, errorCount, startTime])
 
   // ─── Render Components ──────────────────────────────────────────────────────
 

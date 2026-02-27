@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { loadProgress, PLAYS_PER_VILLAGE } from '@/lib/levelSystem'
 import { getExpPercent } from '@/lib/scoring'
 import { getLeaderboard } from '@/lib/api'
+import BrainRadarChart from '@/components/BrainRadarChart'
 
 interface LocalEntry {
     villageId: number
@@ -33,12 +34,22 @@ export default function LeaderboardPage() {
     const [unlockedCount, setUnlockedCount] = useState(0)
     const [globalEntries, setGlobalEntries] = useState<GlobalEntry[]>([])
     const [loadingGlobal, setLoadingGlobal] = useState(true)
+    const [cognitiveData, setCognitiveData] = useState<any>(null)
 
     useEffect(() => {
         const p = loadProgress()
         setUserScore(p.totalScore || 0)
         setUserName(p.userName || 'นักเดินทาง')
         setUnlockedCount(p.unlockedVillages.length)
+
+        if (p.guestId) {
+            fetch(`http://localhost:3001/api/analysis/profile/${p.guestId}`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success && res.data) setCognitiveData(res.data)
+                })
+                .catch(err => console.error('Failed to fetch cognitive profile:', err))
+        }
 
         // Build per-village stats from local progress
         const entries: LocalEntry[] = []
@@ -156,7 +167,7 @@ export default function LeaderboardPage() {
                         </div>
                         <div className="flex-1 text-center md:text-left">
                             <h2 className="text-3xl font-black text-[var(--text-main)]">{userName}</h2>
-                            <p className="text-[var(--text-muted)] font-black uppercase tracking-widest text-xs">นักสำรวจความจำ · ปลดล็อก {unlockedCount}/10 หมู่บ้าน</p>
+                            <p className="text-[var(--text-muted)] font-black uppercase tracking-widest text-xs">นักสำรวจความจำ | ปลดล็อก {unlockedCount}/10 หมู่บ้าน</p>
                         </div>
                         <div className="bg-indigo-600 text-white px-6 py-3 rounded-full">
                             <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-1">Total Score</p>
@@ -178,6 +189,30 @@ export default function LeaderboardPage() {
                                     background: 'linear-gradient(90deg, #6366f1, #8b5cf6)'
                                 }}
                             />
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col md:flex-row gap-8 items-center bg-slate-50/50 rounded-[2rem] p-6 border-2 border-slate-100 mt-8">
+                        <div className="flex-1 flex justify-center">
+                            <BrainRadarChart
+                                data={[
+                                    { label: 'Management', value: cognitiveData?.averages?.executiveFunction || 65, color: '#f97316' },
+                                    { label: 'Calculation', value: cognitiveData?.averages?.processingSpeed || 45, color: '#3b82f6' },
+                                    { label: 'Spatial', value: cognitiveData?.averages?.workingMemory || 55, color: '#22c55e' },
+                                    { label: 'Reaction', value: cognitiveData?.averages?.attention || 50, color: '#f59e0b' },
+                                ]}
+                                size={200}
+                            />
+                        </div>
+                        <div className="w-full md:w-64 space-y-4">
+                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Executive Function</span>
+                                <div className="text-2xl font-black text-indigo-600">{Math.round(cognitiveData?.averages?.executiveFunction || 65)}%</div>
+                            </div>
+                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Working Memory</span>
+                                <div className="text-2xl font-black text-emerald-600">{Math.round(cognitiveData?.averages?.workingMemory || 55)}%</div>
+                            </div>
                         </div>
                     </div>
                 </div>

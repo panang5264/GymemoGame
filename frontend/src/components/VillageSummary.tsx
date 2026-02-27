@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { loadProgress, getVillageRunHistory, VillageRunRecord, getVillageProgress, PLAYS_PER_VILLAGE } from '@/lib/levelSystem'
 import { getExpPercent } from '@/lib/scoring'
+import CognitiveTrendChart from './CognitiveTrendChart'
+import BrainRadarChart from './BrainRadarChart'
 
 interface ScoreBar {
     label: string
@@ -120,7 +122,30 @@ export default function VillageSummary({ villageId, onContinue, scores: propScor
                         ))}
                     </div>
 
-                    {/* Previous runs history */}
+                    {/* Run History Trend Chart */}
+                    {runHistory.length >= 2 && (
+                        <div className="bg-slate-900 rounded-[2.5rem] p-6 text-white overflow-hidden shadow-xl">
+                            <div className="flex justify-between items-center mb-6">
+                                <h4 className="text-sm font-black uppercase tracking-widest text-indigo-300">📈 แนวโน้มพัฒนาการ</h4>
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Last {runHistory.length} runs</span>
+                            </div>
+                            <CognitiveTrendChart
+                                trends={[
+                                    { label: 'Management', points: runHistory.map(r => r.managementScore), color: '#f97316' },
+                                    { label: 'Calculation', points: runHistory.map(r => r.calculationScore), color: '#3b82f6' },
+                                    { label: 'Spatial', points: runHistory.map(r => r.spatialScore), color: '#22c55e' }
+                                ]}
+                                width={400}
+                                height={180}
+                            />
+                            <div className="mt-4 flex justify-between px-2">
+                                <span className="text-[9px] font-bold text-slate-500">PAST</span>
+                                <span className="text-[9px] font-bold text-indigo-400">PRESENT</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Previous runs history list */}
                     {runHistory.length > 1 && (
                         <div>
                             <button
@@ -128,7 +153,7 @@ export default function VillageSummary({ villageId, onContinue, scores: propScor
                                 className="w-full text-left text-xs font-black text-slate-400 uppercase tracking-widest py-2 hover:text-slate-600 transition-colors flex items-center gap-2"
                             >
                                 <span>{showHistory ? '▼' : '▶'}</span>
-                                ประวัติ {runHistory.length} รอบที่ผ่านมา
+                                รายละเอียด {runHistory.length} รอบที่ผ่านมา
                             </button>
 
                             {showHistory && (
