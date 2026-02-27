@@ -372,7 +372,7 @@ function ManagementGameInner() {
     const interval = setInterval(() => {
       const now = Date.now()
 
-      // Sorting cleanup
+      // Sorting cleanup: items expire and disappear
       if (config.mode === 'sorting') {
         setActivePool(prev => prev.filter(item => item.createdAt && (now - item.createdAt < ITEM_LIFETIME)))
       }
