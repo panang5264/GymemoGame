@@ -15,7 +15,7 @@ interface Props {
 
 export default function BrainRadarChart({ data, size = 300 }: Props) {
     const center = size / 2
-    const radius = (size / 2) * 0.7
+    const radius = (size / 2) * 0.35 // Adjusted to ensure Thai labels fit without being cut off
     const angleStep = (Math.PI * 2) / data.length
 
     // Generate background circles
@@ -75,7 +75,7 @@ export default function BrainRadarChart({ data, size = 300 }: Props) {
                 y={y}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                className="text-[10px] font-black fill-slate-400 uppercase tracking-tighter"
+                className="text-[16px] sm:text-[18px] font-black fill-slate-500 uppercase tracking-tight"
             >
                 {d.label}
             </text>
@@ -84,7 +84,7 @@ export default function BrainRadarChart({ data, size = 300 }: Props) {
 
     return (
         <div className="flex justify-center items-center">
-            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible">
                 {/* Background */}
                 {bgCircles}
                 {axes}

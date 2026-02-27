@@ -1,4 +1,4 @@
-const API_BASE_URL =
+export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3001'
 
 export async function getProgression(guestId: string) {
@@ -69,6 +69,20 @@ export async function getUserProfile(token: string) {
   return data
 }
 
+export async function updateProfile(token: string, profileData: { name?: string, avatar?: string }) {
+  const res = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(profileData),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Failed to update profile')
+  return data
+}
+
 // --- Sync API ---
 
 export async function fetchSyncProgress(token: string) {
@@ -78,6 +92,7 @@ export async function fetchSyncProgress(token: string) {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
+    cache: 'no-store',
   })
   const data = await res.json()
   if (!res.ok) throw new Error(data.message || 'Failed to fetch sync progress')

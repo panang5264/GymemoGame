@@ -21,6 +21,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         const initProgress = async () => {
+            setIsLoading(true)
             if (token) {
                 try {
                     const res = await fetchSyncProgress(token)
@@ -34,6 +35,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
                     }
                 } catch (err) {
                     console.error('Failed to sync progress on mount:', err)
+                    setProgress(getDefaultProgress())
                 }
             } else {
                 setProgress(getDefaultProgress())

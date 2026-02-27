@@ -10,18 +10,18 @@ const register = async (req, res) => {
 
     // ตรวจสอบข้อมูล
     if (!name || !phone || !password) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'กรุณากรอกข้อมูลให้ครบถ้วน' 
+      return res.status(400).json({
+        success: false,
+        message: 'กรุณากรอกข้อมูลให้ครบถ้วน'
       })
     }
 
     // ตรวจสอบว่ามีเบอร์โทรนี้แล้วหรือไม่
     const userExists = await User.findOne({ phone })
     if (userExists) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'เบอร์โทรศัพท์นี้ถูกใช้งานแล้ว' 
+      return res.status(400).json({
+        success: false,
+        message: 'เบอร์โทรศัพท์นี้ถูกใช้งานแล้ว'
       })
     }
 
@@ -47,10 +47,14 @@ const register = async (req, res) => {
       }
     })
   } catch (error) {
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(val => val.message)
+      return res.status(400).json({ success: false, message: messages[0] })
+    }
     console.error(error)
-    res.status(500).json({ 
-      success: false, 
-      message: 'เกิดข้อผิดพลาดในการสมัครสมาชิก' 
+    res.status(500).json({
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการสมัครสมาชิก'
     })
   }
 }
@@ -64,9 +68,9 @@ const login = async (req, res) => {
 
     // ตรวจสอบข้อมูล
     if (!phone || !password) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'กรุณากรอกเบอร์โทรและรหัสผ่าน' 
+      return res.status(400).json({
+        success: false,
+        message: 'กรุณากรอกเบอร์โทรและรหัสผ่าน'
       })
     }
 
@@ -74,9 +78,9 @@ const login = async (req, res) => {
     const user = await User.findOne({ phone }).select('+password')
 
     if (!user) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง' 
+      return res.status(401).json({
+        success: false,
+        message: 'เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง'
       })
     }
 
@@ -84,9 +88,9 @@ const login = async (req, res) => {
     const isPasswordCorrect = await user.comparePassword(password)
 
     if (!isPasswordCorrect) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง' 
+      return res.status(401).json({
+        success: false,
+        message: 'เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง'
       })
     }
 
@@ -106,9 +110,9 @@ const login = async (req, res) => {
     })
   } catch (error) {
     console.error(error)
-    res.status(500).json({ 
-      success: false, 
-      message: 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ' 
+    res.status(500).json({
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ'
     })
   }
 }
@@ -121,9 +125,9 @@ const getProfile = async (req, res) => {
     const user = await User.findById(req.user._id)
 
     if (!user) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'ไม่พบผู้ใช้งาน' 
+      return res.status(404).json({
+        success: false,
+        message: 'ไม่พบผู้ใช้งาน'
       })
     }
 
@@ -139,10 +143,44 @@ const getProfile = async (req, res) => {
     })
   } catch (error) {
     console.error(error)
-    res.status(500).json({ 
-      success: false, 
-      message: 'เกิดข้อผิดพลาดในการดึงข้อมูล' 
+    res.status(500).json({
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการดึงข้อมูล'
     })
+  }
+}
+
+// @desc    อัปเดตโปรไฟล์
+// @route   PUT /api/auth/profile
+// @access  Private
+const updateProfile = async (req, res) => {
+  try {
+    const { name, avatar } = req.body
+    const user = await User.findById(req.user._id)
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'ไม่พบผู้ใช้งาน' })
+    }
+
+    if (name) user.name = name
+    if (avatar) user.avatar = avatar
+
+    await user.save()
+
+    res.json({
+      success: true,
+      message: 'อัปเดตโปรไฟล์สำเร็จ',
+      data: {
+        _id: user._id,
+        name: user.name,
+        phone: user.phone,
+        avatar: user.avatar,
+        highScore: user.highScore
+      }
+    })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล' })
   }
 }
 
@@ -156,5 +194,6 @@ const generateToken = (id) => {
 module.exports = {
   register,
   login,
-  getProfile
+  getProfile,
+  updateProfile
 }

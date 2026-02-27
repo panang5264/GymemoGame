@@ -36,30 +36,38 @@ export default function DailyChallengePage() {
   useEffect(() => {
     if (isLoading || !progress) return
 
+    // 1. Calculations
     const dk = getDateKey()
     const maxUnlocked = Math.max(...(progress.unlockedVillages || [1]), 1)
-    setUserRank(maxUnlocked)
 
-    // 1. Load from Context
-    const modes = getDailyProgress(dk)
-    setTodayModes(modes)
-
-    const done = isDailyComplete(dk)
-    setIsDone(done)
-
-    if (done) {
-      const dailyScores = progress.dailyScores?.[dk] || { management: 0, calculation: 0, spatial: 0 }
-      setScores({
-        management: dailyScores.management || 0,
-        calculation: dailyScores.calculation || 0,
-        spatial: dailyScores.spatial || 0
-      })
+    // Only update states if they have actually changed to avoid infinite loops
+    if (userRank !== maxUnlocked) {
+      setUserRank(maxUnlocked)
     }
 
-    // 2. Asynchronous Sync with Backend Source of Truth (only once per mount)
+    const currentLocalModes = getDailyProgress(dk)
+    const currentIsDone = isDailyComplete(dk)
+
+    // Initial load from context (only if not synced yet)
+    if (!hasSynced) {
+      setTodayModes(currentLocalModes)
+      setIsDone(currentIsDone)
+
+      if (currentIsDone) {
+        const dailyScores = progress.dailyScores?.[dk] || { management: 0, calculation: 0, spatial: 0 }
+        setScores({
+          management: dailyScores.management || 0,
+          calculation: dailyScores.calculation || 0,
+          spatial: dailyScores.spatial || 0
+        })
+      }
+    }
+
+    // 2. Asynchronous Sync with Backend (only once)
     if (progress.guestId && !hasSynced) {
       setHasSynced(true)
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
+
       fetch(`${API_BASE_URL}/api/daily/status/${progress.guestId}?date=${dk}`)
         .then(res => res.json())
         .then(res => {
@@ -69,8 +77,9 @@ export default function DailyChallengePage() {
             setIsDone(res.data.allDone)
             if (res.data.rewardClaimed) setRewardClaimed(true)
 
-            // Sync back to context if they differ
-            if (JSON.stringify(modes) !== JSON.stringify(dbModes)) {
+            // Sync back to context only if remote is ahead
+            if (JSON.stringify(currentLocalModes) !== JSON.stringify(dbModes)) {
+              // Note: Use the functional version of path or a careful merge
               const nextP = { ...progress, daily: { ...progress.daily, [dk]: dbModes } }
               saveProgress(nextP)
             }
@@ -78,7 +87,7 @@ export default function DailyChallengePage() {
         })
         .catch(err => console.error('Failed to sync daily status with backend', err))
     }
-  }, [dateKey, progress, isLoading, hasSynced, getDailyProgress, isDailyComplete, saveProgress])
+  }, [isLoading, progress?.guestId, progress?.unlockedVillages, hasSynced])
 
   const handleClaimReward = () => {
     if (rewardClaimed) return

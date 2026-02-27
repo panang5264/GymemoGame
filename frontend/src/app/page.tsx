@@ -3,14 +3,24 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { loginUser } from '@/lib/api'
+import { loginUser, API_BASE_URL } from '@/lib/api'
 import TrainingModal from '@/components/TrainingModal'
 import { useAuth } from '@/contexts/AuthContext'
 import BrainRadarChart from '@/components/BrainRadarChart'
 import { useProgress } from '@/contexts/ProgressContext'
 
-type AuthPhase = 'login' | 'name' | 'profile' | 'intro' | 'grandmother' | 'tutorial_summary' | 'assessment'
+type AuthPhase = 'login' | 'name' | 'profile' | 'intro' | 'grandmother' | 'tutorial_summary' | 'assessment' | 'edit_profile'
 import ClockIntro from '@/components/ClockIntro'
+import { updateProfile } from '@/lib/api'
+
+const AVATARS = [
+  { id: 'avatar-1', emoji: '🧑‍🚀', label: 'นักบินอวกาศ' },
+  { id: 'avatar-2', emoji: '🥷', label: 'นินจา' },
+  { id: 'avatar-3', emoji: '🕵️', label: 'นักสืบ' },
+  { id: 'avatar-4', emoji: '🧑‍🎨', label: 'ศิลปิน' },
+  { id: 'avatar-5', emoji: '👩‍🔬', label: 'นักวิทย์' },
+  { id: 'avatar-6', emoji: '🧙‍♂️', label: 'ผู้วิเศษ' },
+]
 
 export default function Home() {
   const router = useRouter()
@@ -22,13 +32,14 @@ export default function Home() {
   const [isReady, setIsReady] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const { login, logout } = useAuth()
+  const { login, logout, user, token, setUser: setAuthUser } = useAuth()
   const [trainingMode, setTrainingMode] = useState<'management' | 'calculation' | 'spatial' | null>(null)
+  const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar || 'avatar-1')
 
   const { progress, saveProgress, isLoading } = useProgress()
 
   useEffect(() => {
-    if (isLoading || !progress || isReady) return
+    if (isLoading || !progress) return
 
     if (progress.userName) {
       setName(progress.userName)
@@ -38,18 +49,31 @@ export default function Home() {
         return
       }
       setPhase('profile')
-      // Fetch Analysis Data
+
+      // Fetch Analysis Data whenever guestId changes
       if (progress.guestId) {
-        fetch(`http://localhost:3001/api/analysis/profile/${progress.guestId}`)
+        fetch(`${API_BASE_URL}/api/analysis/profile/${progress.guestId}`)
           .then(res => res.json())
           .then(res => {
-            if (res.success && res.data) setCognitiveData(res.data)
+            if (res.success && res.data) {
+              setCognitiveData(res.data)
+            } else {
+              setCognitiveData(null)
+            }
           })
-          .catch(err => console.error('Failed to fetch profile analysis:', err))
+          .catch(err => {
+            console.error('Failed to fetch profile analysis:', err)
+            setCognitiveData(null)
+          })
+      } else {
+        setCognitiveData(null)
       }
+    } else {
+      setPhase('login')
+      setCognitiveData(null)
     }
     setIsReady(true)
-  }, [isLoading, progress, isReady, router])
+  }, [isLoading, progress?.guestId, progress?.userName, progress?.introSeen, router])
 
   if (!isReady || isLoading || !progress) return null
 
@@ -82,12 +106,30 @@ export default function Home() {
     }
   }
 
-  const handleSaveName = (e: React.FormEvent) => {
+  const handleSaveName = async (e: React.FormEvent) => {
     e.preventDefault()
-    const p = { ...progress, userName: name }
-    saveProgress(p)
-    // Direct link to the story flow after name entry
-    setPhase('intro')
+    setLoading(true)
+    try {
+      if (token) {
+        const res = await updateProfile(token, { name, avatar: selectedAvatar })
+        if (res.success) {
+          setAuthUser({ ...user!, name, avatar: selectedAvatar })
+        }
+      }
+
+      const p = { ...progress, userName: name }
+      saveProgress(p)
+
+      if (phase === 'edit_profile') {
+        setPhase('profile')
+      } else {
+        setPhase('intro')
+      }
+    } catch (err: any) {
+      setError(err.message || 'บันทึกข้อมูลไม่สำเร็จ')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const nextPhase = () => {
@@ -205,77 +247,171 @@ export default function Home() {
         {/* Phase 3: Character Profile */}
         {phase === 'profile' && (
           <div className="friendly-card animate-in zoom-in duration-500 text-center">
-            <div className="relative mx-auto w-32 h-32 mb-8">
-              <div className="absolute inset-0 bg-orange-200 border-3 border-[#1a1a1a] rounded-full translate-x-1 translate-y-1" />
-              <div className="relative w-full h-full bg-white border-3 border-[#1a1a1a] rounded-full flex items-center justify-center text-6xl">
-                🧑‍🚀
+            <div className="relative mx-auto w-32 h-32 mb-8 group cursor-pointer" onClick={() => setPhase('edit_profile')}>
+              <div className="absolute inset-0 bg-orange-200 border-4 border-[#1a1a1a] rounded-full translate-x-1 translate-y-1 group-hover:translate-x-0 group-hover:translate-y-0 transition-all" />
+              <div className="relative w-full h-full bg-white border-4 border-[#1a1a1a] rounded-full flex items-center justify-center text-6xl shadow-inner overflow-hidden">
+                {AVATARS.find(a => a.id === (user?.avatar || 'avatar-1'))?.emoji || '🧑‍🚀'}
+                <div className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[10px] py-1 opacity-0 group-hover:opacity-100 transition-opacity">EDIT</div>
               </div>
             </div>
-            <h2 className="text-4xl font-black text-[#1a1a1a] mb-1">{name}</h2>
-            <p className="text-[#717171] font-bold uppercase tracking-[0.2em] text-[10px] mb-10">นักสำรวจความจำ | ปลดล็อก {progress?.unlockedVillages?.length || 1}/10 หมู่บ้าน</p>
+            <h2 className="text-5xl font-black text-[#1a1a1a] mb-2">{name}</h2>
+            <p className="text-[#717171] font-black uppercase tracking-[0.2em] text-[12px] mb-10">นักสำรวจความจำ | ปลดล็อก {progress?.unlockedVillages?.length || 1}/10 หมู่บ้าน</p>
 
             {/* Brain Development Section (Visual Graph) */}
-            <div className="bg-white border-3 border-[#1a1a1a] rounded-[3rem] p-8 shadow-[10px_10px_0_#1a1a1a] mb-12 text-center overflow-hidden">
+            <div className="bg-white border-3 border-[#1a1a1a] rounded-[3rem] p-8 shadow-[10px_10px_0_#1a1a1a] mb-12 text-center">
               <h3 className="text-xl font-black text-[#1a1a1a] mb-2 uppercase tracking-tight flex items-center justify-center gap-2">
                 <span>🧠</span> พัฒนาการสมอง
               </h3>
-              <p className="text-[10px] font-black text-[#717171] uppercase tracking-[0.2em] mb-6 opacity-60">Cognitive Profile Analysis</p>
+              <p className="text-sm font-black text-[#717171] uppercase tracking-[0.2em] mb-8 opacity-60">วิเคราะห์ทักษะสมอง</p>
 
               <BrainRadarChart
                 data={[
-                  { label: 'Management', value: cognitiveData?.averages?.executiveFunction || 65, color: '#4f46e5' },
-                  { label: 'Calculation', value: cognitiveData?.averages?.processingSpeed || 45, color: '#3b82f6' },
-                  { label: 'Spatial', value: cognitiveData?.averages?.workingMemory || 55, color: '#10b981' },
-                  { label: 'Reaction', value: cognitiveData?.averages?.attention || 50, color: '#f59e0b' },
+                  { label: 'การจัดการ', value: cognitiveData?.averages?.executiveFunction || 0, color: '#4f46e5' },
+                  { label: 'การคำนวณ', value: cognitiveData?.averages?.processingSpeed || 0, color: '#3b82f6' },
+                  { label: 'มิติสัมพันธ์', value: cognitiveData?.averages?.workingMemory || 0, color: '#10b981' },
+                  { label: 'การตอบสนอง', value: cognitiveData?.averages?.attention || 0, color: '#f59e0b' },
                 ]}
-                size={220}
+                size={260}
               />
 
-              <div className="mt-8 grid grid-cols-2 gap-3">
-                <div className="p-3 bg-indigo-50 rounded-2xl border-2 border-indigo-100">
-                  <div className="text-[8px] font-black text-indigo-400 uppercase">Executive</div>
-                  <div className="text-xl font-black text-indigo-700">{Math.round(cognitiveData?.averages?.executiveFunction || 65)}%</div>
+              <div className="mt-10 grid grid-cols-1 gap-4">
+                <div className="p-5 bg-indigo-50 rounded-3xl border-2 border-indigo-200 flex items-center justify-between">
+                  <div className="text-left">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[11px] font-black text-indigo-400 uppercase tracking-widest">การบริหารจัดการ</span>
+                      <div className="w-5 h-5 rounded-full border-2 border-indigo-200 flex items-center justify-center text-[11px] font-black text-indigo-400 cursor-help bg-white shadow-sm" title="ทักษะการตัดสินใจ การวางแผน และจัดลำดับความสำคัญ">i</div>
+                    </div>
+                    <div className="text-2xl font-black text-indigo-900 leading-tight">โหมดจัดการ</div>
+                  </div>
+                  <div className="text-4xl font-black text-indigo-700 tabular-nums">{Math.round(cognitiveData?.averages?.executiveFunction || 0)}%</div>
                 </div>
-                <div className="p-3 bg-emerald-50 rounded-2xl border-2 border-emerald-100">
-                  <div className="text-[8px] font-black text-emerald-400 uppercase">Memory</div>
-                  <div className="text-xl font-black text-emerald-700">{Math.round(cognitiveData?.averages?.workingMemory || 55)}%</div>
+
+                <div className="p-5 bg-emerald-50 rounded-3xl border-2 border-emerald-200 flex items-center justify-between">
+                  <div className="text-left">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest">ความจำขณะทำงาน</span>
+                      <div className="w-5 h-5 rounded-full border-2 border-emerald-200 flex items-center justify-center text-[11px] font-black text-emerald-400 cursor-help bg-white shadow-sm" title="ความสามารถในการประมวลผลข้อมูลควบคู่กับการมองภาพมิติในใจ">i</div>
+                    </div>
+                    <div className="text-2xl font-black text-emerald-900 leading-tight">โหมดมิติสัมพันธ์</div>
+                  </div>
+                  <div className="text-4xl font-black text-emerald-700 tabular-nums">{Math.round(cognitiveData?.averages?.workingMemory || 0)}%</div>
+                </div>
+
+                <div className="p-5 bg-blue-50 rounded-3xl border-2 border-blue-200 flex items-center justify-between">
+                  <div className="text-left">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[11px] font-black text-blue-400 uppercase tracking-widest">ความรวดเร็วในการคิด</span>
+                      <div className="w-5 h-5 rounded-full border-2 border-blue-200 flex items-center justify-center text-[11px] font-black text-blue-400 cursor-help bg-white shadow-sm" title="ความไวในการตีความโจทย์และหาคำตอบอย่างแม่นยำ">i</div>
+                    </div>
+                    <div className="text-2xl font-black text-blue-900 leading-tight">โหมดคำนวณ</div>
+                  </div>
+                  <div className="text-4xl font-black text-blue-700 tabular-nums">{Math.round(cognitiveData?.averages?.processingSpeed || 0)}%</div>
                 </div>
               </div>
             </div>
 
 
-            <div className="grid grid-cols-2 gap-4 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
               <div className="bg-white border-3 border-[#1a1a1a] rounded-[2rem] p-4 shadow-[4px_4px_0_#1a1a1a]">
-                <div className="text-[#717171] text-[10px] font-black uppercase tracking-widest mb-1">หมู่บ้าน</div>
-                <div className="text-3xl font-black text-[#1a1a1a]">{progress?.unlockedVillages?.length || 1}</div>
+                <div className="text-[#717171] text-[12px] font-black uppercase tracking-widest mb-1">หมู่บ้าน</div>
+                <div className="text-4xl font-black text-[#1a1a1a]">{progress?.unlockedVillages?.length || 1}</div>
               </div>
               <div className="bg-white border-3 border-[#1a1a1a] rounded-[2rem] p-4 shadow-[4px_4px_0_#1a1a1a]">
-                <div className="text-[#717171] text-[10px] font-black uppercase tracking-widest mb-1">คะแนน</div>
-                <div className="text-3xl font-black text-[#1a1a1a]">{progress?.totalScore || 0}</div>
+                <div className="text-[#717171] text-[12px] font-black uppercase tracking-widest mb-1">คะแนนรวม</div>
+                <div className="text-4xl font-black text-[#1a1a1a]">{progress?.totalScore || 0}</div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <button onClick={nextPhase} className="pill-button w-full py-5 text-xl">
-                ลุยกันเลย! 🚀
-              </button>
+            <div className="flex flex-col gap-4">
               <button
-                onClick={() => router.push('/leaderboard')}
-                className="w-full py-4 bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-full font-black text-[var(--text-main)] uppercase tracking-widest hover:bg-[var(--border-dark)] hover:text-[var(--text-on-dark)] transition-all shadow-[4px_4px_0_var(--border-dark)]"
+                onClick={nextPhase}
+                className="pill-button w-full py-6 text-3xl shadow-[0_8px_0_#000] hover:translate-y-[-2px] hover:shadow-[0_10px_0_#000] active:translate-y-1 active:shadow-none transition-all"
               >
-                อันดับ 🏆
+                เริ่มผจญภัย! 🚀
               </button>
+
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={() => router.push('/leaderboard')}
+                  className="py-4 bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-full font-black text-[var(--text-main)] uppercase tracking-widest hover:bg-[var(--border-dark)] hover:text-[var(--text-on-dark)] transition-all shadow-[6px_6px_0_var(--border-dark)] text-lg"
+                >
+                  อันดับ 🏆
+                </button>
+                <button
+                  onClick={() => setPhase('edit_profile')}
+                  className="py-4 bg-white border-3 border-orange-500 rounded-full font-black text-orange-600 uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all shadow-[6px_6px_0_#f97316] text-lg"
+                >
+                  แก้ไขโปรไฟล์ ✏️
+                </button>
+              </div>
             </div>
 
             <button
               onClick={() => {
                 logout();
-                setPhase('login');
               }}
-              className="mt-10 font-black text-[#717171] hover:text-red-500 transition-colors uppercase tracking-[0.1em] text-[10px] underline underline-offset-4"
+              className="mt-10 text-rose-500 font-black text-sm uppercase tracking-widest hover:text-rose-700 transition-colors flex items-center gap-2 mx-auto bg-rose-50 px-6 py-2 rounded-full border-2 border-rose-100"
             >
-              ออกจากระบบ / เปลี่ยนชื่อ
+              ล็อคเอาท์ 👋
             </button>
+          </div>
+        )}
+
+        {/* Phase Edit Profile: Change Avatar & Name */}
+        {phase === 'edit_profile' && (
+          <div className="friendly-card animate-in zoom-in duration-500 max-w-lg mx-auto overflow-hidden">
+            <h2 className="text-4xl font-black text-center mb-8 uppercase tracking-tight">แก้ไขโปรไฟล์</h2>
+
+            <form onSubmit={handleSaveName} className="space-y-8">
+              <div className="space-y-4">
+                <p className="text-center text-sm font-black text-slate-400 uppercase tracking-widest">เลือกอวตาร</p>
+                <div className="grid grid-cols-3 gap-4">
+                  {AVATARS.map((av) => (
+                    <button
+                      key={av.id}
+                      type="button"
+                      onClick={() => setSelectedAvatar(av.id)}
+                      className={`relative aspect-square flex items-center justify-center text-4xl rounded-[2rem] border-4 transition-all ${selectedAvatar === av.id
+                        ? 'bg-orange-100 border-orange-500 scale-105 shadow-[4px_4px_0_#f97316]'
+                        : 'bg-white border-slate-100 hover:border-slate-300'
+                        }`}
+                    >
+                      {av.emoji}
+                      {selectedAvatar === av.id && (
+                        <div className="absolute -top-2 -right-2 bg-orange-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-white">
+                          ✓
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-center text-sm font-black text-slate-400 uppercase tracking-widest">ชื่อเล่นเสียงเรียกขาน</p>
+                <input
+                  type="text"
+                  placeholder="กรอกชื่อของคุณ..."
+                  className="pill-input w-full text-center text-2xl uppercase tracking-widest"
+                  value={name}
+                  required
+                  onChange={e => setName(e.target.value)}
+                />
+              </div>
+
+              <div className="flex flex-col gap-3 pt-4">
+                <button type="submit" disabled={loading} className="pill-button w-full py-5 text-2xl">
+                  {loading ? 'กำลังบันทึก...' : 'บันทึกการเปลี่ยนแปลง ✨'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPhase('profile')}
+                  className="py-4 text-slate-400 font-black hover:text-slate-600 transition-colors uppercase tracking-widest text-sm"
+                >
+                  ยกเลิก
+                </button>
+              </div>
+            </form>
           </div>
         )}
 

@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema({
   totalKeys: {
     type: Number,
     default: 0
+  },
+  avatar: {
+    type: String,
+    default: 'avatar-1'
   }
 }, {
   timestamps: true

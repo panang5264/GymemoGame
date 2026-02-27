@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { PLAYS_PER_VILLAGE } from '@/lib/levelSystem'
 import { getExpPercent } from '@/lib/scoring'
-import { getLeaderboard } from '@/lib/api'
+import { getLeaderboard, API_BASE_URL } from '@/lib/api'
 import BrainRadarChart from '@/components/BrainRadarChart'
 import { useProgress } from '@/contexts/ProgressContext'
 
@@ -49,12 +49,21 @@ export default function LeaderboardPage() {
         setUnlockedCount(p.unlockedVillages.length)
 
         if (p.guestId) {
-            fetch(`http://localhost:3001/api/analysis/profile/${p.guestId}`)
+            fetch(`${API_BASE_URL}/api/analysis/profile/${p.guestId}`)
                 .then(res => res.json())
                 .then(res => {
-                    if (res.success && res.data) setCognitiveData(res.data)
+                    if (res.success && res.data) {
+                        setCognitiveData(res.data)
+                    } else {
+                        setCognitiveData(null)
+                    }
                 })
-                .catch(err => console.error('Failed to fetch cognitive profile:', err))
+                .catch(err => {
+                    console.error('Failed to fetch cognitive profile:', err)
+                    setCognitiveData(null)
+                })
+        } else {
+            setCognitiveData(null)
         }
 
         // Build per-village stats from local progress
@@ -85,7 +94,7 @@ export default function LeaderboardPage() {
             }
         }
         fetchGlobal()
-    }, [])
+    }, [isLoading, progress?.guestId, progress?.userName])
 
     const totalExp = villageEntries.reduce((s, e) => s + e.expPercent, 0)
     const overallExpPct = Math.round(totalExp / 10)
@@ -175,17 +184,17 @@ export default function LeaderboardPage() {
                             <h2 className="text-3xl font-black text-[var(--text-main)]">{userName}</h2>
                             <p className="text-[var(--text-muted)] font-black uppercase tracking-widest text-xs">นักสำรวจความจำ | ปลดล็อก {unlockedCount}/10 หมู่บ้าน</p>
                         </div>
-                        <div className="bg-indigo-600 text-white px-6 py-3 rounded-full">
-                            <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-1">Total Score</p>
-                            <p className="text-3xl font-black tabular-nums">{userScore.toLocaleString()}</p>
+                        <div className="bg-indigo-600 text-white px-8 py-5 rounded-[2.5rem] shadow-xl border-4 border-white/20">
+                            <p className="text-sm font-black uppercase tracking-widest opacity-90 mb-1">คะแนนรวมทั้งหมด</p>
+                            <p className="text-6xl font-black tabular-nums leading-none">{userScore.toLocaleString()}</p>
                         </div>
                     </div>
 
                     {/* Overall EXP */}
                     <div>
                         <div className="flex justify-between mb-2">
-                            <span className="text-xs font-black text-[var(--text-muted)] uppercase tracking-widest">⚡ EXP โดยรวม</span>
-                            <span className="text-sm font-black text-indigo-600">{overallExpPct}%</span>
+                            <span className="text-base font-black text-[var(--text-muted)] uppercase tracking-widest">⚡ EXP โดยรวม</span>
+                            <span className="text-xl font-black text-indigo-600">{overallExpPct}%</span>
                         </div>
                         <div className="h-3 bg-black/10 rounded-full overflow-hidden">
                             <div
@@ -196,28 +205,44 @@ export default function LeaderboardPage() {
                                 }}
                             />
                         </div>
-                    </div >
+                    </div>
 
-                    <div className="flex flex-col md:flex-row gap-8 items-center bg-slate-50/50 rounded-[2rem] p-6 border-2 border-slate-100 mt-8">
-                        <div className="flex-1 flex justify-center">
+                    <div className="flex flex-col xl:flex-row gap-8 items-center bg-slate-50/50 rounded-[3rem] p-8 border-2 border-slate-100 mt-8">
+                        <div className="flex-1 flex justify-center py-4">
                             <BrainRadarChart
                                 data={[
-                                    { label: 'Management', value: cognitiveData?.averages?.executiveFunction || 65, color: '#f97316' },
-                                    { label: 'Calculation', value: cognitiveData?.averages?.processingSpeed || 45, color: '#3b82f6' },
-                                    { label: 'Spatial', value: cognitiveData?.averages?.workingMemory || 55, color: '#22c55e' },
-                                    { label: 'Reaction', value: cognitiveData?.averages?.attention || 50, color: '#f59e0b' },
+                                    { label: 'กาารจัดการ', value: cognitiveData?.averages?.executiveFunction || 0, color: '#f97316' },
+                                    { label: 'การคำนวณ', value: cognitiveData?.averages?.processingSpeed || 0, color: '#3b82f6' },
+                                    { label: 'มิติสัมพันธ์', value: cognitiveData?.averages?.workingMemory || 0, color: '#22c55e' },
+                                    { label: 'การตอบสนอง', value: cognitiveData?.averages?.attention || 0, color: '#f59e0b' },
                                 ]}
                                 size={200}
                             />
                         </div>
-                        <div className="w-full md:w-64 space-y-4">
-                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Executive Function</span>
-                                <div className="text-2xl font-black text-indigo-600">{Math.round(cognitiveData?.averages?.executiveFunction || 65)}%</div>
+                        <div className="w-full xl:w-[450px] grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4">
+                            <div className="bg-white p-5 rounded-3xl shadow-sm border-2 border-indigo-100/50 flex flex-col justify-center">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <span className="text-xs font-black text-indigo-400 uppercase tracking-widest">การบริหารจัดการ</span>
+                                    <div className="w-4 h-4 rounded-full border border-indigo-200 flex items-center justify-center text-[10px] font-bold text-indigo-400 cursor-help bg-slate-50" title="ทักษะการตัดสินใจ การวางแผน และจัดลำดับความสำคัญ">i</div>
+                                </div>
+                                <div className="text-3xl font-black text-indigo-600 leading-tight">โหมดจัดการ</div>
+                                <div className="text-4xl font-black text-indigo-700 mt-1">{Math.round(cognitiveData?.averages?.executiveFunction || 0)}%</div>
                             </div>
-                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Working Memory</span>
-                                <div className="text-2xl font-black text-emerald-600">{Math.round(cognitiveData?.averages?.workingMemory || 55)}%</div>
+                            <div className="bg-white p-5 rounded-3xl shadow-sm border-2 border-emerald-100/50 flex flex-col justify-center">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <span className="text-xs font-black text-emerald-400 uppercase tracking-widest">ความจำขณะทำงาน</span>
+                                    <div className="w-4 h-4 rounded-full border border-emerald-200 flex items-center justify-center text-[10px] font-bold text-emerald-400 cursor-help bg-slate-50" title="ความสามารถในการประมวลผลข้อมูลควบคู่กับการมองภาพมิติในใจ">i</div>
+                                </div>
+                                <div className="text-3xl font-black text-emerald-600 leading-tight">โหมดมิติสัมพันธ์</div>
+                                <div className="text-4xl font-black text-emerald-700 mt-1">{Math.round(cognitiveData?.averages?.workingMemory || 0)}%</div>
+                            </div>
+                            <div className="bg-white p-5 rounded-3xl shadow-sm border-2 border-blue-100/50 flex flex-col justify-center sm:col-span-2 xl:col-span-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <span className="text-xs font-black text-blue-400 uppercase tracking-widest">ความรวดเร็วในการคิด</span>
+                                    <div className="w-4 h-4 rounded-full border border-blue-200 flex items-center justify-center text-[10px] font-bold text-blue-400 cursor-help bg-slate-50" title="ความไวในการตีความโจทย์และหาคำตอบอย่างแม่นยำ">i</div>
+                                </div>
+                                <div className="text-3xl font-black text-blue-600 leading-tight">โหมดคำนวณ</div>
+                                <div className="text-4xl font-black text-blue-700 mt-1">{Math.round(cognitiveData?.averages?.processingSpeed || 0)}%</div>
                             </div>
                         </div>
                     </div>

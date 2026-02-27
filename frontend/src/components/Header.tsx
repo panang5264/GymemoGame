@@ -8,27 +8,33 @@ export default function Header() {
 
   return (
     <header className="header">
-      <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h1 className="logo" style={{ display: 'inline-block', marginRight: '1rem' }}>🧠 Gymemo</h1>
-          <nav className="nav" style={{ display: 'inline-flex', gap: '1rem', alignItems: 'center' }}>
+      <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+          <Link href="/" className="logo">🧠 Gymemo</Link>
+          <nav className="nav" style={{ display: 'inline-flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <Link href="/" className="nav-link">หน้าแรก</Link>
-            <Link href="/world" className="nav-link">🗺️ แผนที่หมู่บ้าน</Link>
-            <Link href="/daily-challenge" className="nav-link">🌟 ภารกิจรายวัน</Link>
+            <Link href="/world" className="nav-link">🗺️ แผนที่</Link>
+            <Link href="/daily-challenge" className="nav-link">🌟 ภารกิจ</Link>
           </nav>
         </div>
 
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', fontWeight: '900' }}>
           {user ? (
-            <>
-              <span>คุณ {user.name}</span>
-              <button onClick={logout} className="nav-link" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', font: 'inherit' }}>ออกจากระบบ</button>
-            </>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <span className="hidden sm:inline">สวัสดี, {user.name}</span>
+              <button
+                onClick={logout}
+                className="nav-link bg-rose-50 text-rose-500 border-rose-200 hover:bg-rose-500 hover:text-white"
+                style={{ background: 'none', cursor: 'pointer', font: 'inherit' }}
+              >
+                ออกจากระบบ 👋
+              </button>
+            </div>
           ) : (
-            <>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
               <Link href="/" className="nav-link">เข้าสู่ระบบ</Link>
               <Link href="/register" className="nav-link">สมัครสมาชิก</Link>
-            </>
+            </div>
           )}
         </div>
       </div>

@@ -10,6 +10,7 @@ interface User {
     phone: string
     highScore: number
     createdAt: string
+    avatar?: string
 }
 
 interface AuthContextType {
@@ -18,6 +19,7 @@ interface AuthContextType {
     loading: boolean
     login: (token: string, userData: User) => Promise<void>
     logout: () => void
+    setUser: React.Dispatch<React.SetStateAction<User | null>>
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -26,6 +28,7 @@ const AuthContext = createContext<AuthContextType>({
     loading: true,
     login: async () => { },
     logout: () => { },
+    setUser: () => { },
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -64,6 +67,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         Cookies.set('token', authToken, { expires: 7 }) // 7 days
         setToken(authToken)
         setUser(userData)
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('gymemo_progress_v2')
+            localStorage.removeItem('gymemo_guest_id')
+        }
     }
 
     const logout = () => {
@@ -72,12 +79,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null)
         if (typeof window !== 'undefined') {
             localStorage.removeItem('gymemo_progress_v2')
+            localStorage.removeItem('gymemo_guest_id')
             window.location.href = '/'
         }
     }
 
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, logout }}>
+        <AuthContext.Provider value={{ user, token, loading, login, logout, setUser }}>
             {children}
         </AuthContext.Provider>
     )

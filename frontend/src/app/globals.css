@@ -24,6 +24,8 @@
     color: var(--text-main);
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    font-size: 24px;
+    /* Default desktop size increased for better readability */
   }
 }
 
@@ -52,7 +54,8 @@
 }
 
 .pill-input-icon {
-  padding-left: 4.5rem !important;
+  padding-left: 5rem !important;
+  /* Adjusted for larger icons */
 }
 
 .pill-button {
@@ -103,7 +106,8 @@
 }
 
 .logo {
-  font-size: 2rem;
+  font-size: 2.5rem;
+  /* Increased from 2rem */
   font-weight: 900;
   color: var(--text-main);
   text-decoration: none;
@@ -118,8 +122,9 @@
 .nav-link {
   color: var(--text-main);
   text-decoration: none;
-  font-size: 1.1rem;
-  padding: 0.5rem 1.25rem;
+  font-size: 1.25rem;
+  /* Increased from 1.1rem */
+  padding: 0.6rem 1.5rem;
   border-radius: 9999px;
   border: 2px solid transparent;
   transition: all 0.2s;
@@ -420,14 +425,18 @@
   }
 }
 
-/* Responsive */
 @media (max-width: 768px) {
+  html {
+    font-size: 26px;
+    /* Increased from 22px to 26px */
+  }
+
   .hero-title {
-    font-size: 2.5rem;
+    font-size: 3.5rem;
   }
 
   .hero-subtitle {
-    font-size: 1.4rem;
+    font-size: 2rem;
   }
 
   .game-board {
@@ -438,11 +447,33 @@
 
   .card-front,
   .card-back {
-    font-size: 2rem;
+    font-size: 2.2rem;
   }
 
   .features {
     grid-template-columns: 1fr;
+  }
+
+  .friendly-card {
+    padding: 2.5rem 1.75rem;
+    border-radius: 2.5rem;
+  }
+
+  .pill-button {
+    padding: 1.25rem 2rem;
+  }
+
+  /* Increase specific text sizes for mobile in common components */
+  h1 {
+    font-size: 3rem !important;
+  }
+
+  h2 {
+    font-size: 2.5rem !important;
+  }
+
+  p {
+    font-size: 1.3rem !important;
   }
 }
 
