@@ -82,15 +82,15 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
                 <div className="flex gap-4 justify-center mb-10">
                     <button
                         onClick={() => setActiveHand('hour')}
-                        className={`px-6 py-3 rounded-2xl font-black transition-all shadow-lg text-sm md:text-base ${activeHand === 'hour' ? 'bg-indigo-600 text-white scale-110' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                        className={`group relative px-6 py-3 rounded-2xl font-black transition-all shadow-lg text-sm md:text-base ${activeHand === 'hour' ? 'bg-indigo-600 text-white scale-110' : 'bg-white/10 text-white hover:bg-white/20'}`}
                     >
-                        🕘 เข็มชั่วโมง
+                        🕘 เข็มชั่วโมง {hasMovedHour && '✅'}
                     </button>
                     <button
                         onClick={() => setActiveHand('minute')}
-                        className={`px-6 py-3 rounded-2xl font-black transition-all shadow-lg text-sm md:text-base ${activeHand === 'minute' ? 'bg-blue-600 text-white scale-110' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                        className={`group relative px-6 py-3 rounded-2xl font-black transition-all shadow-lg text-sm md:text-base ${activeHand === 'minute' ? 'bg-blue-600 text-white scale-110' : 'bg-white/10 text-white hover:bg-white/20'}`}
                     >
-                        🕒 เข็มนาที
+                        🕒 เข็มนาที {hasMovedMinute && '✅'}
                     </button>
                 </div>
 
@@ -101,6 +101,7 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
                         className="w-72 h-72 md:w-80 md:h-80 drop-shadow-[0_20px_60px_rgba(0,0,0,0.6)] touch-none select-none"
                         onMouseMove={handleInteraction}
                         onTouchMove={handleInteraction}
+                        onClick={() => setActiveHand(null)}
                     >
                         {/* Clock Face */}
                         <circle cx="100" cy="100" r="95" fill="white" stroke="#1e293b" strokeWidth="6" />
@@ -166,6 +167,14 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
                             </div>
                         </div>
                     )}
+
+                    {!activeHand && !isDone && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+                            <div className="bg-amber-400 text-slate-900 px-6 py-3 rounded-2xl font-black shadow-2xl animate-pulse border-4 border-white">
+                                👆 เลือกเข็มที่จะหมุนก่อน
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {feedback && !isDone && (
@@ -179,15 +188,62 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
                         <p className="text-white/40 text-[10px] mt-2 font-bold italic">วิเคราะห์จากความแม่นยำและการตัดสินใจ</p>
                     </div>
                 )}
+                {/* Dynamic Hint */}
+                <div className="mt-4 h-8 flex items-center justify-center">
+                    {activeHand && !isDone && (
+                        <div className="bg-amber-400 text-slate-900 px-4 py-1 rounded-full text-xs font-black animate-bounce border-2 border-white shadow-lg">
+                            📍 ปรับตำแหน่งที่ต้องการแล้ว "คลิกปุ่มด้านล่าง" เพื่อวางเข็ม
+                        </div>
+                    )}
+                    {!activeHand && hasMovedHour && hasMovedMinute && !isDone && (
+                        <div className="bg-green-500/20 text-green-400 px-4 py-1 rounded-full text-xs font-black animate-pulse border border-green-500/30">
+                            ✨ วางเข็มครบแล้ว ตรวจสอบอีกครั้งก่อนส่ง
+                        </div>
+                    )}
+                </div>
 
                 <button
-                    onClick={isDone ? onComplete : checkResult}
+                    onClick={() => {
+                        if (isDone) onComplete();
+                        else if (activeHand) setActiveHand(null);
+                        else checkResult();
+                    }}
                     disabled={(!hasMovedHour && !hasMovedMinute && !isDone)}
-                    className={`mt-8 w-full py-5 rounded-[2rem] font-black text-2xl transition-all shadow-2xl ${isDone ? 'bg-green-500 text-white scale-105 hover:bg-green-400' : (!hasMovedHour && !hasMovedMinute) ? 'bg-slate-700 text-slate-500 cursor-not-allowed border-2 border-slate-600' : 'bg-gradient-to-r from-indigo-600 to-blue-700 text-white hover:scale-105 active:scale-95'}`}
+                    className={`mt-4 w-full py-5 rounded-[2rem] font-black text-2xl transition-all shadow-2xl ${isDone
+                            ? 'bg-green-500 text-white scale-105 hover:bg-green-400'
+                            : activeHand
+                                ? 'bg-amber-500 text-white hover:scale-105 shadow-amber-500/50 border-b-8 border-amber-700 active:border-b-0'
+                                : (!hasMovedHour || !hasMovedMinute)
+                                    ? 'bg-slate-700 text-slate-500 cursor-not-allowed border-2 border-slate-600'
+                                    : 'bg-gradient-to-r from-indigo-600 to-blue-700 text-white hover:shadow-indigo-500/50 animate-pulse-gentle shadow-[0_0_20px_rgba(79,70,229,0.4)] border-b-8 border-indigo-900 active:border-b-0'
+                        }`}
                 >
-                    {isDone ? 'เริ่มการทดสอบถัดไป 🚀' : (!hasMovedHour && !hasMovedMinute) ? 'กรุณาขยับเข็มนาฬิกา' : 'ยืนยันเวลา'}
+                    {isDone
+                        ? 'เริ่มการทดสอบถัดไป 🚀'
+                        : activeHand
+                            ? '📍 เลือกวางเข็มตรงนี้'
+                            : (!hasMovedHour || !hasMovedMinute)
+                                ? 'กรุณาขยับเข็มให้ครบ'
+                                : '✨ ส่งคำตอบ (เลือกตรงนี้)'}
                 </button>
             </div>
+            <style jsx>{`
+                @keyframes pulse-gentle {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.02); }
+                }
+                .animate-pulse-gentle {
+                    animation: pulse-gentle 2s ease-in-out infinite;
+                }
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    25% { transform: translateX(-5px); }
+                    75% { transform: translateX(5px); }
+                }
+                .animate-shake {
+                    animation: shake 0.4s ease-in-out;
+                }
+            `}</style>
         </div>
     )
 }
