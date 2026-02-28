@@ -7,6 +7,7 @@ import { useProgress } from '@/contexts/ProgressContext'
 import { useLevelSystem } from '@/hooks/useLevelSystem'
 import ClockIntro from '@/components/ClockIntro'
 import { getDateKey } from '@/lib/dailyChallenge'
+import PairMatchingGame from './PairMatchingGame'
 
 function SpatialGameInner() {
   const router = useRouter()
@@ -47,10 +48,13 @@ function SpatialGameInner() {
   const [questionData, setQuestionData] = useState<{
     targetView?: string[] | string;
     targetImage?: string;
-    options: (string[] | string)[];
-    correctIndex: number;
+    options?: (string[] | string)[];
+    correctIndex?: number;
     arrow?: 'N' | 'S' | 'E' | 'W';
     displayGrid?: string[][];
+    isPairMatching?: boolean;
+    pairs?: { target: string, correct: string }[];
+    basePath?: string;
   } | null>(null)
 
   const hasSavedRef = useRef(false)
@@ -65,19 +69,30 @@ function SpatialGameInner() {
     const TARGETS_BASE = "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์"
 
     if (levelParam <= 2) {
-      // Village 1-2: Emoji Matching game
-      const emojis = ['🍄', '🌻', '🌵', '🎄', '🎁', '🎈', '🎨', '🎠', '🦋', '🐸', '🌈', '⭐']
-      const target = emojis[Math.floor(Math.random() * emojis.length)]
-      const others = emojis.filter(e => e !== target).sort(() => Math.random() - 0.5).slice(0, 3)
-      const options = [target, ...others].sort(() => Math.random() - 0.5)
+      // Village 1-2: Interactive Image Matching Pair game
+      const isLevel1 = levelParam === 1
+      const basePath = `/assets/level1andlevel2/relation1-${isLevel1 ? '1' : '2'}`
+
+      const pairs = isLevel1 ? [
+        { target: 'left1.PNG', correct: 'right4.PNG' },
+        { target: 'left2.PNG', correct: 'right3.PNG' },
+        { target: 'left3.PNG', correct: 'right1.PNG' },
+        { target: 'left4.PNG', correct: 'right5.PNG' },
+        { target: 'left5.PNG', correct: 'right2.PNG' }
+      ] : [
+        { target: 'left1.PNG', correct: 'right3.PNG' },
+        { target: 'left2.PNG', correct: 'right5.PNG' },
+        { target: 'left3.PNG', correct: 'right4.PNG' },
+        { target: 'left4.PNG', correct: 'right2.PNG' },
+        { target: 'left5.PNG', correct: 'right1.PNG' }
+      ]
 
       setQuestionData({
-        targetView: target,
-        options,
-        correctIndex: options.indexOf(target)
+        isPairMatching: true,
+        pairs: pairs,
+        basePath: basePath
       })
-      setQuestionText('เลือกรูปที่เหมือนกับภาพตัวอย่างด้านบน 🎯')
-
+      setQuestionText('โยงเส้นจับคู่ภาพที่สัมพันธ์กันให้ถูกต้อง 🎯')
     } else if (levelParam <= 4) {
       // Village 3-4: Box unfolding Level 1 (easy Q1-Q4, 2 choices)
       const EASY_BANK = [
@@ -307,7 +322,17 @@ function SpatialGameInner() {
               )}
             </div>
 
-            {questionData && (
+            {questionData && questionData.isPairMatching ? (
+              <PairMatchingGame
+                pairs={questionData.pairs || []}
+                basePath={questionData.basePath || ''}
+                onComplete={() => {
+                  setFeedback({ type: 'correct', message: '✨ ถูกต้องทั้งหมด! เก่งมาก' })
+                  setTimeout(() => setIsGameOver(true), 1500)
+                }}
+                onError={() => setErrorCount(e => e + 1)}
+              />
+            ) : questionData && questionData.options ? (
               <div className="w-full flex flex-col items-center">
                 {/* 1. Target Area (Image or Emoji) */}
                 <div className="mb-12 relative p-4 md:p-8 bg-white/40 backdrop-blur-md rounded-[3rem] border-4 border-white/50 shadow-xl flex items-center justify-center min-h-[200px] min-w-[200px] w-full max-w-md">
@@ -323,7 +348,7 @@ function SpatialGameInner() {
                   questionData.options.length === 3 ? 'grid-cols-1 md:grid-cols-3' :
                     'grid-cols-2'
                   }`}>
-                  {questionData.options.map((opt, idx) => (
+                  {questionData.options.map((opt: (string[] | string), idx: number) => (
                     <button
                       key={idx}
                       onClick={() => {
@@ -344,7 +369,7 @@ function SpatialGameInner() {
                         ) : Array.isArray(opt) ? opt.map((emoji, i) => (
                           <span key={i} className="text-4xl md:text-6xl drop-shadow-md group-hover:scale-110 transition-transform">{emoji}</span>
                         )) : (
-                          <span className="text-6xl md:text-8xl drop-shadow-md group-hover:scale-110 transition-transform">{opt}</span>
+                          <span className="text-6xl md:text-8xl drop-shadow-md group-hover:scale-110 transition-transform">{opt as string}</span>
                         )}
                       </div>
                       <div className="absolute -top-2 -right-2 w-8 h-8 bg-slate-100 rounded-full border-2 border-white text-slate-400 font-black flex items-center justify-center text-xs group-hover:bg-blue-500 group-hover:text-white transition-colors">
@@ -354,7 +379,7 @@ function SpatialGameInner() {
                   ))}
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
         )}
       </div>
