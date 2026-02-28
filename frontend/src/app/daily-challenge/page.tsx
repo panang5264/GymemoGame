@@ -124,21 +124,21 @@ export default function DailyChallengePage() {
       <div className="w-full max-w-2xl bg-[var(--card-bg)] rounded-[3rem] shadow-[15px_15px_0_rgba(0,0,0,0.05)] overflow-hidden border-4 border-[var(--border-dark)] p-8 md:p-12 relative">
 
         {/* Header Section */}
-        <div className="text-center mb-10">
-          <div className="inline-block px-6 py-2 bg-[var(--bg-warm)] text-[var(--text-main)] border-2 border-[var(--border-dark)] rounded-full font-black text-sm uppercase tracking-widest mb-4">
+        <div className="text-center mb-6 md:mb-10">
+          <div className="inline-block px-4 md:px-6 py-1 md:py-2 bg-[var(--bg-warm)] text-[var(--text-main)] border-2 border-[var(--border-dark)] rounded-full font-black text-xs md:text-sm uppercase tracking-widest mb-4">
             Today's Mission
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-[var(--text-main)] tracking-tight mb-2 uppercase">
+          <h1 className="text-3xl md:text-5xl font-black text-[var(--text-main)] tracking-tight mb-2 uppercase">
             🌟 ภารกิจรายวัน
           </h1>
-          <p className="text-[var(--text-muted)] font-bold">ฝึกฝนทักษะให้ครบ 3 ด้าน เพื่อรับรางวัลพิเศษ</p>
+          <p className="text-[var(--text-muted)] font-bold text-sm md:text-base">ฝึกฝนทักษะให้ครบ 3 ด้าน เพื่อรับรางวัลพิเศษ</p>
         </div>
 
         {/* Progress Checklist Area */}
-        <div className="bg-[var(--bg-warm)]/30 rounded-[2.5rem] p-6 md:p-8 mb-8 border-2 border-[var(--border-dark)]">
-          <h2 className="text-[var(--text-muted)] font-black text-[12px] uppercase tracking-widest mb-6 px-2 opacity-60">Checkpoint Checklist</h2>
+        <div className="bg-[var(--bg-warm)]/30 rounded-3xl md:rounded-[2.5rem] p-4 md:p-8 mb-6 md:mb-8 border-2 border-[var(--border-dark)]">
+          <h2 className="text-[var(--text-muted)] font-black text-[10px] md:text-[12px] uppercase tracking-widest mb-4 md:mb-6 px-2 opacity-60">Checkpoint Checklist</h2>
 
-          <div className="grid gap-4">
+          <div className="grid gap-3 md:gap-4">
             {/* Management Task */}
             <div className={`flex items-center justify-between p-5 rounded-2xl border-3 transition-all ${todayModes.management ? 'bg-green-100 border-green-600' : 'bg-[var(--card-bg)] border-[var(--border-dark)]'}`}>
               <div className="flex items-center gap-4">
@@ -187,34 +187,34 @@ export default function DailyChallengePage() {
         {isDone ? (
           <div className="text-center animate-in zoom-in">
             {!rewardClaimed ? (
-              <div className="bg-[var(--border-dark)] rounded-[2.5rem] p-8 text-[var(--text-on-dark)] shadow-xl">
-                <div className="text-6xl mb-4">🔑</div>
-                <h4 className="text-3xl font-black mb-2 italic uppercase">Congratulation!</h4>
-                <p className="opacity-80 font-bold mb-6">คุณทำสำเร็จครบทุกภารกิจแล้ว! รับกุญแจรางวัลของคุณเลย</p>
+              <div className="bg-[var(--border-dark)] rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 text-[var(--text-on-dark)] shadow-xl">
+                <div className="text-5xl md:text-6xl mb-4">🔑</div>
+                <h4 className="text-2xl md:text-3xl font-black mb-2 italic uppercase">Congratulation!</h4>
+                <p className="opacity-80 font-bold mb-4 md:mb-6 text-sm md:text-base">คุณทำสำเร็จครบทุกภารกิจแล้ว! รับกุญแจรางวัลของคุณเลย</p>
                 <button
                   onClick={handleClaimReward}
-                  className="w-full bg-[var(--card-bg)] text-[var(--border-dark)] py-4 rounded-2xl font-black text-2xl hover:translate-y-[-4px] transition-all shadow-[0_8px_0_#000] active:translate-y-0 active:shadow-none border-2 border-black"
+                  className="w-full bg-[var(--card-bg)] text-[var(--border-dark)] py-4 rounded-xl md:rounded-2xl font-black text-xl md:text-2xl hover:translate-y-[-4px] transition-all shadow-[0_6px_0_#000] md:shadow-[0_8px_0_#000] active:translate-y-0 active:shadow-none border-2 border-black"
                 >
                   รับกุญแจ 🗝️ (+1 Key)
                 </button>
               </div>
             ) : (
-              <div className="bg-[var(--bg-warm)] rounded-[2.5rem] p-8 border-4 border-[var(--border-dark)]">
-                <div className="text-5xl mb-4">✨</div>
-                <h4 className="text-2xl font-black mb-2 uppercase">ภารกิจวันนี้เสร็จสิ้น</h4>
-                <p className="text-[var(--text-muted)] text-sm mb-6 font-bold">คุณได้รับรางวัลของวันไปแล้ว พักผ่อนและกลับมาใหม่ในวันถัดไป!</p>
-                <div className="flex flex-col items-center justify-center gap-1 bg-[var(--card-bg)] py-3 px-6 rounded-2xl border-2 border-[var(--border-dark)] inline-flex">
-                  <span className="text-[10px] uppercase font-black tracking-widest opacity-50">Resetting In</span>
-                  <span className="text-3xl tabular-nums font-black">{countdown}</span>
+              <div className="bg-[var(--bg-warm)] rounded-3xl md:rounded-[2.5rem] p-6 md:p-8 border-4 border-[var(--border-dark)]">
+                <div className="text-4xl md:text-5xl mb-4">✨</div>
+                <h4 className="text-xl md:text-2xl font-black mb-2 uppercase">ภารกิจวันนี้เสร็จสิ้น</h4>
+                <p className="text-[var(--text-muted)] text-xs md:text-sm mb-4 md:mb-6 font-bold">คุณได้รับรางวัลของวันไปแล้ว พักผ่อนและกลับมาใหม่ในวันถัดไป!</p>
+                <div className="flex flex-col items-center justify-center gap-1 bg-[var(--card-bg)] py-2 md:py-3 px-4 md:px-6 rounded-xl md:rounded-2xl border-2 border-[var(--border-dark)] inline-flex">
+                  <span className="text-[8px] md:text-[10px] uppercase font-black tracking-widest opacity-50">Resetting In</span>
+                  <span className="text-2xl md:text-3xl tabular-nums font-black">{countdown}</span>
                 </div>
               </div>
             )}
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 md:gap-4">
             <button
               onClick={startNextMode}
-              className="w-full py-6 bg-[var(--border-dark)] text-[var(--text-on-dark)] rounded-[2rem] font-black text-3xl shadow-[0_10px_0_rgba(0,0,0,0.2)] transition-all hover:-translate-y-1 active:scale-95 border-2 border-black"
+              className="w-full py-4 md:py-6 bg-[var(--border-dark)] text-[var(--text-on-dark)] rounded-2xl md:rounded-[2rem] font-black text-xl md:text-3xl shadow-[0_6px_0_rgba(0,0,0,0.2)] md:shadow-[0_10px_0_rgba(0,0,0,0.2)] transition-all hover:-translate-y-1 active:scale-95 border-2 border-black"
             >
               เริ่มภารกิจต่อไป 🚀
             </button>
@@ -226,15 +226,15 @@ export default function DailyChallengePage() {
           </div>
         )}
 
-        <div className="mt-8 pt-8 border-t-2 border-[var(--border-dark)] flex items-center justify-between px-2">
+        <div className="mt-6 md:mt-8 pt-6 md:pt-8 border-t-2 border-[var(--border-dark)] flex items-center justify-between px-2">
           <div className="flex flex-col">
-            <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest opacity-60">Current Keys</span>
+            <span className="text-[8px] md:text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest opacity-60">Current Keys</span>
             <div className="flex items-center gap-2">
-              <span className="text-3xl font-black text-[var(--text-main)]">{currentKeys}</span>
-              <span className="text-2xl">🔑</span>
+              <span className="text-2xl md:text-3xl font-black text-[var(--text-main)]">{currentKeys}</span>
+              <span className="text-xl md:text-2xl">🔑</span>
             </div>
           </div>
-          <Link href="/world" className="bg-[var(--bg-warm)] border-2 border-[var(--border-dark)] px-4 py-2 rounded-full font-black text-sm hover:translate-y-[-2px] transition-all shadow-[3px_3px_0_#000]">ไปยังแผนที่โลก 🌏</Link>
+          <Link href="/world" className="bg-[var(--bg-warm)] border-2 border-[var(--border-dark)] px-3 md:px-4 py-2 rounded-full font-black text-xs md:text-sm hover:translate-y-[-2px] transition-all shadow-[2px_2px_0_#000] md:shadow-[3px_3px_0_#000]">ไปยังแผนที่โลก 🌏</Link>
         </div>
 
       </div>

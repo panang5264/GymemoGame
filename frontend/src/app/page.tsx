@@ -171,11 +171,11 @@ export default function Home() {
         {/* Phase 1: Login */}
         {phase === 'login' && (
           <div className="friendly-card animate-in fade-in zoom-in duration-500">
-            <div className="flex flex-col items-center mb-8">
-              <div className="w-20 h-20 bg-[var(--card-bg)] border-4 border-[var(--border-dark)] rounded-full flex items-center justify-center text-4xl mb-4 shadow-[6px_6px_0_var(--border-dark)]">
+            <div className="flex flex-col items-center mb-6 md:mb-8">
+              <div className="w-16 h-16 md:w-20 md:h-20 bg-[var(--card-bg)] border-4 border-[var(--border-dark)] rounded-full flex items-center justify-center text-3xl md:text-4xl mb-4 shadow-[4px_4px_0_var(--border-dark)] md:shadow-[6px_6px_0_var(--border-dark)]">
                 🧠
               </div>
-              <h1 className="text-4xl font-black text-[var(--text-main)] tracking-tight uppercase">ยินดีต้อนรับ</h1>
+              <h1 className="text-3xl md:text-4xl font-black text-[var(--text-main)] tracking-tight uppercase">ยินดีต้อนรับ</h1>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-5">
@@ -206,7 +206,7 @@ export default function Home() {
                   required
                 />
               </div>
-              <button disabled={loading} className="pill-button w-full py-5 text-2xl mt-4 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_6px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70">
+              <button disabled={loading} className="pill-button w-full py-4 md:py-5 text-xl md:text-2xl mt-4 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_4px_0_#000] md:shadow-[0_6px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70">
                 {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
               </button>
             </form>
@@ -229,12 +229,12 @@ export default function Home() {
 
         {/* Phase 2: Name Input */}
         {phase === 'name' && (
-          <div className="friendly-card animate-in slide-in-from-right duration-500 text-center">
-            <div className="text-7xl mb-6">👋</div>
-            <h2 className="text-3xl font-black text-[#1a1a1a] mb-2">ยินดีที่ได้รู้จัก!</h2>
-            <p className="text-[#717171] font-bold mb-10">เราควรเรียกคุณว่าอะไรดีครับ?</p>
+          <div className="friendly-card animate-in slide-in-from-right duration-500 text-center px-4 md:px-8 py-8 md:py-12">
+            <div className="text-6xl md:text-7xl mb-6">👋</div>
+            <h2 className="text-2xl md:text-3xl font-black text-[#1a1a1a] mb-2">ยินดีที่ได้รู้จัก!</h2>
+            <p className="text-[#717171] font-bold mb-8 md:mb-10 text-sm md:text-base">เราควรเรียกคุณว่าอะไรดีครับ?</p>
 
-            <form onSubmit={handleSaveName} className="space-y-6">
+            <form onSubmit={handleSaveName} className="space-y-4 md:space-y-6">
               <input
                 autoFocus
                 type="text"
@@ -268,21 +268,21 @@ export default function Home() {
                 <h2 className="text-5xl font-black text-[#1a1a1a] mb-2">{name}</h2>
                 <p className="text-[#717171] font-black uppercase tracking-[0.2em] text-[12px] mb-10">นักสำรวจความจำ | ปลดล็อก {progress?.unlockedVillages?.length || 1}/10 หมู่บ้าน</p>
 
-                <div className="w-full grid grid-cols-2 gap-4 mb-10">
-                  <div className="bg-white border-3 border-[#1a1a1a] rounded-[2rem] p-4 shadow-[4px_4px_0_#1a1a1a]">
-                    <div className="text-[#717171] text-[12px] font-black uppercase tracking-widest mb-1">หมู่บ้าน</div>
-                    <div className="text-4xl font-black text-[#1a1a1a]">{progress?.unlockedVillages?.length || 1}</div>
+                <div className="w-full grid grid-cols-2 gap-2 md:gap-4 mb-8 md:mb-10">
+                  <div className="bg-white border-[2px] md:border-3 border-[#1a1a1a] rounded-2xl md:rounded-[2rem] p-3 md:p-4 shadow-[2px_2px_0_#1a1a1a] md:shadow-[4px_4px_0_#1a1a1a]">
+                    <div className="text-[#717171] text-[10px] md:text-[12px] font-black uppercase tracking-widest mb-1">หมู่บ้าน</div>
+                    <div className="text-2xl md:text-4xl font-black text-[#1a1a1a]">{progress?.unlockedVillages?.length || 1}</div>
                   </div>
-                  <div className="bg-white border-3 border-[#1a1a1a] rounded-[2rem] p-4 shadow-[4px_4px_0_#1a1a1a]">
-                    <div className="text-[#717171] text-[12px] font-black uppercase tracking-widest mb-1">คะแนนรวม</div>
-                    <div className="text-4xl font-black text-[#1a1a1a]">{progress?.totalScore || 0}</div>
+                  <div className="bg-white border-[2px] md:border-3 border-[#1a1a1a] rounded-2xl md:rounded-[2rem] p-3 md:p-4 shadow-[2px_2px_0_#1a1a1a] md:shadow-[4px_4px_0_#1a1a1a]">
+                    <div className="text-[#717171] text-[10px] md:text-[12px] font-black uppercase tracking-widest mb-1">คะแนนรวม</div>
+                    <div className="text-2xl md:text-4xl font-black text-[#1a1a1a]">{progress?.totalScore || 0}</div>
                   </div>
                 </div>
 
-                <div className="w-full flex flex-col gap-4">
+                <div className="w-full flex flex-col gap-3 md:gap-4">
                   <button
                     onClick={nextPhase}
-                    className="pill-button w-full py-6 text-3xl shadow-[0_8px_0_#000] hover:translate-y-[-2px] hover:shadow-[0_10px_0_#000] active:translate-y-1 active:shadow-none transition-all"
+                    className="pill-button w-full py-4 md:py-6 text-xl md:text-3xl shadow-[0_4px_0_#000] md:shadow-[0_8px_0_#000] hover:translate-y-[-2px] hover:shadow-[0_10px_0_#000] active:translate-y-1 active:shadow-none transition-all"
                   >
                     เริ่มผจญภัย! 🚀
                   </button>
@@ -417,13 +417,13 @@ export default function Home() {
               </div>
 
               <div className="flex flex-col gap-3 pt-4">
-                <button type="submit" disabled={loading} className="pill-button w-full py-5 text-2xl">
+                <button type="submit" disabled={loading} className="pill-button w-full py-4 md:py-5 text-xl md:text-2xl">
                   {loading ? 'กำลังบันทึก...' : 'บันทึกการเปลี่ยนแปลง ✨'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setPhase('profile')}
-                  className="py-4 text-slate-400 font-black hover:text-slate-600 transition-colors uppercase tracking-widest text-sm"
+                  className="py-3 md:py-4 text-slate-400 font-black hover:text-slate-600 transition-colors uppercase tracking-widest text-xs md:text-sm"
                 >
                   ยกเลิก
                 </button>
@@ -437,11 +437,11 @@ export default function Home() {
           <div className="text-center animate-in fade-in duration-1000 max-w-6xl mx-auto w-full h-[85vh] flex flex-col items-center">
             <iframe
               src="/assets/Assets'Employer/Background/INTRO.pdf#view=FitH&toolbar=0"
-              className="w-full h-full rounded-[2rem] border-4 border-black shadow-[10px_10px_0_#1a1a1a] bg-white"
+              className="w-full h-full rounded-[1rem] md:rounded-[2rem] border-2 md:border-4 border-black shadow-[4px_4px_0_#1a1a1a] md:shadow-[10px_10px_0_#1a1a1a] bg-white"
               title="Game Intro"
             />
-            <div className="mt-8 w-full max-w-md">
-              <button onClick={nextPhase} className="pill-button w-full py-6 text-2xl group shadow-xl">
+            <div className="mt-4 md:mt-8 w-full max-w-md px-4 md:px-0">
+              <button onClick={nextPhase} className="pill-button w-full py-4 md:py-6 text-xl md:text-2xl group shadow-lg md:shadow-xl">
                 เริ่มต้นการเดินทาง <span className="inline-block transition-transform group-hover:translate-x-2">→</span>
               </button>
             </div>
@@ -487,21 +487,21 @@ export default function Home() {
 
         {/* Phase 6: Tutorial Summary */}
         {phase === 'tutorial_summary' && (
-          <div className="friendly-card !p-12 animate-in slide-in-from-bottom duration-700 max-w-5xl mx-auto border-[6px]">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
-              <div className="text-left">
+          <div className="friendly-card !p-6 md:!p-12 animate-in slide-in-from-bottom duration-700 max-w-5xl mx-auto border-[4px] md:border-[6px]">
+            <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-8 md:mb-16 gap-6 text-center md:text-left">
+              <div className="w-full">
                 <div className="inline-block px-4 py-1 bg-yellow-400 border-2 border-black text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-4">Training Mode</div>
-                <h2 className="text-6xl font-black text-black tracking-tighter leading-none mb-4">เรียนรู้วิธีฟื้นฟู 🧠</h2>
-                <p className="text-[#717171] font-bold text-lg">ทดสอบทักษะทั้ง 3 ด้านเพื่อเตรียมความพร้อมสู่การเดินทางจริง</p>
+                <h2 className="text-4xl md:text-6xl font-black text-black tracking-tighter leading-none mb-4">เรียนรู้วิธีฟื้นฟู 🧠</h2>
+                <p className="text-[#717171] font-bold text-sm md:text-lg">ทดสอบทักษะทั้ง 3 ด้านเพื่อเตรียมความพร้อมสู่การเดินทางจริง</p>
               </div>
               <div className="flex -space-x-4">
-                <div className="w-16 h-16 bg-white border-4 border-black rounded-2xl flex items-center justify-center text-3xl shadow-lg -rotate-12">📦</div>
-                <div className="w-16 h-16 bg-white border-4 border-black rounded-2xl flex items-center justify-center text-3xl shadow-lg rotate-0 z-10">🔢</div>
-                <div className="w-16 h-16 bg-white border-4 border-black rounded-2xl flex items-center justify-center text-3xl shadow-lg rotate-12">🗺️</div>
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-white border-2 md:border-4 border-black rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-3xl shadow-md md:shadow-lg -rotate-12">📦</div>
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-white border-2 md:border-4 border-black rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-3xl shadow-md md:shadow-lg rotate-0 z-10">🔢</div>
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-white border-2 md:border-4 border-black rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-3xl shadow-md md:shadow-lg rotate-12">🗺️</div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-10 mb-10 md:mb-16">
               {/* Management */}
               <div
                 onClick={() => setTrainingMode('management')}
@@ -548,16 +548,16 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-black text-[var(--text-on-dark)] p-10 rounded-[3.5rem] mb-16 text-center shadow-[0_15px_40px_rgba(0,0,0,0.2)] relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-20 text-9xl -rotate-12 text-yellow-400">⚡</div>
-              <p className="text-3xl font-black leading-tight">
+            <div className="bg-black text-[var(--text-on-dark)] p-6 md:p-10 rounded-[2rem] md:rounded-[3.5rem] mb-10 md:mb-16 text-center shadow-[0_10px_20px_rgba(0,0,0,0.2)] md:shadow-[0_15px_40px_rgba(0,0,0,0.2)] relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-20 text-7xl md:text-9xl -rotate-12 text-yellow-400">⚡</div>
+              <p className="text-xl md:text-3xl font-black leading-tight">
                 "ทุกหมู่บ้านรอคอยให้เจ้าปลดปล่อยความทรงจำกลับคืนมา"
               </p>
             </div>
 
             <button
               onClick={nextPhase}
-              className="pill-button w-full py-10 text-4xl shadow-[0_15px_0_#1a1a1a] hover:translate-y-2 hover:shadow-[0_8px_0_#1a1a1a] active:translate-y-4 active:shadow-none transition-all"
+              className="pill-button w-full py-6 md:py-10 text-2xl md:text-4xl shadow-[0_8px_0_#1a1a1a] md:shadow-[0_15px_0_#1a1a1a] hover:translate-y-1 hover:shadow-[0_4px_0_#1a1a1a] md:hover:shadow-[0_8px_0_#1a1a1a] active:translate-y-2 md:active:translate-y-4 active:shadow-none transition-all"
             >
               พร้อมแล้ว! เข้าสู่ก้าวสำคัญ 🗝️
             </button>

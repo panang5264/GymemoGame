@@ -119,7 +119,7 @@ export default function PairMatchingGame({ pairs, basePath, onComplete, onError 
 
             <div className="flex justify-between w-full max-w-3xl mx-auto px-4 z-20 relative gap-8">
                 {/* Left Column */}
-                <div className="flex flex-col gap-6 w-1/2">
+                <div className="flex flex-col gap-4 md:gap-6 w-1/2">
                     {leftItems.map((item) => {
                         const isMatched = Object.keys(matchedPairs).includes(item.id)
                         const isSelected = selectedLeft === item.id
@@ -129,7 +129,7 @@ export default function PairMatchingGame({ pairs, basePath, onComplete, onError 
                                 ref={el => leftRefs.current[item.id] = el}
                                 onClick={() => handleLeftClick(item.id)}
                                 disabled={isMatched}
-                                className={`flex items-center justify-center p-4 rounded-2xl border-4 transition-all w-full h-32 md:h-40 bg-white
+                                className={`flex items-center justify-center p-2 md:p-4 rounded-xl md:rounded-2xl border-2 md:border-4 transition-all w-full h-24 sm:h-32 md:h-40 bg-white
                   ${isMatched ? 'border-blue-500 opacity-50 scale-95' :
                                         isSelected ? 'border-indigo-500 shadow-lg scale-105' :
                                             'border-slate-200 hover:border-slate-300 hover:shadow-md'}`}
@@ -141,7 +141,7 @@ export default function PairMatchingGame({ pairs, basePath, onComplete, onError 
                 </div>
 
                 {/* Right Column */}
-                <div className="flex flex-col gap-6 w-1/2">
+                <div className="flex flex-col gap-4 md:gap-6 w-1/2">
                     {rightItems.map((item) => {
                         const isMatched = Object.values(matchedPairs).includes(item.id)
                         const isSelected = selectedRight === item.id
@@ -151,7 +151,7 @@ export default function PairMatchingGame({ pairs, basePath, onComplete, onError 
                                 ref={el => rightRefs.current[item.id] = el}
                                 onClick={() => handleRightClick(item.id)}
                                 disabled={isMatched}
-                                className={`flex items-center justify-center p-4 rounded-2xl border-4 transition-all w-full h-32 md:h-40 bg-white
+                                className={`flex items-center justify-center p-2 md:p-4 rounded-xl md:rounded-2xl border-2 md:border-4 transition-all w-full h-24 sm:h-32 md:h-40 bg-white
                   ${isMatched ? 'border-blue-500 opacity-50 scale-95' :
                                         isSelected ? 'border-indigo-500 shadow-lg scale-105' :
                                             'border-slate-200 hover:border-slate-300 hover:shadow-md'}`}

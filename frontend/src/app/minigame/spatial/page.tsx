@@ -234,10 +234,10 @@ function SpatialGameInner() {
   if (phase === 'intro' && levelParam === 1) {
     return (
       <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4 font-['Supermarket']">
-        <div className="max-w-md w-full bg-white rounded-[40px] p-10 shadow-2xl border border-slate-100 text-center animate-in zoom-in">
-          <div className="text-9xl mb-8 animate-bounce">🗺️</div>
-          <h2 className="text-3xl font-black text-slate-800 mb-4 uppercase tracking-tighter">มิติจำลอง</h2>
-          <p className="text-slate-500 font-bold mb-12 text-lg">{diffDesc}</p>
+        <div className="max-w-md w-full bg-white rounded-[2rem] md:rounded-[40px] p-6 md:p-10 shadow-2xl border border-slate-100 text-center animate-in zoom-in">
+          <div className="text-7xl md:text-9xl mb-6 md:mb-8 animate-bounce">🗺️</div>
+          <h2 className="text-2xl md:text-3xl font-black text-slate-800 mb-3 md:mb-4 uppercase tracking-tighter">มิติจำลอง</h2>
+          <p className="text-slate-500 font-bold mb-8 md:mb-12 text-sm md:text-lg">{diffDesc}</p>
           <button
             onClick={() => {
               if (mode === 'village') setPhase('play')
@@ -266,21 +266,21 @@ function SpatialGameInner() {
     <div className="min-h-[calc(100vh-140px)] py-6 flex flex-col items-center relative overflow-hidden font-['Supermarket']">
 
       <div className="max-w-4xl w-full px-4 relative z-10">
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 mb-8">
-          <h1 className="text-3xl font-black text-slate-800 text-center mb-1">
+        <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-slate-200 mb-6 md:mb-8">
+          <h1 className="text-xl md:text-3xl font-black text-slate-800 text-center mb-1">
             {mode === 'daily' ? '🌟 ภารกิจรายวัน: พื้นที่' : `🗺️ Spatial — ด่าน ${subId}`}
           </h1>
-          <p className="text-center text-slate-500 font-bold uppercase tracking-wider text-sm">
+          <p className="text-center text-slate-500 font-bold uppercase tracking-wider text-xs md:text-sm">
             {diffDesc}
           </p>
         </div>
 
         {isComplete ? (
-          <div className="bg-white/95 backdrop-blur-md border-2 border-white/20 p-12 rounded-[3.5rem] shadow-2xl text-center max-w-xl mx-auto animate-in zoom-in duration-500">
-            <div className="text-8xl mb-6">🎯</div>
-            <h2 className="text-4xl font-black text-slate-800 mb-4">คะแนนที่ทำได้</h2>
-            <p className="text-slate-500 mb-10 text-lg">คุณผ่านความท้าทายนี้ได้อย่างยอดเยี่ยม!</p>
-            <div className="grid grid-cols-1 gap-4">
+          <div className="bg-white/95 backdrop-blur-md border-2 border-white/20 p-8 md:p-12 rounded-[2rem] md:rounded-[3.5rem] shadow-2xl text-center max-w-xl mx-auto animate-in zoom-in duration-500">
+            <div className="text-6xl md:text-8xl mb-4 md:mb-6">🎯</div>
+            <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-3 md:mb-4">คะแนนที่ทำได้</h2>
+            <p className="text-slate-500 mb-8 md:mb-10 text-sm md:text-lg">คุณผ่านความท้าทายนี้ได้อย่างยอดเยี่ยม!</p>
+            <div className="grid grid-cols-1 gap-3 md:gap-4">
               {mode === 'daily' ? (
                 <button
                   className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black text-xl shadow-lg transition-all active:scale-95"
@@ -309,14 +309,14 @@ function SpatialGameInner() {
           </div>
         ) : (
           <div className="w-full flex flex-col items-center">
-            <div className="mb-8 min-h-[50px] text-center w-full">
+            <div className="mb-6 md:mb-8 min-h-[40px] md:min-h-[50px] text-center w-full">
               {feedback && (
-                <div className={`inline-block px-10 py-3 rounded-full font-black text-xl shadow-lg border-4 ${feedback.type === 'correct' ? 'bg-green-500 text-white border-green-300' : 'bg-red-500 text-white border-red-300 animate-shake'}`}>
+                <div className={`inline-block px-6 md:px-10 py-2 md:py-3 rounded-full font-black text-base md:text-xl shadow-lg border-2 md:border-4 ${feedback.type === 'correct' ? 'bg-green-500 text-white border-green-300' : 'bg-red-500 text-white border-red-300 animate-shake'}`}>
                   {feedback.message}
                 </div>
               )}
               {!feedback && questionText && (
-                <div className="inline-block px-10 py-3 rounded-full font-bold text-slate-600 bg-white/80 backdrop-blur-sm border-2 border-white/50 shadow-sm">
+                <div className="inline-block px-4 md:px-10 py-2 md:py-3 rounded-full font-bold text-slate-600 bg-white/80 backdrop-blur-sm border-2 border-white/50 shadow-sm text-sm md:text-base">
                   💡 {questionText}
                 </div>
               )}
@@ -335,16 +335,16 @@ function SpatialGameInner() {
             ) : questionData && questionData.options ? (
               <div className="w-full flex flex-col items-center">
                 {/* 1. Target Area (Image or Emoji) */}
-                <div className="mb-12 relative p-4 md:p-8 bg-white/40 backdrop-blur-md rounded-[3rem] border-4 border-white/50 shadow-xl flex items-center justify-center min-h-[200px] min-w-[200px] w-full max-w-md">
+                <div className="mb-8 md:mb-12 relative p-2 md:p-8 bg-white/40 backdrop-blur-md rounded-2xl md:rounded-[3rem] border-2 md:border-4 border-white/50 shadow-xl flex items-center justify-center min-h-[150px] md:min-h-[200px] w-full max-w-xs md:max-w-md">
                   {questionData.targetView ? (
-                    <div className="text-9xl drop-shadow-2xl animate-bounce">{questionData.targetView}</div>
+                    <div className="text-7xl md:text-9xl drop-shadow-2xl animate-bounce">{questionData.targetView}</div>
                   ) : questionData.targetImage ? (
-                    <img src={questionData.targetImage} className="w-full h-[300px] object-contain drop-shadow-md" alt="target" />
+                    <img src={questionData.targetImage} className="w-full h-[200px] md:h-[300px] object-contain drop-shadow-md" alt="target" />
                   ) : null}
                 </div>
 
                 {/* 2. Options Area */}
-                <div className={`grid gap-6 w-full max-w-2xl px-4 pb-20 ${questionData.options.length === 2 ? 'grid-cols-2' :
+                <div className={`grid gap-4 md:gap-6 w-full max-w-2xl px-2 md:px-4 pb-20 ${questionData.options.length === 2 ? 'grid-cols-2' :
                   questionData.options.length === 3 ? 'grid-cols-1 md:grid-cols-3' :
                     'grid-cols-2'
                   }`}>
@@ -361,15 +361,15 @@ function SpatialGameInner() {
                           setTimeout(() => setFeedback(null), 1000)
                         }
                       }}
-                      className="group relative p-6 bg-white hover:bg-blue-50 border-b-8 border-slate-200 hover:border-blue-200 rounded-[2rem] shadow-lg transition-all active:scale-95 flex flex-col items-center justify-center min-h-[140px]"
+                      className="group relative p-3 md:p-6 bg-white hover:bg-blue-50 border-b-4 md:border-b-8 border-slate-200 hover:border-blue-200 rounded-xl md:rounded-[2rem] shadow-md md:shadow-lg transition-all active:scale-95 flex flex-col items-center justify-center min-h-[120px] md:min-h-[140px]"
                     >
                       <div className="flex gap-2 w-full h-full items-center justify-center">
                         {typeof opt === 'string' && opt.startsWith('/') ? (
-                          <img src={opt as string} className="max-w-[120px] max-h-[120px] object-contain drop-shadow-sm group-hover:scale-110 transition-transform" alt={`option ${idx}`} />
+                          <img src={opt as string} className="max-w-[80px] max-h-[80px] md:max-w-[120px] md:max-h-[120px] object-contain drop-shadow-sm group-hover:scale-110 transition-transform" alt={`option ${idx}`} />
                         ) : Array.isArray(opt) ? opt.map((emoji, i) => (
-                          <span key={i} className="text-4xl md:text-6xl drop-shadow-md group-hover:scale-110 transition-transform">{emoji}</span>
+                          <span key={i} className="text-3xl md:text-6xl drop-shadow-md group-hover:scale-110 transition-transform">{emoji}</span>
                         )) : (
-                          <span className="text-6xl md:text-8xl drop-shadow-md group-hover:scale-110 transition-transform">{opt as string}</span>
+                          <span className="text-5xl md:text-8xl drop-shadow-md group-hover:scale-110 transition-transform">{opt as string}</span>
                         )}
                       </div>
                       <div className="absolute -top-2 -right-2 w-8 h-8 bg-slate-100 rounded-full border-2 border-white text-slate-400 font-black flex items-center justify-center text-xs group-hover:bg-blue-500 group-hover:text-white transition-colors">

@@ -217,63 +217,63 @@ export default function WorldPage() {
       {showTutorial && (
         <div className={styles.introOverlay} style={{ zIndex: 11000 }}>
           <div className={`${styles.introCard} ${styles.tutorialCard}`}>
-            <div className="flex justify-between items-center mb-12">
+            <div className="flex justify-between items-center mb-8 md:mb-12">
               <div className="text-left">
-                <h2 className="text-5xl font-black text-black tracking-tighter mb-2">คู่มือการเล่น 🧠</h2>
-                <div className="h-2 w-32 bg-black rounded-full"></div>
+                <h2 className="text-3xl md:text-5xl font-black text-black tracking-tighter mb-2">คู่มือการเล่น 🧠</h2>
+                <div className="h-2 w-24 md:w-32 bg-black rounded-full"></div>
               </div>
               <button
                 onClick={() => setShowTutorial(false)}
-                className="w-14 h-14 rounded-2xl bg-black/5 hover:bg-red-500 hover:text-white flex items-center justify-center text-4xl transition-all duration-300 shadow-[4px_4px_0_rgba(0,0,0,0.1)] hover:translate-y-[-2px]"
+                className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-black/5 hover:bg-red-500 hover:text-white flex items-center justify-center text-2xl md:text-4xl transition-all duration-300 shadow-[4px_4px_0_rgba(0,0,0,0.1)] hover:translate-y-[-2px]"
               >
                 ✕
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-8 md:mb-12">
               {/* Management */}
-              <div className="group relative bg-[#fcfaf2] p-8 rounded-[3.5rem] border-4 border-black text-center shadow-[12px_12px_0_#000] hover:translate-y-[-10px] transition-all duration-500">
-                <div className="w-24 h-24 bg-orange-50 border-3 border-black rounded-[2rem] flex items-center justify-center text-5xl mx-auto mb-8 shadow-[6px_6px_0_#000] group-hover:rotate-6 transition-transform">📦</div>
-                <h4 className="font-black text-2xl text-black mb-4 tracking-tighter">MANAGEMENT</h4>
-                <div className="h-1 w-12 bg-orange-400 mx-auto mb-6 rounded-full"></div>
-                <p className="text-lg font-bold text-black/70 leading-relaxed">
+              <div className="group relative bg-[#fcfaf2] p-6 md:p-8 rounded-[2rem] md:rounded-[3.5rem] border-4 border-black text-center shadow-[8px_8px_0_#000] md:shadow-[12px_12px_0_#000] hover:translate-y-[-10px] transition-all duration-500">
+                <div className="w-16 h-16 md:w-24 md:h-24 bg-orange-50 border-3 border-black rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center text-4xl md:text-5xl mx-auto mb-4 md:mb-8 shadow-[6px_6px_0_#000] group-hover:rotate-6 transition-transform">📦</div>
+                <h4 className="font-black text-xl md:text-2xl text-black mb-2 md:mb-4 tracking-tighter">MANAGEMENT</h4>
+                <div className="h-1 w-10 md:w-12 bg-orange-400 mx-auto mb-4 md:mb-6 rounded-full"></div>
+                <p className="text-sm md:text-lg font-bold text-black/70 leading-relaxed">
                   ฝึกทักษะการแยกแยะและจัดหมวดหมู่สิ่งของตามเงื่อนไขที่กำหนด
                 </p>
               </div>
 
               {/* Calculation */}
-              <div className="group relative bg-[#fcfaf2] p-8 rounded-[3.5rem] border-4 border-black text-center shadow-[12px_12px_0_#000] hover:translate-y-[-10px] transition-all duration-500">
-                <div className="w-24 h-24 bg-blue-50 border-3 border-black rounded-[2rem] flex items-center justify-center text-5xl mx-auto mb-8 shadow-[6px_6px_0_#000] group-hover:rotate-6 transition-transform">🔢</div>
-                <h4 className="font-black text-2xl text-black mb-4 tracking-tighter">CALCULATION</h4>
-                <div className="h-1 w-12 bg-blue-400 mx-auto mb-6 rounded-full"></div>
-                <p className="text-lg font-bold text-black/70 leading-relaxed">
+              <div className="group relative bg-[#fcfaf2] p-6 md:p-8 rounded-[2rem] md:rounded-[3.5rem] border-4 border-black text-center shadow-[8px_8px_0_#000] md:shadow-[12px_12px_0_#000] hover:translate-y-[-10px] transition-all duration-500">
+                <div className="w-16 h-16 md:w-24 md:h-24 bg-blue-50 border-3 border-black rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center text-4xl md:text-5xl mx-auto mb-4 md:mb-8 shadow-[6px_6px_0_#000] group-hover:rotate-6 transition-transform">🔢</div>
+                <h4 className="font-black text-xl md:text-2xl text-black mb-2 md:mb-4 tracking-tighter">CALCULATION</h4>
+                <div className="h-1 w-10 md:w-12 bg-blue-400 mx-auto mb-4 md:mb-6 rounded-full"></div>
+                <p className="text-sm md:text-lg font-bold text-black/70 leading-relaxed">
                   ท้าทายความไวในการแก้โจทย์คณิตศาสตร์ภายใต้ความกดดันของเวลา
                 </p>
               </div>
 
               {/* Spatial */}
-              <div className="group relative bg-[#fcfaf2] p-8 rounded-[3.5rem] border-4 border-black text-center shadow-[12px_12px_0_#000] hover:translate-y-[-10px] transition-all duration-500">
-                <div className="w-24 h-24 bg-green-50 border-3 border-black rounded-[2rem] flex items-center justify-center text-5xl mx-auto mb-8 shadow-[6px_6px_0_#000] group-hover:rotate-6 transition-transform">🗺️</div>
-                <h4 className="font-black text-2xl text-black mb-4 tracking-tighter">SPATIAL</h4>
-                <div className="h-1 w-12 bg-green-400 mx-auto mb-6 rounded-full"></div>
-                <p className="text-lg font-bold text-black/70 leading-relaxed">
+              <div className="group relative bg-[#fcfaf2] p-6 md:p-8 rounded-[2rem] md:rounded-[3.5rem] border-4 border-black text-center shadow-[8px_8px_0_#000] md:shadow-[12px_12px_0_#000] hover:translate-y-[-10px] transition-all duration-500">
+                <div className="w-16 h-16 md:w-24 md:h-24 bg-green-50 border-3 border-black rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center text-4xl md:text-5xl mx-auto mb-4 md:mb-8 shadow-[6px_6px_0_#000] group-hover:rotate-6 transition-transform">🗺️</div>
+                <h4 className="font-black text-xl md:text-2xl text-black mb-2 md:mb-4 tracking-tighter">SPATIAL</h4>
+                <div className="h-1 w-10 md:w-12 bg-green-400 mx-auto mb-4 md:mb-6 rounded-full"></div>
+                <p className="text-sm md:text-lg font-bold text-black/70 leading-relaxed">
                   ฝึกการวาดภาพในใจ จับคู่มุมมองและรูปทรงให้แม่นยำที่สุด
                 </p>
               </div>
             </div>
 
-            <div className="bg-white/60 backdrop-blur-md p-10 rounded-[3rem] mb-12 text-left border-4 border-black shadow-[8px_8px_0_rgba(0,0,0,0.05)] relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-10 text-8xl rotate-12">🎯</div>
-              <p className="text-xs font-black text-black/40 uppercase tracking-[0.2em] mb-3">Our Mission Objective</p>
-              <p className="text-2xl font-black text-black leading-tight">
+            <div className="bg-white/60 backdrop-blur-md p-6 md:p-10 rounded-3xl md:rounded-[3rem] mb-8 md:mb-12 text-left border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,0.05)] md:shadow-[8px_8px_0_rgba(0,0,0,0.05)] relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10 text-6xl md:text-8xl rotate-12">🎯</div>
+              <p className="text-[10px] md:text-xs font-black text-black/40 uppercase tracking-[0.2em] mb-2 md:mb-3">Our Mission Objective</p>
+              <p className="text-lg md:text-2xl font-black text-black leading-tight">
                 สะสม <span className="text-orange-500 underline decoration-4 underline-offset-4">EXP</span> ในแต่ละหมู่บ้านให้เต็มเพื่อปลดล็อกพื้นที่ถัดไป <br className="hidden md:block" />
-                และภารกิจสำคัญคือ <span className="bg-yellow-300 px-2 py-0.5 rounded-lg border-2 border-yellow-400/20 shadow-sm inline-block translate-y-1">กู้คืนความทรงจำที่หายไป</span> กลับคืนมา!
+                และภารกิจสำคัญคือ <span className="bg-yellow-300 px-2 py-0.5 rounded-lg border-2 border-yellow-400/20 shadow-sm inline-block translate-y-1 mt-1 md:mt-0">กู้คืนความทรงจำที่หายไป</span> กลับคืนมา!
               </p>
             </div>
 
             <button
               onClick={() => setShowTutorial(false)}
-              className={`${styles.navBtn} ${styles.navBtnPrimary} w-full text-3xl py-8 rounded-[2.5rem] border-4 border-black shadow-[0_12px_0_#1a1a1a] hover:translate-y-2 hover:shadow-[0_4px_0_#1a1a1a] transition-all duration-200 active:translate-y-3 active:shadow-none`}
+              className={`${styles.navBtn} ${styles.navBtnPrimary} w-full text-xl md:text-3xl py-4 md:py-8 rounded-2xl md:rounded-[2.5rem] border-4 border-black shadow-[0_6px_0_#1a1a1a] md:shadow-[0_12px_0_#1a1a1a] hover:translate-y-2 hover:shadow-[0_4px_0_#1a1a1a] transition-all duration-200 active:translate-y-3 active:shadow-none`}
             >
               เข้าใจแล้ว เริ่มผจญภัย! 🚀
             </button>
@@ -377,7 +377,7 @@ export default function WorldPage() {
                 className={styles.stageIcon}
                 style={{ backgroundImage: `url("${iconPath}")` }}
               />
-              <span className="bg-[var(--card-bg)] text-[var(--text-main)] px-3 py-1 rounded-full text-[10px] sm:text-xs font-black shadow-[2px_2px_0_var(--border-dark)] uppercase tracking-widest whitespace-nowrap mt-1">
+              <span className="bg-[var(--card-bg)] text-[var(--text-main)] px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[8px] sm:text-[10px] md:text-xs font-black shadow-[1px_1px_0_var(--border-dark)] sm:shadow-[2px_2px_0_var(--border-dark)] uppercase tracking-widest whitespace-nowrap mt-1">
                 ด่าน {stage}
               </span>
               {state !== 'locked' && (

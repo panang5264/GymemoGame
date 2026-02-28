@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Supermarket';
+  src: url('/assets/fonts/supermarket.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --breakpoint-sm: 480px;
   --breakpoint-md: 600px;
@@ -107,10 +115,18 @@
 
 .header .container {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 1rem;
   align-items: center;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .header .container {
+    flex-direction: row;
+    justify-content: space-between;
+  }
 }
 
 .logo {
@@ -130,9 +146,8 @@
 .nav-link {
   color: var(--text-main);
   text-decoration: none;
-  font-size: 1.25rem;
-  /* Increased from 1.1rem */
-  padding: 0.6rem 1.5rem;
+  font-size: 1.1rem;
+  padding: 0.4rem 1rem;
   border-radius: 9999px;
   border: 2px solid transparent;
   transition: all 0.2s;

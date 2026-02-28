@@ -661,19 +661,19 @@ function ManagementGameInner() {
       <div className="w-full max-w-5xl bg-white rounded-[32px] md:rounded-[40px] shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-140px)] min-h-[550px] max-h-[850px] relative border border-slate-100">
 
         {/* Header Bar */}
-        <div className="h-20 bg-white border-b-2 border-slate-50 flex items-center justify-between px-6 md:px-10 shrink-0">
-          <div className="flex items-center gap-3 md:gap-4">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-2xl md:text-3xl">
+        <div className="h-16 md:h-20 bg-white border-b-2 border-slate-50 flex items-center justify-between px-4 md:px-10 shrink-0">
+          <div className="flex items-center gap-2 md:gap-4">
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-50 rounded-lg md:rounded-2xl flex items-center justify-center text-xl md:text-3xl">
               {levelParam <= 3 ? '📦' : levelParam <= 5 ? '🍳' : levelParam <= 9 ? '🧭' : '📝'}
             </div>
-            <h1 className="text-lg md:text-2xl font-black text-slate-800 tracking-tight">
+            <h1 className="text-sm md:text-2xl font-black text-slate-800 tracking-tight leading-tight max-w-[150px] md:max-w-none">
               {config.instruction}
             </h1>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-end">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Score</span>
-              <span className="text-4xl font-black text-indigo-600 tabular-nums">{score}</span>
+              <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Score</span>
+              <span className="text-2xl md:text-4xl font-black text-indigo-600 tabular-nums">{score}</span>
             </div>
           </div>
         </div>
@@ -689,13 +689,13 @@ function ManagementGameInner() {
           )}
 
           {phase === 'intro' && (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-sm p-10">
-              <div className="max-w-md w-full bg-white rounded-[40px] p-10 shadow-2xl border border-slate-100 text-center animate-in zoom-in">
-                <div className="text-9xl mb-8 animate-bounce">
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-sm p-4 md:p-10">
+              <div className="max-w-md w-full bg-white rounded-3xl md:rounded-[40px] p-8 md:p-10 shadow-2xl border border-slate-100 text-center animate-in zoom-in">
+                <div className="text-7xl md:text-9xl mb-6 md:mb-8 animate-bounce">
                   {levelParam <= 3 ? '📦' : levelParam <= 5 ? '🍳' : levelParam <= 9 ? '🧭' : '📝'}
                 </div>
-                <h3 className="text-2xl font-black text-slate-800 mb-4 uppercase tracking-tighter">Level {levelParam}</h3>
-                <p className="text-slate-500 font-bold mb-12 text-lg">{config.instruction}</p>
+                <h3 className="text-xl md:text-2xl font-black text-slate-800 mb-2 md:mb-4 uppercase tracking-tighter">Level {levelParam}</h3>
+                <p className="text-slate-500 font-bold mb-8 md:mb-12 text-sm md:text-lg">{config.instruction}</p>
                 <button
                   onClick={() => {
                     if (levelParam === 1 && modeParam !== 'village') setPhase('clock')
@@ -718,17 +718,17 @@ function ManagementGameInner() {
           )}
 
           {phase === 'done' && (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-md p-6">
-              <div className="max-w-[400px] w-full bg-white rounded-[48px] p-10 md:p-12 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] border border-white text-center animate-in zoom-in">
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-md p-4 md:p-6">
+              <div className="max-w-[400px] w-full bg-white rounded-3xl md:rounded-[48px] p-8 md:p-12 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] border border-white text-center animate-in zoom-in">
                 <div className="relative mb-4 flex justify-center">
                   <div className="absolute inset-0 bg-yellow-400 blur-3xl opacity-20 animate-pulse" />
-                  <div className="text-8xl relative drop-shadow-2xl">🎯</div>
+                  <div className="text-6xl md:text-8xl relative drop-shadow-2xl">🎯</div>
                 </div>
-                <h3 className="text-4xl font-black text-slate-800 tracking-tight">
+                <h3 className="text-2xl md:text-4xl font-black text-slate-800 tracking-tight">
                   คะแนนรอบนี้: {score}
                 </h3>
                 {playedRounds > 1 && (
-                  <p className="text-3xl font-black text-indigo-600 mb-2 mt-4">
+                  <p className="text-xl md:text-3xl font-black text-indigo-600 mb-2 mt-4">
                     คะแนนเฉลี่ย ({playedRounds} รอบ): {Math.round((accumulatedScore + score) / playedRounds)}
                   </p>
                 )}
@@ -827,25 +827,25 @@ function ManagementGameInner() {
               )}
 
               {config.mode === 'cooking' && (
-                <div className="w-full h-full flex flex-col items-center justify-center p-10">
-                  <div className="absolute top-6 left-1/2 -translate-x-1/2 flex flex-col items-center">
-                    <span className="bg-slate-800 text-white px-6 py-2 rounded-full font-black text-xl mb-2">เมนู: {COOKING_RECIPES[dishIndex]?.name}</span>
+                <div className="w-full h-full flex flex-col items-center justify-center p-4 md:p-10">
+                  <div className="absolute top-4 md:top-6 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                    <span className="bg-slate-800 text-white px-4 py-1.5 md:px-6 md:py-2 rounded-full font-black text-sm md:text-xl mb-2 text-center whitespace-nowrap">เมนู: {COOKING_RECIPES[dishIndex]?.name}</span>
                     {showCookingOrder && (
-                      <div className="flex gap-4 p-4 bg-white rounded-3xl shadow-2xl border-4 border-blue-400 animate-in zoom-in">
-                        {currentOrder.map((ing, i) => <div key={i} className="text-5xl">{ing}</div>)}
+                      <div className="flex gap-2 md:gap-4 p-2 md:p-4 bg-white rounded-2xl md:rounded-3xl shadow-2xl border-2 md:border-4 border-blue-400 animate-in zoom-in">
+                        {currentOrder.map((ing, i) => <div key={i} className="text-3xl md:text-5xl">{ing}</div>)}
                       </div>
                     )}
                   </div>
-                  <div className="flex-1 flex flex-col items-center justify-center mt-20">
-                    <div className="flex gap-4 mb-20 bg-slate-100 p-8 rounded-[40px] shadow-inner min-h-[140px] items-center">
-                      {collectedIngredients.map((ing, i) => <div key={i} className="text-6xl animate-in bounce-in">{ing}</div>)}
+                  <div className="flex-1 flex flex-col items-center justify-center mt-16 md:mt-20">
+                    <div className="flex gap-2 md:gap-4 mb-10 md:mb-20 bg-slate-100 p-4 md:p-8 rounded-[2rem] md:rounded-[40px] shadow-inner min-h-[100px] md:min-h-[140px] items-center">
+                      {collectedIngredients.map((ing, i) => <div key={i} className="text-4xl md:text-6xl animate-in bounce-in">{ing}</div>)}
                       {collectedIngredients.length < currentOrder.length && !showCookingOrder && (
-                        <div className="w-16 h-16 rounded-full border-4 border-dashed border-slate-300 flex items-center justify-center text-slate-300 text-3xl font-black">?</div>
+                        <div className="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 md:border-4 border-dashed border-slate-300 flex items-center justify-center text-slate-300 text-2xl md:text-3xl font-black">?</div>
                       )}
                     </div>
-                    <div className="grid grid-cols-4 md:grid-cols-7 gap-3">
+                    <div className="grid grid-cols-4 md:grid-cols-7 gap-2 md:gap-3 px-2">
                       {cookingItems.map((ing, i) => (
-                        <button key={i} onClick={() => handleCookIngredient(ing)} className="w-12 h-12 md:w-16 md:h-16 bg-white rounded-2xl md:rounded-3xl shadow-xl flex items-center justify-center text-2xl md:text-3xl hover:scale-110 active:scale-90 border-b-4 border-slate-200">{ing}</button>
+                        <button key={i} onClick={() => handleCookIngredient(ing)} className="w-14 h-14 md:w-16 md:h-16 bg-white rounded-[1rem] md:rounded-3xl shadow-md md:shadow-xl flex items-center justify-center text-3xl hover:scale-110 active:scale-90 border-b-4 border-slate-200">{ing}</button>
                       ))}
                     </div>
                   </div>
@@ -884,25 +884,25 @@ function ManagementGameInner() {
               )}
 
               {config.mode === 'matching' && (
-                <div className="w-full h-full flex flex-col items-center justify-center p-10">
-                  <div className="grid grid-cols-2 gap-x-12 md:gap-x-20 gap-y-4 w-full max-w-3xl">
-                    <div className="flex flex-col gap-3">
-                      <span className="text-center font-black text-slate-400 text-xs mb-2 uppercase tracking-widest">วลี/คำพูด</span>
+                <div className="w-full h-full flex flex-col items-center justify-center p-4 md:p-10">
+                  <div className="grid grid-cols-2 gap-x-4 md:gap-x-20 gap-y-3 md:gap-y-4 w-full max-w-3xl">
+                    <div className="flex flex-col gap-2 md:gap-3">
+                      <span className="text-center font-black text-slate-400 text-[10px] md:text-xs mb-1 md:mb-2 uppercase tracking-widest">วลี/คำพูด</span>
                       {matchingPairs.map((pair) => (
-                        <button key={pair.id} onClick={() => handleMatchClick('left', pair.id)} disabled={pair.matched} className={`p-3 rounded-2xl shadow-md font-black text-xs md:text-base transition-all ${pair.matched ? 'bg-green-50 text-green-300 opacity-40' : selectedLeft === pair.id ? 'bg-blue-600 text-white' : 'bg-white text-slate-700'}`}>
+                        <button key={pair.id} onClick={() => handleMatchClick('left', pair.id)} disabled={pair.matched} className={`p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm md:shadow-md font-black text-[10px] sm:text-xs md:text-base min-h-[50px] transition-all ${pair.matched ? 'bg-green-50 text-green-300 opacity-40' : selectedLeft === pair.id ? 'bg-blue-600 text-white' : 'bg-white text-slate-700'}`}>
                           {pair.left}
                         </button>
                       ))}
                     </div>
-                    <div className="flex flex-col gap-3">
-                      <span className="text-center font-black text-slate-400 text-xs mb-2 uppercase tracking-widest">หมวดหมู่</span>
+                    <div className="flex flex-col gap-2 md:gap-3">
+                      <span className="text-center font-black text-slate-400 text-[10px] md:text-xs mb-1 md:mb-2 uppercase tracking-widest">หมวดหมู่</span>
                       {shuffledRight.map((item, idx) => {
                         const isMatched = matchingPairs.find(p => p.id === item.id)?.matched
-                        return (<button key={idx} onClick={() => handleMatchClick('right', item.id)} disabled={isMatched} className={`p-3 rounded-2xl shadow-md font-black text-xs md:text-base transition-all ${isMatched ? 'opacity-20' : 'bg-white text-slate-600 border-2 border-dashed'}`}>{item.text}</button>)
+                        return (<button key={idx} onClick={() => handleMatchClick('right', item.id)} disabled={isMatched} className={`p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm md:shadow-md font-black text-[10px] sm:text-xs md:text-base min-h-[50px] transition-all ${isMatched ? 'opacity-20' : 'bg-white text-slate-600 border-2 border-dashed'}`}>{item.text}</button>)
                       })}
                     </div>
                   </div>
-                  <p className="mt-12 text-blue-400 font-bold italic animate-pulse">💡 เลือกวลีทางซ้าย แล้วเลือกหมวดหมู่ที่ถูกต้องทางขวา</p>
+                  <p className="mt-8 md:mt-12 text-blue-400 font-bold italic text-xs md:text-base animate-pulse text-center">💡 เลือกวลีทางซ้าย แล้วเลือกหมวดหมู่ที่ถูกต้องทางขวา</p>
                 </div>
               )}
             </div>

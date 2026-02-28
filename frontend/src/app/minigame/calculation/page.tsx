@@ -344,7 +344,7 @@ function CalculationGameInner() {
                       </div>
                     ) : typeof value === 'number' ? (
                       /* 3. Normal Number */
-                      <span className="text-2xl md:text-4xl lg:text-5xl font-black text-slate-800 tracking-tighter shrink-0">{value}</span>
+                      <span className="text-xl md:text-3xl lg:text-5xl font-black text-slate-800 tracking-tighter shrink-0">{value}</span>
                     ) : (
                       /* 4. Dice Image */
                       <div className="p-1 md:p-2 bg-white rounded-xl border border-slate-100 shadow-sm flex items-center justify-center w-[40px] h-[30px] md:w-[75px] md:h-[55px] shrink-0">
@@ -354,17 +354,17 @@ function CalculationGameInner() {
 
                     {/* Operator between operands */}
                     {index < question.operators.length && (
-                      <span className={`${level.level === 10 ? 'text-2xl md:text-4xl text-indigo-400/50' : 'text-2xl md:text-4xl text-indigo-400'} font-black shrink-0`}>
+                      <span className={`${level.level === 10 ? 'text-xl md:text-3xl text-indigo-400/50' : 'text-xl md:text-3xl text-indigo-400'} font-black shrink-0`}>
                         {question.operators[index].name}
                       </span>
                     )}
 
                     {/* Show equals sign at the end */}
                     {index === question.operands.length - 1 && (
-                      <div className="flex items-center gap-2 md:gap-3 ml-1 md:ml-2 shrink-0">
-                        <span className="text-xl md:text-3xl font-black text-indigo-400">=</span>
+                      <div className="flex items-center gap-1 md:gap-3 ml-1 md:ml-2 shrink-0">
+                        <span className="text-lg md:text-3xl font-black text-indigo-400">=</span>
                         {question.final_result !== undefined ? (
-                          <span className="text-2xl md:text-4xl lg:text-5xl font-black text-slate-800 tracking-tighter">{question.final_result}</span>
+                          <span className="text-xl md:text-4xl lg:text-5xl font-black text-slate-800 tracking-tighter">{question.final_result}</span>
                         ) : (
                           <div className="w-8 h-8 md:w-12 md:h-12 flex items-center justify-center bg-blue-50 border-2 md:border-4 border-dashed border-blue-200 rounded-xl text-xl md:text-3xl text-blue-600 font-black">?</div>
                         )}
@@ -382,7 +382,7 @@ function CalculationGameInner() {
                 autoFocus
                 inputMode="numeric"
                 pattern="[0-9]*"
-                className={`w-full bg-slate-50 border-[4px] md:border-[6px] rounded-[1.25rem] md:rounded-[1.5rem] py-3 md:py-5 px-5 md:px-8 text-3xl md:text-4xl font-black text-center outline-none transition-all ${lastCorrect === true ? 'border-green-500 text-green-600 bg-green-50/50' : lastCorrect === false ? 'border-red-500 text-red-600 animate-shake bg-red-50/50' : 'border-slate-100 focus:border-blue-400 text-blue-700'}`}
+                className={`w-full bg-slate-50 border-[3px] md:border-[6px] rounded-[1rem] md:rounded-[1.5rem] py-3 md:py-5 px-4 md:px-8 text-2xl md:text-4xl font-black text-center outline-none transition-all ${lastCorrect === true ? 'border-green-500 text-green-600 bg-green-50/50' : lastCorrect === false ? 'border-red-500 text-red-600 animate-shake bg-red-50/50' : 'border-slate-100 focus:border-blue-400 text-blue-700'}`}
                 placeholder="?"
                 value={answer}
                 disabled={isTimeUp}

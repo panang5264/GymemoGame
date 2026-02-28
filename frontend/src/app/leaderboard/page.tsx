@@ -104,22 +104,22 @@ export default function LeaderboardPage() {
             <div className="max-w-4xl mx-auto">
 
                 {/* Header */}
-                <div className="flex items-center justify-between mb-10">
+                <div className="flex flex-col md:flex-row items-center justify-between mb-8 md:mb-10 gap-4">
                     <button
                         onClick={() => router.back()}
-                        className="w-14 h-14 bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-2xl flex items-center justify-center shadow-[4px_4px_0_var(--border-dark)] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_var(--border-dark)] transition-all font-black text-2xl"
+                        className="w-12 h-12 md:w-14 md:h-14 bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-xl md:rounded-2xl flex items-center justify-center shadow-[4px_4px_0_var(--border-dark)] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_var(--border-dark)] transition-all font-black text-xl md:text-2xl self-start md:self-auto"
                     >
                         ←
                     </button>
-                    <h1 className="text-4xl font-black text-[var(--text-main)] uppercase tracking-tight">กระดานผู้นำ</h1>
-                    <div className="w-14 h-14 invisible" />
+                    <h1 className="text-3xl md:text-4xl font-black text-[var(--text-main)] uppercase tracking-tight text-center">กระดานผู้นำ</h1>
+                    <div className="w-12 h-12 md:w-14 md:h-14 hidden md:block invisible" />
                 </div>
 
                 {/* Global Leaderboard Table */}
-                <div className="friendly-card mb-12 shadow-[15px_15px_0_rgba(79,70,229,0.05)] border-4">
-                    <div className="flex items-center gap-3 mb-8">
-                        <div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center text-3xl shadow-sm">🏆</div>
-                        <h2 className="text-3xl font-black text-slate-800">อันดับทั้งหมด</h2>
+                <div className="friendly-card mb-8 md:mb-12 shadow-[10px_10px_0_rgba(79,70,229,0.05)] md:shadow-[15px_15px_0_rgba(79,70,229,0.05)] border-4 p-4 md:p-8">
+                    <div className="flex flex-col md:flex-row items-center gap-3 mb-6 md:mb-8 text-center md:text-left">
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-100 rounded-xl md:rounded-2xl flex items-center justify-center text-2xl md:text-3xl shadow-sm">🏆</div>
+                        <h2 className="text-2xl md:text-3xl font-black text-slate-800">อันดับทั้งหมด</h2>
                     </div>
 
                     <div className="overflow-x-auto">
@@ -175,15 +175,15 @@ export default function LeaderboardPage() {
                 </div>
 
                 {/* Overall User Card */}
-                <div className="friendly-card mb-8 shadow-[20px_20px_0_rgba(79,70,229,0.1)] border-4 border-indigo-100 bg-white/80 backdrop-blur-sm p-8">
-                    <div className="flex flex-col md:flex-row items-center gap-8 mb-8">
-                        <div className="w-24 h-24 bg-indigo-50 border-4 border-indigo-200 rounded-3xl flex items-center justify-center text-5xl shadow-inner relative">
+                <div className="friendly-card mb-8 shadow-[10px_10px_0_rgba(79,70,229,0.1)] md:shadow-[20px_20px_0_rgba(79,70,229,0.1)] border-4 border-indigo-100 bg-white/80 backdrop-blur-sm p-4 md:p-8">
+                    <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 mb-8">
+                        <div className="w-20 h-20 md:w-24 md:h-24 bg-indigo-50 border-4 border-indigo-200 rounded-[1rem] md:rounded-[1.5rem] flex items-center justify-center text-4xl md:text-5xl shadow-inner relative">
                             🧑‍🚀
-                            <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 border-4 border-white rounded-full"></div>
+                            <div className="absolute -bottom-2 -right-2 w-6 h-6 md:w-8 md:h-8 bg-green-500 border-4 border-white rounded-full"></div>
                         </div>
                         <div className="flex-1 text-center md:text-left">
-                            <h2 className="text-4xl font-black text-slate-800 mb-1">{userName}</h2>
-                            <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-2">
+                            <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-1">{userName}</h2>
+                            <div className="flex flex-wrap justify-center md:justify-start gap-2 md:gap-4 mt-2">
                                 <span className="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-sm font-black uppercase tracking-widest border-2 border-slate-200">
                                     🗺️ ปลดล็อก {unlockedCount}/10
                                 </span>
@@ -192,9 +192,9 @@ export default function LeaderboardPage() {
                                 </span>
                             </div>
                         </div>
-                        <div className="bg-gradient-to-br from-indigo-600 to-blue-700 text-white px-10 py-6 rounded-[3rem] shadow-2xl border-4 border-white/20 transform hover:scale-105 transition-transform">
-                            <p className="text-xs font-black uppercase tracking-[0.2em] opacity-80 mb-2">คะแนนรวมทั้งหมด</p>
-                            <p className="text-6xl font-black tabular-nums leading-none tracking-tighter">{userScore.toLocaleString()}</p>
+                        <div className="bg-gradient-to-br from-indigo-600 to-blue-700 text-white px-6 md:px-10 py-4 md:py-6 rounded-[2rem] md:rounded-[3rem] shadow-xl md:shadow-2xl border-4 border-white/20 transform hover:scale-105 transition-transform w-full md:w-auto text-center">
+                            <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] opacity-80 mb-1 md:mb-2">คะแนนรวมทั้งหมด</p>
+                            <p className="text-4xl md:text-6xl font-black tabular-nums leading-none tracking-tighter">{userScore.toLocaleString()}</p>
                         </div>
                     </div>
 
@@ -215,8 +215,8 @@ export default function LeaderboardPage() {
                         </div>
                     </div>
 
-                    <div className="flex flex-col xl:flex-row gap-8 items-center bg-slate-50/50 rounded-[3rem] p-8 border-2 border-slate-100 mt-8">
-                        <div className="flex-1 flex justify-center py-4">
+                    <div className="flex flex-col xl:flex-row gap-8 items-center bg-slate-50/50 rounded-3xl p-4 md:p-8 border-2 border-slate-100 mt-8">
+                        <div className="flex-1 flex justify-center py-2 md:py-4">
                             <BrainRadarChart
                                 data={[
                                     { label: 'กาารจัดการ', value: cognitiveData?.averages?.executiveFunction || 0, color: '#f97316' },
@@ -227,30 +227,30 @@ export default function LeaderboardPage() {
                                 size={200}
                             />
                         </div>
-                        <div className="w-full xl:w-[450px] grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4">
-                            <div className="bg-white p-5 rounded-3xl shadow-sm border-2 border-indigo-100/50 flex flex-col justify-center">
+                        <div className="w-full xl:w-[450px] grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3 md:gap-4">
+                            <div className="bg-white p-4 md:p-5 rounded-3xl shadow-sm border-2 border-indigo-100/50 flex flex-col justify-center">
                                 <div className="flex items-center gap-2 mb-1">
-                                    <span className="text-xs font-black text-indigo-400 uppercase tracking-widest">การบริหารจัดการ</span>
+                                    <span className="text-[10px] md:text-xs font-black text-indigo-400 uppercase tracking-widest">การบริหารจัดการ</span>
                                     <div className="w-4 h-4 rounded-full border border-indigo-200 flex items-center justify-center text-[10px] font-bold text-indigo-400 cursor-help bg-slate-50" title="ทักษะการตัดสินใจ การวางแผน และจัดลำดับความสำคัญ">i</div>
                                 </div>
-                                <div className="text-3xl font-black text-indigo-600 leading-tight">โหมดจัดการ</div>
-                                <div className="text-4xl font-black text-indigo-700 mt-1">{Math.round(cognitiveData?.averages?.executiveFunction || 0)}%</div>
+                                <div className="text-2xl md:text-3xl font-black text-indigo-600 leading-tight">โหมดจัดการ</div>
+                                <div className="text-3xl md:text-4xl font-black text-indigo-700 mt-1">{Math.round(cognitiveData?.averages?.executiveFunction || 0)}%</div>
                             </div>
-                            <div className="bg-white p-5 rounded-3xl shadow-sm border-2 border-emerald-100/50 flex flex-col justify-center">
+                            <div className="bg-white p-4 md:p-5 rounded-3xl shadow-sm border-2 border-emerald-100/50 flex flex-col justify-center">
                                 <div className="flex items-center gap-2 mb-1">
-                                    <span className="text-xs font-black text-emerald-400 uppercase tracking-widest">ความจำขณะทำงาน</span>
+                                    <span className="text-[10px] md:text-xs font-black text-emerald-400 uppercase tracking-widest">ความจำขณะทำงาน</span>
                                     <div className="w-4 h-4 rounded-full border border-emerald-200 flex items-center justify-center text-[10px] font-bold text-emerald-400 cursor-help bg-slate-50" title="ความสามารถในการประมวลผลข้อมูลควบคู่กับการมองภาพมิติในใจ">i</div>
                                 </div>
-                                <div className="text-3xl font-black text-emerald-600 leading-tight">โหมดมิติสัมพันธ์</div>
-                                <div className="text-4xl font-black text-emerald-700 mt-1">{Math.round(cognitiveData?.averages?.workingMemory || 0)}%</div>
+                                <div className="text-2xl md:text-3xl font-black text-emerald-600 leading-tight">โหมดมิติสัมพันธ์</div>
+                                <div className="text-3xl md:text-4xl font-black text-emerald-700 mt-1">{Math.round(cognitiveData?.averages?.workingMemory || 0)}%</div>
                             </div>
-                            <div className="bg-white p-5 rounded-3xl shadow-sm border-2 border-blue-100/50 flex flex-col justify-center sm:col-span-2 xl:col-span-1">
+                            <div className="bg-white p-4 md:p-5 rounded-3xl shadow-sm border-2 border-blue-100/50 flex flex-col justify-center sm:col-span-2 xl:col-span-1">
                                 <div className="flex items-center gap-2 mb-1">
-                                    <span className="text-xs font-black text-blue-400 uppercase tracking-widest">ความรวดเร็วในการคิด</span>
+                                    <span className="text-[10px] md:text-xs font-black text-blue-400 uppercase tracking-widest">ความรวดเร็วในการคิด</span>
                                     <div className="w-4 h-4 rounded-full border border-blue-200 flex items-center justify-center text-[10px] font-bold text-blue-400 cursor-help bg-slate-50" title="ความไวในการตีความโจทย์และหาคำตอบอย่างแม่นยำ">i</div>
                                 </div>
-                                <div className="text-3xl font-black text-blue-600 leading-tight">โหมดคำนวณ</div>
-                                <div className="text-4xl font-black text-blue-700 mt-1">{Math.round(cognitiveData?.averages?.processingSpeed || 0)}%</div>
+                                <div className="text-2xl md:text-3xl font-black text-blue-600 leading-tight">โหมดคำนวณ</div>
+                                <div className="text-3xl md:text-4xl font-black text-blue-700 mt-1">{Math.round(cognitiveData?.averages?.processingSpeed || 0)}%</div>
                             </div>
                         </div>
                     </div>

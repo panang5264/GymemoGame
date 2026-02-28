@@ -157,6 +157,14 @@
   border: 4px solid rgba(255, 255, 255, 0.5);
 }
 
+@media (max-width: 600px) {
+  .stageIcon {
+    width: 45px;
+    height: 45px;
+    border-width: 2px;
+  }
+}
+
 /* Removing old blocky styles as we use images now */
 .current .stageIcon {
   border: 4px solid #facc15;
@@ -235,14 +243,22 @@
 .introCard {
   background: var(--bg-warm);
   border: 4px solid var(--border-dark);
-  border-radius: 3rem;
-  padding: 3rem;
+  border-radius: 2rem;
+  padding: 2rem;
   max-width: 480px;
   width: 100%;
   position: relative;
-  box-shadow: 15px 15px 0 var(--border-dark);
+  box-shadow: 10px 10px 0 var(--border-dark);
   color: var(--text-main);
   text-align: center;
+}
+
+@media (min-width: 600px) {
+  .introCard {
+    border-radius: 3rem;
+    padding: 3rem;
+    box-shadow: 15px 15px 0 var(--border-dark);
+  }
 }
 
 .tutorialCard {
