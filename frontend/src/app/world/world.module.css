@@ -142,15 +142,19 @@
 }
 
 .stageIcon {
-  width: 120px;
-  height: 120px;
+  width: 75px;
+  height: 75px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.3s ease;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+  border-radius: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(4px);
+  border: 4px solid rgba(255, 255, 255, 0.5);
 }
 
 /* Removing old blocky styles as we use images now */

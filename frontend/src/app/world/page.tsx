@@ -17,16 +17,16 @@ import { useProgress } from '@/contexts/ProgressContext'
 const TOTAL_STAGES = 10
 
 const STAGE_POSITIONS: Array<{ x: number; y: number }> = [
-  { x: 44, y: 88 }, // 1: Bottom center
-  { x: 29, y: 78 }, // 2: Bottom left
-  { x: 18, y: 64 }, // 3: Mountain left
-  { x: 27, y: 39 }, // 4: Middle left
-  { x: 45, y: 26 }, // 5: Top center
-  { x: 53, y: 41 }, // 6: Center path (Upper)
-  { x: 64, y: 30 }, // 7: Top right
-  { x: 66, y: 48 }, // 8: Middle right
-  { x: 50, y: 52 }, // 9: Center path (Middle)
-  { x: 45, y: 68 }, // 10: Center path (Lower)
+  { x: 50, y: 80 }, // 1: Bottom center
+  { x: 30, y: 65 }, // 2
+  { x: 57, y: 60 }, // 3
+  { x: 32, y: 49 }, // 4
+  { x: 55, y: 45 }, // 5
+  { x: 29, y: 36 }, // 6
+  { x: 39, y: 27 }, // 7
+  { x: 54, y: 26 }, // 8
+  { x: 80, y: 25 }, // 9
+  { x: 83, y: 44 }, // 10
 ]
 
 const LOCKED_ICONS = ['IMG_0665.PNG', 'IMG_0666.PNG', 'IMG_0667.PNG', 'IMG_0668.PNG', 'IMG_0669.PNG', 'IMG_0670.PNG', 'IMG_0671.PNG', 'IMG_0672.PNG', 'IMG_0673.PNG', 'IMG_0674.PNG'];
@@ -336,7 +336,7 @@ export default function WorldPage() {
             if (maxUnlocked === 1 && exp1 === 0) {
               return 'url("/assets/Assets\'Employer/Background/แผนที่ 10 หมู่บ้าน/พื้นธรรมดา.PNG")';
             }
-            return `url("/assets/Assets'Employer/Background/แผนที่ 10 หมู่บ้าน/ปลดล็อก ${Math.max(1, Math.min(10, maxUnlocked))} .PNG")`;
+            return `url("/assets/Assets\'Employer/Background/แผนที่ 10 หมู่บ้าน/ปลดล็อก ${Math.max(1, Math.min(10, maxUnlocked))} .PNG")`;
           })()
         }}
       >
