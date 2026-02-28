@@ -65,37 +65,20 @@
 .mapContainer {
   position: relative;
   width: 100%;
-  max-width: 1200px;
+  max-width: 880px;
   margin: 0 auto;
-  height: 650px;
+  aspect-ratio: 18 / 20;
   background-color: #e5e2d5;
-  background-image:
-    url("/assets/Assets'Employer/Background/แผนที่ 10 หมู่บ้าน/พื้นธรรมดา.PNG"),
-    radial-gradient(rgba(18, 18, 18, 0.05) 1px, transparent 1px);
-  background-size: 100% 100%, 32px 32px;
+  background-size: 100% 100%;
   background-position: center;
-  background-blend-mode: overlay;
-  border-radius: 4rem;
+  background-repeat: no-repeat;
+  border-radius: 2rem;
   border: 4px solid var(--border-dark);
-  box-shadow: 15px 15px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  position: relative;
 }
 
-/* Background Placeholder overlay when image is missing */
-.mapContainer::before {
-  content: "WORLD MAP AREA";
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 4rem;
-  font-weight: 900;
-  color: rgba(0, 0, 0, 0.03);
-  pointer-events: none;
-  z-index: 0;
-}
+/* Background Placeholder overlay - removed */
 
 /* Stage nodes */
 .stageNode {
@@ -110,10 +93,42 @@
   background: transparent;
   padding: 0;
   transition: all 0.2s;
+  z-index: 10;
 }
 
-.stageNode:hover {
-  transform: translate(-50%, -50%) scale(1.15) rotate(5deg);
+.stageNode:hover .stageIcon {
+  transform: scale(1.1) rotate(5deg);
+  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
+}
+
+.stageNode.locked {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.stageNode.locked .stageIcon {
+  filter: grayscale(1) opacity(0.7);
+}
+
+.stageNode.current .stageIcon {
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
+  animation: float 3s ease-in-out infinite;
+}
+
+.stageNode.completed .stageIcon {
+  filter: drop-shadow(0 0 10px rgba(74, 222, 128, 0.4));
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .stageNode.locked {
@@ -127,32 +142,28 @@
 }
 
 .stageIcon {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   background-size: contain;
-  /* Updated */
   background-repeat: no-repeat;
   background-position: center;
-  /* Removed text-related styles: background, color, font-size */
+}
+
+/* Removing old blocky styles as we use images now */
+.current .stageIcon {
+  border: 4px solid #facc15;
+  border-radius: 2rem;
+  background-color: rgba(250, 204, 21, 0.1);
 }
 
 .completed .stageIcon {
-  /* background: var(--card-bg); */
-  /* Removed */
-  filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.2));
-  /* Added */
-}
-
-.current .stageIcon {
-  /* background: #fff; */
-  /* Removed */
-  filter: drop-shadow(6px 6px 0 rgba(0, 0, 0, 0.3));
-  /* Added */
-  animation: bounceMini 2s infinite ease-in-out;
+  border: 4px solid #4ade80;
+  border-radius: 2rem;
+  background-color: rgba(74, 222, 128, 0.1);
 }
 
 @keyframes bounceMini {

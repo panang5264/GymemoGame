@@ -175,18 +175,26 @@ export default function LeaderboardPage() {
                 </div>
 
                 {/* Overall User Card */}
-                <div className="friendly-card mb-8 shadow-[10px_10px_0_rgba(0,0,0,0.05)] border-3">
-                    <div className="flex flex-col md:flex-row items-center gap-6 mb-6">
-                        <div className="w-20 h-20 bg-indigo-100 border-4 border-[var(--border-dark)] rounded-full flex items-center justify-center text-4xl shadow-[4px_4px_0_var(--border-dark)]">
+                <div className="friendly-card mb-8 shadow-[20px_20px_0_rgba(79,70,229,0.1)] border-4 border-indigo-100 bg-white/80 backdrop-blur-sm p-8">
+                    <div className="flex flex-col md:flex-row items-center gap-8 mb-8">
+                        <div className="w-24 h-24 bg-indigo-50 border-4 border-indigo-200 rounded-3xl flex items-center justify-center text-5xl shadow-inner relative">
                             🧑‍🚀
+                            <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 border-4 border-white rounded-full"></div>
                         </div>
                         <div className="flex-1 text-center md:text-left">
-                            <h2 className="text-3xl font-black text-[var(--text-main)]">{userName}</h2>
-                            <p className="text-[var(--text-muted)] font-black uppercase tracking-widest text-xs">นักสำรวจความจำ | ปลดล็อก {unlockedCount}/10 หมู่บ้าน</p>
+                            <h2 className="text-4xl font-black text-slate-800 mb-1">{userName}</h2>
+                            <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-2">
+                                <span className="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-sm font-black uppercase tracking-widest border-2 border-slate-200">
+                                    🗺️ ปลดล็อก {unlockedCount}/10
+                                </span>
+                                <span className="bg-indigo-50 text-indigo-600 px-4 py-1.5 rounded-full text-sm font-black uppercase tracking-widest border-2 border-indigo-100">
+                                    🏆 อันดับ -
+                                </span>
+                            </div>
                         </div>
-                        <div className="bg-indigo-600 text-white px-8 py-5 rounded-[2.5rem] shadow-xl border-4 border-white/20">
-                            <p className="text-sm font-black uppercase tracking-widest opacity-90 mb-1">คะแนนรวมทั้งหมด</p>
-                            <p className="text-6xl font-black tabular-nums leading-none">{userScore.toLocaleString()}</p>
+                        <div className="bg-gradient-to-br from-indigo-600 to-blue-700 text-white px-10 py-6 rounded-[3rem] shadow-2xl border-4 border-white/20 transform hover:scale-105 transition-transform">
+                            <p className="text-xs font-black uppercase tracking-[0.2em] opacity-80 mb-2">คะแนนรวมทั้งหมด</p>
+                            <p className="text-6xl font-black tabular-nums leading-none tracking-tighter">{userScore.toLocaleString()}</p>
                         </div>
                     </div>
 

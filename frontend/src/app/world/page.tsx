@@ -17,17 +17,20 @@ import { useProgress } from '@/contexts/ProgressContext'
 const TOTAL_STAGES = 10
 
 const STAGE_POSITIONS: Array<{ x: number; y: number }> = [
-  { x: 15, y: 85 }, // 1: Bottom Left
-  { x: 45, y: 82 }, // 2: Bottom Middle-Left
-  { x: 75, y: 85 }, // 3: Bottom Middle-Right
-  { x: 88, y: 65 }, // 4: Right Side Middle-Down
-  { x: 65, y: 55 }, // 5: Middle Center
-  { x: 35, y: 60 }, // 6: Middle Left
-  { x: 12, y: 45 }, // 7: Left Side Middle-Up
-  { x: 30, y: 25 }, // 8: Top Left
-  { x: 60, y: 20 }, // 9: Top Middle
-  { x: 88, y: 15 }, // 10: Top Right
+  { x: 44, y: 88 }, // 1: Bottom center
+  { x: 29, y: 78 }, // 2: Bottom left
+  { x: 18, y: 64 }, // 3: Mountain left
+  { x: 27, y: 39 }, // 4: Middle left
+  { x: 45, y: 26 }, // 5: Top center
+  { x: 53, y: 41 }, // 6: Center path (Upper)
+  { x: 64, y: 30 }, // 7: Top right
+  { x: 66, y: 48 }, // 8: Middle right
+  { x: 50, y: 52 }, // 9: Center path (Middle)
+  { x: 45, y: 68 }, // 10: Center path (Lower)
 ]
+
+const LOCKED_ICONS = ['IMG_0665.PNG', 'IMG_0666.PNG', 'IMG_0667.PNG', 'IMG_0668.PNG', 'IMG_0669.PNG', 'IMG_0670.PNG', 'IMG_0671.PNG', 'IMG_0672.PNG', 'IMG_0673.PNG', 'IMG_0674.PNG'];
+const UNLOCKED_ICONS = ['1.PNG', '2.PNG', '3.PNG', '4.PNG', '5.PNG', '6.PNG', '7.PNG', '8.PNG', '9.PNG', '10.PNG'];
 
 const INTRO_SLIDES: Array<{ emoji: string; title: string; desc: string }> = [
   { emoji: '👋', title: 'ยินดีต้อนรับ', desc: 'มาสำรวจแผนที่โลกกัน!' },
@@ -326,12 +329,25 @@ export default function WorldPage() {
 
       <div
         className={styles.mapContainer}
-        style={{ backgroundImage: `url("/assets/Assets'Employer/Background/แผนที่ 10 หมู่บ้าน/ปลดล็อก ${Math.max(1, Math.min(10, Math.max(...(unlockedVillages.length ? unlockedVillages : [1]))))} .PNG"), radial-gradient(rgba(18, 18, 18, 0.05) 1px, transparent 1px)` }}
+        style={{
+          backgroundImage: (() => {
+            const maxUnlocked = Math.max(...(unlockedVillages.length ? unlockedVillages : [1]));
+            const exp1 = villageExp[1] ?? 0;
+            if (maxUnlocked === 1 && exp1 === 0) {
+              return 'url("/assets/Assets\'Employer/Background/แผนที่ 10 หมู่บ้าน/พื้นธรรมดา.PNG")';
+            }
+            return `url("/assets/Assets'Employer/Background/แผนที่ 10 หมู่บ้าน/ปลดล็อก ${Math.max(1, Math.min(10, maxUnlocked))} .PNG")`;
+          })()
+        }}
       >
         {Array.from({ length: TOTAL_STAGES }, (_, i) => i + 1).map((stage) => {
           const exp = villageExp[stage] ?? 0
           const state = getStageState(stage, unlockedVillages, exp)
           const pos = STAGE_POSITIONS[stage - 1]
+          const iconFilename = state === 'locked' ? LOCKED_ICONS[stage - 1] : UNLOCKED_ICONS[stage - 1]
+          const iconFolder = state === 'locked' ? 'ไม่มีสี (ยังไม่ปลดล็อก)' : 'มีสี (ปลดล็อกแล้ว)'
+          const iconPath = `/assets/Assets'Employer/Background/แผนที่ 10 หมู่บ้าน/ตัวหมู่บ้าน/${iconFolder}/${iconFilename}`
+
           return (
             <button
               key={stage}
@@ -340,16 +356,13 @@ export default function WorldPage() {
               onClick={() => handleStageClick(stage)}
               title={state === 'locked' ? 'ล็อก' : `หมู่บ้าน ${stage}`}
             >
-              <span
+              <div
                 className={styles.stageIcon}
-                style={{
-                  backgroundImage: state === 'locked'
-                    ? `url("/assets/Assets'Employer/Background/แผนที่ 10 หมู่บ้าน/ตัวหมู่บ้าน/ไม่มีสี (ยังไม่ปลดล็อก)/IMG_06${64 + stage}.PNG")`
-                    : `url("/assets/Assets'Employer/Background/แผนที่ 10 หมู่บ้าน/ตัวหมู่บ้าน/มีสี (ปลดล็อกแล้ว)/${stage}.PNG")`
-                }}
-              >
+                style={{ backgroundImage: `url("${iconPath}")` }}
+              />
+              <span className="bg-[var(--card-bg)] text-[var(--text-main)] px-3 py-1 rounded-full text-[10px] sm:text-xs font-black shadow-[2px_2px_0_var(--border-dark)] uppercase tracking-widest whitespace-nowrap mt-1">
+                ด่าน {stage}
               </span>
-              <span className={styles.stageLabel}>ด่าน {stage}</span>
               {state !== 'locked' && (
                 <div
                   style={{
@@ -384,7 +397,7 @@ export default function WorldPage() {
           ด่าน {Object.values(villageExp).filter((v) => v >= 100).length}/{TOTAL_STAGES}
         </span>
       </div>
-    </div>
+    </div >
   )
 }
 
