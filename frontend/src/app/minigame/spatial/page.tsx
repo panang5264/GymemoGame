@@ -61,62 +61,104 @@ function SpatialGameInner() {
     setFeedback(null)
     setIsGameOver(false)
 
+    const CHOICES_BASE = "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/choices_cropped"
+    const TARGETS_BASE = "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์"
+
     if (levelParam <= 2) {
-      // Level 1-2: Box folding / Unfolding (Using custom assets)
-      // โจทย์ข้อ 1 เป็นกล่องคลี่
-      const targetImage = "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/โจทย์ข้อ 1.png"
-      const options = [
-        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/ช้อยข้อ 1.png",
-        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/ช้อยข้อ 2.png",
-        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/ช้อยข้อ 3.jpeg",
-        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/ช้อยท์ข้อ 4.png"
-      ]
-
-      const shuffledOptions = [...options].sort(() => Math.random() - 0.5)
+      // Village 1-2: Emoji Matching game
+      const emojis = ['🍄', '🌻', '🌵', '🎄', '🎁', '🎈', '🎨', '🎠', '🦋', '🐸', '🌈', '⭐']
+      const target = emojis[Math.floor(Math.random() * emojis.length)]
+      const others = emojis.filter(e => e !== target).sort(() => Math.random() - 0.5).slice(0, 3)
+      const options = [target, ...others].sort(() => Math.random() - 0.5)
 
       setQuestionData({
-        targetImage,
-        options: shuffledOptions,
-        correctIndex: shuffledOptions.indexOf(options[0]) // สมมติว่าไฟล์แรกคือข้อที่ถูกที่สุด
+        targetView: target,
+        options,
+        correctIndex: options.indexOf(target)
       })
-      setQuestionText('เลือกรูปกล่องที่ประกอบแล้วตรงกับภาพคลี่ด้านบน 📦')
+      setQuestionText('เลือกรูปที่เหมือนกับภาพตัวอย่างด้านบน 🎯')
+
+    } else if (levelParam <= 4) {
+      // Village 3-4: Box unfolding Level 1 (easy Q1-Q4, 2 choices)
+      const EASY_BANK = [
+        {
+          target: `${TARGETS_BASE}/โจทย์ข้อ 1.png`,
+          correct: `${CHOICES_BASE}/q1_correct.png`,
+          wrongs: [`${CHOICES_BASE}/q1_wrong1.png`],
+          direction: 'มองจากบนลงล่าง ⬇️'
+        },
+        {
+          target: `${TARGETS_BASE}/โจทย์ข้อ 2.png`,
+          correct: `${CHOICES_BASE}/q2_correct.png`,
+          wrongs: [`${CHOICES_BASE}/q2_wrong1.png`],
+          direction: 'มองจากล่างขึ้นบน ⬆️'
+        },
+        {
+          target: `${TARGETS_BASE}/โจทย์ข้อ3.png`,
+          correct: `${CHOICES_BASE}/q3_correct.png`,
+          wrongs: [`${CHOICES_BASE}/q3_wrong1.png`],
+          direction: 'มองจากด้านข้างซ้าย ➡️'
+        },
+        {
+          target: `${TARGETS_BASE}/โจทย์ข้อ 4.png`,
+          correct: `${CHOICES_BASE}/q4_correct.png`,
+          wrongs: [`${CHOICES_BASE}/q4_wrong1.png`, `${CHOICES_BASE}/q4_wrong2.png`],
+          direction: 'มองจากบนลงล่าง ⬇️'
+        },
+      ]
+      const q = EASY_BANK[Math.floor(Math.random() * EASY_BANK.length)]
+      const options = [q.correct, q.wrongs[0]].sort(() => Math.random() - 0.5)
+
+      setQuestionData({
+        targetImage: q.target,
+        options,
+        correctIndex: options.indexOf(q.correct)
+      })
+      setQuestionText(`ถ้า${q.direction} คุณจะเห็นรูปไหน? 📦`)
+
     } else {
-      // Level 3-10: 3D Box views (Using custom assets)
-      const targetImages = [
-        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/โจทย์ข้อ 2.png",
-        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/โจทย์ข้อ3.png",
-        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/โจทย์ข้อ 4.png",
-        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/โจทย์ข้อ 5.png",
-        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/โจทย์ข้อ 6.png",
-        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/โจทย์ข้อ 7.png",
-        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/โจทย์ข้อ 8.png"
+      // Village 5+: Box unfolding Level 2 (harder Q5-Q8, 3-4 choices)
+      const HARD_BANK = [
+        {
+          target: `${TARGETS_BASE}/โจทย์ข้อ 5.png`,
+          correct: `${CHOICES_BASE}/q5_correct.png`,
+          wrongs: [`${CHOICES_BASE}/q5_wrong1.png`, `${CHOICES_BASE}/q5_wrong2.png`],
+          direction: 'มองจากบนลงล่าง ⬇️'
+        },
+        {
+          target: `${TARGETS_BASE}/โจทย์ข้อ 6.png`,
+          correct: `${CHOICES_BASE}/q6_correct.png`,
+          wrongs: [`${CHOICES_BASE}/q6_wrong1.png`, `${CHOICES_BASE}/q6_wrong2.png`],
+          direction: 'มองจากล่างขึ้นบน ⬆️'
+        },
+        {
+          target: `${TARGETS_BASE}/โจทย์ข้อ 7.png`,
+          correct: `${CHOICES_BASE}/q7_correct.png`,
+          wrongs: [`${CHOICES_BASE}/q7_wrong1.png`, `${CHOICES_BASE}/q7_wrong2.png`, `${CHOICES_BASE}/q7_wrong3.png`],
+          direction: 'มองจากด้านข้าง ↔️'
+        },
+        {
+          target: `${TARGETS_BASE}/โจทย์ข้อ 8.png`,
+          correct: `${CHOICES_BASE}/q8_correct.png`,
+          wrongs: [`${CHOICES_BASE}/q8_wrong1.png`, `${CHOICES_BASE}/q8_wrong2.png`, `${CHOICES_BASE}/q8_wrong3.png`],
+          direction: 'มองจากบนลงล่าง ⬇️'
+        },
       ]
-      const choiceImages = [
-        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/ช้อย 5.jpg",
-        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/ช้อย 6.png",
-        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/ช้อย 7.PNG",
-        "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/ช้อย 8.jpg"
-      ]
 
-      const targetImage = targetImages[Math.floor(Math.random() * targetImages.length)]
-      const correctChoice = choiceImages[Math.floor(Math.random() * choiceImages.length)] // สมมติว่าอันที่สุ่มมาคือคำตอบ
-      const wrongChoices = choiceImages.filter(img => img !== correctChoice).sort(() => Math.random() - 0.5)
-
-      let numOptions = 4;
-      if (levelParam >= 3 && levelParam <= 5) numOptions = 2;
-      else if (levelParam >= 6 && levelParam <= 8) numOptions = 3;
-      else if (levelParam >= 9 && levelParam <= 10) numOptions = 4;
-
-      const options = [correctChoice, ...wrongChoices.slice(0, numOptions - 1)]
-      const shuffledOptions = [...options].sort(() => Math.random() - 0.5)
+      const numOptions = levelParam <= 7 ? 3 : 4
+      const eligible = HARD_BANK.filter(q => q.wrongs.length >= numOptions - 1)
+      const q = eligible[Math.floor(Math.random() * eligible.length)]
+      const wrongPool = [...q.wrongs].sort(() => Math.random() - 0.5).slice(0, numOptions - 1)
+      const options = [q.correct, ...wrongPool].sort(() => Math.random() - 0.5)
 
       setQuestionData({
-        targetImage,
-        options: shuffledOptions,
-        correctIndex: shuffledOptions.indexOf(correctChoice)
+        targetImage: q.target,
+        options,
+        correctIndex: options.indexOf(q.correct)
       })
-      setQuestionText('มองจากทิศทางของลูกศร คุณจะเห็นภาพใด? 👁️')
+      setQuestionText(`ถ้า${q.direction} คุณจะเห็นรูปไหน? 📦`)
     }
+
   }, [levelParam, subId])
 
   const { progress, saveProgress } = useProgress()
@@ -267,11 +309,13 @@ function SpatialGameInner() {
 
             {questionData && (
               <div className="w-full flex flex-col items-center">
-                {/* 1. Target Area (Image) */}
+                {/* 1. Target Area (Image or Emoji) */}
                 <div className="mb-12 relative p-4 md:p-8 bg-white/40 backdrop-blur-md rounded-[3rem] border-4 border-white/50 shadow-xl flex items-center justify-center min-h-[200px] min-w-[200px] w-full max-w-md">
-                  {questionData.targetImage && (
+                  {questionData.targetView ? (
+                    <div className="text-9xl drop-shadow-2xl animate-bounce">{questionData.targetView}</div>
+                  ) : questionData.targetImage ? (
                     <img src={questionData.targetImage} className="w-full h-[300px] object-contain drop-shadow-md" alt="target" />
-                  )}
+                  ) : null}
                 </div>
 
                 {/* 2. Options Area */}
