@@ -123,10 +123,27 @@ export default function WorldPage() {
 
   function resetProgress() {
     if (!progress) return
-    const fresh = getDefaultProgress()
     const current = progress
-    fresh.introSeen = true
-    fresh.userName = current.userName // Preserve login state
+    const fresh = getDefaultProgress()
+
+    // Preserve Identity and High Scores
+    fresh.userName = current.userName
+    fresh.guestId = current.guestId
+    fresh.totalScore = current.totalScore
+    fresh.introSeen = false // Allow seeing intro again if they reset
+
+    // Preserve best scores for each village
+    Object.keys(current.villages).forEach(key => {
+      const cv = current.villages[key]
+      if (cv && cv.bestScore) {
+        fresh.villages[key] = {
+          playsCompleted: 0,
+          expTubeFilled: false,
+          bestScore: cv.bestScore
+        }
+      }
+    })
+
     saveProgress(fresh)
     setUnlockedVillages(fresh.unlockedVillages)
     setVillageExp({})

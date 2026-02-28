@@ -38,6 +38,7 @@ export default function Home() {
   const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar || 'avatar-1')
 
   const { progress, saveProgress, isLoading } = useProgress()
+  const [clockTarget, setClockTarget] = useState({ hour: 10, minute: 10 })
 
   useEffect(() => {
     if (isLoading || !progress) return
@@ -135,13 +136,18 @@ export default function Home() {
 
   const nextPhase = () => {
     if (phase === 'profile') {
-      const p = { ...progress, introSeen: true }
-      saveProgress(p)
-      router.push('/world')
+      setPhase('intro') // Go to Intro PDF next, don't skip to world
     }
     else if (phase === 'intro') setPhase('grandmother')
     else if (phase === 'grandmother') setPhase('tutorial_summary')
     else if (phase === 'tutorial_summary') {
+      // Randomize clock target: Hour 1-12, Minutes 10, 20, 30, 40, 50
+      const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+      const minutes = [10, 20, 30, 40, 50];
+      setClockTarget({
+        hour: hours[Math.floor(Math.random() * hours.length)],
+        minute: minutes[Math.floor(Math.random() * minutes.length)]
+      });
       setPhase('assessment')
     }
     else if (phase === 'assessment') {
@@ -160,7 +166,7 @@ export default function Home() {
         <div className="absolute bottom-[-5%] left-[-5%] w-[30%] h-[30%] bg-rose-100/50 blur-[100px] rounded-full" />
       </div>
 
-      <div className={`w-full relative z-10 transition-all duration-700 ${(phase === 'tutorial_summary' || phase === 'profile' || phase === 'intro') ? 'max-w-5xl' : 'max-w-md'}`}>
+      <div className={`w-full relative z-10 transition-all duration-700 ${(phase === 'tutorial_summary' || phase === 'profile') ? 'max-w-5xl' : (phase === 'intro' ? 'max-w-7xl' : 'max-w-md')}`}>
 
         {/* Phase 1: Login */}
         {phase === 'login' && (
@@ -428,9 +434,9 @@ export default function Home() {
 
         {/* Phase 4: Game Intro Narrative (Using Employer's PDF) */}
         {phase === 'intro' && (
-          <div className="text-center animate-in fade-in duration-1000 max-w-4xl mx-auto w-full h-[80vh] flex flex-col items-center">
+          <div className="text-center animate-in fade-in duration-1000 max-w-6xl mx-auto w-full h-[85vh] flex flex-col items-center">
             <iframe
-              src="/assets/Assets'Employer/Background/INTRO.pdf#toolbar=0"
+              src="/assets/Assets'Employer/Background/INTRO.pdf#view=FitH&toolbar=0"
               className="w-full h-full rounded-[2rem] border-4 border-black shadow-[10px_10px_0_#1a1a1a] bg-white"
               title="Game Intro"
             />
@@ -562,8 +568,8 @@ export default function Home() {
         {phase === 'assessment' && (
           <div className="animate-in fade-in duration-700 w-full max-w-4xl relative z-[5000]">
             <ClockIntro
-              targetHour={10}
-              targetMinute={10}
+              targetHour={clockTarget.hour}
+              targetMinute={clockTarget.minute}
               onComplete={nextPhase}
             />
           </div>
