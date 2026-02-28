@@ -111,8 +111,8 @@ export default function TrainingModal({ mode, onClose }: TrainingModalProps) {
                 {/* Header */}
                 <div className="p-8 border-b-4 border-black flex justify-between items-center bg-white">
                     <div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Onboarding Training</span>
-                        <h2 className="text-3xl font-black text-black">{titles[mode]}</h2>
+                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Onboarding Training</span>
+                        <h2 className="text-2xl font-black text-black">{titles[mode]}</h2>
                     </div>
                     <button
                         onClick={onClose}
@@ -124,17 +124,17 @@ export default function TrainingModal({ mode, onClose }: TrainingModalProps) {
                 <div className="flex-1 p-10 flex flex-col items-center justify-center overflow-y-auto">
                     {subPhase === 'intro' && (
                         <div className="text-center animate-in zoom-in">
-                            <div className="text-9xl mb-8">
+                            <div className="text-7xl mb-6">
                                 {mode === 'management' ? '📦' : mode === 'calculation' ? '🔢' : '🗺️'}
                             </div>
-                            <p className="text-slate-500 font-bold mb-10 text-lg leading-relaxed max-w-sm mx-auto">
+                            <p className="text-slate-500 font-bold mb-8 text-base leading-relaxed max-w-sm mx-auto">
                                 {mode === 'management' ? 'พร้อมที่จะฝึกทักษะการจัดการหรือยัง? คุณจะต้องผ่านบททดสอบสั้นๆ 3 หัวข้อ (คัดแยก, ปรุงอาหาร, เขาวงกต)' :
                                     mode === 'calculation' ? 'ท้าทายสมองด้วยการคิดเลขเร็วแบบสั้นๆ เพื่อกู้คืนเซลล์สมองที่หายไป' :
                                         'ฝึกวางตัวในพื้นที่มิติจำลองเพื่อค้นหาความลับที่ซ่อนอยู่'}
                             </p>
                             <button
                                 onClick={() => setSubPhase('play')}
-                                className="pill-button px-16 py-6 text-2xl"
+                                className="pill-button px-12 py-4 text-xl"
                             >
                                 เริ่มฝึกฝนทันที ⚡
                             </button>
@@ -149,12 +149,12 @@ export default function TrainingModal({ mode, onClose }: TrainingModalProps) {
                                     {mgmtStep === 0 && (
                                         <div className="text-center animate-in zoom-in">
                                             <p className="text-slate-500 font-bold mb-6">แยกหมวดหมู่สิ่งของ (ของกิน vs ของเล่น)</p>
-                                            <div className="text-9xl mb-10 animate-bounce">
+                                            <div className="text-7xl mb-8 animate-bounce">
                                                 {[{ e: '🍎', c: 'food' }, { e: '⚽', c: 'toy' }, { e: '🍔', c: 'food' }][sortIdx].e}
                                             </div>
                                             <div className="grid grid-cols-2 gap-4">
-                                                <button onClick={() => handleSort('food')} className="pill-button py-4 text-xl bg-orange-100 !text-orange-900 border-orange-200">ของกิน 🥪</button>
-                                                <button onClick={() => handleSort('toy')} className="pill-button py-4 text-xl bg-blue-100 !text-blue-900 border-blue-200">ของเล่น 🧸</button>
+                                                <button onClick={() => handleSort('food')} className="pill-button py-3 text-lg bg-orange-100 !text-orange-900 border-orange-200">ของกิน 🥪</button>
+                                                <button onClick={() => handleSort('toy')} className="pill-button py-3 text-lg bg-blue-100 !text-blue-900 border-blue-200">ของเล่น 🧸</button>
                                             </div>
                                         </div>
                                     )}
@@ -200,18 +200,18 @@ export default function TrainingModal({ mode, onClose }: TrainingModalProps) {
                             {mode === 'calculation' && (
                                 <div className="text-center animate-in zoom-in w-full max-w-sm">
                                     <p className="text-slate-500 font-bold mb-6 italic text-sm">ตอบโจทย์เลขต่อไปนี้ (ด่านทดสอบความไว)</p>
-                                    <div className="text-6xl font-black mb-10 text-slate-800 tracking-tighter">
+                                    <div className="text-5xl font-black mb-8 text-slate-800 tracking-tighter">
                                         {['15 + 7', '24 - 9', '6 x 4'][calcIdx]} = ?
                                     </div>
                                     <input
                                         autoFocus
-                                        className="w-full text-center text-5xl font-black border-4 border-black rounded-3xl py-6 mb-6 outline-none focus:bg-indigo-50 transition-colors"
+                                        className="w-full text-center text-4xl font-black border-3 border-black rounded-2xl py-4 mb-5 outline-none focus:bg-indigo-50 transition-colors"
                                         type="number"
                                         value={calcInput}
                                         onChange={e => setCalcInput(e.target.value)}
                                         onKeyDown={e => e.key === 'Enter' && handleCalcSubmit()}
                                     />
-                                    <button onClick={handleCalcSubmit} className="pill-button w-full py-5 text-2xl">ถัดไป 🚀</button>
+                                    <button onClick={handleCalcSubmit} className="pill-button w-full py-4 text-xl">ถัดไป 🚀</button>
                                 </div>
                             )}
 
@@ -220,11 +220,11 @@ export default function TrainingModal({ mode, onClose }: TrainingModalProps) {
                                 <>
                                     {spatialStep === 0 && (
                                         <div className="text-center animate-in zoom-in">
-                                            <p className="text-slate-500 font-bold mb-6">เลือกภาพที่เหมือนด้านบน (การจดจำมิติ)</p>
-                                            <div className="text-[10rem] mb-12 drop-shadow-xl animate-pulse">🎨</div>
-                                            <div className="grid grid-cols-3 gap-6">
+                                            <p className="text-slate-500 font-bold mb-4">เลือกภาพที่เหมือนด้านบน (การจดจำมิติ)</p>
+                                            <div className="text-8xl mb-10 drop-shadow-xl animate-pulse">🎨</div>
+                                            <div className="grid grid-cols-3 gap-4">
                                                 {['⚽', '🎨', '🧶'].map(e => (
-                                                    <button key={e} onClick={() => handleSpatialMatch(e === '🎨')} className="p-8 bg-white border-2 border-slate-200 rounded-[2rem] text-6xl hover:scale-110 active:scale-95 transition-all shadow-md">{e}</button>
+                                                    <button key={e} onClick={() => handleSpatialMatch(e === '🎨')} className="p-6 bg-white border-2 border-slate-200 rounded-[1.5rem] text-5xl hover:scale-110 active:scale-95 transition-all shadow-md">{e}</button>
                                                 ))}
                                             </div>
                                         </div>
@@ -252,18 +252,18 @@ export default function TrainingModal({ mode, onClose }: TrainingModalProps) {
 
                     {subPhase === 'result' && (
                         <div className="text-center animate-in zoom-in duration-700">
-                            <div className="text-[10rem] mb-8">🏆</div>
-                            <h3 className="text-5xl font-black text-black mb-4 leading-none uppercase tracking-tighter">สุดยอดไปเลย!</h3>
-                            <p className="text-slate-500 font-bold mb-10 text-xl">คุณผ่านการฝึกฝนระดับต้นแล้ว ✨</p>
+                            <div className="text-8xl mb-6">🏆</div>
+                            <h3 className="text-4xl font-black text-black mb-3 leading-none uppercase tracking-tighter">สุดยอดไปเลย!</h3>
+                            <p className="text-slate-500 font-bold mb-8 text-lg">คุณผ่านการฝึกฝนระดับต้นแล้ว ✨</p>
 
-                            <div className="bg-white border-4 border-black p-8 rounded-[3rem] mb-10 shadow-[10px_10px_0_rgba(0,0,0,0.05)]">
-                                <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Training Performance</p>
-                                <div className="text-5xl font-black text-indigo-600">Perfect! คมกริบ</div>
+                            <div className="bg-white border-3 border-black p-6 rounded-[2rem] mb-8 shadow-[8px_8px_0_rgba(0,0,0,0.05)]">
+                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Training Performance</p>
+                                <div className="text-3xl font-black text-indigo-600">Perfect! คมกริบ</div>
                             </div>
 
                             <button
                                 onClick={onClose}
-                                className="pill-button w-full py-8 text-3xl shadow-[0_12px_0_#1a1a1a] hover:translate-y-2 hover:shadow-[0_4px_0_#1a1a1a] transition-all"
+                                className="pill-button w-full py-6 text-2xl shadow-[0_8px_0_#1a1a1a] hover:translate-y-1 hover:shadow-[0_4px_0_#1a1a1a] transition-all"
                             >
                                 ไปลุยของจริงกัน! 🚀
                             </button>

@@ -234,16 +234,16 @@ function SpatialGameInner() {
   if (phase === 'intro' && levelParam === 1) {
     return (
       <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4 font-['Supermarket']">
-        <div className="max-w-md w-full bg-white/95 backdrop-blur-md rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-10 shadow-2xl border border-white/20 text-center animate-in zoom-in duration-500">
-          <div className="text-8xl md:text-9xl mb-6 md:mb-8 animate-bounce drop-shadow-xl">🗺️</div>
-          <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-3 md:mb-4 uppercase tracking-tighter">มิติจำลอง</h2>
-          <p className="text-slate-500 font-bold mb-8 md:mb-12 text-base md:text-lg px-2">{diffDesc}</p>
+        <div className="max-w-md w-full bg-white/95 backdrop-blur-md rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-2xl border border-white/20 text-center animate-in zoom-in duration-500">
+          <div className="text-7xl md:text-8xl mb-6 md:mb-8 animate-bounce drop-shadow-xl">🗺️</div>
+          <h2 className="text-2xl md:text-3xl font-black text-slate-800 mb-3 md:mb-4 uppercase tracking-tighter">มิติจำลอง</h2>
+          <p className="text-slate-500 font-bold mb-6 md:mb-8 text-sm md:text-base px-2">{diffDesc}</p>
           <button
             onClick={() => {
               if (mode === 'village') setPhase('play')
               else setPhase('clock')
             }}
-            className="w-full py-5 bg-indigo-600 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95"
+            className="w-full py-4 bg-indigo-600 text-white rounded-[20px] font-black text-xl shadow-xl hover:scale-105 transition-all active:scale-95"
           >
             เริ่มเลย! 🚀
           </button>
@@ -266,8 +266,8 @@ function SpatialGameInner() {
     <div className="min-h-[calc(100vh-140px)] py-6 flex flex-col items-center relative overflow-hidden font-['Supermarket']">
 
       <div className="max-w-4xl w-full px-4 relative z-10">
-        <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-slate-200 mb-6 md:mb-8">
-          <h1 className="text-xl md:text-3xl font-black text-slate-800 text-center mb-1">
+        <div className="bg-white p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm border border-slate-200 mb-4 md:mb-6">
+          <h1 className="text-lg md:text-2xl font-black text-slate-800 text-center mb-1">
             {mode === 'daily' ? '🌟 ภารกิจรายวัน: พื้นที่' : `🗺️ Spatial — ด่าน ${subId}`}
           </h1>
           <p className="text-center text-slate-500 font-bold uppercase tracking-wider text-xs md:text-sm">
@@ -277,9 +277,9 @@ function SpatialGameInner() {
 
         {isComplete ? (
           <div className="bg-white/95 backdrop-blur-md border-2 border-white/20 p-8 md:p-12 rounded-[2rem] md:rounded-[3.5rem] shadow-2xl text-center max-w-xl mx-auto animate-in zoom-in duration-500">
-            <div className="text-6xl md:text-8xl mb-4 md:mb-6">🎯</div>
-            <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-3 md:mb-4">คะแนนที่ทำได้</h2>
-            <p className="text-slate-500 mb-8 md:mb-10 text-sm md:text-lg">คุณผ่านความท้าทายนี้ได้อย่างยอดเยี่ยม!</p>
+            <div className="text-5xl md:text-7xl mb-4 md:mb-6">🎯</div>
+            <h2 className="text-2xl md:text-3xl font-black text-slate-800 mb-3 md:mb-4">คะแนนที่ทำได้</h2>
+            <p className="text-slate-500 mb-6 md:mb-8 text-xs md:text-base">คุณผ่านความท้าทายนี้ได้อย่างยอดเยี่ยม!</p>
             <div className="grid grid-cols-1 gap-3 md:gap-4">
               {mode === 'daily' ? (
                 <button
@@ -291,11 +291,11 @@ function SpatialGameInner() {
               ) : (
                 <>
                   {subId < 12 ? (
-                    <button className="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-black text-xl shadow-md transition-all active:scale-95" onClick={() => router.push(`/world/${villageId}/sublevel/${subId + 1}`)}>
+                    <button className="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-black text-lg shadow-md transition-all active:scale-95" onClick={() => router.push(`/world/${villageId}/sublevel/${subId + 1}`)}>
                       ด่านต่อไป 🚀
                     </button>
                   ) : villageId < 10 ? (
-                    <button className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl font-black text-xl shadow-md transition-all active:scale-95" onClick={() => router.push(`/world/${villageId + 1}`)}>
+                    <button className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-black text-lg shadow-md transition-all active:scale-95" onClick={() => router.push(`/world/${villageId + 1}`)}>
                       หมู่บ้านถัดไป 🏘️
                     </button>
                   ) : null}
@@ -311,7 +311,7 @@ function SpatialGameInner() {
           <div className="w-full flex flex-col items-center h-full">
             <div className="mb-6 md:mb-8 min-h-[40px] md:min-h-[50px] text-center w-full mt-2 md:mt-4">
               {feedback && (
-                <div className={`inline-block px-4 sm:px-6 md:px-10 py-2 sm:py-3 rounded-full font-black text-sm sm:text-base md:text-xl shadow-lg border-2 md:border-4 ${feedback.type === 'correct' ? 'bg-green-500 text-white border-green-300' : 'bg-red-500 text-white border-red-300 animate-shake'}`}>
+                <div className={`inline-block px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 rounded-full font-black text-xs sm:text-sm md:text-lg shadow-lg border-2 md:border-4 ${feedback.type === 'correct' ? 'bg-green-500 text-white border-green-300' : 'bg-red-500 text-white border-red-300 animate-shake'}`}>
                   {feedback.message}
                 </div>
               )}
@@ -335,11 +335,11 @@ function SpatialGameInner() {
             ) : questionData && questionData.options ? (
               <div className="w-full flex flex-col items-center">
                 {/* 1. Target Area (Image or Emoji) */}
-                <div className="mb-8 md:mb-12 relative p-4 md:p-8 bg-white/40 backdrop-blur-md rounded-3xl md:rounded-[3rem] border-2 md:border-4 border-white/50 shadow-xl flex items-center justify-center min-h-[160px] md:min-h-[220px] w-full max-w-[280px] sm:max-w-xs md:max-w-md">
+                <div className="mb-6 md:mb-8 relative p-4 md:p-6 bg-white/40 backdrop-blur-md rounded-2xl md:rounded-[2rem] border-2 md:border-4 border-white/50 shadow-xl flex items-center justify-center min-h-[140px] md:min-h-[200px] w-full max-w-[240px] sm:max-w-[280px] md:max-w-sm">
                   {questionData.targetView ? (
-                    <div className="text-6xl sm:text-7xl md:text-9xl drop-shadow-2xl animate-bounce">{questionData.targetView}</div>
+                    <div className="text-5xl sm:text-6xl md:text-8xl drop-shadow-2xl animate-bounce">{questionData.targetView}</div>
                   ) : questionData.targetImage ? (
-                    <img src={questionData.targetImage} className="w-full h-[140px] sm:h-[180px] md:h-[260px] object-contain drop-shadow-md" alt="target" />
+                    <img src={questionData.targetImage} className="w-full h-[120px] sm:h-[160px] md:h-[220px] object-contain drop-shadow-md" alt="target" />
                   ) : null}
                 </div>
 
@@ -365,11 +365,11 @@ function SpatialGameInner() {
                     >
                       <div className="flex gap-1 sm:gap-2 w-full h-full items-center justify-center">
                         {typeof opt === 'string' && opt.startsWith('/') ? (
-                          <img src={opt as string} className="max-w-[70px] max-h-[70px] sm:max-w-[90px] sm:max-h-[90px] md:max-w-[140px] md:max-h-[140px] object-contain drop-shadow-sm group-hover:scale-105 transition-transform" alt={`option ${idx}`} />
+                          <img src={opt as string} className="max-w-[60px] max-h-[60px] sm:max-w-[80px] sm:max-h-[80px] md:max-w-[120px] md:max-h-[120px] object-contain drop-shadow-sm group-hover:scale-105 transition-transform" alt={`option ${idx}`} />
                         ) : Array.isArray(opt) ? opt.map((emoji, i) => (
-                          <span key={i} className="text-2xl sm:text-3xl md:text-5xl drop-shadow-md group-hover:scale-110 transition-transform">{emoji}</span>
+                          <span key={i} className="text-xl sm:text-2xl md:text-4xl drop-shadow-md group-hover:scale-110 transition-transform">{emoji}</span>
                         )) : (
-                          <span className="text-4xl sm:text-5xl md:text-7xl drop-shadow-md group-hover:scale-110 transition-transform">{opt as string}</span>
+                          <span className="text-3xl sm:text-4xl md:text-6xl drop-shadow-md group-hover:scale-110 transition-transform">{opt as string}</span>
                         )}
                       </div>
                       <div className="absolute -top-2 -right-2 w-8 h-8 bg-slate-100 rounded-full border-2 border-white text-slate-400 font-black flex items-center justify-center text-xs group-hover:bg-blue-500 group-hover:text-white transition-colors">

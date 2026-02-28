@@ -172,10 +172,10 @@ export default function Home() {
         {phase === 'login' && (
           <div className="friendly-card animate-in fade-in zoom-in duration-500">
             <div className="flex flex-col items-center mb-6 md:mb-8">
-              <div className="w-16 h-16 md:w-20 md:h-20 bg-[var(--card-bg)] border-4 border-[var(--border-dark)] rounded-full flex items-center justify-center text-3xl md:text-4xl mb-4 shadow-[4px_4px_0_var(--border-dark)] md:shadow-[6px_6px_0_var(--border-dark)]">
+              <div className="w-14 h-14 md:w-16 md:h-16 bg-[var(--card-bg)] border-3 md:border-4 border-[var(--border-dark)] rounded-full flex items-center justify-center text-2xl md:text-3xl mb-3 shadow-[3px_3px_0_var(--border-dark)] md:shadow-[4px_4px_0_var(--border-dark)]">
                 🧠
               </div>
-              <h1 className="text-3xl md:text-4xl font-black text-[var(--text-main)] tracking-tight uppercase">ยินดีต้อนรับ</h1>
+              <h1 className="text-2xl md:text-3xl font-black text-[var(--text-main)] tracking-tight uppercase">ยินดีต้อนรับ</h1>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-5">
@@ -189,7 +189,7 @@ export default function Home() {
                 <input
                   type="tel"
                   placeholder="เบอร์โทรศัพท์"
-                  className="pill-input pill-input-icon w-full py-4 text-lg"
+                  className="pill-input pill-input-icon w-full py-3 text-base"
                   value={username}
                   onChange={e => setUsername(e.target.value)}
                   required
@@ -206,7 +206,7 @@ export default function Home() {
                   required
                 />
               </div>
-              <button disabled={loading} className="pill-button w-full py-4 md:py-5 text-xl md:text-2xl mt-4 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_4px_0_#000] md:shadow-[0_6px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70">
+              <button disabled={loading} className="pill-button w-full py-3 md:py-4 text-lg md:text-xl mt-4 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_4px_0_#000] md:shadow-[0_5px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70">
                 {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
               </button>
             </form>
@@ -265,8 +265,8 @@ export default function Home() {
                     <div className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[10px] py-1 opacity-0 group-hover:opacity-100 transition-opacity">EDIT</div>
                   </div>
                 </div>
-                <h2 className="text-5xl font-black text-[#1a1a1a] mb-2">{name}</h2>
-                <p className="text-[#717171] font-black uppercase tracking-[0.2em] text-[12px] mb-10">นักสำรวจความจำ | ปลดล็อก {progress?.unlockedVillages?.length || 1}/10 หมู่บ้าน</p>
+                <h2 className="text-4xl font-black text-[#1a1a1a] mb-2">{name}</h2>
+                <p className="text-[#717171] font-black uppercase tracking-[0.2em] text-[10px] mb-8">นักสำรวจความจำ | ปลดล็อก {progress?.unlockedVillages?.length || 1}/10 หมู่บ้าน</p>
 
                 <div className="w-full grid grid-cols-2 gap-2 md:gap-4 mb-8 md:mb-10">
                   <div className="bg-white border-[2px] md:border-3 border-[#1a1a1a] rounded-2xl md:rounded-[2rem] p-3 md:p-4 shadow-[2px_2px_0_#1a1a1a] md:shadow-[4px_4px_0_#1a1a1a]">
@@ -282,7 +282,7 @@ export default function Home() {
                 <div className="w-full flex flex-col gap-3 md:gap-4">
                   <button
                     onClick={nextPhase}
-                    className="pill-button w-full py-4 md:py-6 text-xl md:text-3xl shadow-[0_4px_0_#000] md:shadow-[0_8px_0_#000] hover:translate-y-[-2px] hover:shadow-[0_10px_0_#000] active:translate-y-1 active:shadow-none transition-all"
+                    className="pill-button w-full py-3 md:py-4 text-lg md:text-2xl shadow-[0_4px_0_#000] md:shadow-[0_6px_0_#000] hover:translate-y-[-2px] hover:shadow-[0_8px_0_#000] active:translate-y-1 active:shadow-none transition-all"
                   >
                     เริ่มผจญภัย! 🚀
                   </button>
@@ -290,13 +290,13 @@ export default function Home() {
                   <div className="grid grid-cols-2 gap-4">
                     <button
                       onClick={() => router.push('/leaderboard')}
-                      className="py-4 bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-full font-black text-[var(--text-main)] uppercase tracking-widest hover:bg-[var(--border-dark)] hover:text-[var(--text-on-dark)] transition-all shadow-[6px_6px_0_var(--border-dark)] text-lg"
+                      className="py-3 bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-full font-black text-[var(--text-main)] uppercase tracking-widest hover:bg-[var(--border-dark)] hover:text-[var(--text-on-dark)] transition-all shadow-[4px_4px_0_var(--border-dark)] text-base"
                     >
                       อันดับ 🏆
                     </button>
                     <button
                       onClick={() => setPhase('edit_profile')}
-                      className="py-4 bg-white border-3 border-orange-500 rounded-full font-black text-orange-600 uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all shadow-[6px_6px_0_#f97316] text-lg"
+                      className="py-3 bg-white border-3 border-orange-500 rounded-full font-black text-orange-600 uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all shadow-[4px_4px_0_#f97316] text-base"
                     >
                       แก้ไขโปรไฟล์ ✏️
                     </button>
@@ -325,7 +325,7 @@ export default function Home() {
                     { label: 'มิติสัมพันธ์', value: cognitiveData?.averages?.workingMemory || 0, color: '#10b981' },
                     { label: 'การตอบสนอง', value: cognitiveData?.averages?.attention || 0, color: '#f59e0b' },
                   ]}
-                  size={260}
+                  size={200}
                 />
 
                 <div className="mt-10 grid grid-cols-1 gap-4">
@@ -335,9 +335,9 @@ export default function Home() {
                         <span className="text-[11px] font-black text-indigo-400 uppercase tracking-widest">การบริหารจัดการ</span>
                         <div className="w-5 h-5 rounded-full border-2 border-indigo-200 flex items-center justify-center text-[11px] font-black text-indigo-400 cursor-help bg-white shadow-sm" title="ทักษะการตัดสินใจ การวางแผน และจัดลำดับความสำคัญ">i</div>
                       </div>
-                      <div className="text-2xl font-black text-indigo-900 leading-tight">โหมดจัดการ</div>
+                      <div className="text-xl font-black text-indigo-900 leading-tight">โหมดจัดการ</div>
                     </div>
-                    <div className="text-4xl font-black text-indigo-700 tabular-nums">{Math.round(cognitiveData?.averages?.executiveFunction || 0)}%</div>
+                    <div className="text-3xl font-black text-indigo-700 tabular-nums">{Math.round(cognitiveData?.averages?.executiveFunction || 0)}%</div>
                   </div>
 
                   <div className="p-5 bg-emerald-50 rounded-3xl border-2 border-emerald-200 flex items-center justify-between">
@@ -357,9 +357,9 @@ export default function Home() {
                         <span className="text-[11px] font-black text-blue-400 uppercase tracking-widest">ความรวดเร็วในการคิด</span>
                         <div className="w-5 h-5 rounded-full border-2 border-blue-200 flex items-center justify-center text-[11px] font-black text-blue-400 cursor-help bg-white shadow-sm" title="ความไวในการตีความโจทย์และหาคำตอบอย่างแม่นยำ">i</div>
                       </div>
-                      <div className="text-2xl font-black text-blue-900 leading-tight">โหมดคำนวณ</div>
+                      <div className="text-xl font-black text-blue-900 leading-tight">โหมดคำนวณ</div>
                     </div>
-                    <div className="text-4xl font-black text-blue-700 tabular-nums">{Math.round(cognitiveData?.averages?.processingSpeed || 0)}%</div>
+                    <div className="text-3xl font-black text-blue-700 tabular-nums">{Math.round(cognitiveData?.averages?.processingSpeed || 0)}%</div>
                   </div>
                 </div>
 
@@ -475,7 +475,7 @@ export default function Home() {
               <div className="mt-12 w-full">
                 <button
                   onClick={nextPhase}
-                  className="pill-button w-full py-6 text-2xl shadow-[0_10px_0_#1a1a1a] hover:translate-y-1 hover:shadow-[0_6px_0_#1a1a1a] active:translate-y-2 active:shadow-none transition-all"
+                  className="pill-button w-full py-4 text-xl shadow-[0_8px_0_#1a1a1a] hover:translate-y-1 hover:shadow-[0_4px_0_#1a1a1a] active:translate-y-2 active:shadow-none transition-all"
                 >
                   รับคำท้าและเตรียมตัว 🏹
                 </button>
@@ -488,16 +488,16 @@ export default function Home() {
         {/* Phase 6: Tutorial Summary */}
         {phase === 'tutorial_summary' && (
           <div className="friendly-card !p-6 md:!p-12 animate-in slide-in-from-bottom duration-700 max-w-5xl mx-auto border-[4px] md:border-[6px]">
-            <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-8 md:mb-16 gap-6 text-center md:text-left">
+            <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-6 md:mb-10 gap-4 text-center md:text-left">
               <div className="w-full">
-                <div className="inline-block px-4 py-1 bg-yellow-400 border-2 border-black text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-4">Training Mode</div>
-                <h2 className="text-4xl md:text-6xl font-black text-black tracking-tighter leading-none mb-4">เรียนรู้วิธีฟื้นฟู 🧠</h2>
-                <p className="text-[#717171] font-bold text-sm md:text-lg">ทดสอบทักษะทั้ง 3 ด้านเพื่อเตรียมความพร้อมสู่การเดินทางจริง</p>
+                <div className="inline-block px-3 py-0.5 bg-yellow-400 border-2 border-black text-[9px] font-black uppercase tracking-[0.2em] rounded-full mb-3">Training Mode</div>
+                <h2 className="text-3xl md:text-5xl font-black text-black tracking-tighter leading-none mb-3">เรียนรู้วิธีฟื้นฟู 🧠</h2>
+                <p className="text-[#717171] font-bold text-xs md:text-base">ทดสอบทักษะทั้ง 3 ด้านเพื่อเตรียมความพร้อมสู่การเดินทางจริง</p>
               </div>
-              <div className="flex -space-x-4">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-white border-2 md:border-4 border-black rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-3xl shadow-md md:shadow-lg -rotate-12">📦</div>
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-white border-2 md:border-4 border-black rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-3xl shadow-md md:shadow-lg rotate-0 z-10">🔢</div>
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-white border-2 md:border-4 border-black rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-3xl shadow-md md:shadow-lg rotate-12">🗺️</div>
+              <div className="flex -space-x-3">
+                <div className="w-10 h-10 md:w-14 md:h-14 bg-white border-2 md:border-3 border-black rounded-lg md:rounded-xl flex items-center justify-center text-lg md:text-2xl shadow-md md:shadow-lg -rotate-12">📦</div>
+                <div className="w-10 h-10 md:w-14 md:h-14 bg-white border-2 md:border-3 border-black rounded-lg md:rounded-xl flex items-center justify-center text-lg md:text-2xl shadow-md md:shadow-lg rotate-0 z-10">🔢</div>
+                <div className="w-10 h-10 md:w-14 md:h-14 bg-white border-2 md:border-3 border-black rounded-lg md:rounded-xl flex items-center justify-center text-lg md:text-2xl shadow-md md:shadow-lg rotate-12">🗺️</div>
               </div>
             </div>
 
@@ -507,9 +507,9 @@ export default function Home() {
                 onClick={() => setTrainingMode('management')}
                 className="group cursor-pointer relative bg-[#fffcf0] p-10 rounded-[4rem] border-4 border-black text-center shadow-[15px_15px_0_#000] hover:translate-y-[-12px] transition-all duration-500"
               >
-                <div className="w-28 h-28 bg-orange-100 border-4 border-black rounded-[2.5rem] flex items-center justify-center text-6xl mx-auto mb-10 shadow-[8px_8px_0_#000] group-hover:rotate-12 transition-transform">📦</div>
-                <h4 className="font-black text-3xl text-black mb-6 tracking-tighter uppercase">Management</h4>
-                <p className="text-xl font-bold text-black/60 leading-relaxed">
+                <div className="w-20 h-20 bg-orange-100 border-3 border-black rounded-[1.5rem] flex items-center justify-center text-4xl mx-auto mb-6 shadow-[6px_6px_0_#000] group-hover:rotate-12 transition-transform">📦</div>
+                <h4 className="font-black text-2xl text-black mb-4 tracking-tighter uppercase">Management</h4>
+                <p className="text-lg font-bold text-black/60 leading-relaxed">
                   ฝึกการแยกแยะสิ่งของตามเงื่อนไข
                 </p>
                 <div className="mt-8 py-3 bg-[var(--border-dark)] text-white rounded-2xl text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
@@ -557,7 +557,7 @@ export default function Home() {
 
             <button
               onClick={nextPhase}
-              className="pill-button w-full py-6 md:py-10 text-2xl md:text-4xl shadow-[0_8px_0_#1a1a1a] md:shadow-[0_15px_0_#1a1a1a] hover:translate-y-1 hover:shadow-[0_4px_0_#1a1a1a] md:hover:shadow-[0_8px_0_#1a1a1a] active:translate-y-2 md:active:translate-y-4 active:shadow-none transition-all"
+              className="pill-button w-full py-5 md:py-8 text-xl md:text-3xl shadow-[0_6px_0_#1a1a1a] md:shadow-[0_12px_0_#1a1a1a] hover:translate-y-1 hover:shadow-[0_3px_0_#1a1a1a] md:hover:shadow-[0_6px_0_#1a1a1a] active:translate-y-2 md:active:translate-y-4 active:shadow-none transition-all"
             >
               พร้อมแล้ว! เข้าสู่ก้าวสำคัญ 🗝️
             </button>

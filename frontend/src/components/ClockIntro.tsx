@@ -71,12 +71,12 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
     return (
         <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-900/95 backdrop-blur-2xl animate-in fade-in duration-700 p-6">
             <div className="max-w-md w-full text-center">
-                <div className="inline-block px-4 py-1 bg-amber-500 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-4 shadow-lg">
+                <div className="inline-block px-4 py-1 bg-amber-500 text-white text-[9px] font-black uppercase tracking-[0.2em] rounded-full mb-3 shadow-lg">
                     Brain Warm-up
                 </div>
-                <h2 className="text-3xl font-black text-white mb-2">ตั้งเวลาวอร์มอัพ</h2>
-                <p className="text-blue-200 font-bold mb-8 text-sm md:text-base">
-                    เลือกเข็มและหมุนไปที่ <span className="text-white text-2xl underline decoration-amber-400">{targetHour}:{targetMinute < 10 ? `0${targetMinute}` : targetMinute}</span>
+                <h2 className="text-2xl font-black text-white mb-2">ตั้งเวลาวอร์มอัพ</h2>
+                <p className="text-blue-200 font-bold mb-6 text-xs md:text-sm">
+                    เลือกเข็มและหมุนไปที่ <span className="text-white text-xl underline decoration-amber-400">{targetHour}:{targetMinute < 10 ? `0${targetMinute}` : targetMinute}</span>
                 </p>
 
                 <div className="flex gap-4 justify-center mb-10">
@@ -98,7 +98,7 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
                     <svg
                         ref={clockRef}
                         viewBox="0 0 200 200"
-                        className="w-72 h-72 md:w-80 md:h-80 drop-shadow-[0_20px_60px_rgba(0,0,0,0.6)] touch-none select-none"
+                        className="w-64 h-64 md:w-72 md:h-72 drop-shadow-[0_15px_40px_rgba(0,0,0,0.5)] touch-none select-none"
                         onMouseMove={handleInteraction}
                         onTouchMove={handleInteraction}
                         onClick={() => setActiveHand(null)}
@@ -208,13 +208,13 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
                         else checkResult();
                     }}
                     disabled={(!hasMovedHour && !hasMovedMinute && !isDone)}
-                    className={`mt-4 w-full py-5 rounded-[2rem] font-black text-2xl transition-all shadow-2xl ${isDone
+                    className={`mt-4 w-full py-4 rounded-[1.5rem] font-black text-xl transition-all shadow-2xl ${isDone
                         ? 'bg-green-500 text-white scale-105 hover:bg-green-400'
                         : activeHand
-                            ? 'bg-amber-500 text-white hover:scale-105 shadow-amber-500/50 border-b-8 border-amber-700 active:border-b-0'
+                            ? 'bg-amber-500 text-white hover:scale-105 shadow-amber-500/50 border-b-4 border-amber-700 active:border-b-0'
                             : (!hasMovedHour || !hasMovedMinute)
                                 ? 'bg-slate-700 text-slate-500 cursor-not-allowed border-2 border-slate-600'
-                                : 'bg-gradient-to-r from-indigo-600 to-blue-700 text-white hover:shadow-indigo-500/50 animate-pulse-gentle shadow-[0_0_20px_rgba(79,70,229,0.4)] border-b-8 border-indigo-900 active:border-b-0'
+                                : 'bg-gradient-to-r from-indigo-600 to-blue-700 text-white hover:shadow-indigo-500/50 animate-pulse-gentle shadow-[0_0_20px_rgba(79,70,229,0.4)] border-b-4 border-indigo-900 active:border-b-0'
                         }`}
                 >
                     {isDone
