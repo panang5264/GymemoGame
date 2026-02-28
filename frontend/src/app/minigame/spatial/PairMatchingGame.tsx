@@ -119,7 +119,7 @@ export default function PairMatchingGame({ pairs, basePath, onComplete, onError 
 
             <div className="flex justify-between w-full max-w-3xl mx-auto px-4 z-20 relative gap-8">
                 {/* Left Column */}
-                <div className="flex flex-col gap-4 md:gap-6 w-1/2">
+                <div className="flex flex-col gap-3 sm:gap-4 md:gap-6 w-1/2">
                     {leftItems.map((item) => {
                         const isMatched = Object.keys(matchedPairs).includes(item.id)
                         const isSelected = selectedLeft === item.id
@@ -141,7 +141,7 @@ export default function PairMatchingGame({ pairs, basePath, onComplete, onError 
                 </div>
 
                 {/* Right Column */}
-                <div className="flex flex-col gap-4 md:gap-6 w-1/2">
+                <div className="flex flex-col gap-3 sm:gap-4 md:gap-6 w-1/2">
                     {rightItems.map((item) => {
                         const isMatched = Object.values(matchedPairs).includes(item.id)
                         const isSelected = selectedRight === item.id

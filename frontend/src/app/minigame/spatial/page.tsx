@@ -234,10 +234,10 @@ function SpatialGameInner() {
   if (phase === 'intro' && levelParam === 1) {
     return (
       <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4 font-['Supermarket']">
-        <div className="max-w-md w-full bg-white rounded-[2rem] md:rounded-[40px] p-6 md:p-10 shadow-2xl border border-slate-100 text-center animate-in zoom-in">
-          <div className="text-7xl md:text-9xl mb-6 md:mb-8 animate-bounce">🗺️</div>
-          <h2 className="text-2xl md:text-3xl font-black text-slate-800 mb-3 md:mb-4 uppercase tracking-tighter">มิติจำลอง</h2>
-          <p className="text-slate-500 font-bold mb-8 md:mb-12 text-sm md:text-lg">{diffDesc}</p>
+        <div className="max-w-md w-full bg-white/95 backdrop-blur-md rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-10 shadow-2xl border border-white/20 text-center animate-in zoom-in duration-500">
+          <div className="text-8xl md:text-9xl mb-6 md:mb-8 animate-bounce drop-shadow-xl">🗺️</div>
+          <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-3 md:mb-4 uppercase tracking-tighter">มิติจำลอง</h2>
+          <p className="text-slate-500 font-bold mb-8 md:mb-12 text-base md:text-lg px-2">{diffDesc}</p>
           <button
             onClick={() => {
               if (mode === 'village') setPhase('play')
@@ -308,15 +308,15 @@ function SpatialGameInner() {
             </div>
           </div>
         ) : (
-          <div className="w-full flex flex-col items-center">
-            <div className="mb-6 md:mb-8 min-h-[40px] md:min-h-[50px] text-center w-full">
+          <div className="w-full flex flex-col items-center h-full">
+            <div className="mb-6 md:mb-8 min-h-[40px] md:min-h-[50px] text-center w-full mt-2 md:mt-4">
               {feedback && (
-                <div className={`inline-block px-6 md:px-10 py-2 md:py-3 rounded-full font-black text-base md:text-xl shadow-lg border-2 md:border-4 ${feedback.type === 'correct' ? 'bg-green-500 text-white border-green-300' : 'bg-red-500 text-white border-red-300 animate-shake'}`}>
+                <div className={`inline-block px-4 sm:px-6 md:px-10 py-2 sm:py-3 rounded-full font-black text-sm sm:text-base md:text-xl shadow-lg border-2 md:border-4 ${feedback.type === 'correct' ? 'bg-green-500 text-white border-green-300' : 'bg-red-500 text-white border-red-300 animate-shake'}`}>
                   {feedback.message}
                 </div>
               )}
               {!feedback && questionText && (
-                <div className="inline-block px-4 md:px-10 py-2 md:py-3 rounded-full font-bold text-slate-600 bg-white/80 backdrop-blur-sm border-2 border-white/50 shadow-sm text-sm md:text-base">
+                <div className="inline-block px-4 sm:px-6 md:px-10 py-2 sm:py-3 rounded-full font-bold text-slate-600 bg-white/80 backdrop-blur-sm border-2 border-white/50 shadow-sm text-sm sm:text-base">
                   💡 {questionText}
                 </div>
               )}
@@ -335,17 +335,17 @@ function SpatialGameInner() {
             ) : questionData && questionData.options ? (
               <div className="w-full flex flex-col items-center">
                 {/* 1. Target Area (Image or Emoji) */}
-                <div className="mb-8 md:mb-12 relative p-2 md:p-8 bg-white/40 backdrop-blur-md rounded-2xl md:rounded-[3rem] border-2 md:border-4 border-white/50 shadow-xl flex items-center justify-center min-h-[150px] md:min-h-[200px] w-full max-w-xs md:max-w-md">
+                <div className="mb-8 md:mb-12 relative p-4 md:p-8 bg-white/40 backdrop-blur-md rounded-3xl md:rounded-[3rem] border-2 md:border-4 border-white/50 shadow-xl flex items-center justify-center min-h-[160px] md:min-h-[220px] w-full max-w-[280px] sm:max-w-xs md:max-w-md">
                   {questionData.targetView ? (
-                    <div className="text-7xl md:text-9xl drop-shadow-2xl animate-bounce">{questionData.targetView}</div>
+                    <div className="text-6xl sm:text-7xl md:text-9xl drop-shadow-2xl animate-bounce">{questionData.targetView}</div>
                   ) : questionData.targetImage ? (
-                    <img src={questionData.targetImage} className="w-full h-[200px] md:h-[300px] object-contain drop-shadow-md" alt="target" />
+                    <img src={questionData.targetImage} className="w-full h-[140px] sm:h-[180px] md:h-[260px] object-contain drop-shadow-md" alt="target" />
                   ) : null}
                 </div>
 
                 {/* 2. Options Area */}
-                <div className={`grid gap-4 md:gap-6 w-full max-w-2xl px-2 md:px-4 pb-20 ${questionData.options.length === 2 ? 'grid-cols-2' :
-                  questionData.options.length === 3 ? 'grid-cols-1 md:grid-cols-3' :
+                <div className={`grid gap-3 sm:gap-4 md:gap-6 w-full max-w-2xl px-2 sm:px-4 pb-20 ${questionData.options.length === 2 ? 'grid-cols-2' :
+                  questionData.options.length === 3 ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' :
                     'grid-cols-2'
                   }`}>
                   {questionData.options.map((opt: (string[] | string), idx: number) => (
@@ -361,15 +361,15 @@ function SpatialGameInner() {
                           setTimeout(() => setFeedback(null), 1000)
                         }
                       }}
-                      className="group relative p-3 md:p-6 bg-white hover:bg-blue-50 border-b-4 md:border-b-8 border-slate-200 hover:border-blue-200 rounded-xl md:rounded-[2rem] shadow-md md:shadow-lg transition-all active:scale-95 flex flex-col items-center justify-center min-h-[120px] md:min-h-[140px]"
+                      className="group relative p-2 sm:p-3 md:p-6 bg-white hover:bg-blue-50 border-b-4 md:border-b-8 border-slate-200 hover:border-blue-200 rounded-xl md:rounded-[2rem] shadow-md md:shadow-lg transition-all active:scale-95 flex flex-col items-center justify-center min-h-[100px] sm:min-h-[120px] md:min-h-[160px]"
                     >
-                      <div className="flex gap-2 w-full h-full items-center justify-center">
+                      <div className="flex gap-1 sm:gap-2 w-full h-full items-center justify-center">
                         {typeof opt === 'string' && opt.startsWith('/') ? (
-                          <img src={opt as string} className="max-w-[80px] max-h-[80px] md:max-w-[120px] md:max-h-[120px] object-contain drop-shadow-sm group-hover:scale-110 transition-transform" alt={`option ${idx}`} />
+                          <img src={opt as string} className="max-w-[70px] max-h-[70px] sm:max-w-[90px] sm:max-h-[90px] md:max-w-[140px] md:max-h-[140px] object-contain drop-shadow-sm group-hover:scale-105 transition-transform" alt={`option ${idx}`} />
                         ) : Array.isArray(opt) ? opt.map((emoji, i) => (
-                          <span key={i} className="text-3xl md:text-6xl drop-shadow-md group-hover:scale-110 transition-transform">{emoji}</span>
+                          <span key={i} className="text-2xl sm:text-3xl md:text-5xl drop-shadow-md group-hover:scale-110 transition-transform">{emoji}</span>
                         )) : (
-                          <span className="text-5xl md:text-8xl drop-shadow-md group-hover:scale-110 transition-transform">{opt as string}</span>
+                          <span className="text-4xl sm:text-5xl md:text-7xl drop-shadow-md group-hover:scale-110 transition-transform">{opt as string}</span>
                         )}
                       </div>
                       <div className="absolute -top-2 -right-2 w-8 h-8 bg-slate-100 rounded-full border-2 border-white text-slate-400 font-black flex items-center justify-center text-xs group-hover:bg-blue-500 group-hover:text-white transition-colors">
