@@ -139,7 +139,8 @@ export default function WorldPage() {
         fresh.villages[key] = {
           playsCompleted: 0,
           expTubeFilled: false,
-          bestScore: cv.bestScore
+          bestScore: cv.bestScore,
+          runHistory: cv.runHistory || []
         }
       }
     })
@@ -150,6 +151,22 @@ export default function WorldPage() {
     const { currentKeys: ck, nextRegenIn: nr } = getKeys(fresh)
     setCurrentKeys(ck)
     setNextRegenIn(nr)
+  }
+
+  function unlockAllCheat() {
+    if (!progress) return
+    const p = { ...progress }
+    p.unlockedVillages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    for (let i = 1; i <= 10; i++) {
+      p.villages[String(i)] = {
+        playsCompleted: 12,
+        expTubeFilled: true,
+        runHistory: p.villages[String(i)]?.runHistory || []
+      }
+    }
+    saveProgress(p)
+    refreshProgress()
+    alert('⚡ ปลดล็อกทุกด่านแล้ว! ขอให้สนุกกับการทดสอบครับ')
   }
 
   function handleStageClick(stage: number) {
@@ -216,64 +233,76 @@ export default function WorldPage() {
       {/* Tutorial Modal */}
       {showTutorial && (
         <div className={styles.introOverlay} style={{ zIndex: 11000 }}>
-          <div className={`${styles.introCard} ${styles.tutorialCard}`}>
-            <div className="flex justify-between items-center mb-8 md:mb-12">
+          <div className={`${styles.introCard} ${styles.compactTutorialCard}`}>
+            <div className="flex justify-between items-center mb-6 md:mb-8">
               <div className="text-left">
-                <h2 className="text-3xl md:text-5xl font-black text-black tracking-tighter mb-2">คู่มือการเล่น 🧠</h2>
-                <div className="h-2 w-24 md:w-32 bg-black rounded-full"></div>
+                <h2 className="text-2xl md:text-3xl font-black text-black tracking-tighter mb-1">คู่มือการเล่น 🧠</h2>
+                <div className="h-1.5 w-16 md:w-20 bg-black rounded-full"></div>
               </div>
               <button
                 onClick={() => setShowTutorial(false)}
-                className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-black/5 hover:bg-red-500 hover:text-white flex items-center justify-center text-2xl md:text-4xl transition-all duration-300 shadow-[4px_4px_0_rgba(0,0,0,0.1)] hover:translate-y-[-2px]"
+                className="w-10 h-10 rounded-xl bg-black/5 hover:bg-red-500 hover:text-white flex items-center justify-center text-xl transition-all duration-300 shadow-[4px_4px_0_rgba(0,0,0,0.1)]"
               >
                 ✕
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-8 md:mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
               {/* Management */}
-              <div className="group relative bg-[#fcfaf2] p-6 md:p-8 rounded-[2rem] md:rounded-[3.5rem] border-4 border-black text-center shadow-[8px_8px_0_#000] md:shadow-[12px_12px_0_#000] hover:translate-y-[-10px] transition-all duration-500">
-                <div className="w-16 h-16 md:w-24 md:h-24 bg-orange-50 border-3 border-black rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center text-4xl md:text-5xl mx-auto mb-4 md:mb-8 shadow-[6px_6px_0_#000] group-hover:rotate-6 transition-transform">📦</div>
-                <h4 className="font-black text-xl md:text-2xl text-black mb-2 md:mb-4 tracking-tighter">MANAGEMENT</h4>
-                <div className="h-1 w-10 md:w-12 bg-orange-400 mx-auto mb-4 md:mb-6 rounded-full"></div>
-                <p className="text-sm md:text-lg font-bold text-black/70 leading-relaxed">
-                  ฝึกทักษะการแยกแยะและจัดหมวดหมู่สิ่งของตามเงื่อนไขที่กำหนด
+              <button
+                onClick={() => router.push('/minigame/management?mode=practice&level=1')}
+                className="group relative bg-[#fcfaf2] p-5 md:p-6 rounded-[2rem] border-4 border-black text-center shadow-[6px_6px_0_#000] hover:translate-y-[-5px] transition-all hover:bg-orange-50/50"
+              >
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-orange-50 border-2 border-black rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3 shadow-[4px_4px_0_#000]">📦</div>
+                <h4 className="font-black text-lg text-black mb-1 tracking-tighter">MANAGEMENT</h4>
+                <div className="h-0.5 w-8 bg-orange-400 mx-auto mb-3 rounded-full"></div>
+                <p className="text-xs md:text-sm font-bold text-black/70 leading-relaxed">
+                  ฝึกทักษะการแยกแยะและจัดหมวดหมู่สิ่งของ
                 </p>
-              </div>
+                <div className="mt-3 text-[10px] font-black text-orange-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">คลิกเพื่อลองเล่น ➔</div>
+              </button>
 
               {/* Calculation */}
-              <div className="group relative bg-[#fcfaf2] p-6 md:p-8 rounded-[2rem] md:rounded-[3.5rem] border-4 border-black text-center shadow-[8px_8px_0_#000] md:shadow-[12px_12px_0_#000] hover:translate-y-[-10px] transition-all duration-500">
-                <div className="w-16 h-16 md:w-24 md:h-24 bg-blue-50 border-3 border-black rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center text-4xl md:text-5xl mx-auto mb-4 md:mb-8 shadow-[6px_6px_0_#000] group-hover:rotate-6 transition-transform">🔢</div>
-                <h4 className="font-black text-xl md:text-2xl text-black mb-2 md:mb-4 tracking-tighter">CALCULATION</h4>
-                <div className="h-1 w-10 md:w-12 bg-blue-400 mx-auto mb-4 md:mb-6 rounded-full"></div>
-                <p className="text-sm md:text-lg font-bold text-black/70 leading-relaxed">
-                  ท้าทายความไวในการแก้โจทย์คณิตศาสตร์ภายใต้ความกดดันของเวลา
+              <button
+                onClick={() => router.push('/minigame/calculation?mode=practice&level=1')}
+                className="group relative bg-[#fcfaf2] p-5 md:p-6 rounded-[2rem] border-4 border-black text-center shadow-[6px_6px_0_#000] hover:translate-y-[-5px] transition-all hover:bg-blue-50/50"
+              >
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-50 border-2 border-black rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3 shadow-[4px_4px_0_#000]">🔢</div>
+                <h4 className="font-black text-lg text-black mb-1 tracking-tighter">CALCULATION</h4>
+                <div className="h-0.5 w-8 bg-blue-400 mx-auto mb-3 rounded-full"></div>
+                <p className="text-xs md:text-sm font-bold text-black/70 leading-relaxed">
+                  ท้าทายความไวในการแก้โจทย์คณิตศาสตร์
                 </p>
-              </div>
+                <div className="mt-3 text-[10px] font-black text-blue-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">คลิกเพื่อลองเล่น ➔</div>
+              </button>
 
               {/* Spatial */}
-              <div className="group relative bg-[#fcfaf2] p-6 md:p-8 rounded-[2rem] md:rounded-[3.5rem] border-4 border-black text-center shadow-[8px_8px_0_#000] md:shadow-[12px_12px_0_#000] hover:translate-y-[-10px] transition-all duration-500">
-                <div className="w-16 h-16 md:w-24 md:h-24 bg-green-50 border-3 border-black rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center text-4xl md:text-5xl mx-auto mb-4 md:mb-8 shadow-[6px_6px_0_#000] group-hover:rotate-6 transition-transform">🗺️</div>
-                <h4 className="font-black text-xl md:text-2xl text-black mb-2 md:mb-4 tracking-tighter">SPATIAL</h4>
-                <div className="h-1 w-10 md:w-12 bg-green-400 mx-auto mb-4 md:mb-6 rounded-full"></div>
-                <p className="text-sm md:text-lg font-bold text-black/70 leading-relaxed">
-                  ฝึกการวาดภาพในใจ จับคู่มุมมองและรูปทรงให้แม่นยำที่สุด
+              <button
+                onClick={() => router.push('/minigame/spatial?mode=practice&level=1')}
+                className="group relative bg-[#fcfaf2] p-5 md:p-6 rounded-[2rem] border-4 border-black text-center shadow-[6px_6px_0_#000] hover:translate-y-[-5px] transition-all hover:bg-green-50/50"
+              >
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-green-50 border-2 border-black rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3 shadow-[4px_4px_0_#000]">🗺️</div>
+                <h4 className="font-black text-lg text-black mb-1 tracking-tighter">SPATIAL</h4>
+                <div className="h-0.5 w-8 bg-green-400 mx-auto mb-3 rounded-full"></div>
+                <p className="text-xs md:text-sm font-bold text-black/70 leading-relaxed">
+                  ฝึกการวาดภาพในใจ จับคู่มุมมองและรูปทรง
                 </p>
-              </div>
+                <div className="mt-3 text-[10px] font-black text-green-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">คลิกเพื่อลองเล่น ➔</div>
+              </button>
             </div>
 
-            <div className="bg-white/60 backdrop-blur-md p-6 md:p-10 rounded-3xl md:rounded-[3rem] mb-8 md:mb-12 text-left border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,0.05)] md:shadow-[8px_8px_0_rgba(0,0,0,0.05)] relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-10 text-6xl md:text-8xl rotate-12">🎯</div>
-              <p className="text-[10px] md:text-xs font-black text-black/40 uppercase tracking-[0.2em] mb-2 md:mb-3">Our Mission Objective</p>
-              <p className="text-lg md:text-2xl font-black text-black leading-tight">
-                สะสม <span className="text-orange-500 underline decoration-4 underline-offset-4">EXP</span> ในแต่ละหมู่บ้านให้เต็มเพื่อปลดล็อกพื้นที่ถัดไป <br className="hidden md:block" />
-                และภารกิจสำคัญคือ <span className="bg-yellow-300 px-2 py-0.5 rounded-lg border-2 border-yellow-400/20 shadow-sm inline-block translate-y-1 mt-1 md:mt-0">กู้คืนความทรงจำที่หายไป</span> กลับคืนมา!
+            <div className="bg-white/60 backdrop-blur-md p-5 md:p-6 rounded-3xl mb-6 md:mb-8 text-left border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,0.05)] relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10 text-4xl rotate-12">🎯</div>
+              <p className="text-[10px] font-black text-black/40 uppercase tracking-[0.2em] mb-1">Our Mission Objective</p>
+              <p className="text-sm md:text-base font-black text-black leading-tight">
+                สะสม <span className="text-orange-500 underline decoration-2 underline-offset-2">EXP</span> เพื่อปลดล็อกพื้นที่ถัดไป <br />
+                และ <span className="bg-yellow-300 px-2 py-0.5 rounded-lg border-2 border-yellow-400/20 inline-block">กู้คืนความทรงจำที่หายไป</span> กลับคืนมา!
               </p>
             </div>
 
             <button
               onClick={() => setShowTutorial(false)}
-              className={`${styles.navBtn} ${styles.navBtnPrimary} w-full text-xl md:text-3xl py-4 md:py-8 rounded-2xl md:rounded-[2.5rem] border-4 border-black shadow-[0_6px_0_#1a1a1a] md:shadow-[0_12px_0_#1a1a1a] hover:translate-y-2 hover:shadow-[0_4px_0_#1a1a1a] transition-all duration-200 active:translate-y-3 active:shadow-none`}
+              className={`${styles.navBtn} ${styles.navBtnPrimary} w-full text-lg md:text-xl py-3 md:py-4 rounded-xl md:rounded-2xl border-4 border-black shadow-[0_6px_0_#1a1a1a] hover:translate-y-1 hover:shadow-[0_4px_0_#1a1a1a] transition-all`}
             >
               เข้าใจแล้ว เริ่มผจญภัย! 🚀
             </button>
@@ -336,6 +365,10 @@ export default function WorldPage() {
             }}
           >
             📖 บทนำ
+          </button>
+
+          <button className={styles.cheatBtn} onClick={unlockAllCheat}>
+            ⚡ Cheat
           </button>
 
           <button className={styles.actionBtn} onClick={resetProgress}>

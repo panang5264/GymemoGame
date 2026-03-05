@@ -61,6 +61,31 @@
   box-shadow: none;
 }
 
+.cheatBtn {
+  background: linear-gradient(135deg, #4f46e5, #9333ea);
+  border: 3px solid #1a1a1a;
+  color: white;
+  font-weight: 900;
+  padding: 0.85rem 1.75rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 #1a1a1a;
+}
+
+.cheatBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0 #1a1a1a;
+  filter: brightness(1.1);
+}
+
+.cheatBtn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
 /* Map container */
 .mapContainer {
   position: relative;
@@ -265,6 +290,18 @@
   max-width: 1000px !important;
   background: linear-gradient(135deg, var(--bg-warm) 0%, #e8e4d8 100%);
   padding: 4rem;
+}
+
+.compactTutorialCard {
+  max-width: 700px !important;
+  padding: 2.5rem !important;
+  background: linear-gradient(135deg, var(--bg-warm) 0%, #f4f1e6 100%);
+}
+
+@media (max-width: 600px) {
+  .compactTutorialCard {
+    padding: 1.5rem !important;
+  }
 }
 
 .skipBtn {

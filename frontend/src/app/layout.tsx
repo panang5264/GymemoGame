@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   description: 'เกมจับคู่การ์ดเพื่อฝึกความจำและสมาธิ',
 }
 
+import CheatOverlay from '@/components/CheatOverlay'
+
 export default function RootLayout({
   children,
 }: {
@@ -34,6 +36,7 @@ export default function RootLayout({
             </main>
             <Footer />
             <Suspense fallback={null}>
+              <CheatOverlay />
             </Suspense>
           </ProgressProvider>
         </AuthProvider>
