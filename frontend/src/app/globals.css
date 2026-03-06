@@ -1,12 +1,6 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: 'Supermarket';
-  src: url('/assets/fonts/supermarket.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
+/* Fonts updated to Google Fonts Itim & Mali */
 
 @theme {
   --breakpoint-sm: 480px;
@@ -31,17 +25,32 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: var(--font-itim), cursive !important;
   }
 
   body {
-    font-family: var(--font-supermarket), 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-itim), cursive;
     background-color: var(--bg-warm);
     min-height: 100vh;
     color: var(--text-main);
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
-    font-size: 20px;
-    /* Default size reduced from 24px */
+    font-size: 18px;
+    /* Reduced from 20px to make UI more compact */
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .game-font,
+  button,
+  input,
+  select,
+  textarea {
+    font-family: var(--font-itim), cursive;
   }
 }
 
@@ -101,11 +110,23 @@
 }
 
 .friendly-card {
-  background-color: var(--card-bg);
+  background: linear-gradient(135deg, var(--card-bg) 0%, #e8e5d8 100%);
   border: 4px solid var(--border-dark);
-  border-radius: 2rem;
-  padding: 2rem;
-  box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.1);
+  border-radius: 2.5rem;
+  padding: 1.5rem;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.friendly-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .header {
@@ -135,7 +156,7 @@
   font-weight: 900;
   color: var(--text-main);
   text-decoration: none;
-  font-family: 'Supermarket';
+  font-family: var(--font-itim), cursive;
 }
 
 .nav {
@@ -460,73 +481,71 @@
   }
 }
 
-/* Responsive Scales */
-
-/* Mobile: 320–480px (Standard for Samsung/iPhone) */
+/* Mobile: 320–480px */
 @media (max-width: 480px) {
   html {
-    font-size: 20px;
+    font-size: 17px;
   }
 
   .friendly-card {
-    padding: 1.5rem;
+    padding: 1.25rem;
     border-radius: 2rem;
   }
 
   h1 {
-    font-size: 2.2rem !important;
+    font-size: 2rem !important;
   }
 
   h2 {
-    font-size: 1.8rem !important;
+    font-size: 1.6rem !important;
   }
 
   p {
-    font-size: 0.95rem !important;
+    font-size: 0.9rem !important;
   }
 }
 
 /* Tablet: 600–768px */
 @media (min-width: 600px) and (max-width: 1023px) {
   html {
-    font-size: 20px;
+    font-size: 17px;
   }
 
   .friendly-card {
-    padding: 2.5rem;
+    padding: 1.75rem;
   }
 }
 
 /* Laptop: 1024–1366px */
 @media (min-width: 1024px) and (max-width: 1439px) {
   html {
+    font-size: 15px;
+  }
+
+  .friendly-card {
+    padding: 2rem;
+  }
+}
+
+/* Desktop: 1440px+ */
+@media (min-width: 1440px) {
+  html {
     font-size: 16px;
   }
 
   .friendly-card {
-    padding: 2.5rem;
+    padding: 2.25rem;
   }
 }
 
-/* Desktop: 1440px+ (Standard Desktop) */
-@media (min-width: 1440px) {
+/* Large screen: 1920px+ */
+@media (min-width: 1920px) {
   html {
     font-size: 18px;
   }
 
   .friendly-card {
-    padding: 3rem;
-  }
-}
-
-/* Large screen: 1920px+ (Full HD / Ultrawide) */
-@media (min-width: 1920px) {
-  html {
-    font-size: 20px;
-  }
-
-  .friendly-card {
-    padding: 3.5rem;
+    padding: 2.5rem;
   }
 }
 

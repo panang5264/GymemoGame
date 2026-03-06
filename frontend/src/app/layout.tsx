@@ -4,12 +4,20 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { ProgressProvider } from '@/contexts/ProgressContext'
-import localFont from 'next/font/local'
+import { Itim, Mali } from 'next/font/google'
 import './globals.css'
 
-const supermarketFont = localFont({
-  src: '../../public/assets/fonts/supermarket.ttf',
-  variable: '--font-supermarket',
+const itim = Itim({
+  weight: '400',
+  subsets: ['thai', 'latin'],
+  variable: '--font-itim',
+  display: 'swap',
+})
+
+const mali = Mali({
+  weight: ['400', '700'],
+  subsets: ['thai', 'latin'],
+  variable: '--font-mali',
   display: 'swap',
 })
 
@@ -27,7 +35,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="th">
-      <body className={`${supermarketFont.variable}`}>
+      <body className={`${itim.variable} ${mali.variable}`}>
         <AuthProvider>
           <ProgressProvider>
             <Header />
