@@ -384,9 +384,9 @@ export default function WorldPage() {
             const maxUnlocked = Math.max(...(unlockedVillages.length ? unlockedVillages : [1]));
             const exp1 = villageExp[1] ?? 0;
             if (maxUnlocked === 1 && exp1 === 0) {
-              return 'url("/assets/Assets\'Employer/Background/แผนที่ 10 หมู่บ้าน/พื้นธรรมดา.PNG")';
+              return 'url("/assets_employer/background/map/plain.PNG")';
             }
-            return `url("/assets/Assets\'Employer/Background/แผนที่ 10 หมู่บ้าน/ปลดล็อก ${Math.max(1, Math.min(10, maxUnlocked))} .PNG")`;
+            return `url("/assets_employer/background/map/unlocked-${Math.max(1, Math.min(10, maxUnlocked))}.PNG")`;
           })()
         }}
       >
@@ -395,8 +395,8 @@ export default function WorldPage() {
           const state = getStageState(stage, unlockedVillages, exp)
           const pos = STAGE_POSITIONS[stage - 1]
           const iconFilename = state === 'locked' ? LOCKED_ICONS[stage - 1] : UNLOCKED_ICONS[stage - 1]
-          const iconFolder = state === 'locked' ? 'ไม่มีสี (ยังไม่ปลดล็อก)' : 'มีสี (ปลดล็อกแล้ว)'
-          const iconPath = `/assets/Assets'Employer/Background/แผนที่ 10 หมู่บ้าน/ตัวหมู่บ้าน/${iconFolder}/${iconFilename}`
+          const iconFolder = state === 'locked' ? 'locked' : 'unlocked'
+          const iconPath = `/assets_employer/background/map/villages/${iconFolder}/${iconFilename}`
 
           return (
             <button

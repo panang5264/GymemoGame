@@ -8,7 +8,7 @@ function setUpImage(name: string) {
 }
 export default async function Page() {
   let filenames: string[] = []
-  const directoryPath = path.join(process.cwd(), 'public/assets/level1/relation1-1');
+  const directoryPath = path.join(process.cwd(), 'public/assets/level1andlevel2/relation1-1');
   try {
     filenames = await fs.readdir(directoryPath);
     console.log(filenames)

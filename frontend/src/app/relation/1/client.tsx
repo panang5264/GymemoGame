@@ -18,7 +18,7 @@ export default function ClientPage({ filenames }: { filenames: string[] }) {
       {filenames.map((name) => (
         <Image
           key={name}
-          onClick={function() {
+          onClick={function () {
             if (selected.name != name) {
               setSelected({ name: name, is_selected: true })
             } else {
@@ -28,7 +28,7 @@ export default function ClientPage({ filenames }: { filenames: string[] }) {
           }}
           className={`cursor-pointer border-4 ${(selected.is_selected === true && selected.name === name) ? 'border-red-500' : 'border-transparent'
             }`}
-          src={`/assets/level1/relation1-1/${name}`}
+          src={`/assets/level1andlevel2/relation1-1/${name}`}
           alt={name}
           width={150}
           height={150}

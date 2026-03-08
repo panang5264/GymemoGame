@@ -66,8 +66,8 @@ function SpatialGameInner() {
     setFeedback(null)
     setIsGameOver(false)
 
-    const CHOICES_BASE = "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์/choices_cropped"
-    const TARGETS_BASE = "/assets/Assets'Employer/Assess ด้าน/มิติสัมพันธ์"
+    const CHOICES_BASE = "/assets_employer/assess/spatial/choices_cropped"
+    const TARGETS_BASE = "/assets_employer/assess/spatial"
 
     if (levelParam <= 2) {
       // Village 1-2: Interactive Image Matching Pair game
@@ -98,25 +98,25 @@ function SpatialGameInner() {
       // Village 3-4: Box unfolding Level 1 (easy Q1-Q4, 2 choices)
       const EASY_BANK = [
         {
-          target: `${TARGETS_BASE}/โจทย์ข้อ 1.png`,
+          target: `${TARGETS_BASE}/q1.png`,
           correct: `${CHOICES_BASE}/q1_correct.png`,
           wrongs: [`${CHOICES_BASE}/q1_wrong1.png`],
           direction: 'มองจากบนลงล่าง ⬇️'
         },
         {
-          target: `${TARGETS_BASE}/โจทย์ข้อ 2.png`,
+          target: `${TARGETS_BASE}/q2.png`,
           correct: `${CHOICES_BASE}/q2_correct.png`,
           wrongs: [`${CHOICES_BASE}/q2_wrong1.png`],
           direction: 'มองจากล่างขึ้นบน ⬆️'
         },
         {
-          target: `${TARGETS_BASE}/โจทย์ข้อ3.png`,
+          target: `${TARGETS_BASE}/q3.png`,
           correct: `${CHOICES_BASE}/q3_correct.png`,
           wrongs: [`${CHOICES_BASE}/q3_wrong1.png`],
           direction: 'มองจากด้านข้างซ้าย ➡️'
         },
         {
-          target: `${TARGETS_BASE}/โจทย์ข้อ 4.png`,
+          target: `${TARGETS_BASE}/q4.png`,
           correct: `${CHOICES_BASE}/q4_correct.png`,
           wrongs: [`${CHOICES_BASE}/q4_wrong1.png`, `${CHOICES_BASE}/q4_wrong2.png`],
           direction: 'มองจากบนลงล่าง ⬇️'
@@ -136,25 +136,25 @@ function SpatialGameInner() {
       // Village 5+: Box unfolding Level 2 (harder Q5-Q8, 3-4 choices)
       const HARD_BANK = [
         {
-          target: `${TARGETS_BASE}/โจทย์ข้อ 5.png`,
+          target: `${TARGETS_BASE}/q5.png`,
           correct: `${CHOICES_BASE}/q5_correct.png`,
           wrongs: [`${CHOICES_BASE}/q5_wrong1.png`, `${CHOICES_BASE}/q5_wrong2.png`],
           direction: 'มองจากบนลงล่าง ⬇️'
         },
         {
-          target: `${TARGETS_BASE}/โจทย์ข้อ 6.png`,
+          target: `${TARGETS_BASE}/q6.png`,
           correct: `${CHOICES_BASE}/q6_correct.png`,
           wrongs: [`${CHOICES_BASE}/q6_wrong1.png`, `${CHOICES_BASE}/q6_wrong2.png`],
           direction: 'มองจากล่างขึ้นบน ⬆️'
         },
         {
-          target: `${TARGETS_BASE}/โจทย์ข้อ 7.png`,
+          target: `${TARGETS_BASE}/q7.png`,
           correct: `${CHOICES_BASE}/q7_correct.png`,
           wrongs: [`${CHOICES_BASE}/q7_wrong1.png`, `${CHOICES_BASE}/q7_wrong2.png`, `${CHOICES_BASE}/q7_wrong3.png`],
           direction: 'มองจากด้านข้าง ↔️'
         },
         {
-          target: `${TARGETS_BASE}/โจทย์ข้อ 8.png`,
+          target: `${TARGETS_BASE}/q8.png`,
           correct: `${CHOICES_BASE}/q8_correct.png`,
           wrongs: [`${CHOICES_BASE}/q8_wrong1.png`, `${CHOICES_BASE}/q8_wrong2.png`, `${CHOICES_BASE}/q8_wrong3.png`],
           direction: 'มองจากบนลงล่าง ⬇️'

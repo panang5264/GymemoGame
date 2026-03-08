@@ -436,7 +436,7 @@ export default function Home() {
         {phase === 'intro' && (
           <div className="text-center animate-in fade-in duration-1000 max-w-6xl mx-auto w-full h-[85vh] flex flex-col items-center">
             <iframe
-              src="/assets/Assets'Employer/Background/INTRO.pdf#view=FitH&toolbar=0"
+              src="/assets_employer/background/INTRO.pdf#view=FitH&toolbar=0"
               className="w-full h-full rounded-[1rem] md:rounded-[2rem] border-2 md:border-4 border-black shadow-[4px_4px_0_#1a1a1a] md:shadow-[10px_10px_0_#1a1a1a] bg-white"
               title="Game Intro"
             />
@@ -456,7 +456,7 @@ export default function Home() {
                 <div className="absolute inset-0 bg-white border-4 border-black rounded-[3rem] rotate-3 group-hover:rotate-0 transition-transform"></div>
                 <div className="absolute inset-0 bg-[#fefae0] border-4 border-black rounded-[3rem] -rotate-3 group-hover:rotate-0 transition-transform flex items-center justify-center shadow-[10px_10px_0_rgba(0,0,0,0.1)] overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/assets/Assets'Employer/ตัวละคร/คุณตา.png" alt="คุณตา" className="w-full h-full object-cover scale-110 translate-y-4" />
+                  <img src="/assets_employer/characters/grandpa.png" alt="คุณตา" className="w-full h-full object-cover scale-110 translate-y-4" />
                 </div>
                 <div className="absolute -bottom-4 -right-4 bg-red-500 text-white w-20 h-20 rounded-full border-4 border-black flex items-center justify-center text-3xl shadow-[4px_4px_0_#000] rotate-12 z-10">❤️</div>
               </div>
