@@ -16,6 +16,7 @@ function SpatialGameInner() {
   const subId = parseInt(searchParams.get('subId') || '1', 10)
   const villageId = parseInt(searchParams.get('villageId') || '1', 10)
   const mode = searchParams.get('mode')
+  const isBonus = searchParams.get('isBonus') === '1'
 
   const [phase, setPhase] = useState<'intro' | 'clock' | 'play'>('intro')
   const [clockTarget] = useState(() => ({
@@ -186,7 +187,8 @@ function SpatialGameInner() {
       if (mode === 'village') {
         const accuracy = errorCount === 0 ? 100 : Math.max(0, 100 - (errorCount * 25))
         const duration = (Date.now() - startTime) / 1000
-        recordPlay(villageId, 100, 'spatial', subId, accuracy, duration)
+        const finalScore = 100 * (isBonus ? 2 : 1)
+        recordPlay(villageId, finalScore, 'spatial', subId, accuracy, duration)
       } else if (mode === 'daily') {
         const dateKey = getDateKey()
 
@@ -267,8 +269,13 @@ function SpatialGameInner() {
 
       <div className="max-w-4xl w-full px-4 relative z-10">
         <div className="bg-white p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm border border-slate-200 mb-4 md:mb-6">
-          <h1 className="text-lg md:text-2xl font-black text-slate-800 text-center mb-1">
+          <h1 className="text-lg md:text-2xl font-black text-slate-800 text-center mb-1 relative inline-block w-full">
             {mode === 'daily' ? '🌟 ภารกิจรายวัน: พื้นที่' : `🗺️ Spatial — ด่าน ${subId}`}
+            {isBonus && (
+              <span className="absolute -top-3 right-0 bg-yellow-400 text-yellow-900 text-[10px] md:text-xs font-black px-2 py-0.5 rounded-full border border-yellow-500 shadow-sm animate-pulse">
+                x2 BONUS
+              </span>
+            )}
           </h1>
           <p className="text-center text-slate-500 font-bold uppercase tracking-wider text-xs md:text-sm">
             {diffDesc}

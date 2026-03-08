@@ -255,6 +255,7 @@ function ManagementGameInner() {
   const levelParam = parseInt(searchParams.get('level') || '1', 10)
   const villageId = parseInt(searchParams.get('villageId') || '1', 10)
   const modeParam = searchParams.get('mode')
+  const isBonus = searchParams.get('isBonus') === '1'
 
   // Phase State
   const [phase, setPhase] = useState<'intro' | 'clock' | 'play' | 'done'>('intro')
@@ -570,7 +571,10 @@ function ManagementGameInner() {
     const accuracy = (correctCount + errorCount) > 0 ? (correctCount / (correctCount + errorCount)) * 100 : 100
     const timeTaken = (Date.now() - startTime) / 1000
 
-    if (modeParam === 'village') recordPlay(villageId, finalAverage, 'management', subId, accuracy, timeTaken)
+    const scoreMultiplier = isBonus ? 2 : 1
+    const multipliedScore = finalAverage * scoreMultiplier
+
+    if (modeParam === 'village') recordPlay(villageId, multipliedScore, 'management', subId, accuracy, timeTaken)
     else if (modeParam === 'daily') {
       const dk = getDateKey()
 
@@ -663,8 +667,13 @@ function ManagementGameInner() {
         {/* Header Bar */}
         <div className="h-16 md:h-20 bg-white border-b-2 border-slate-50 flex items-center justify-between px-4 md:px-10 shrink-0">
           <div className="flex items-center gap-2 md:gap-4">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-50 rounded-lg md:rounded-2xl flex items-center justify-center text-xl md:text-3xl">
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-50 rounded-lg md:rounded-2xl flex items-center justify-center text-xl md:text-3xl relative">
               {levelParam <= 3 ? '📦' : levelParam <= 5 ? '🍳' : levelParam <= 9 ? '🧭' : '📝'}
+              {isBonus && (
+                <div className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-[8px] md:text-[10px] font-black px-1.5 py-0.5 rounded-full border border-yellow-500 shadow-sm animate-pulse">
+                  x2
+                </div>
+              )}
             </div>
             <h1 className="text-sm md:text-2xl font-black text-slate-800 tracking-tight leading-tight max-w-[150px] md:max-w-none">
               {config.instruction}

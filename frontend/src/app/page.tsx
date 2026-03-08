@@ -454,17 +454,18 @@ export default function Home() {
             <div className="flex flex-col items-center">
               <div className="relative w-full aspect-square max-w-[280px] mb-10 group">
                 <div className="absolute inset-0 bg-white border-4 border-black rounded-[3rem] rotate-3 group-hover:rotate-0 transition-transform"></div>
-                <div className="absolute inset-0 bg-[#fefae0] border-4 border-black rounded-[3rem] -rotate-3 group-hover:rotate-0 transition-transform flex items-center justify-center text-[10rem] shadow-[10px_10px_0_rgba(0,0,0,0.1)]">
-                  👵
+                <div className="absolute inset-0 bg-[#fefae0] border-4 border-black rounded-[3rem] -rotate-3 group-hover:rotate-0 transition-transform flex items-center justify-center shadow-[10px_10px_0_rgba(0,0,0,0.1)] overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/assets/Assets'Employer/ตัวละคร/คุณตา.png" alt="คุณตา" className="w-full h-full object-cover scale-110 translate-y-4" />
                 </div>
-                <div className="absolute -bottom-4 -right-4 bg-red-500 text-white w-20 h-20 rounded-full border-4 border-black flex items-center justify-center text-3xl shadow-[4px_4px_0_#000] rotate-12">❤️</div>
+                <div className="absolute -bottom-4 -right-4 bg-red-500 text-white w-20 h-20 rounded-full border-4 border-black flex items-center justify-center text-3xl shadow-[4px_4px_0_#000] rotate-12 z-10">❤️</div>
               </div>
 
               <div className="bg-white border-4 border-black rounded-[2.5rem] p-8 relative shadow-[10px_10px_0_#000]">
                 {/* Speech bubble arrow */}
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-white border-l-4 border-t-4 border-black rotate-45"></div>
 
-                <h3 className="text-xl font-black text-black mb-4 uppercase tracking-widest text-center">คุณยายผู้ดูแลหมู่บ้าน</h3>
+                <h3 className="text-xl font-black text-black mb-4 uppercase tracking-widest text-center">คุณตาผู้ดูแลหมู่บ้าน</h3>
                 <p className="text-2xl font-black leading-relaxed text-[#444] text-center italic">
                   "ความทรงจำของพวกเราน่ะ...<br />
                   ซ่อนอยู่ในความกล้าหาญของคนรุ่นใหม่เช่นเจ้า<br />

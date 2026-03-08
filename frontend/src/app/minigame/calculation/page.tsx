@@ -32,6 +32,7 @@ function CalculationGameInner() {
   const subId = searchParams.get('subId') ? parseInt(searchParams.get('subId')!, 10) : 1
   const levelParam = parseInt(searchParams.get('level') ?? (mode === 'village' ? Math.min(subId, 10).toString() : '1'), 10)
   const villageId = searchParams.get('villageId')
+  const isBonus = searchParams.get('isBonus') === '1'
 
   const levelIndex = Math.min(Math.max(levelParam - 1, 0), CALC_LEVELS.length - 1)
   const level = CALC_LEVELS[levelIndex]
@@ -84,7 +85,8 @@ function CalculationGameInner() {
       hasSavedVillageRef.current = true
       const accuracy = total > 0 ? (score / total) * 100 : 100
       const duration = (Date.now() - startTime) / 1000
-      recordPlay(parseInt(villageId, 10), score * 25, 'calculation', subId, accuracy, duration)
+      const finalScore = score * 25 * (isBonus ? 2 : 1)
+      recordPlay(parseInt(villageId, 10), finalScore, 'calculation', subId, accuracy, duration)
     }
   }, [phase, mode, villageId, score, subId, total, startTime, recordPlay])
 
@@ -256,8 +258,13 @@ function CalculationGameInner() {
       <div className="min-h-[calc(100vh-140px)] flex flex-col items-center p-4 font-['Supermarket']">
         {/* Responsive Header */}
         <div className="w-full max-w-3xl flex justify-between items-center mb-6 mt-2 md:mt-8 px-2 md:px-0">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 relative">
             <h1 className="text-xl md:text-2xl font-black text-white drop-shadow-md tracking-tight">🔢 ด่าน {level.level}</h1>
+            {isBonus && (
+              <div className="absolute -top-3 left-[15%] bg-yellow-400 text-yellow-900 text-[10px] md:text-xs font-black px-2 py-0.5 rounded-full border border-yellow-500 shadow-sm animate-pulse z-10 whitespace-nowrap">
+                x2 BONUS
+              </div>
+            )}
             <button
               onClick={() => setShowInfo(true)}
               className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md flex items-center justify-center text-white border border-white/20 transition-all active:scale-90"

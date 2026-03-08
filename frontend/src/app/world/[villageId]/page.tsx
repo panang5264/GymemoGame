@@ -152,20 +152,25 @@ function VillagePageInner({ params }: { params: Promise<{ villageId: string }> }
           </div>
 
           {[
-            { id: 1, top: '15%', left: '25%', type: 'star' },
-            { id: 2, top: '30%', left: '15%', type: 'star' },
-            { id: 3, top: '50%', left: '15%', type: 'star' },
-            { id: 4, top: '70%', left: '25%', type: 'chest' },
-            { id: 5, top: '85%', left: '40%', type: 'star' },
-            { id: 6, top: '85%', left: '60%', type: 'star' },
-            { id: 7, top: '70%', left: '75%', type: 'star' },
-            { id: 8, top: '50%', left: '85%', type: 'star' },
-            { id: 9, top: '30%', left: '85%', type: 'chest' },
-            { id: 10, top: '15%', left: '75%', type: 'star' },
-            { id: 11, top: '15%', left: '50%', type: 'star' },
-            { id: 12, top: '30%', left: '50%', type: 'star' },
+            { id: 1, top: '15%', left: '25%' },
+            { id: 2, top: '30%', left: '15%' },
+            { id: 3, top: '50%', left: '15%' },
+            { id: 4, top: '70%', left: '25%' },
+            { id: 5, top: '85%', left: '40%' },
+            { id: 6, top: '85%', left: '60%' },
+            { id: 7, top: '70%', left: '75%' },
+            { id: 8, top: '50%', left: '85%' },
+            { id: 9, top: '30%', left: '85%' },
+            { id: 10, top: '15%', left: '75%' },
+            { id: 11, top: '15%', left: '50%' },
+            { id: 12, top: '30%', left: '50%' },
           ].map((node) => {
-            const isChest = node.type === 'chest'
+            const bonuses: Record<number, number[]> = {
+              1: [4, 9], 2: [2, 7], 3: [3, 8], 4: [4, 9], 5: [5, 10],
+              6: [3, 11], 7: [7, 12], 8: [2, 10], 9: [3, 8], 10: [7, 12]
+            }
+            const isBonus = bonuses[villageId]?.includes(node.id) || false
+
             const currentSubId = (playsCompleted % 12) + 1
             const loops = Math.floor(playsCompleted / 12)
             const isPassed = loops > 0 || node.id < currentSubId
@@ -177,25 +182,20 @@ function VillagePageInner({ params }: { params: Promise<{ villageId: string }> }
               <div
                 key={node.id}
                 onClick={() => {
-                  if (isPassed && !isChest) {
+                  if (isPassed) {
                     setSubLevelModal({ subId: node.id, score: score || 0 })
                     return
-                  }
-                  if (isChest && isPassed) {
-                    return // Chest passed can't click again
                   }
                   if (isUnlocked) handlePlay(node.id)
                 }}
                 className={`absolute w-12 h-12 md:w-16 md:h-16 flex items-center justify-center cursor-pointer transition-all duration-300 z-10 
                   ${!isUnlocked
                     ? 'bg-slate-300 opacity-50 grayscale cursor-not-allowed'
-                    : (isChest && isPassed)
-                      ? 'bg-green-100 opacity-80 cursor-default'
-                      : isCurrent
-                        ? 'bg-white scale-125 z-20 shadow-[0_0_20px_rgba(255,255,255,0.8)]'
-                        : isPassed
-                          ? 'bg-blue-50 hover:scale-110 active:scale-95'
-                          : 'bg-[var(--card-bg)] hover:scale-110 active:scale-95'
+                    : isCurrent
+                      ? 'bg-white scale-125 z-20 shadow-[0_0_20px_rgba(255,255,255,0.8)]'
+                      : isPassed
+                        ? 'bg-blue-50 hover:scale-110 active:scale-95'
+                        : 'bg-[var(--card-bg)] hover:scale-110 active:scale-95'
                   } 
                   border-3 border-[var(--border-dark)] rounded-2xl shadow-[4px_4px_0_var(--border-dark)]
                 `}
@@ -204,13 +204,13 @@ function VillagePageInner({ params }: { params: Promise<{ villageId: string }> }
                   left: node.left,
                   transform: 'translate(-50%, -50%)',
                 }}
-                title={!isUnlocked ? '🔒 ยังไม่ถึงด่านนี้' : `ด่านที่ ${node.id}`}
+                title={!isUnlocked ? '🔒 ยังไม่ถึงด่านนี้' : `ด่านที่ ${node.id}${isBonus ? ' (โบนัส x2)' : ''}`}
               >
                 <div className="text-2xl md:text-3xl">
-                  {!isUnlocked ? '🔒' : (isChest && isPassed) ? '✅' : isChest ? '🎁' : isPassed ? '✅' : '⭐'}
+                  {!isUnlocked ? '🔒' : isBonus && isPassed ? '✅' : isBonus ? '🎁' : isPassed ? '✅' : '⭐'}
                 </div>
-                {isPassed && !isChest && score !== undefined && (
-                  <div className="absolute -top-2 -left-2 bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black border-2 border-white shadow-sm z-30">
+                {isPassed && score !== undefined && (
+                  <div className={`absolute -top-2 -left-2 ${isBonus ? 'bg-yellow-500' : 'bg-indigo-600'} text-white text-[10px] px-2 py-0.5 rounded-full font-black border-2 border-white shadow-sm z-30`}>
                     {score}
                   </div>
                 )}
