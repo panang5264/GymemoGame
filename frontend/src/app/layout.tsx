@@ -25,7 +25,11 @@ export const metadata: Metadata = {
   title: 'Gymemo Game - เกมฝึกสมอง',
   description: 'เกมจับคู่การ์ดเพื่อฝึกความจำและสมาธิ',
   icons: {
-    icon: '/assets_employer/logo.png',
+    icon: [
+      { url: '/assets_employer/logo.png', sizes: '32x32', type: 'image/png' },
+      { url: '/assets_employer/logo.png', sizes: '16x16', type: 'image/png' },
+    ],
+    apple: '/assets_employer/logo.png',
   },
 }
 

@@ -17,8 +17,8 @@ export default function Header() {
   ]
 
   return (
-    <header className="header bg-white/80 backdrop-blur-md sticky top-0 z-[50] border-b-2 border-slate-100 shadow-sm py-2">
-      <div className="container max-w-7xl px-4 flex flex-col md:flex-row justify-between items-center gap-3">
+    <header className="header bg-white/90 backdrop-blur-md sticky top-0 z-[100] border-b-2 border-slate-100 shadow-sm py-1.5">
+      <div className="container max-w-7xl px-4 flex flex-col md:flex-row justify-between items-center gap-2">
 
         {/* Logo Section */}
         <Link href="/" className="flex items-center gap-2 hover:scale-105 transition-all group">
@@ -38,19 +38,19 @@ export default function Header() {
           </div>
         </Link>
 
-        {/* Navigation Menu */}
-        <nav className="flex items-center gap-1 md:gap-2 flex-wrap justify-center bg-slate-100/50 p-1 rounded-[2rem] border-2 border-slate-100">
+        {/* Navigation Menu - Centered */}
+        <nav className="flex items-center gap-1 md:gap-2 flex-wrap justify-center bg-slate-100/40 p-1 rounded-full border-2 border-slate-50">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-2 px-4 py-2 rounded-[1.5rem] font-black transition-all text-base md:text-lg border-2 ${pathname === link.href
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-black transition-all text-sm md:text-base border-2 ${pathname === link.href
                 ? 'bg-indigo-600 text-white border-indigo-700 shadow-[1px_1px_0_#312e81]'
-                : 'text-slate-600 border-transparent hover:bg-white hover:text-indigo-600 hover:border-indigo-100 hover:shadow-sm'
+                : 'text-slate-600 border-transparent hover:bg-white hover:text-indigo-600 hover:border-indigo-100'
                 }`}
             >
-              <span className="text-xl">{link.icon}</span>
-              <span className="hidden lg:inline">{link.name}</span>
+              <span className="text-lg">{link.icon}</span>
+              <span className="hidden md:inline">{link.name}</span>
             </Link>
           ))}
         </nav>

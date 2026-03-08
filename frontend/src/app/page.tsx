@@ -352,8 +352,8 @@ export default function Home() {
 
         {/* Guide Popup Modal */}
         {showGuide && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className="bg-white border-4 border-[#1a1a1a] rounded-[3rem] shadow-[15px_15px_0_#000] max-w-md w-full p-8 animate-in zoom-in duration-300">
+          <div className="fixed inset-0 z-[120] flex items-start justify-center p-4 bg-slate-900/40 backdrop-blur-[2px] animate-in fade-in duration-300 pt-24 overflow-y-auto">
+            <div className="bg-white border-4 border-[#1a1a1a] rounded-[3rem] shadow-[15px_15px_0_#1a1a1a] max-w-md w-full p-8 animate-in zoom-in duration-300 my-auto">
               <div className="text-center mb-6">
                 <div className="text-5xl mb-4">📖</div>
                 <h2 className="text-3xl font-black text-[#1a1a1a]">คู่มือการผจญภัย</h2>
