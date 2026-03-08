@@ -48,6 +48,7 @@ export interface GymemoProgressV2 {
   totalScore: number
   userName: string
   guestId?: string
+  history?: any[]
 }
 
 // Fallback UUID generator if crypto.randomUUID is not available
@@ -72,7 +73,8 @@ export function getDefaultProgress(): GymemoProgressV2 {
     dailyScores: {},
     totalScore: 0,
     userName: '',
-    guestId: typeof window !== 'undefined' ? generateUUID() : undefined
+    guestId: typeof window !== 'undefined' ? generateUUID() : undefined,
+    history: []
   }
 }
 

@@ -24,6 +24,9 @@ const mali = Mali({
 export const metadata: Metadata = {
   title: 'Gymemo Game - เกมฝึกสมอง',
   description: 'เกมจับคู่การ์ดเพื่อฝึกความจำและสมาธิ',
+  icons: {
+    icon: '/assets_employer/logo.png',
+  },
 }
 
 import CheatOverlay from '@/components/CheatOverlay'

@@ -19,18 +19,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     const { token } = useAuth()
     const [progress, setProgress] = useState<GymemoProgressV2>(getDefaultProgress())
     const [isLoading, setIsLoading] = useState(true)
-    const [history, setHistory] = useState<any[]>([])
 
     useEffect(() => {
-        // Load local history on mount
-        const localHistory = localStorage.getItem('gymemo_history')
-        if (localHistory) {
-            try {
-                setHistory(JSON.parse(localHistory))
-            } catch (e) {
-                console.error('Failed to parse history', e)
-            }
-        }
+        // No separate state needed, history is in progress
     }, [])
 
     useEffect(() => {
@@ -40,10 +31,18 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
                 try {
                     const res = await fetchSyncProgress(token)
                     if (res.success && res.data && Object.keys(res.data).length > 0) {
-                        const merged = { ...getDefaultProgress(), ...res.data }
+                        let merged = { ...getDefaultProgress(), ...res.data }
+
+                        // Seed history from local storage if DB history is empty
+                        if (!merged.history || merged.history.length === 0) {
+                            const localHistory = localStorage.getItem('gymemo_history')
+                            if (localHistory) {
+                                merged.history = JSON.parse(localHistory)
+                            }
+                        }
+
                         setProgress(merged)
-                        // Also sync current total score to local history if not exists
-                        syncToLocalHistory(merged)
+                        syncHistory(merged)
                     } else {
                         const defaultP = getDefaultProgress()
                         setProgress(defaultP)
@@ -54,7 +53,13 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
                     setProgress(getDefaultProgress())
                 }
             } else {
-                setProgress(getDefaultProgress())
+                const defaultP = getDefaultProgress()
+                // Guest mode: load history from local
+                const localHistory = localStorage.getItem('gymemo_history')
+                if (localHistory) {
+                    try { defaultP.history = JSON.parse(localHistory) } catch (e) { }
+                }
+                setProgress(defaultP)
             }
             setIsLoading(false)
         }
@@ -62,19 +67,14 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         initProgress()
     }, [token])
 
-    const syncToLocalHistory = (p: GymemoProgressV2) => {
-        const localHistory = localStorage.getItem('gymemo_history')
-        let historyArray = []
-        if (localHistory) {
-            try { historyArray = JSON.parse(localHistory) } catch (e) { }
-        }
+    const syncHistory = (p: GymemoProgressV2) => {
+        let historyArray = p.history || []
 
         // Add current state as a snapshot if totalScore > 0 or at least one play
         if (p.totalScore > 0) {
             const lastEntry = historyArray[0]
             const currentVillages = p.unlockedVillages.length
 
-            // Only add if it's a new achievement
             if (!lastEntry || lastEntry.score !== p.totalScore || lastEntry.villages !== currentVillages) {
                 const newEntry = {
                     date: new Date().toISOString(),
@@ -84,18 +84,31 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
                     lastVillage: p.unlockedVillages[p.unlockedVillages.length - 1]
                 }
                 const updatedHistory = [newEntry, ...historyArray].slice(0, 15)
+
+                // Save to local storage for guest/backup
                 localStorage.setItem('gymemo_history', JSON.stringify(updatedHistory))
-                setHistory(updatedHistory)
+
+                // Update progress object (this will be synced to DB on next save)
+                setProgress(prev => ({ ...prev, history: updatedHistory }))
+                return updatedHistory
             }
         }
+        return historyArray
     }
 
     const saveProgress = async (newProgress: GymemoProgressV2) => {
-        setProgress(newProgress)
-        syncToLocalHistory(newProgress)
+        // Ensure history is updated in the new progress
+        const updatedWithHistory = { ...newProgress }
+        if (!updatedWithHistory.history) {
+            updatedWithHistory.history = progress.history || []
+        }
+
+        setProgress(updatedWithHistory)
+        syncHistory(updatedWithHistory)
+
         if (token) {
             try {
-                await updateSyncProgress(token, newProgress)
+                await updateSyncProgress(token, updatedWithHistory)
             } catch (err) {
                 console.error('Failed to sync progress to DB:', err)
             }
@@ -103,7 +116,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <ProgressContext.Provider value={{ progress, setProgress, saveProgress, isLoading, history }}>
+        <ProgressContext.Provider value={{ progress, setProgress, saveProgress, isLoading, history: progress.history || [] }}>
             {children}
         </ProgressContext.Provider>
     )

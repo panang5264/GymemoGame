@@ -472,8 +472,12 @@ export default function Home() {
                     </button>
                     <button
                       onClick={async () => {
-                        if (window.confirm('คุณต้องการรีเซ็ตความก้าวหน้าใช่หรือไม่? (ประวัติคะแนนเดิมจะยังถูกเก็บไว้ในเครื่องนี้)')) {
+                        if (window.confirm('คุณต้องการรีเซ็ตความก้าวหน้าใช่หรือไม่? (ประวัติความสำเร็จของคุณทั้งหมดจะยังคงถูกเก็บไว้)')) {
                           const defaultP = getDefaultProgress()
+                          // Deep copy history to preserve it through the reset
+                          if (progress.history) {
+                            defaultP.history = [...progress.history]
+                          }
                           await saveProgress(defaultP)
                           window.location.reload()
                         }
