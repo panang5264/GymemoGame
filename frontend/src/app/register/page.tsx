@@ -56,18 +56,18 @@ export default function RegisterPage() {
                 <div className="absolute bottom-[-5%] right-[-5%] w-[30%] h-[30%] bg-rose-100/50 blur-[100px] rounded-full" />
             </div>
 
-            <div className="w-full max-w-md relative z-10 transition-all duration-700">
-                <div className="friendly-card animate-in fade-in zoom-in duration-500">
+            <div className="w-full max-w-xl relative z-10 transition-all duration-700">
+                <div className="friendly-card animate-in fade-in zoom-in duration-500 p-8 md:p-12">
                     <div className="flex flex-col items-center mb-6">
-                        <div className="w-20 h-20 bg-[var(--card-bg)] border-4 border-[var(--border-dark)] rounded-full flex items-center justify-center text-4xl mb-4 shadow-[6px_6px_0_var(--border-dark)]">
-                            📝
+                        <div className="w-24 h-24 md:w-28 md:h-28 bg-white border-4 border-[#1a1a1a] rounded-full flex items-center justify-center mb-6 overflow-hidden">
+                            <img src="/assets_employer/logo.png" className="w-full h-full object-cover scale-[1.25]" alt="Gymemo Game Logo" />
                         </div>
                         <h1 className="text-4xl font-black text-[var(--text-main)] tracking-tight uppercase">สมัครสมาชิก</h1>
                     </div>
 
-                    <div className="mb-6 bg-slate-50 border-2 border-slate-100 rounded-[1.5rem] p-4 text-[11px] font-bold text-slate-500 space-y-2">
-                        <p className="text-indigo-600 uppercase tracking-widest text-[10px]">ขั้นตอนการสมัคร 📋</p>
-                        <ul className="list-disc pl-4 space-y-1">
+                    <div className="mb-8 bg-indigo-50/40 border-2 border-indigo-100/60 rounded-[2.5rem] p-8 text-base font-bold text-slate-700 space-y-4">
+                        <p className="text-indigo-600 uppercase tracking-[0.3em] text-sm mb-2">แนวทางการเป็นนักสำรวจ 📋</p>
+                        <ul className="list-disc pl-6 space-y-3 leading-relaxed">
                             <li>กรอกชื่อเล่นหรือชื่อจริง (ใช้แสดงในอันดับ)</li>
                             <li>ใช้เบอร์โทรศัพท์จริงเพื่อใช้ในการเข้าสู่ระบบ</li>
                             <li>ตั้งรหัสผ่านที่จำได้ง่ายแต่ปลอดภัย</li>
@@ -137,7 +137,7 @@ export default function RegisterPage() {
                             <div className={`mt-1 min-w-[20px] h-5 rounded-md border-2 border-indigo-400 flex items-center justify-center transition-all ${acceptedPDPA ? 'bg-indigo-500 border-indigo-500' : 'bg-white'}`}>
                                 {acceptedPDPA && <span className="text-white text-[10px]">✓</span>}
                             </div>
-                            <p className="text-[10px] font-bold text-slate-500 leading-tight">
+                            <p className="text-sm font-bold text-slate-500 leading-tight">
                                 ฉันยอมรับนโยบายความเป็นส่วนตัวและการจัดเก็บข้อมูลตามกฎหมายคุ้มครองข้อมูลส่วนบุคคล (PDPA) ของประเทศไทย เพื่อใช้ในการประมวลผลสถิติและลำดับคะแนน
                             </p>
                         </div>

@@ -4,16 +4,17 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { loginUser, API_BASE_URL } from '@/lib/api'
+import { loginUser, updateProfile, getLeaderboard, API_BASE_URL } from '@/lib/api'
 import TrainingModal from '@/components/TrainingModal'
 import { useAuth } from '@/contexts/AuthContext'
 import BrainRadarChart from '@/components/BrainRadarChart'
 import WeeklySummaryChart from '@/components/WeeklySummaryChart'
 import { useProgress } from '@/contexts/ProgressContext'
+import { getDefaultProgress } from '@/lib/levelSystem'
+import { getCognitiveAnalysis, getWeeklyTrends } from '@/lib/profile'
 
 type AuthPhase = 'login' | 'name' | 'profile' | 'intro' | 'grandmother' | 'tutorial_summary' | 'assessment' | 'edit_profile'
 import ClockIntro from '@/components/ClockIntro'
-import { updateProfile } from '@/lib/api'
 
 import { AVATARS, getAvatarPath } from '@/lib/avatars'
 
@@ -29,17 +30,18 @@ export default function Home() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [showForgot, setShowForgot] = useState(false)
+  const [showGuide, setShowGuide] = useState(false)
   const { login, logout, user, token, setUser: setAuthUser } = useAuth()
   const [trainingMode, setTrainingMode] = useState<'management' | 'calculation' | 'spatial' | null>(null)
   const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar || 'avatar-1')
 
-  const { progress, saveProgress, isLoading } = useProgress()
+  const { progress, setProgress, saveProgress, isLoading: progressLoading, history } = useProgress()
   const [clockTarget, setClockTarget] = useState({ hour: 10, minute: 10 })
   const [isClockTraining, setIsClockTraining] = useState(false)
   const [storyStep, setStoryStep] = useState(0)
 
   useEffect(() => {
-    if (isLoading || !progress) return
+    if (progressLoading || !progress) return
 
     if (progress.userName) {
       setName(progress.userName)
@@ -77,9 +79,20 @@ export default function Home() {
       setCognitiveData(null)
     }
     setIsReady(true)
-  }, [isLoading, progress?.guestId, progress?.userName, progress?.introSeen, router, searchParams])
+  }, [progressLoading, progress?.guestId, progress?.userName, progress?.introSeen, router, searchParams])
 
-  if (!isReady || isLoading || !progress) return null
+  if (progressLoading) {
+    return (
+      <div className="min-h-screen bg-[var(--bg-warm)] flex items-center justify-center font-['Supermarket']">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-xl font-black text-indigo-600 animate-pulse">กำลังเตรียมความพร้อม... 🧠</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isReady || !progress) return null
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -177,18 +190,35 @@ export default function Home() {
         <div className="absolute bottom-[-5%] left-[-5%] w-[30%] h-[30%] bg-rose-100/50 blur-[100px] rounded-full" />
       </div>
 
-      <div className={`w-full relative z-10 transition-all duration-700 ${(phase === 'tutorial_summary' || phase === 'profile') ? 'max-w-5xl' : (phase === 'intro' ? 'max-w-7xl' : 'max-w-md')}`}>
+      <div className={`w-full relative z-10 transition-all duration-700 ${(phase === 'tutorial_summary' || phase === 'profile') ? 'max-w-5xl' : (phase === 'intro' ? 'max-w-7xl' : (phase === 'login' ? 'max-w-xl' : 'max-w-md'))}`}>
 
         {/* Phase 1: Login / Forgot Password */}
         {phase === 'login' && (
-          <div className="friendly-card animate-in fade-in zoom-in duration-500 min-h-[450px] flex flex-col justify-center py-10">
-            <div className="flex flex-col items-center mb-6 md:mb-10">
-              <div className="w-16 h-16 md:w-20 md:h-20 bg-[var(--card-bg)] border-3 md:border-4 border-[var(--border-dark)] rounded-full flex items-center justify-center text-3xl md:text-4xl mb-4 shadow-[4px_4px_0_var(--border-dark)] md:shadow-[6px_6px_0_var(--border-dark)]">
-                {showForgot ? '🔑' : '🧠'}
+          <div className="friendly-card animate-in fade-in zoom-in duration-500 relative min-h-[450px] flex flex-col justify-center py-10">
+            {/* Guide Button */}
+            {!showForgot && (
+              <button
+                onClick={() => setShowGuide(true)}
+                className="absolute top-6 right-6 w-12 h-12 rounded-full bg-indigo-50 border-2 border-indigo-100 flex items-center justify-center text-2xl hover:bg-indigo-100 transition-colors shadow-sm z-20"
+                title="คู่มือการผจญภัย"
+              >
+                ❓
+              </button>
+            )}
+
+            <div className="flex flex-col items-center mb-6 md:mb-10 text-center">
+              <div className="w-24 h-24 md:w-28 md:h-28 bg-white border-4 border-[#1a1a1a] rounded-full flex items-center justify-center mb-6 overflow-hidden">
+                {showForgot ? (
+                  <span className="text-5xl">🔑</span>
+                ) : (
+                  <img src="/assets_employer/logo.png" className="w-full h-full object-cover scale-[1.25]" alt="Gymemo Game Logo" />
+                )}
               </div>
-              <h1 className="text-3xl md:text-4xl font-black text-[var(--text-main)] tracking-tight uppercase">
-                {showForgot ? 'ลืมรหัสผ่าน' : 'ยินดีต้อนรับ'}
+              {!showForgot && <p className="text-indigo-600 font-black uppercase tracking-[0.3em] text-xs mb-2">เข้าสู่การผจญภัย</p>}
+              <h1 className="text-4xl md:text-5xl font-black text-[#1a1a1a] tracking-tight uppercase">
+                {showForgot ? 'ลืมรหัสผ่าน' : 'Gymemo Game'}
               </h1>
+              {!showForgot && <p className="text-slate-700 font-black mt-3 text-lg drop-shadow-sm">ยินดีต้อนรับนักสำรวจความจำ!</p>}
             </div>
 
             {showForgot ? (
@@ -295,7 +325,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={() => setShowForgot(true)}
-                    className="text-xs font-bold text-slate-400 hover:text-indigo-600 transition-colors"
+                    className="text-base font-bold text-slate-400 hover:text-indigo-600 transition-colors"
                   >
                     ลืมรหัสผ่าน? รีเซ็ตได้ที่นี่ 🔑
                   </button>
@@ -307,13 +337,56 @@ export default function Home() {
               ยังไม่มีบัญชี? <Link href="/register" className="text-blue-600 underline hover:text-blue-800 ml-1">สมัครสมาชิก</Link>
             </div>
 
+            {/* Other Options Row: Leaderboard with Game Feel */}
             <div className="mt-10 pt-10 border-t-2 border-[#1a1a1a]/10">
-              <p className="text-center text-sm font-bold text-[#717171] mb-8 uppercase tracking-widest">ทางเลือกอื่น</p>
+              <p className="text-center text-sm font-bold text-[#717171] mb-8 uppercase tracking-widest">ทางเลือกอื่นสำหรับนักเดินทาง</p>
               <button
                 onClick={() => router.push('/leaderboard')}
-                className="w-full py-5 bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-full font-black text-[var(--text-main)] uppercase tracking-widest hover:bg-[var(--border-dark)] hover:text-[var(--text-on-dark)] transition-all shadow-[6px_6px_0_var(--border-dark)] text-xl"
+                className="w-full py-6 bg-slate-800 border-4 border-[#1a1a1a] rounded-full font-black text-white uppercase tracking-widest hover:bg-black transition-all shadow-[8px_8px_0_#4f46e5] text-xl flex items-center justify-center gap-3"
               >
-                🏆 กระดานผู้นำ
+                <span>🏆</span> กระดานผู้นำระดับโลก
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Guide Popup Modal */}
+        {showGuide && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+            <div className="bg-white border-4 border-[#1a1a1a] rounded-[3rem] shadow-[15px_15px_0_#000] max-w-md w-full p-8 animate-in zoom-in duration-300">
+              <div className="text-center mb-6">
+                <div className="text-5xl mb-4">📖</div>
+                <h2 className="text-3xl font-black text-[#1a1a1a]">คู่มือการผจญภัย</h2>
+              </div>
+
+              <div className="space-y-6">
+                <div className="flex gap-4 p-4 bg-orange-50 border-2 border-orange-100 rounded-2xl">
+                  <div className="w-10 h-10 shrink-0 bg-orange-400 rounded-full flex items-center justify-center font-black text-white text-xl">!</div>
+                  <p className="text-orange-900 font-bold">หากคุณยังไม่เคยเข้าเล่น โปรด "สมัครสมาชิก" เพื่อสร้างประวัติการผจญภัยของคุณก่อนนะครับ</p>
+                </div>
+                <div className="flex gap-4 px-2">
+                  <div className="w-10 h-10 shrink-0 bg-indigo-100 rounded-full flex items-center justify-center font-black text-indigo-600">1</div>
+                  <p className="text-slate-600 font-bold">เข้าสู่ระบบด้วยเบอร์โทรศัพท์และรหัสผ่านที่คุณสมัครไว้</p>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-10 h-10 shrink-0 bg-indigo-100 rounded-full flex items-center justify-center font-black text-indigo-600">2</div>
+                  <p className="text-slate-600 font-bold">ออกเดินทางสำรวจหมู่บ้านต่างๆ เพื่อค้นหายาฟื้นฟูสมอง</p>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-10 h-10 shrink-0 bg-indigo-100 rounded-full flex items-center justify-center font-black text-indigo-600">3</div>
+                  <p className="text-slate-600 font-bold">ฝึกฝนทักษะการตัดสินใจ การคำนวณ และความทรงจำผ่านมินิเกม</p>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-10 h-10 shrink-0 bg-indigo-100 rounded-full flex items-center justify-center font-black text-indigo-600">4</div>
+                  <p className="text-slate-600 font-bold">สะสมคะแนนเพื่อชิงอันดับหนึ่งในกระดานผู้นำโลก!</p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowGuide(false)}
+                className="w-full mt-10 py-4 bg-indigo-600 text-white rounded-full font-black text-xl shadow-[0_6px_0_#312e81] hover:translate-y-[-2px] active:translate-y-1 active:shadow-none transition-all"
+              >
+                เข้าใจแล้ว พร้อมลุย!
               </button>
             </div>
           </div>
@@ -398,14 +471,16 @@ export default function Home() {
                       <span>✏️</span> ปรับแต่ง
                     </button>
                     <button
-                      onClick={() => {
-                        setClockTarget({ hour: 10, minute: 10 })
-                        setIsClockTraining(true)
-                        setPhase('assessment')
+                      onClick={async () => {
+                        if (window.confirm('คุณต้องการรีเซ็ตความก้าวหน้าใช่หรือไม่? (ประวัติคะแนนเดิมจะยังถูกเก็บไว้ในเครื่องนี้)')) {
+                          const defaultP = getDefaultProgress()
+                          await saveProgress(defaultP)
+                          window.location.reload()
+                        }
                       }}
-                      className="flex items-center justify-center gap-2 py-3 bg-white border-2 border-slate-200 rounded-2xl font-black text-slate-600 hover:bg-slate-50 transition-all text-sm"
+                      className="flex items-center justify-center gap-2 py-3 bg-rose-50 border-2 border-rose-100 rounded-2xl font-black text-rose-600 hover:bg-rose-100 transition-all text-sm"
                     >
-                      <span>⏱️</span> ฝึกอ่านเวลา
+                      <span>🔄</span> รีเซ็ตเกม
                     </button>
                     <button
                       onClick={() => setPhase('grandmother')}
@@ -482,6 +557,28 @@ export default function Home() {
                     <WeeklySummaryChart guestId={progress.guestId} />
                   </div>
                 )}
+
+                {/* Local History Section */}
+                <div className="mt-8 pt-8 border-t-2 border-slate-100">
+                  <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-4">📜 ประวัติความสำเร็จ (ในเครื่องนี้)</h4>
+                  <div className="space-y-2">
+                    {history && history.length > 0 ? (
+                      history.map((h: any, i: number) => (
+                        <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100 text-xs">
+                          <div className="text-left">
+                            <p className="font-black text-slate-700">{new Date(h.date).toLocaleDateString('th-TH')}</p>
+                            <p className="text-[10px] text-slate-400">ปลดล็อก {h.villages} หมู่บ้าน</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-black text-indigo-600 text-sm">{h.score.toLocaleString()} แต้ม</p>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-[10px] text-slate-300 font-bold py-4">ยังไม่พบประวัติการเล่น</p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
