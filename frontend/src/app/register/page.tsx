@@ -18,6 +18,7 @@ export default function RegisterPage() {
     })
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
+    const [acceptedPDPA, setAcceptedPDPA] = useState(false)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -64,6 +65,15 @@ export default function RegisterPage() {
                         <h1 className="text-4xl font-black text-[var(--text-main)] tracking-tight uppercase">สมัครสมาชิก</h1>
                     </div>
 
+                    <div className="mb-6 bg-slate-50 border-2 border-slate-100 rounded-[1.5rem] p-4 text-[11px] font-bold text-slate-500 space-y-2">
+                        <p className="text-indigo-600 uppercase tracking-widest text-[10px]">ขั้นตอนการสมัคร 📋</p>
+                        <ul className="list-disc pl-4 space-y-1">
+                            <li>กรอกชื่อเล่นหรือชื่อจริง (ใช้แสดงในอันดับ)</li>
+                            <li>ใช้เบอร์โทรศัพท์จริงเพื่อใช้ในการเข้าสู่ระบบ</li>
+                            <li>ตั้งรหัสผ่านที่จำได้ง่ายแต่ปลอดภัย</li>
+                        </ul>
+                    </div>
+
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {error && (
                             <div className="bg-red-100 text-red-600 p-3 rounded-2xl text-sm font-bold text-center mb-4">
@@ -75,7 +85,7 @@ export default function RegisterPage() {
                             <input
                                 type="text"
                                 name="name"
-                                placeholder="ชื่อ-นามสกุล"
+                                placeholder="ชื่อผู้เล่น (ใช้แสดงในอันดับ)"
                                 className="pill-input pill-input-icon w-full py-4 text-lg"
                                 value={formData.name}
                                 onChange={handleChange}
@@ -122,10 +132,20 @@ export default function RegisterPage() {
                             />
                         </div>
 
+                        {/* PDPA Section */}
+                        <div className="bg-indigo-50/50 p-4 rounded-2xl border-2 border-indigo-100/50 flex items-start gap-3 mt-4 group cursor-pointer" onClick={() => setAcceptedPDPA(!acceptedPDPA)}>
+                            <div className={`mt-1 min-w-[20px] h-5 rounded-md border-2 border-indigo-400 flex items-center justify-center transition-all ${acceptedPDPA ? 'bg-indigo-500 border-indigo-500' : 'bg-white'}`}>
+                                {acceptedPDPA && <span className="text-white text-[10px]">✓</span>}
+                            </div>
+                            <p className="text-[10px] font-bold text-slate-500 leading-tight">
+                                ฉันยอมรับนโยบายความเป็นส่วนตัวและการจัดเก็บข้อมูลตามกฎหมายคุ้มครองข้อมูลส่วนบุคคล (PDPA) ของประเทศไทย เพื่อใช้ในการประมวลผลสถิติและลำดับคะแนน
+                            </p>
+                        </div>
+
                         <button
                             type="submit"
-                            disabled={loading}
-                            className="pill-button w-full py-5 text-2xl mt-6 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_6px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70"
+                            disabled={loading || !acceptedPDPA}
+                            className="pill-button w-full py-5 text-2xl mt-6 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_6px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                             {loading ? 'กำลังสมัครสมาชิก...' : 'สมัครสมาชิก!'}
                         </button>

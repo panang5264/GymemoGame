@@ -28,6 +28,7 @@ export default function Home() {
   const [isReady, setIsReady] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showForgot, setShowForgot] = useState(false)
   const { login, logout, user, token, setUser: setAuthUser } = useAuth()
   const [trainingMode, setTrainingMode] = useState<'management' | 'calculation' | 'spatial' | null>(null)
   const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar || 'avatar-1')
@@ -178,58 +179,139 @@ export default function Home() {
 
       <div className={`w-full relative z-10 transition-all duration-700 ${(phase === 'tutorial_summary' || phase === 'profile') ? 'max-w-5xl' : (phase === 'intro' ? 'max-w-7xl' : 'max-w-md')}`}>
 
-        {/* Phase 1: Login */}
+        {/* Phase 1: Login / Forgot Password */}
         {phase === 'login' && (
-          <div className="friendly-card animate-in fade-in zoom-in duration-500">
-            <div className="flex flex-col items-center mb-6 md:mb-8">
-              <div className="w-14 h-14 md:w-16 md:h-16 bg-[var(--card-bg)] border-3 md:border-4 border-[var(--border-dark)] rounded-full flex items-center justify-center text-2xl md:text-3xl mb-3 shadow-[3px_3px_0_var(--border-dark)] md:shadow-[4px_4px_0_var(--border-dark)]">
-                🧠
+          <div className="friendly-card animate-in fade-in zoom-in duration-500 min-h-[450px] flex flex-col justify-center py-10">
+            <div className="flex flex-col items-center mb-6 md:mb-10">
+              <div className="w-16 h-16 md:w-20 md:h-20 bg-[var(--card-bg)] border-3 md:border-4 border-[var(--border-dark)] rounded-full flex items-center justify-center text-3xl md:text-4xl mb-4 shadow-[4px_4px_0_var(--border-dark)] md:shadow-[6px_6px_0_var(--border-dark)]">
+                {showForgot ? '🔑' : '🧠'}
               </div>
-              <h1 className="text-2xl md:text-3xl font-black text-[var(--text-main)] tracking-tight uppercase">ยินดีต้อนรับ</h1>
+              <h1 className="text-3xl md:text-4xl font-black text-[var(--text-main)] tracking-tight uppercase">
+                {showForgot ? 'ลืมรหัสผ่าน' : 'ยินดีต้อนรับ'}
+              </h1>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-5">
-              {error && (
-                <div className="bg-red-100 text-red-600 p-3 rounded-2xl text-sm font-bold text-center mb-4">
-                  {error}
+            {showForgot ? (
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setLoading(true);
+                  setError('');
+                  try {
+                    const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ phone: username, newPassword: password }),
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                      alert(data.message);
+                      setShowForgot(false);
+                      setPassword('');
+                    } else {
+                      setError(data.message);
+                    }
+                  } catch (err) {
+                    setError('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+                className="space-y-6"
+              >
+                {error && (
+                  <div className="bg-red-100 text-red-600 p-4 rounded-2xl text-sm font-bold text-center mb-4">
+                    {error}
+                  </div>
+                )}
+                <div className="relative group">
+                  <div className="absolute left-7 top-1/2 -translate-y-1/2 text-2xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">📞</div>
+                  <input
+                    type="tel"
+                    placeholder="ระบุเบอร์โทรศัพท์ที่สมัคร"
+                    className="pill-input pill-input-icon w-full py-4 text-lg"
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
+                    required
+                  />
                 </div>
-              )}
-              <div className="relative group">
-                <div className="absolute left-7 top-1/2 -translate-y-1/2 text-xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">📞</div>
-                <input
-                  type="tel"
-                  placeholder="เบอร์โทรศัพท์"
-                  className="pill-input pill-input-icon w-full py-3 text-base"
-                  value={username}
-                  onChange={e => setUsername(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="relative group">
-                <div className="absolute left-7 top-1/2 -translate-y-1/2 text-xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">🔒</div>
-                <input
-                  type="password"
-                  placeholder="รหัสผ่าน (PASSWORD)"
-                  className="pill-input pill-input-icon w-full py-4 text-lg"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <button disabled={loading} className="pill-button w-full py-3 md:py-4 text-lg md:text-xl mt-4 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_4px_0_#000] md:shadow-[0_5px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70">
-                {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
-              </button>
-            </form>
+                <div className="relative group">
+                  <div className="absolute left-7 top-1/2 -translate-y-1/2 text-2xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">🔒</div>
+                  <input
+                    type="password"
+                    placeholder="ตั้งรหัสผ่านใหม่"
+                    className="pill-input pill-input-icon w-full py-4 text-lg"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="flex flex-col gap-4">
+                  <button disabled={loading} className="pill-button w-full py-4 md:py-5 text-xl md:text-2xl bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_5px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70">
+                    {loading ? 'กำลังดำเนินการ...' : 'บันทึกรหัสผ่านใหม่'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowForgot(false)}
+                    className="text-sm font-bold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors underline"
+                  >
+                    ← กลับไปหน้าล็อกอิน
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={handleLogin} className="space-y-6">
+                {error && (
+                  <div className="bg-red-100 text-red-600 p-4 rounded-2xl text-sm font-bold text-center mb-4">
+                    {error}
+                  </div>
+                )}
+                <div className="relative group">
+                  <div className="absolute left-7 top-1/2 -translate-y-1/2 text-2xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">📞</div>
+                  <input
+                    type="tel"
+                    placeholder="เบอร์โทรศัพท์"
+                    className="pill-input pill-input-icon w-full py-4 text-lg"
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="relative group">
+                  <div className="absolute left-7 top-1/2 -translate-y-1/2 text-2xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">🔒</div>
+                  <input
+                    type="password"
+                    placeholder="รหัสผ่าน (PASSWORD)"
+                    className="pill-input pill-input-icon w-full py-5 text-xl"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="flex flex-col gap-4">
+                  <button disabled={loading} className="pill-button w-full py-4 md:py-5 text-xl md:text-2xl mt-4 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_5px_0_#000] md:shadow-[0_7px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70">
+                    {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowForgot(true)}
+                    className="text-xs font-bold text-slate-400 hover:text-indigo-600 transition-colors"
+                  >
+                    ลืมรหัสผ่าน? รีเซ็ตได้ที่นี่ 🔑
+                  </button>
+                </div>
+              </form>
+            )}
 
-            <div className="mt-6 text-center text-sm font-bold text-[#717171]">
+            <div className="mt-8 text-center text-base font-bold text-[#717171]">
               ยังไม่มีบัญชี? <Link href="/register" className="text-blue-600 underline hover:text-blue-800 ml-1">สมัครสมาชิก</Link>
             </div>
 
-            <div className="mt-8 pt-8 border-t-2 border-[#1a1a1a]/10">
-              <p className="text-center text-sm font-bold text-[#717171] mb-6">ล็อกอินโดยเบอร์โทรศัพท์ / เข้าชมทั่วไป</p>
+            <div className="mt-10 pt-10 border-t-2 border-[#1a1a1a]/10">
+              <p className="text-center text-sm font-bold text-[#717171] mb-8 uppercase tracking-widest">ทางเลือกอื่น</p>
               <button
                 onClick={() => router.push('/leaderboard')}
-                className="w-full py-4 bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-full font-black text-[var(--text-main)] uppercase tracking-widest hover:bg-[var(--border-dark)] hover:text-[var(--text-on-dark)] transition-all shadow-[4px_4px_0_var(--border-dark)]"
+                className="w-full py-5 bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-full font-black text-[var(--text-main)] uppercase tracking-widest hover:bg-[var(--border-dark)] hover:text-[var(--text-on-dark)] transition-all shadow-[6px_6px_0_var(--border-dark)] text-xl"
               >
                 🏆 กระดานผู้นำ
               </button>

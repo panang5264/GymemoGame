@@ -35,8 +35,8 @@
     color: var(--text-main);
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
-    font-size: 18px;
-    /* Reduced from 20px to make UI more compact */
+    font-size: 19px;
+    /* Reduced from 24px */
   }
 
   h1,
@@ -471,20 +471,20 @@
 
 @media (max-width: 480px) {
   html {
-    font-size: 18px;
+    font-size: 16px;
   }
 }
 
 @media (min-width: 600px) and (max-width: 768px) {
   html {
-    font-size: 18px;
+    font-size: 17px;
   }
 }
 
 /* Mobile: 320–480px */
 @media (max-width: 480px) {
   html {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .friendly-card {
@@ -497,11 +497,11 @@
   }
 
   h2 {
-    font-size: 1.6rem !important;
+    font-size: 1.7rem !important;
   }
 
   p {
-    font-size: 0.9rem !important;
+    font-size: 1rem !important;
   }
 }
 
@@ -519,7 +519,7 @@
 /* Laptop: 1024–1366px */
 @media (min-width: 1024px) and (max-width: 1439px) {
   html {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .friendly-card {
@@ -530,7 +530,7 @@
 /* Desktop: 1440px+ */
 @media (min-width: 1440px) {
   html {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   .friendly-card {
@@ -541,7 +541,7 @@
 /* Large screen: 1920px+ */
 @media (min-width: 1920px) {
   html {
-    font-size: 18px;
+    font-size: 19px;
   }
 
   .friendly-card {

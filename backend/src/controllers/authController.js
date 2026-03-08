@@ -184,6 +184,46 @@ const updateProfile = async (req, res) => {
   }
 }
 
+// @desc    ลืมรหัสผ่าน (รีเซ็ตรหัสผ่านแบบง่าย)
+// @route   POST /api/auth/forgot-password
+// @access  Public
+const forgotPassword = async (req, res) => {
+  try {
+    const { phone, newPassword } = req.body
+
+    if (!phone || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'กรุณากรอกเบอร์โทรและรหัสผ่านใหม่'
+      })
+    }
+
+    const user = await User.findOne({ phone })
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'ไม่พบผู้ใช้ที่ผูกกับเบอร์โทรศัพท์นี้'
+      })
+    }
+
+    // อัปเดตรหัสผ่านใหม่
+    user.password = newPassword
+    await user.save()
+
+    res.json({
+      success: true,
+      message: 'รีเซ็ตรหัสผ่านสำเร็จ ท่านสามารถเข้าสู่ระบบด้วยรหัสผ่านใหม่ได้ทันที'
+    })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการรีเซ็ตรหัสผ่าน'
+    })
+  }
+}
+
 // Helper function สร้าง JWT token
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -195,5 +235,6 @@ module.exports = {
   register,
   login,
   getProfile,
-  updateProfile
+  updateProfile,
+  forgotPassword
 }
