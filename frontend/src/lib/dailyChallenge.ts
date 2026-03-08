@@ -7,39 +7,28 @@
  *   string, so canPlayDailyChallenge() automatically becomes true again.
  */
 
-const RESET_HOUR = 22 // 22:00 or 10 PM
+const RESET_HOUR = 0 // 00:00 or Midnight
 
 /** 
  * Returns a "YYYY-MM-DD" string for the "game day".
- * If it's before 22:00, it's still the "calendar day".
- * If it's 22:00 or later, it's considered the "next calendar day".
  */
 export function getDateKey(now?: Date): string {
   const d = now ?? new Date()
-  const dEffective = new Date(d)
 
-  // If we are past 22:00, we're effectively in the "next game day"
-  if (d.getHours() >= RESET_HOUR) {
-    dEffective.setDate(dEffective.getDate() + 1)
-  }
-
-  const y = dEffective.getFullYear()
-  const m = String(dEffective.getMonth() + 1).padStart(2, '0')
-  const day = String(dEffective.getDate()).padStart(2, '0')
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
   return `${y}-${m}-${day}`
 }
 
-/** Returns a Date object representing the next reset time (22:00:00). */
+/** Returns a Date object representing the next reset time (Midnight of the next day). */
 export function getNextResetTime(now?: Date): Date {
   const d = now ?? new Date()
   const reset = new Date(d)
 
-  reset.setHours(RESET_HOUR, 0, 0, 0)
-
-  // If it's already past 22:00 today, the next reset is 22:00 tomorrow
-  if (d.getHours() >= RESET_HOUR) {
-    reset.setDate(reset.getDate() + 1)
-  }
+  // Set to midnight (00:00:00) of the NEXT calendar day
+  reset.setDate(reset.getDate() + 1)
+  reset.setHours(0, 0, 0, 0)
 
   return reset
 }
@@ -52,7 +41,7 @@ export function canPlayDailyChallenge(isCompletedPattern: boolean): boolean {
 }
 
 /**
- * Returns a "HH:MM:SS" countdown string until the next reset time (22:00).
+ * Returns a "HH:MM:SS" countdown string until the next reset time (Midnight).
  */
 export function getCountdownToReset(now?: Date): string {
   const current = now ?? new Date()

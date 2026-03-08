@@ -7,6 +7,8 @@ import { getExpPercent } from '@/lib/scoring'
 import { getLeaderboard, API_BASE_URL } from '@/lib/api'
 import BrainRadarChart from '@/components/BrainRadarChart'
 import { useProgress } from '@/contexts/ProgressContext'
+import { useAuth } from '@/contexts/AuthContext'
+import { getAvatarPath } from '@/lib/avatars'
 
 interface LocalEntry {
     villageId: number
@@ -21,6 +23,7 @@ interface GlobalEntry {
         _id?: string
         name: string
         phone?: string
+        avatar?: string
     }
     score: number
     moves?: number
@@ -32,12 +35,14 @@ export default function LeaderboardPage() {
     const router = useRouter()
     const [userScore, setUserScore] = useState(0)
     const [userName, setUserName] = useState('')
+    const { user } = useAuth()
 
     const [villageEntries, setVillageEntries] = useState<LocalEntry[]>([])
     const [unlockedCount, setUnlockedCount] = useState(0)
     const [globalEntries, setGlobalEntries] = useState<GlobalEntry[]>([])
     const [loadingGlobal, setLoadingGlobal] = useState(true)
-    const [cognitiveData, setCognitiveData] = useState<any>(null)
+    const [modeScores, setModeScores] = useState({ management: 0, calculation: 0, spatial: 0 })
+    const [selectedUserEntry, setSelectedUserEntry] = useState<(GlobalEntry & { displayRank: number }) | null>(null)
 
     const { progress, isLoading } = useProgress()
 
@@ -48,23 +53,37 @@ export default function LeaderboardPage() {
         setUserName(p.userName || 'นักเดินทาง')
         setUnlockedCount(p.unlockedVillages.length)
 
-        if (p.guestId) {
-            fetch(`${API_BASE_URL}/api/analysis/profile/${p.guestId}`)
-                .then(res => res.json())
-                .then(res => {
-                    if (res.success && res.data) {
-                        setCognitiveData(res.data)
-                    } else {
-                        setCognitiveData(null)
-                    }
-                })
-                .catch(err => {
-                    console.error('Failed to fetch cognitive profile:', err)
-                    setCognitiveData(null)
-                })
-        } else {
-            setCognitiveData(null)
+        // Aggregate mode scores from all villages and daily plays
+        let mScore = 0
+        let cScore = 0
+        let sScore = 0
+
+        if (p.villages) {
+            Object.values(p.villages).forEach(vp => {
+                if (vp.runHistory) {
+                    vp.runHistory.forEach(run => {
+                        mScore += (run.managementScore || 0)
+                        cScore += (run.calculationScore || 0)
+                        sScore += (run.spatialScore || 0)
+                    })
+                }
+                if (vp.currentRunScore) {
+                    mScore += (vp.currentRunScore.management || 0)
+                    cScore += (vp.currentRunScore.calculation || 0)
+                    sScore += (vp.currentRunScore.spatial || 0)
+                }
+            })
         }
+
+        if (p.dailyScores) {
+            Object.values(p.dailyScores).forEach(ds => {
+                mScore += (ds.management || 0)
+                cScore += (ds.calculation || 0)
+                sScore += (ds.spatial || 0)
+            })
+        }
+
+        setModeScores({ management: mScore, calculation: cScore, spatial: sScore })
 
         // Build per-village stats from local progress
         const entries: LocalEntry[] = []
@@ -139,19 +158,26 @@ export default function LeaderboardPage() {
                                     </tr>
                                 ) : globalEntries.length > 0 ? (
                                     globalEntries.map((entry, idx) => (
-                                        <tr key={entry.user?._id || idx} className="group hover:translate-x-1 transition-transform">
-                                            <td className="px-6 py-4 bg-slate-50 border-y-2 border-l-2 border-slate-100 rounded-l-3xl">
-                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black ${idx === 0 ? 'bg-amber-400 text-white' : idx === 1 ? 'bg-slate-300 text-white' : idx === 2 ? 'bg-orange-300 text-white' : 'text-slate-400'}`}>
+                                        <tr
+                                            key={entry.user?._id || idx}
+                                            className="group hover:translate-x-1 hover:bg-indigo-50 transition-all cursor-pointer"
+                                            onClick={() => setSelectedUserEntry({ ...entry, displayRank: idx + 1 })}
+                                        >
+                                            <td className="px-6 py-4 bg-slate-50 group-hover:bg-indigo-50 border-y-2 border-l-2 border-slate-100 group-hover:border-indigo-100 rounded-l-3xl transition-colors">
+                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black ${idx === 0 ? 'bg-amber-400 text-white shadow-md' : idx === 1 ? 'bg-slate-300 text-white shadow-md' : idx === 2 ? 'bg-orange-300 text-white shadow-md' : 'text-slate-400'}`}>
                                                     {idx + 1}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 bg-slate-50 border-y-2 border-slate-100 font-black text-slate-700">
-                                                {entry.user?.name || 'Unknown User'}
+                                            <td className="px-6 py-4 bg-slate-50 group-hover:bg-indigo-50 border-y-2 border-slate-100 group-hover:border-indigo-100 font-black text-slate-700 transition-colors">
+                                                <div className="flex items-center gap-3">
+                                                    <img src={getAvatarPath(entry.user?.avatar)} alt="avatar" className="w-8 h-8 rounded-full object-cover border-2 border-slate-200" />
+                                                    {entry.user?.name || 'Unknown User'}
+                                                </div>
                                             </td>
-                                            <td className="px-6 py-4 bg-slate-50 border-y-2 border-slate-100 text-right">
+                                            <td className="px-6 py-4 bg-slate-50 group-hover:bg-indigo-50 border-y-2 border-slate-100 group-hover:border-indigo-100 text-right transition-colors">
                                                 <span className="text-xl font-black text-indigo-600 tabular-nums">{entry.score.toLocaleString()}</span>
                                             </td>
-                                            <td className="px-6 py-4 bg-slate-50 border-y-2 border-r-2 border-slate-100 rounded-r-3xl text-right font-bold text-slate-400 text-sm">
+                                            <td className="px-6 py-4 bg-slate-50 group-hover:bg-indigo-50 border-y-2 border-r-2 border-slate-100 group-hover:border-indigo-100 rounded-r-3xl text-right font-bold text-slate-400 text-sm transition-colors">
                                                 {entry.timeTaken}s
                                             </td>
                                         </tr>
@@ -177,9 +203,9 @@ export default function LeaderboardPage() {
                 {/* Overall User Card */}
                 <div className="friendly-card mb-8 shadow-[10px_10px_0_rgba(79,70,229,0.1)] md:shadow-[20px_20px_0_rgba(79,70,229,0.1)] border-4 border-indigo-100 bg-white/80 backdrop-blur-sm p-4 md:p-8">
                     <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 mb-8">
-                        <div className="w-20 h-20 md:w-24 md:h-24 bg-indigo-50 border-4 border-indigo-200 rounded-[1rem] md:rounded-[1.5rem] flex items-center justify-center text-4xl md:text-5xl shadow-inner relative">
-                            🧑‍🚀
-                            <div className="absolute -bottom-2 -right-2 w-6 h-6 md:w-8 md:h-8 bg-green-500 border-4 border-white rounded-full"></div>
+                        <div className="w-20 h-20 md:w-24 md:h-24 bg-white border-4 border-indigo-200 rounded-[1rem] md:rounded-[1.5rem] flex items-center justify-center shadow-inner relative p-1 mt-2">
+                            <img src={getAvatarPath(user?.avatar || (progress as any)?.avatar)} alt="avatar" className="w-full h-full object-cover rounded-[0.5rem] md:rounded-[1rem]" />
+                            <div className="absolute -bottom-2 -right-2 w-6 h-6 md:w-8 md:h-8 bg-green-500 border-4 border-white rounded-full z-10 shadow-sm"></div>
                         </div>
                         <div className="flex-1 text-center md:text-left">
                             <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-1">{userName}</h2>
@@ -219,10 +245,9 @@ export default function LeaderboardPage() {
                         <div className="flex-1 flex justify-center py-2 md:py-4">
                             <BrainRadarChart
                                 data={[
-                                    { label: 'กาารจัดการ', value: cognitiveData?.averages?.executiveFunction || 0, color: '#f97316' },
-                                    { label: 'การคำนวณ', value: cognitiveData?.averages?.processingSpeed || 0, color: '#3b82f6' },
-                                    { label: 'มิติสัมพันธ์', value: cognitiveData?.averages?.workingMemory || 0, color: '#22c55e' },
-                                    { label: 'การตอบสนอง', value: cognitiveData?.averages?.attention || 0, color: '#f59e0b' },
+                                    { label: 'การจัดการ', value: Math.round((modeScores.management / Math.max(modeScores.management, modeScores.calculation, modeScores.spatial, 1)) * 100), color: '#f97316' },
+                                    { label: 'การคำนวณ', value: Math.round((modeScores.calculation / Math.max(modeScores.management, modeScores.calculation, modeScores.spatial, 1)) * 100), color: '#3b82f6' },
+                                    { label: 'มิติสัมพันธ์', value: Math.round((modeScores.spatial / Math.max(modeScores.management, modeScores.calculation, modeScores.spatial, 1)) * 100), color: '#22c55e' }
                                 ]}
                                 size={200}
                             />
@@ -234,7 +259,7 @@ export default function LeaderboardPage() {
                                     <div className="w-4 h-4 rounded-full border border-indigo-200 flex items-center justify-center text-[10px] font-bold text-indigo-400 cursor-help bg-slate-50" title="ทักษะการตัดสินใจ การวางแผน และจัดลำดับความสำคัญ">i</div>
                                 </div>
                                 <div className="text-2xl md:text-3xl font-black text-indigo-600 leading-tight">โหมดจัดการ</div>
-                                <div className="text-3xl md:text-4xl font-black text-indigo-700 mt-1">{Math.round(cognitiveData?.averages?.executiveFunction || 0)}%</div>
+                                <div className="text-3xl md:text-4xl font-black text-indigo-700 mt-1">{modeScores.management.toLocaleString()} <span className="text-lg md:text-xl">คะแนน</span></div>
                             </div>
                             <div className="bg-white p-4 md:p-5 rounded-3xl shadow-sm border-2 border-emerald-100/50 flex flex-col justify-center">
                                 <div className="flex items-center gap-2 mb-1">
@@ -242,7 +267,7 @@ export default function LeaderboardPage() {
                                     <div className="w-4 h-4 rounded-full border border-emerald-200 flex items-center justify-center text-[10px] font-bold text-emerald-400 cursor-help bg-slate-50" title="ความสามารถในการประมวลผลข้อมูลควบคู่กับการมองภาพมิติในใจ">i</div>
                                 </div>
                                 <div className="text-2xl md:text-3xl font-black text-emerald-600 leading-tight">โหมดมิติสัมพันธ์</div>
-                                <div className="text-3xl md:text-4xl font-black text-emerald-700 mt-1">{Math.round(cognitiveData?.averages?.workingMemory || 0)}%</div>
+                                <div className="text-3xl md:text-4xl font-black text-emerald-700 mt-1">{modeScores.spatial.toLocaleString()} <span className="text-lg md:text-xl">คะแนน</span></div>
                             </div>
                             <div className="bg-white p-4 md:p-5 rounded-3xl shadow-sm border-2 border-blue-100/50 flex flex-col justify-center sm:col-span-2 xl:col-span-1">
                                 <div className="flex items-center gap-2 mb-1">
@@ -250,11 +275,11 @@ export default function LeaderboardPage() {
                                     <div className="w-4 h-4 rounded-full border border-blue-200 flex items-center justify-center text-[10px] font-bold text-blue-400 cursor-help bg-slate-50" title="ความไวในการตีความโจทย์และหาคำตอบอย่างแม่นยำ">i</div>
                                 </div>
                                 <div className="text-2xl md:text-3xl font-black text-blue-600 leading-tight">โหมดคำนวณ</div>
-                                <div className="text-3xl md:text-4xl font-black text-blue-700 mt-1">{Math.round(cognitiveData?.averages?.processingSpeed || 0)}%</div>
+                                <div className="text-3xl md:text-4xl font-black text-blue-700 mt-1">{modeScores.calculation.toLocaleString()} <span className="text-lg md:text-xl">คะแนน</span></div>
                             </div>
                         </div>
                     </div>
-                </div >
+                </div>
 
                 {/* Per-village breakdown */}
                 {
@@ -308,6 +333,63 @@ export default function LeaderboardPage() {
                 <p className="text-center mt-12 text-[#717171] font-black uppercase tracking-[0.2em] text-[10px] opacity-50">
                     ข้อมูลสรุปคะแนนและการผจญภัยของคุณ 🧠
                 </p>
+
+                {/* User Profile Modal */}
+                {selectedUserEntry && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4 md:p-8 animate-in fade-in duration-300" onClick={() => setSelectedUserEntry(null)}>
+                        <div
+                            className="bg-white rounded-[3rem] p-8 md:p-12 max-w-xl w-full border-[6px] border-[var(--border-dark)] shadow-[20px_20px_0_var(--border-dark)] relative flex flex-col items-center animate-in zoom-in-75 duration-300"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button
+                                onClick={() => setSelectedUserEntry(null)}
+                                className="absolute top-6 right-6 w-12 h-12 md:w-14 md:h-14 bg-slate-100 hover:bg-rose-100 hover:text-rose-600 rounded-full flex items-center justify-center text-3xl transition-colors font-black z-10"
+                            >
+                                ✕
+                            </button>
+
+                            <div className="relative mb-8 md:mb-12 mt-4">
+                                <div className={`w-36 h-36 md:w-48 md:h-48 bg-slate-100 rounded-full border-[6px] border-[var(--border-dark)] overflow-hidden shadow-inner mx-auto`}>
+                                    <img src={getAvatarPath(selectedUserEntry.user?.avatar)} alt="avatar" className="w-full h-full object-cover" />
+                                </div>
+                                <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-[var(--border-dark)] text-white px-8 py-2 md:py-3 rounded-full font-black text-xl md:text-3xl border-4 border-white shadow-xl flex items-center gap-2 whitespace-nowrap">
+                                    อันดับ {selectedUserEntry.displayRank} 🏆
+                                </div>
+                            </div>
+
+                            <h3 className="text-4xl md:text-6xl font-black text-slate-800 mb-2 tracking-tighter text-center">{selectedUserEntry.user?.name || 'Unknown User'}</h3>
+                            <p className="text-slate-500 font-bold uppercase tracking-widest text-sm md:text-base mb-8 text-center bg-slate-100 px-6 py-2 rounded-full border-2 border-slate-200">✨ ผู้เล่นอันดับแนวหน้า</p>
+
+                            <div className="w-full bg-indigo-50 border-4 border-indigo-100 rounded-[2.5rem] p-6 md:p-8 mb-8">
+                                <div className="grid grid-cols-2 gap-4 text-center">
+                                    <div className="bg-white p-4 md:p-6 rounded-3xl border-2 border-indigo-50 shadow-sm">
+                                        <p className="text-indigo-400 font-black text-xs md:text-sm uppercase tracking-widest mb-2">คะแนนรวมสุทธิ</p>
+                                        <p className="text-4xl md:text-6xl font-black text-indigo-600 tabular-nums leading-none">{selectedUserEntry.score.toLocaleString()}</p>
+                                    </div>
+                                    <div className="bg-white p-4 md:p-6 rounded-3xl border-2 border-indigo-50 shadow-sm">
+                                        <p className="text-orange-400 font-black text-xs md:text-sm uppercase tracking-widest mb-2">เวลาแข่งขัน</p>
+                                        <p className="text-4xl md:text-6xl font-black text-orange-500 tabular-nums leading-none">{selectedUserEntry.timeTaken}<span className="text-2xl md:text-4xl ml-2">s</span></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="w-full bg-slate-50/50 rounded-[2.5rem] p-6 md:p-8 border-4 border-slate-100 relative">
+                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-xs md:text-sm font-black uppercase text-slate-500 tracking-widest bg-white px-6 py-2 rounded-full border-2 border-slate-200 shadow-sm whitespace-nowrap">🧠 กราฟความสามารถ (จำลอง)</div>
+                                <div className="w-full max-h-[250px] md:max-h-[350px] flex justify-center items-center mt-4">
+                                    <BrainRadarChart
+                                        data={[
+                                            { label: 'การจัดการ', value: Math.min(100, 40 + (selectedUserEntry.score % 60)), color: '#f97316' },
+                                            { label: 'การคำนวณ', value: Math.min(100, 50 + ((selectedUserEntry.score * 7) % 50)), color: '#3b82f6' },
+                                            { label: 'มิติสัมพันธ์', value: Math.min(100, 30 + ((selectedUserEntry.score * 13) % 70)), color: '#22c55e' }
+                                        ]}
+                                        size={300}
+                                    />
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                )}
 
             </div >
         </div >

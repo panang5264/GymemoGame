@@ -14,14 +14,7 @@ type AuthPhase = 'login' | 'name' | 'profile' | 'intro' | 'grandmother' | 'tutor
 import ClockIntro from '@/components/ClockIntro'
 import { updateProfile } from '@/lib/api'
 
-const AVATARS = [
-  { id: 'avatar-1', emoji: '🧑‍🚀', label: 'นักบินอวกาศ' },
-  { id: 'avatar-2', emoji: '🥷', label: 'นินจา' },
-  { id: 'avatar-3', emoji: '🕵️', label: 'นักสืบ' },
-  { id: 'avatar-4', emoji: '🧑‍🎨', label: 'ศิลปิน' },
-  { id: 'avatar-5', emoji: '👩‍🔬', label: 'นักวิทย์' },
-  { id: 'avatar-6', emoji: '🧙‍♂️', label: 'ผู้วิเศษ' },
-]
+import { AVATARS, getAvatarPath } from '@/lib/avatars'
 
 export default function Home() {
   const router = useRouter()
@@ -261,7 +254,7 @@ export default function Home() {
                 <div className="relative mx-auto w-32 h-32 mb-8 group cursor-pointer" onClick={() => setPhase('edit_profile')}>
                   <div className="absolute inset-0 bg-orange-200 border-4 border-[#1a1a1a] rounded-full translate-x-1 translate-y-1 group-hover:translate-x-0 group-hover:translate-y-0 transition-all" />
                   <div className="relative w-full h-full bg-white border-4 border-[#1a1a1a] rounded-full flex items-center justify-center text-6xl shadow-inner overflow-hidden">
-                    {AVATARS.find(a => a.id === (user?.avatar || 'avatar-1'))?.emoji || '🧑‍🚀'}
+                    <img src={getAvatarPath(user?.avatar || 'avatar-1')} className="w-full h-full object-cover p-1 rounded-full" alt="avatar" />
                     <div className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[10px] py-1 opacity-0 group-hover:opacity-100 transition-opacity">EDIT</div>
                   </div>
                 </div>
@@ -393,7 +386,7 @@ export default function Home() {
                         : 'bg-white border-slate-100 hover:border-slate-300'
                         }`}
                     >
-                      {av.emoji}
+                      <img src={av.imagePath} alt={av.label} className="w-full h-full object-cover p-2 rounded-[2rem]" />
                       {selectedAvatar === av.id && (
                         <div className="absolute -top-2 -right-2 bg-orange-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-white">
                           ✓

@@ -200,8 +200,18 @@ function CalculationGameInner() {
 
         <div className="bg-white/95 backdrop-blur-md border border-white/20 p-6 md:p-10 rounded-[2.5rem] shadow-2xl max-w-lg w-full text-center animate-in zoom-in duration-500">
           <div className="text-6xl md:text-7xl mb-6">🧮</div>
-          <h2 className="text-xl md:text-2xl font-black mb-4 text-slate-800">ระดับ {level.level}: {level.name}</h2>
-          <p className="text-slate-500 mb-10 text-base md:text-lg px-2">{level.description}</p>
+
+          {mode === 'daily' ? (
+            <>
+              <h2 className="text-2xl md:text-3xl font-black text-orange-500 mb-2 uppercase tracking-tighter">🌟 ภารกิจรายวัน</h2>
+              <p className="text-slate-600 font-bold mb-8 md:mb-10 text-sm md:text-lg bg-orange-50 py-2 border-2 border-orange-200 rounded-full">ด่านที่ 2/3: โหมดการคำนวณ</p>
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl md:text-2xl font-black mb-4 text-slate-800">ระดับ {level.level}: {level.name}</h2>
+              <p className="text-slate-500 mb-10 text-base md:text-lg px-2">{level.description}</p>
+            </>
+          )}
 
           <div className={`${level.level === 10 ? 'bg-amber-100 border-amber-300' : 'bg-blue-50/50 border-blue-100/50'} p-5 rounded-3xl mb-10 border-2 border-dashed`}>
             <p className="text-slate-600 font-bold flex items-center justify-center gap-2">
@@ -232,10 +242,10 @@ function CalculationGameInner() {
           )}
 
           <button
-            className="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-[2rem] font-black text-xl shadow-xl active:scale-95 transition-all"
+            className={`w-full py-5 text-white rounded-[2rem] font-black text-xl shadow-xl active:scale-95 transition-all ${mode === 'daily' ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500'}`}
             onClick={startGame}
           >
-            ไปกันเลย! 🚀
+            {mode === 'daily' ? 'เริ่มภารกิจ! 🚀' : 'ไปกันเลย! 🚀'}
           </button>
         </div>
       </div>

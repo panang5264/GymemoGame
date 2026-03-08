@@ -1,25 +1,33 @@
 .worldPage {
   min-height: 100vh;
-  padding: 1rem 2rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  background-color: var(--bg-warm);
+  gap: 1rem;
+  background: radial-gradient(circle at top, #f0ede1 0%, var(--bg-warm) 100%);
   font-family: 'Supermarket', sans-serif;
+  overflow-x: hidden;
 }
 
 .topBar {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 0 1rem;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  z-index: 10;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 768px) {
+  .worldPage {
+    padding: 1.5rem 2rem;
+    gap: 1.5rem;
+  }
+
   .topBar {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    padding: 0;
   }
 }
 
@@ -29,6 +37,12 @@
   color: var(--text-main);
   text-transform: uppercase;
   letter-spacing: -0.02em;
+}
+
+@media (max-width: 768px) {
+  .mapTitle {
+    font-size: 1.8rem;
+  }
 }
 
 .topActions {
@@ -61,6 +75,15 @@
   box-shadow: none;
 }
 
+@media (max-width: 768px) {
+  .actionBtn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border-width: 2px;
+    box-shadow: 3px 3px 0 #1a1a1a;
+  }
+}
+
 .cheatBtn {
   background: linear-gradient(135deg, #4f46e5, #9333ea);
   border: 3px solid #1a1a1a;
@@ -86,21 +109,42 @@
   box-shadow: none;
 }
 
+@media (max-width: 768px) {
+  .cheatBtn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border-width: 2px;
+    box-shadow: 3px 3px 0 #1a1a1a;
+  }
+}
+
 /* Map container */
 .mapContainer {
   position: relative;
   width: 100%;
-  max-width: 880px;
-  margin: 0 auto;
+  max-width: 1000px;
+  margin: 0 auto 2rem;
+  flex-grow: 1;
   aspect-ratio: 18 / 20;
   background-color: #e5e2d5;
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
-  border-radius: 2rem;
-  border: 4px solid var(--border-dark);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  border-radius: 2.5rem;
+  border: 6px solid var(--border-dark);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25), inset 0 0 40px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .mapContainer {
+    max-width: 100%;
+    margin-top: 0.5rem;
+    border-radius: 2rem;
+    border-width: 4px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
 }
 
 /* Background Placeholder overlay - removed */
@@ -122,8 +166,8 @@
 }
 
 .stageNode:hover .stageIcon {
-  transform: scale(1.1) rotate(5deg);
-  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
+  transform: scale(1.15) translateY(-5px);
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
 }
 
 .stageNode.locked {
@@ -167,25 +211,34 @@
 }
 
 .stageIcon {
-  width: 75px;
-  height: 75px;
+  width: 90px;
+  height: 90px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  border-radius: 1.5rem;
-  background-color: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(4px);
-  border: 4px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  border: 4px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 1024px) {
+  .stageIcon {
+    width: 65px;
+    height: 65px;
+    border-width: 3px;
+  }
 }
 
 @media (max-width: 600px) {
   .stageIcon {
-    width: 45px;
-    height: 45px;
+    width: 50px;
+    height: 50px;
     border-width: 2px;
   }
 }
@@ -193,14 +246,13 @@
 /* Removing old blocky styles as we use images now */
 .current .stageIcon {
   border: 4px solid #facc15;
-  border-radius: 2rem;
-  background-color: rgba(250, 204, 21, 0.1);
+  background-color: rgba(250, 204, 21, 0.2);
+  box-shadow: 0 0 25px rgba(250, 204, 21, 0.5);
 }
 
 .completed .stageIcon {
   border: 4px solid #4ade80;
-  border-radius: 2rem;
-  background-color: rgba(74, 222, 128, 0.1);
+  background-color: rgba(74, 222, 128, 0.2);
 }
 
 @keyframes bounceMini {
@@ -396,22 +448,17 @@
 
 @media (max-width: 480px) {
   .mapContainer {
-    height: 480px;
-    border-radius: 2.5rem;
-  }
-
-  .stageIcon {
-    width: 44px;
-    height: 44px;
-    font-size: 1.3rem;
+    border-radius: 1.5rem;
+    border-width: 3px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   }
 
   .mapTitle {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
   }
 
   .introCard {
-    padding: 2rem;
-    border-radius: 2rem;
+    padding: 1.5rem;
+    border-radius: 1.5rem;
   }
 }

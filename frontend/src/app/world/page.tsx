@@ -345,7 +345,7 @@ export default function WorldPage() {
       <div className={styles.topBar}>
         <div className="flex flex-col">
           <h1 className={styles.mapTitle}>🗺️ ยินดีต้อนรับ, {userName}</h1>
-          <p className="text-[var(--text-muted)] text-sm font-black ml-1 uppercase tracking-widest">เป้าหมาย: ฟื้นฟูให้ครบ 10 หมู่บ้าน</p>
+          <p className="text-black/60 text-xs sm:text-sm font-black uppercase tracking-widest mt-1">เป้าหมาย: ฟื้นฟูให้ครบ 10 หมู่บ้าน</p>
         </div>
         <div className={styles.topActions}>
           <button className={styles.actionBtn} onClick={() => router.push('/leaderboard')}>
@@ -410,7 +410,7 @@ export default function WorldPage() {
                 className={styles.stageIcon}
                 style={{ backgroundImage: `url("${iconPath}")` }}
               />
-              <span className="bg-[var(--card-bg)] text-[var(--text-main)] px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[8px] sm:text-[10px] md:text-xs font-black shadow-[1px_1px_0_var(--border-dark)] sm:shadow-[2px_2px_0_var(--border-dark)] uppercase tracking-widest whitespace-nowrap mt-1">
+              <span className="bg-[var(--card-bg)] text-[var(--text-main)] px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-black shadow-[2px_2px_0_var(--border-dark)] uppercase tracking-widest whitespace-nowrap mt-1">
                 ด่าน {stage}
               </span>
               {state !== 'locked' && (

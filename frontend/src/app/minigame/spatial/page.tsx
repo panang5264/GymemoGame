@@ -238,16 +238,25 @@ function SpatialGameInner() {
       <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4 font-['Supermarket']">
         <div className="max-w-md w-full bg-white/95 backdrop-blur-md rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-2xl border border-white/20 text-center animate-in zoom-in duration-500">
           <div className="text-7xl md:text-8xl mb-6 md:mb-8 animate-bounce drop-shadow-xl">🗺️</div>
-          <h2 className="text-2xl md:text-3xl font-black text-slate-800 mb-3 md:mb-4 uppercase tracking-tighter">มิติจำลอง</h2>
-          <p className="text-slate-500 font-bold mb-6 md:mb-8 text-sm md:text-base px-2">{diffDesc}</p>
+          {mode === 'daily' ? (
+            <>
+              <h2 className="text-2xl md:text-3xl font-black text-orange-500 mb-2 md:mb-4 uppercase tracking-tighter">🌟 ภารกิจรายวัน</h2>
+              <p className="text-slate-600 font-bold mb-6 md:mb-8 text-sm md:text-base px-2 bg-orange-50 py-2 border-2 border-orange-200 rounded-full">ด่านที่ 3/3: โหมดแผนที่และมิติ</p>
+            </>
+          ) : (
+            <>
+              <h2 className="text-2xl md:text-3xl font-black text-slate-800 mb-3 md:mb-4 uppercase tracking-tighter">มิติจำลอง</h2>
+              <p className="text-slate-500 font-bold mb-6 md:mb-8 text-sm md:text-base px-2">{diffDesc}</p>
+            </>
+          )}
           <button
             onClick={() => {
               if (mode === 'village') setPhase('play')
               else setPhase('clock')
             }}
-            className="w-full py-4 bg-indigo-600 text-white rounded-[20px] font-black text-xl shadow-xl hover:scale-105 transition-all active:scale-95"
+            className={`w-full py-4 text-white rounded-[20px] font-black text-xl shadow-xl hover:scale-105 transition-all active:scale-95 ${mode === 'daily' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}
           >
-            เริ่มเลย! 🚀
+            {mode === 'daily' ? 'เริ่มภารกิจ! 🚀' : 'เริ่มเลย! 🚀'}
           </button>
         </div>
       </div>

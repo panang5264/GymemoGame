@@ -703,16 +703,25 @@ function ManagementGameInner() {
                 <div className="text-7xl md:text-9xl mb-6 md:mb-8 animate-bounce">
                   {levelParam <= 3 ? '📦' : levelParam <= 5 ? '🍳' : levelParam <= 9 ? '🧭' : '📝'}
                 </div>
-                <h3 className="text-xl md:text-2xl font-black text-slate-800 mb-2 md:mb-4 uppercase tracking-tighter">Level {levelParam}</h3>
-                <p className="text-slate-500 font-bold mb-8 md:mb-12 text-sm md:text-lg">{config.instruction}</p>
+                {modeParam === 'daily' ? (
+                  <>
+                    <h3 className="text-2xl md:text-3xl font-black text-orange-500 mb-2 uppercase tracking-tighter">🌟 ภารกิจรายวัน</h3>
+                    <p className="text-slate-600 font-bold mb-8 md:mb-10 text-sm md:text-lg bg-orange-50 py-2 border-2 border-orange-200 rounded-full">ด่านที่ 1/3: โหมดการจัดการ</p>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-xl md:text-2xl font-black text-slate-800 mb-2 md:mb-4 uppercase tracking-tighter">Level {levelParam}</h3>
+                    <p className="text-slate-500 font-bold mb-8 md:mb-12 text-sm md:text-lg">{config.instruction}</p>
+                  </>
+                )}
                 <button
                   onClick={() => {
                     if (levelParam === 1 && modeParam !== 'village') setPhase('clock')
                     else setPhase('play')
                   }}
-                  className="w-full py-5 bg-slate-800 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95"
+                  className={`w-full py-5 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95 ${modeParam === 'daily' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-slate-800'}`}
                 >
-                  เริ่มภารกิจ 🚀
+                  {modeParam === 'daily' ? 'เริ่มภารกิจ! 🚀' : 'เริ่มเล่น 🚀'}
                 </button>
               </div>
             </div>
