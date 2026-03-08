@@ -39,37 +39,37 @@ export default function WeeklySummaryChart({ guestId }: Props) {
 
     const maxVal = 100
     const chartHeight = 120
-    const barWidth = 12
+    const barWidth = 10 // Slightly reduced to prevent overflow
 
     return (
-        <div className="bg-white border-3 border-[#1a1a1a] rounded-[2.5rem] p-6 shadow-[8px_8px_0_#1a1a1a] mt-6">
+        <div className="bg-white border-3 border-[#1a1a1a] rounded-[2.5rem] p-5 md:p-6 shadow-[8px_8px_0_#1a1a1a] mt-6 overflow-hidden">
             <h3 className="text-xl font-black text-[#1a1a1a] mb-6 flex items-center gap-2">
                 📈 สรุปพัฒนาการรายสัปดาห์
             </h3>
 
-            <div className="flex items-end justify-between gap-2 h-48 px-2 border-b-2 border-slate-100 pb-2">
+            <div className="flex items-end justify-between gap-1 h-36 border-b-2 border-slate-100 pb-2 overflow-x-auto no-scrollbar">
                 {data.map((day, i) => {
                     const h1 = (day.management / maxVal) * chartHeight
                     const h2 = (day.calculation / maxVal) * chartHeight
                     const h3 = (day.spatial / maxVal) * chartHeight
 
                     return (
-                        <div key={i} className="flex flex-col items-center flex-1 group">
-                            <div className="flex items-end gap-1 mb-2">
+                        <div key={i} className="flex flex-col items-center min-w-[40px] flex-1 group">
+                            <div className="flex items-end gap-0.5 mb-2">
                                 <div
-                                    className="bg-orange-400 border-2 border-[#1a1a1a] rounded-t-lg transition-all duration-500 group-hover:brightness-110"
+                                    className="bg-orange-400 border-2 border-[#1a1a1a] rounded-t-md transition-all duration-500 group-hover:brightness-110"
                                     style={{ height: `${Math.max(4, h1)}px`, width: `${barWidth}px` }}
-                                    title={`Management: ${day.management}`}
+                                    title={`การจัดการ: ${day.management}`}
                                 />
                                 <div
-                                    className="bg-blue-400 border-2 border-[#1a1a1a] rounded-t-lg transition-all duration-500 group-hover:brightness-110"
+                                    className="bg-blue-400 border-2 border-[#1a1a1a] rounded-t-md transition-all duration-500 group-hover:brightness-110"
                                     style={{ height: `${Math.max(4, h2)}px`, width: `${barWidth}px` }}
-                                    title={`Calculation: ${day.calculation}`}
+                                    title={`การคำนวณ: ${day.calculation}`}
                                 />
                                 <div
-                                    className="bg-indigo-400 border-2 border-[#1a1a1a] rounded-t-lg transition-all duration-500 group-hover:brightness-110"
+                                    className="bg-indigo-400 border-2 border-[#1a1a1a] rounded-t-md transition-all duration-500 group-hover:brightness-110"
                                     style={{ height: `${Math.max(4, h3)}px`, width: `${barWidth}px` }}
-                                    title={`Spatial: ${day.spatial}`}
+                                    title={`มิติสัมพันธ์: ${day.spatial}`}
                                 />
                             </div>
                             <span className="text-[10px] font-black uppercase text-slate-400">{day.label}</span>
@@ -78,18 +78,18 @@ export default function WeeklySummaryChart({ guestId }: Props) {
                 })}
             </div>
 
-            <div className="flex justify-center gap-4 mt-4">
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4">
                 <div className="flex items-center gap-1">
                     <div className="w-3 h-3 bg-orange-400 border-2 border-[#1a1a1a] rounded-sm" />
-                    <span className="text-[10px] font-black opacity-60">MANAGEMENT</span>
+                    <span className="text-[9px] font-black opacity-60">การจัดการ</span>
                 </div>
                 <div className="flex items-center gap-1">
                     <div className="w-3 h-3 bg-blue-400 border-2 border-[#1a1a1a] rounded-sm" />
-                    <span className="text-[10px] font-black opacity-60">CALCULATION</span>
+                    <span className="text-[9px] font-black opacity-60">การคำนวณ</span>
                 </div>
                 <div className="flex items-center gap-1">
                     <div className="w-3 h-3 bg-indigo-400 border-2 border-[#1a1a1a] rounded-sm" />
-                    <span className="text-[10px] font-black opacity-60">SPATIAL</span>
+                    <span className="text-[9px] font-black opacity-60">มิติสัมพันธ์</span>
                 </div>
             </div>
         </div>
