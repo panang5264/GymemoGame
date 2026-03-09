@@ -836,81 +836,83 @@ export default function Home() {
 
         {/* Phase 7: Integrated Assessment */}
         {phase === 'assessment' && (
-          <div className="animate-in fade-in duration-700 w-full max-w-4xl relative z-[200]">
-            {assessmentSubPhase === 'memorize' && (
-              <MemoryRecallChallenge
-                phase="memorize"
-                onWordsGenerated={setMemoryWords}
-                onComplete={() => setAssessmentSubPhase('clock')}
-              />
-            )}
+          <div className="animate-in fade-in duration-700 fixed inset-0 z-[5000] bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4">
+            <div className="w-full max-w-4xl">
+              {assessmentSubPhase === 'memorize' && (
+                <MemoryRecallChallenge
+                  phase="memorize"
+                  onWordsGenerated={setMemoryWords}
+                  onComplete={() => setAssessmentSubPhase('clock')}
+                />
+              )}
 
-            {assessmentSubPhase === 'clock' && (
-              <ClockIntro
-                targetHour={clockTarget.hour}
-                targetMinute={clockTarget.minute}
-                showResult={false}
-                onEvaluation={(score, title, text) => setClockEval({ score, title, text })}
-                onComplete={() => setAssessmentSubPhase('recall')}
-              />
-            )}
+              {assessmentSubPhase === 'clock' && (
+                <ClockIntro
+                  targetHour={clockTarget.hour}
+                  targetMinute={clockTarget.minute}
+                  showResult={false}
+                  onEvaluation={(score, title, text) => setClockEval({ score, title, text })}
+                  onComplete={() => setAssessmentSubPhase('recall')}
+                />
+              )}
 
-            {assessmentSubPhase === 'recall' && (
-              <MemoryRecallChallenge
-                phase="recall"
-                selectedWords={memoryWords}
-                showFeedback={false}
-                onEvaluation={(tries, success) => setMemoryEval({ tries, success })}
-                onComplete={() => setAssessmentSubPhase('result')}
-              />
-            )}
+              {assessmentSubPhase === 'recall' && (
+                <MemoryRecallChallenge
+                  phase="recall"
+                  selectedWords={memoryWords}
+                  showFeedback={false}
+                  onEvaluation={(tries, success) => setMemoryEval({ tries, success })}
+                  onComplete={() => setAssessmentSubPhase('result')}
+                />
+              )}
 
-            {assessmentSubPhase === 'result' && (
-              <div className="fixed inset-0 z-[150] flex flex-col items-center justify-center bg-slate-900/95 backdrop-blur-xl p-6">
-                <div className="max-w-xl w-full bg-white rounded-[3rem] p-8 md:p-12 border-4 border-black shadow-[20px_20px_0_#000] text-center animate-in zoom-in duration-500">
-                  <div className="w-32 h-32 mx-auto mb-8 bg-amber-50 rounded-full border-4 border-black overflow-hidden flex items-end justify-center">
-                    <img src="/assets_employer/characters/grandpa_front.png" alt="คุณตา" className="w-full h-full object-contain scale-125 translate-y-2" />
-                  </div>
-
-                  <h2 className="text-3xl font-black text-slate-800 mb-2 uppercase">ผลการประเมินเบื้องต้น</h2>
-                  <p className="text-slate-500 font-bold mb-8 text-sm md:text-base">คุณตาได้สรุปผลระดับการรู้คิดของหลานไว้ตรงนี้แล้วนะ</p>
-
-                  <div className="space-y-6 mb-12">
-                    {/* Clock Result */}
-                    <div className="bg-indigo-50 p-6 rounded-3xl border-3 border-indigo-200 text-left">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-2xl">🕘</span>
-                        <h4 className="font-black text-indigo-700 uppercase">ทักษะการวางแผน (Clock Task)</h4>
-                      </div>
-                      <p className="font-bold text-indigo-900/70 text-sm leading-relaxed">
-                        {clockEval?.text || 'การตอบสนองปกติดีมาก'}
-                      </p>
+              {assessmentSubPhase === 'result' && (
+                <div className="fixed inset-0 z-[150] flex flex-col items-center justify-center bg-slate-900/95 backdrop-blur-xl p-6">
+                  <div className="max-w-xl w-full bg-white rounded-[3rem] p-8 md:p-12 border-4 border-black shadow-[20px_20px_0_#000] text-center animate-in zoom-in duration-500">
+                    <div className="w-32 h-32 mx-auto mb-8 bg-amber-50 rounded-full border-4 border-black overflow-hidden flex items-end justify-center">
+                      <img src="/assets_employer/characters/grandpa_front.png" alt="คุณตา" className="w-full h-full object-contain scale-125 translate-y-2" />
                     </div>
 
-                    {/* Memory Result */}
-                    <div className="bg-amber-50 p-6 rounded-3xl border-3 border-amber-200 text-left">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-2xl">🧠</span>
-                        <h4 className="font-black text-amber-700 uppercase">ความจำระยะสั้น (Memory Task)</h4>
-                      </div>
-                      <p className="font-bold text-amber-900/70 text-sm leading-relaxed">
-                        {memoryEval?.success
-                          ? `ยอดเยี่ยมมาก! หลานความจำดีมาก จำได้แม่นยำในเวลาไม่กี่อึดใจ`
-                          : `ไม่เป็นไรนะ ความจำคนเรามีขึ้นมีลง ฝึกฝนบ่อยๆ เดี๋ยวก็ดีขึ้นเอง!`
-                        }
-                      </p>
-                    </div>
-                  </div>
+                    <h2 className="text-3xl font-black text-slate-800 mb-2 uppercase">ผลการประเมินเบื้องต้น</h2>
+                    <p className="text-slate-500 font-bold mb-8 text-sm md:text-base">คุณตาได้สรุปผลระดับการรู้คิดของหลานไว้ตรงนี้แล้วนะ</p>
 
-                  <button
-                    onClick={nextPhase}
-                    className="w-full py-5 bg-black text-white rounded-2xl font-black text-2xl shadow-[0_8px_0_#4f46e5] active:translate-y-1 active:shadow-none transition-all"
-                  >
-                    เริ่มออกเดินทางจริง! 🌍
-                  </button>
+                    <div className="space-y-6 mb-12">
+                      {/* Clock Result */}
+                      <div className="bg-indigo-50 p-6 rounded-3xl border-3 border-indigo-200 text-left">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="text-2xl">🕘</span>
+                          <h4 className="font-black text-indigo-700 uppercase">ทักษะการวางแผน (Clock Task)</h4>
+                        </div>
+                        <p className="font-bold text-indigo-900/70 text-sm leading-relaxed">
+                          {clockEval?.text || 'การตอบสนองปกติดีมาก'}
+                        </p>
+                      </div>
+
+                      {/* Memory Result */}
+                      <div className="bg-amber-50 p-6 rounded-3xl border-3 border-amber-200 text-left">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="text-2xl">🧠</span>
+                          <h4 className="font-black text-amber-700 uppercase">ความจำระยะสั้น (Memory Task)</h4>
+                        </div>
+                        <p className="font-bold text-amber-900/70 text-sm leading-relaxed">
+                          {memoryEval?.success
+                            ? `ยอดเยี่ยมมาก! หลานความจำดีมาก จำได้แม่นยำในเวลาไม่กี่อึดใจ`
+                            : `ไม่เป็นไรนะ ความจำคนเรามีขึ้นมีลง ฝึกฝนบ่อยๆ เดี๋ยวก็ดีขึ้นเอง!`
+                          }
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={nextPhase}
+                      className="w-full py-5 bg-black text-white rounded-2xl font-black text-2xl shadow-[0_8px_0_#4f46e5] active:translate-y-1 active:shadow-none transition-all"
+                    >
+                      เริ่มออกเดินทางจริง! 🌍
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
 

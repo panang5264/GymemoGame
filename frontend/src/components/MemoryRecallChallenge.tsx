@@ -33,20 +33,33 @@ export default function MemoryRecallChallenge({
     const [tries, setTries] = useState(0);
 
     useEffect(() => {
-        // Pick 3 random words once when the component mounts or when words are empty
-        if (selectedWords.length === 0) {
+        // Phase 1: Generate words if in memorize phase and none exist
+        if (phase === 'memorize' && selectedWords.length === 0) {
             const shuffled = [...MEMORY_WORDS].sort(() => 0.5 - Math.random());
             const picked = shuffled.slice(0, 3);
             setSelectedWords(picked);
             if (onWordsGenerated) onWordsGenerated(picked);
-
-            // For recall phase, give 6-9 options
-            const otherWords = MEMORY_WORDS.filter(w => !picked.includes(w));
-            const shuffledOthers = otherWords.sort(() => 0.5 - Math.random());
-            const recallOptions = [...picked, ...shuffledOthers.slice(0, 6)].sort(() => 0.5 - Math.random());
-            setOptions(recallOptions);
         }
-    }, [selectedWords, onWordsGenerated]);
+
+        // Phase 2: Generate options (distractors) if in recall phase and none exist
+        if (phase === 'recall' && options.length === 0) {
+            const wordsToUse = (externalSelectedWords && externalSelectedWords.length > 0)
+                ? externalSelectedWords
+                : selectedWords;
+
+            if (wordsToUse.length > 0) {
+                const otherWords = MEMORY_WORDS.filter(w => !wordsToUse.includes(w));
+                const shuffledOthers = otherWords.sort(() => 0.5 - Math.random());
+                const recallOptions = [...wordsToUse, ...shuffledOthers.slice(0, 6)].sort(() => 0.5 - Math.random());
+                setOptions(recallOptions);
+
+                // Sync internal state with external if provided
+                if (externalSelectedWords && externalSelectedWords.length > 0 && selectedWords.length === 0) {
+                    setSelectedWords(externalSelectedWords);
+                }
+            }
+        }
+    }, [phase, selectedWords, externalSelectedWords, options.length, onWordsGenerated]);
 
     const toggleAnswer = (word: string) => {
         if (userAnswers.includes(word)) {
@@ -88,7 +101,7 @@ export default function MemoryRecallChallenge({
 
     if (phase === 'memorize') {
         return (
-            <div className="fixed inset-0 z-[110] flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-md p-6 animate-in fade-in duration-500">
+            <div className="flex flex-col items-center justify-center p-6 animate-in fade-in duration-500 min-h-[400px]">
                 <div className="max-w-md w-full bg-white rounded-[3rem] p-8 border-4 border-black shadow-[15px_15px_0_#000] text-center">
                     <div className="w-40 h-40 mx-auto mb-6 bg-amber-50 rounded-full border-4 border-black overflow-hidden flex items-end justify-center">
                         <img src="/assets_employer/characters/grandpa_front.png" alt="Grandpa" className="w-full h-full object-contain scale-125 translate-y-2" />
@@ -117,7 +130,7 @@ export default function MemoryRecallChallenge({
     }
 
     return (
-        <div className="fixed inset-0 z-[110] flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-md p-6 animate-in fade-in duration-500">
+        <div className="flex flex-col items-center justify-center p-6 animate-in fade-in duration-500 min-h-[400px]">
             <div className="max-w-md w-full bg-white rounded-[3rem] p-8 border-4 border-black shadow-[15px_15px_0_#000] text-center">
                 <div className="w-24 h-24 mx-auto mb-4 bg-amber-50 rounded-full border-4 border-black overflow-hidden flex items-end justify-center">
                     <img src="/assets_employer/characters/grandpa_front.png" alt="Grandpa" className="w-full h-full object-contain scale-125 translate-y-2" />
@@ -126,20 +139,20 @@ export default function MemoryRecallChallenge({
                 <h2 className="text-2xl font-black text-slate-800 mb-2">จำที่ตาบอกได้ไหม?</h2>
                 <p className="text-slate-500 font-bold mb-6 text-sm">ก่อนหน้านี้ ตาให้หลานจำคำว่าอะไรบ้าง (เลือก 3 คำ)</p>
 
-                {feedback && showFeedback && (
-                    <div className={`mb-4 py-2 px-4 rounded-full font-black text-sm border-2 ${feedback.includes('ถูกต้อง') ? 'bg-green-100 text-green-600 border-green-200' : 'bg-red-100 text-red-600 border-red-200 animate-shake'}`}>
+                {feedback && (
+                    <div className={`mb-4 py-3 px-6 rounded-2xl font-black text-sm border-4 shadow-md ${feedback.includes('ถูกต้อง') ? 'bg-green-100 text-green-600 border-green-200' : 'bg-red-100 text-red-600 border-red-200 animate-shake'}`}>
                         {feedback}
                     </div>
                 )}
 
-                <div className="grid grid-cols-3 gap-3 mb-8">
+                <div className="grid grid-cols-3 gap-3 mb-8 w-full">
                     {options.map((word, idx) => (
                         <button
                             key={idx}
                             onClick={() => toggleAnswer(word)}
-                            className={`py-3 px-2 rounded-xl font-black text-sm transition-all border-3 ${userAnswers.includes(word)
-                                ? 'bg-indigo-600 text-white border-indigo-800 scale-105 shadow-md'
-                                : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-indigo-300'
+                            className={`py-4 px-2 rounded-2xl font-black text-base transition-all border-4 ${userAnswers.includes(word)
+                                ? 'bg-indigo-600 text-white border-indigo-800 scale-105 shadow-[0_4px_0_#312e81] translate-y-[-2px]'
+                                : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-indigo-300 hover:bg-slate-100 shadow-[0_4px_0_#cbd5e1] active:translate-y-1 active:shadow-none'
                                 }`}
                         >
                             {word}
