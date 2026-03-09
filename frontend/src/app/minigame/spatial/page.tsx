@@ -302,7 +302,10 @@ function SpatialGameInner() {
       if (mode === 'village') {
         const accuracy = errorCount === 0 ? 100 : Math.max(0, 100 - errorCount * 25)
         const duration = (Date.now() - startTime) / 1000
-        const finalScore = 100 * (isBonus ? 2 : 1)
+
+        // Target: Completion = 100% of Village * 100 base score
+        const finalScore = (villageId * 100) * (isBonus ? 2 : 1)
+
         recordPlay(villageId, finalScore, 'spatial', subId, accuracy, duration)
       } else if (mode === 'daily') {
         const dateKey = getDateKey()
@@ -476,10 +479,10 @@ function SpatialGameInner() {
 
                 {/* Answer choices */}
                 <div className={`grid gap-3 sm:gap-4 md:gap-5 w-full max-w-2xl px-2 sm:px-4 pb-8 ${questionData.options.length === 2
-                    ? 'grid-cols-2'
-                    : questionData.options.length === 3
-                      ? 'grid-cols-3'
-                      : 'grid-cols-2 md:grid-cols-4'
+                  ? 'grid-cols-2'
+                  : questionData.options.length === 3
+                    ? 'grid-cols-3'
+                    : 'grid-cols-2 md:grid-cols-4'
                   }`}>
                   {questionData.options.map((opt: string, idx: number) => (
                     <button

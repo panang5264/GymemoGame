@@ -48,9 +48,30 @@ function getRandomPos() {
 // ─── Level Definitions ───────────────────────────────────────────────────────
 
 const COOKING_RECIPES = [
-  { name: 'แตงกวาผัดไข่', ingredients: ['🥒', '🥚', '🧂'] },
-  { name: 'ผัดไทยกุ้ง', ingredients: ['🍝', '🍤', '🥜'] },
-  { name: 'กะเพราหมูสับ', ingredients: ['🐷', '🌿', '🌶️'] },
+  {
+    name: 'แตงกวาผัดไข่',
+    ingredients: ['แตงกวา', 'ไข่ไก่', 'กระเทียม', 'น้ำตาล', 'น้ำปลา', 'พริกไทย'],
+    extra: 'น้ำตาล',
+    thought: 'อยากได้ความหวานเพิ่มจัง... (ใส่น้ำตาลเพิ่ม)'
+  },
+  {
+    name: 'ผัดไทยกุ้ง',
+    ingredients: ['เส้นจันท์', 'กุ้ง', 'น้ำตาล', 'น้ำปลา', 'กุยช่าย', 'เต้าหู้', 'ถั่วงอก'],
+    extra: 'น้ำปลา',
+    thought: 'อยากได้ความเค็มเพิ่มจัง... (ใส่น้ำปลาเพิ่ม)'
+  },
+  {
+    name: 'กะเพราหมูสับ',
+    ingredients: ['ข้าว', 'หมูสับ', 'กะเพรา', 'น้ำปลา', 'น้ำตาล', 'พริกแดง'],
+    extra: 'พริกแดง',
+    thought: 'อยากได้ความเผ็ดเพิ่มจัง... (ใส่พริกแดงเพิ่ม)'
+  },
+]
+
+const ALL_INGREDIENTS = [
+  'ข้าว', 'เส้นจันท์', 'แตงกวา', 'กุ้ง', 'ไข่ไก่',
+  'หมูสับ', 'กระเทียม', 'พริกแดง', 'กะเพรา', 'น้ำตาล',
+  'น้ำปลา', 'พริกไทย', 'ถั่วงอก', 'กุยช่าย', 'เต้าหู้'
 ]
 
 // ─── Procedural Maze Generator ──────────────────────────────────────────────
@@ -148,7 +169,7 @@ const MG_BASE = '/Asset ด้าน/บริหารจัดการ'
 
 // Village 2 images – หมู่บ้านที่ 2/รอบที่1
 const V2_ANIMALS = [
-  { id: 'a1', label: 'จรเข้', emoji: '🐊', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่1(สัตว์4ขา)/จรเข้.png` },
+  { id: 'a1', label: 'จระเข้', emoji: '🐊', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่1(สัตว์4ขา)/จรเข้.png` },
   { id: 'a2', label: 'ช้าง', emoji: '🐘', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่1(สัตว์4ขา)/ช้าง.png` },
   { id: 'a3', label: 'ม้าลาย', emoji: '🦓', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่1(สัตว์4ขา)/ม้าลาย.png` },
   { id: 'a4', label: 'ยีราฟ', emoji: '🦒', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่1(สัตว์4ขา)/ยีราฟ.png` },
@@ -198,7 +219,7 @@ function getLevelConfig(level: number) {
         { id: 'scrubber', title: 'อุปกรณ์ขัด/แปรง 🧽', emoji: '📦', accepts: i => i.tags.includes('scrubber') },
       ]
       items = [
-        { id: 'a1', label: 'จรเข้', emoji: '🐊', tags: ['animal4'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 3/จรเข้.png` },
+        { id: 'a1', label: 'จระเข้', emoji: '🐊', tags: ['animal4'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 3/จรเข้.png` },
         { id: 'a2', label: 'ช้าง', emoji: '🐘', tags: ['animal4'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 3/ช้าง.png` },
         { id: 'a3', label: 'ม้าลาย', emoji: '🦓', tags: ['animal4'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 3/ม้าลาย.png` },
         { id: 'a4', label: 'ยีราฟ', emoji: '🦒', tags: ['animal4'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 3/ยีราฟ.png` },
@@ -215,7 +236,7 @@ function getLevelConfig(level: number) {
     case 4:
     case 5:
       mode = 'cooking'
-      instruction = level === 4 ? 'ปรุงอาหารตามคำสั่งที่ปรากฏ (จำคำสั่งให้ดี!)' : 'ปรุงอาหารและปรับรสชาติพิเศษ'
+      instruction = level === 4 ? 'ปรุงอาหารตามลำดับที่ปรากฏ (จำลำดับให้ดี!)' : 'ปรุงอาหารและปรับรสชาติพิเศษตามความคิดของตัวละคร'
       break
 
     case 6:
@@ -283,6 +304,9 @@ function ManagementGameInner() {
   const [currentOrder, setCurrentOrder] = useState<string[]>([])
   const [collectedIngredients, setCollectedIngredients] = useState<string[]>([])
   const [cookingItems, setCookingItems] = useState<string[]>([])
+  const [isExtraPhase, setIsExtraPhase] = useState(false)
+  const [thoughtBubble, setThoughtBubble] = useState<string | null>(null)
+  const [shuffledRecipes, setShuffledRecipes] = useState<typeof COOKING_RECIPES>([...COOKING_RECIPES])
 
   // Maze State
   const [maze, setMaze] = useState<number[][]>([])
@@ -328,8 +352,10 @@ function ManagementGameInner() {
     }
 
     if (c.mode === 'cooking') {
+      const recipes = levelParam === 5 ? [...COOKING_RECIPES].sort(() => Math.random() - 0.5) : COOKING_RECIPES
+      setShuffledRecipes(recipes)
       setDishIndex(0)
-      startNewCookingDish(0)
+      startNewCookingDish(0, recipes)
     }
 
     if (c.mode === 'matching') {
@@ -418,36 +444,59 @@ function ManagementGameInner() {
   }
 
   // Cooking Handlers
-  const startNewCookingDish = (idx: number) => {
-    if (idx >= COOKING_RECIPES.length) {
+  const startNewCookingDish = (idx: number, recipesToUse = shuffledRecipes) => {
+    if (idx >= recipesToUse.length) {
       setPhase('done')
       return
     }
-    const recipe = COOKING_RECIPES[idx]
+    const recipe = recipesToUse[idx]
     setCurrentOrder(recipe.ingredients)
     setCollectedIngredients([])
     setShowCookingOrder(true)
+    setIsExtraPhase(false)
+    setThoughtBubble(null)
+    setFeedback(null)
 
-    // Generate random ingredients including distractors
-    const pool = ['🥒', '🥚', '🧂', '🍝', '🍤', '🥜', '🐷', '🌿', '🌶️', '🦪', '🥡', '🥦', '🧅']
-    const items = [...recipe.ingredients, ...pool.sort(() => Math.random() - 0.5).slice(0, 5)].sort(() => Math.random() - 0.5)
-    setCookingItems(items)
+    // Pool of all 15 ingredients
+    setCookingItems([...ALL_INGREDIENTS].sort(() => Math.random() - 0.5))
 
-    setTimeout(() => setShowCookingOrder(false), 3000)
+    setTimeout(() => setShowCookingOrder(false), 5000)
   }
 
   const handleCookIngredient = (ing: string) => {
+    if (isExtraPhase) {
+      const recipe = shuffledRecipes[dishIndex]
+      if (recipe.extra === ing) {
+        setScore(s => s + 5)
+        setFeedback({ type: 'correct', message: '✨ รสชาติเลิศมาก!' })
+        setTimeout(() => {
+          setDishIndex(d => d + 1)
+          startNewCookingDish(dishIndex + 1)
+        }, 1000)
+      } else {
+        setFeedback({ type: 'wrong', message: '❌ รสชาตินี้ยังไม่ใช่...' })
+        setTimeout(() => setFeedback(null), 1000)
+      }
+      return
+    }
+
     const isCorrect = currentOrder[collectedIngredients.length] === ing
     if (isCorrect) {
       const next = [...collectedIngredients, ing]
       setCollectedIngredients(next)
       if (next.length === currentOrder.length) {
-        setScore(s => s + 1)
-        setFeedback({ type: 'correct', message: '🍽️ ปรุงเสร็จแล้ว!' })
-        setTimeout(() => {
-          setDishIndex(d => d + 1)
-          startNewCookingDish(dishIndex + 1)
-        }, 1000)
+        if (levelParam === 5) {
+          setIsExtraPhase(true)
+          setThoughtBubble(shuffledRecipes[dishIndex].thought)
+          setFeedback({ type: 'correct', message: '🥣 ปรุงเสร็จแล้ว... เอ๊ะ?' })
+        } else {
+          setScore(s => s + 5)
+          setFeedback({ type: 'correct', message: '🍽️ ปรุงเสร็จแล้ว!' })
+          setTimeout(() => {
+            setDishIndex(d => d + 1)
+            startNewCookingDish(dishIndex + 1)
+          }, 1000)
+        }
       }
     } else {
       setFeedback({ type: 'wrong', message: '❌ ผิดสูตรนะ!' })
@@ -569,9 +618,18 @@ function ManagementGameInner() {
     const timeTaken = (Date.now() - startTime) / 1000
 
     const scoreMultiplier = isBonus ? 2 : 1
-    const multipliedScore = finalAverage * scoreMultiplier
 
-    if (modeParam === 'village') recordPlay(villageId, multipliedScore, 'management', subId, accuracy, timeTaken)
+    // Scaling target: VillageId * 100
+    // Target Raw: Cooking=15, Sorting=10, Matching=10, Maze=20
+    let targetRaw = 10
+    if (config.mode === 'cooking') targetRaw = 15
+    if (config.mode === 'maze') targetRaw = 20
+    if (config.mode === 'matching') targetRaw = 10
+
+    const scaledScore = Math.floor(((finalAverage * scoreMultiplier) / targetRaw) * (villageId * 100))
+    const finalVillageScore = Math.max(0, scaledScore)
+
+    if (modeParam === 'village') recordPlay(villageId, finalVillageScore, 'management', subId, accuracy, timeTaken)
     else if (modeParam === 'daily') {
       const dk = getDateKey()
 
@@ -636,8 +694,10 @@ function ManagementGameInner() {
     }
 
     if (c.mode === 'cooking') {
+      const recipes = levelParam === 5 ? [...COOKING_RECIPES].sort(() => Math.random() - 0.5) : COOKING_RECIPES
+      setShuffledRecipes(recipes)
       setDishIndex(0)
-      startNewCookingDish(0)
+      startNewCookingDish(0, recipes)
     }
 
     if (c.mode === 'matching') {
@@ -863,24 +923,58 @@ function ManagementGameInner() {
 
               {config.mode === 'cooking' && (
                 <div className="w-full h-full flex flex-col items-center justify-center p-4 md:p-10">
-                  <div className="absolute top-4 md:top-6 left-1/2 -translate-x-1/2 flex flex-col items-center">
-                    <span className="bg-slate-800 text-white px-4 py-1.5 md:px-6 md:py-2 rounded-full font-black text-sm md:text-xl mb-2 text-center whitespace-nowrap">เมนู: {COOKING_RECIPES[dishIndex]?.name}</span>
+                  <div className="absolute top-4 md:top-6 left-1/2 -translate-x-1/2 flex flex-col items-center z-20">
+                    <span className="bg-amber-500 text-white px-6 py-2 rounded-full font-black text-sm md:text-xl mb-4 shadow-lg border-2 border-amber-300">
+                      เมนู: {shuffledRecipes[dishIndex]?.name}
+                    </span>
+
                     {showCookingOrder && (
-                      <div className="flex gap-2 md:gap-4 p-2 md:p-4 bg-white rounded-2xl md:rounded-3xl shadow-2xl border-2 md:border-4 border-blue-400 animate-in zoom-in">
-                        {currentOrder.map((ing, i) => <div key={i} className="text-3xl md:text-5xl">{ing}</div>)}
+                      <div className="flex flex-wrap justify-center gap-2 p-4 bg-white rounded-3xl shadow-2xl border-4 border-indigo-400 animate-in zoom-in max-w-lg">
+                        {currentOrder.map((ing, i) => (
+                          <div key={i} className="px-3 py-1.5 bg-indigo-50 rounded-xl text-indigo-700 font-black text-sm md:text-lg border-2 border-indigo-100">
+                            {ing}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {thoughtBubble && (
+                      <div className="relative p-6 bg-white rounded-[2rem] shadow-2xl border-4 border-rose-400 animate-in slide-in-from-top duration-500 max-w-md">
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-white border-l-4 border-t-4 border-rose-400 rotate-45"></div>
+                        <p className="text-rose-600 font-black text-lg md:text-2xl text-center">
+                          💭 "{thoughtBubble}"
+                        </p>
                       </div>
                     )}
                   </div>
-                  <div className="flex-1 flex flex-col items-center justify-center mt-16 md:mt-20">
-                    <div className="flex gap-2 md:gap-4 mb-10 md:mb-20 bg-slate-100 p-4 md:p-8 rounded-[2rem] md:rounded-[40px] shadow-inner min-h-[100px] md:min-h-[140px] items-center">
-                      {collectedIngredients.map((ing, i) => <div key={i} className="text-4xl md:text-6xl animate-in bounce-in">{ing}</div>)}
-                      {collectedIngredients.length < currentOrder.length && !showCookingOrder && (
-                        <div className="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 md:border-4 border-dashed border-slate-300 flex items-center justify-center text-slate-300 text-2xl md:text-3xl font-black">?</div>
-                      )}
+
+                  <div className="flex-1 flex flex-col items-center justify-center mt-24 md:mt-32">
+                    <div className="relative mb-12 md:mb-16">
+                      <div className="w-64 h-24 md:w-96 md:h-32 bg-slate-200/50 rounded-full border-b-[12px] border-slate-300 flex items-center justify-center relative overflow-hidden shadow-inner">
+                        <div className="flex flex-wrap justify-center gap-2 p-4">
+                          {collectedIngredients.map((ing, i) => (
+                            <div key={i} className="px-3 py-1.5 bg-white rounded-xl text-slate-800 font-black text-xs md:text-sm shadow-md animate-in bounce-in">
+                              {ing}
+                            </div>
+                          ))}
+                          {collectedIngredients.length < currentOrder.length && !showCookingOrder && !isExtraPhase && (
+                            <div className="text-slate-400 font-black text-xl animate-pulse">?</div>
+                          )}
+                        </div>
+                      </div>
+                      {/* Pan handle or decor */}
+                      <div className="absolute top-1/2 -right-16 md:-right-24 w-20 md:w-32 h-4 md:h-6 bg-slate-400 rounded-full -translate-y-1/2 shadow-md"></div>
                     </div>
-                    <div className="grid grid-cols-4 md:grid-cols-7 gap-2 md:gap-3 px-2">
+
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 max-w-3xl px-4">
                       {cookingItems.map((ing, i) => (
-                        <button key={i} onClick={() => handleCookIngredient(ing)} className="w-14 h-14 md:w-16 md:h-16 bg-white rounded-[1rem] md:rounded-3xl shadow-md md:shadow-xl flex items-center justify-center text-3xl hover:scale-110 active:scale-90 border-b-4 border-slate-200">{ing}</button>
+                        <button
+                          key={i}
+                          onClick={() => handleCookIngredient(ing)}
+                          className="px-4 py-3 md:px-6 md:py-4 bg-white rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 active:translate-y-0 active:shadow-none transition-all border-b-4 border-slate-200 font-black text-slate-700 text-sm md:text-lg flex items-center justify-center"
+                        >
+                          {ing}
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -888,22 +982,24 @@ function ManagementGameInner() {
               )}
 
               {config.mode === 'maze' && (
-                <div className={`w-full h-full flex flex-col items-center justify-center p-6 transition-opacity duration-1000 ${isMazeHidden ? 'opacity-0' : 'opacity-100'}`}>
-                  <div className="bg-slate-800 p-4 rounded-[40px] shadow-2xl border-8 border-slate-700">
-                    <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${maze[0]?.length || 0}, minmax(0, 1fr))` }}>
+                <div className={`w-full h-full flex flex-col items-center justify-center p-6 transition-all duration-1000 ${isMazeHidden ? 'bg-slate-900' : 'bg-white'}`}>
+                  <div className="bg-white p-2 rounded-[40px] shadow-2xl border-4 border-slate-800">
+                    <div className="grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${maze[0]?.length || 0}, minmax(0, 1fr))` }}>
                       {maze.map((row, r) => row.map((cell, c) => (
-                        <div key={`${r}-${c}`} className={`w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-xl md:text-2xl ${cell === 1 ? 'bg-slate-700' : 'bg-slate-900/40'}`}>
-                          {playerPos.r === r && playerPos.c === c && <span className="animate-pulse">🧍</span>}
+                        <div key={`${r}-${c}`} className={`w-8 h-8 md:w-10 md:h-10 border border-slate-100 flex items-center justify-center text-xl md:text-2xl ${cell === 1 ? 'bg-slate-800' : 'bg-white'}`}>
+                          {playerPos.r === r && playerPos.c === c && (
+                            <img src="/assets_employer/logo.png" className="w-[80%] h-[80%] object-contain animate-bounce" alt="brain" />
+                          )}
                           {cell === 2 && (
                             <div className={`relative w-full h-full flex items-center justify-center ${levelParam >= 7 && !hasKey ? 'grayscale opacity-30 brightness-50' : ''}`}>
-                              <span className="drop-shadow-lg">🚪</span>
+                              <span className="drop-shadow-lg">�</span>
                             </div>
                           )}
                           {cell === 3 && (
-                            <span>🔑</span>
+                            <span className="scale-125">🔑</span>
                           )}
                           {cell === 4 && showBombs && (
-                            <span>💣</span>
+                            <span className="scale-125">💣</span>
                           )}
                         </div>
                       )))}

@@ -6,37 +6,41 @@ interface TimerProps {
   isRunning: boolean
   initialSeconds?: number
   onTimeUp?: () => void
+  mode?: 'up' | 'down'
 }
 
-export default function Timer({ isRunning, initialSeconds = 60, onTimeUp }: TimerProps) {
-  const [seconds, setSeconds] = useState(initialSeconds)
+export default function Timer({ isRunning, initialSeconds = 60, onTimeUp, mode = 'down' }: TimerProps) {
+  const [seconds, setSeconds] = useState(mode === 'down' ? initialSeconds : 0)
 
   useEffect(() => {
-    if (!isRunning) {
-      // ไม่ reset ถ้าเวลาเป็น 0 (หมดเวลาแล้ว)
-      if (seconds !== 0) {
-        setSeconds(initialSeconds)
-      }
-      return
-    }
-
-    if (seconds <= 0) {
-      onTimeUp?.()
-      return
-    }
+    if (!isRunning) return
 
     const interval = setInterval(() => {
       setSeconds(prev => {
-        if (prev <= 1) {
-          // onTimeUp?.()
-          return 0
+        if (mode === 'down') {
+          if (prev <= 1) {
+            onTimeUp?.()
+            clearInterval(interval)
+            return 0
+          }
+          return prev - 1
+        } else {
+          return prev + 1
         }
-        return prev - 1
       })
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [isRunning, seconds, onTimeUp, initialSeconds])
+  }, [isRunning, onTimeUp, mode])
+
+  useEffect(() => {
+    if (!isRunning && mode === 'down') {
+      setSeconds(initialSeconds)
+    }
+    if (!isRunning && mode === 'up') {
+      setSeconds(0)
+    }
+  }, [isRunning, initialSeconds, mode])
 
   const minutes = Math.floor(seconds / 60)
   const remainingSeconds = seconds % 60
@@ -44,7 +48,7 @@ export default function Timer({ isRunning, initialSeconds = 60, onTimeUp }: Time
   return (
     <div className="timer">
       <span className="timer-label">เวลา:</span>
-      <span className="timer-value" style={{ color: seconds <= 10 ? 'red' : 'inherit' }}>
+      <span className="timer-value" style={{ color: mode === 'down' && seconds <= 10 ? 'red' : 'inherit' }}>
         {String(minutes).padStart(2, '0')}:{String(remainingSeconds).padStart(2, '0')}
       </span>
     </div>

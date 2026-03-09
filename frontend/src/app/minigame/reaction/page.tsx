@@ -87,8 +87,12 @@ function MazeGameInner() {
             setPhase('done')
             if (mode === 'village') {
                 const timeTaken = (Date.now() - startTime) / 1000
-                const score = Math.max(10, Math.floor(1000 / (timeTaken + 1)))
-                recordPlay(parseInt(villageIdParam), score, 'reaction', subId, 100, timeTaken)
+                // Target: High performance (~10-20s) gives full village score
+                const targetFactor = Math.floor(150 / (timeTaken / 5 + 1))
+                const baseScaled = (targetFactor / 30) * (parseInt(villageIdParam) * 100)
+                const finalScore = Math.max(5, Math.floor(baseScaled))
+
+                recordPlay(parseInt(villageIdParam), finalScore, 'reaction', subId, 100, timeTaken)
 
                 // ถือว่าทำภารกิจรายวันโหมด management ควบคู่ไปด้วย (เนื่องจาก Reaction เป็นส่วนหนึ่งของหมู่บ้าน)
                 const dk = getDateKey()
@@ -158,7 +162,7 @@ function MazeGameInner() {
                     {phase === 'play' && (
                         <div className="flex flex-col items-center">
                             <div
-                                className="bg-slate-800 p-3 rounded-[32px] shadow-2xl border-8 border-slate-700 overflow-hidden"
+                                className="bg-white p-2 rounded-[40px] shadow-2xl border-4 border-slate-800"
                                 style={{
                                     display: 'grid',
                                     gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
@@ -169,14 +173,14 @@ function MazeGameInner() {
                                 {maze.map((row, r) => row.map((cell, c) => (
                                     <div
                                         key={`${r}-${c}`}
-                                        className={`w-6 h-6 md:w-8 md:h-8 rounded-[4px] flex items-center justify-center text-lg ${cell === 1 ? 'bg-slate-700/80 shadow-inner' : 'bg-slate-900/30'
+                                        className={`w-6 h-6 md:w-8 md:h-8 border border-slate-50 flex items-center justify-center text-lg ${cell === 1 ? 'bg-slate-800' : 'bg-white'
                                             }`}
                                     >
                                         {playerPos.r === r && playerPos.c === c && (
-                                            <span className="animate-pulse">🧍</span>
+                                            <img src="/assets_employer/logo.png" className="w-[85%] h-[85%] object-contain animate-bounce" alt="brain" />
                                         )}
                                         {cell === 2 && (
-                                            <span className="drop-shadow-xl animate-bounce">🚪</span>
+                                            <span className="drop-shadow-xl animate-pulse">🚩</span>
                                         )}
                                     </div>
                                 )))}

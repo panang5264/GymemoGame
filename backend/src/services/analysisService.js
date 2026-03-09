@@ -33,7 +33,7 @@ async function recordGameSession(data) {
         timeTaken,
         accuracy,
         moves,
-        domainMetrics: calculateDomainMetrics(gameType, score, timeTaken, accuracy)
+        domainMetrics: calculateDomainMetrics(gameType, score, timeTaken, accuracy, level)
     });
 
     // 2. Update/Create Cognitive Profile
@@ -65,15 +65,18 @@ async function recordGameSession(data) {
     return { session, profile };
 }
 
-function calculateDomainMetrics(gameType, score, timeTaken, accuracy) {
-    // Basic weight logic
+function calculateDomainMetrics(gameType, score, timeTaken, accuracy, level) {
     const metrics = { executive: 0, memory: 0, attention: 0, calculation: 0 };
-    const normalizedScore = Math.min(100, (score / 15) * 100);
 
-    if (gameType === 'management') metrics.executive = normalizedScore;
-    if (gameType === 'calculation') metrics.calculation = normalizedScore;
-    if (gameType === 'spatial') metrics.memory = normalizedScore;
-    if (gameType === 'reaction') metrics.attention = normalizedScore;
+    // Scale target based on Village ID (Village 1 = 100, Village 10 = 1000)
+    // If level is 0 or missing (daily), default to 100
+    const villageId = (level && level > 0) ? level : 1;
+    const target = villageId * 100;
+
+    if (gameType === 'management') metrics.executive = Math.min(100, (score / target) * 100);
+    if (gameType === 'calculation') metrics.calculation = Math.min(100, (score / target) * 100);
+    if (gameType === 'spatial') metrics.memory = Math.min(100, (score / target) * 100);
+    if (gameType === 'reaction') metrics.attention = Math.min(100, (score / target) * 100);
 
     return metrics;
 }

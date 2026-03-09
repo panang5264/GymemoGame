@@ -1,6 +1,7 @@
 const STORAGE_KEY = 'gymemo_progress_v2'
+import { getDateKey } from './dailyChallenge'
 
-export const PLAYS_PER_VILLAGE = 12
+export const PLAYS_PER_VILLAGE = 126
 export const MAX_KEYS = 9
 export const REGEN_INTERVAL_MS = 30 * 60 * 1000
 
@@ -83,7 +84,7 @@ export function recordPlay(
   accuracy?: number,
   timeTaken?: number
 ): GymemoProgressV2 {
-  const nextP = { ...p, villages: { ...p.villages } }
+  let nextP = { ...p, villages: { ...p.villages } }
   const key = String(villageId)
   const vp = { ...(nextP.villages[key] ?? { playsCompleted: 0, expTubeFilled: false }) }
   const newPlays = Math.min(vp.playsCompleted + 1, PLAYS_PER_VILLAGE * 99)
@@ -91,10 +92,24 @@ export function recordPlay(
 
   if (gameType) {
     const current = { ...(vp.currentRunScore ?? { management: 0, calculation: 0, spatial: 0, reaction: 0 }) }
-    if (gameType !== 'reaction' || current.reaction !== undefined) {
-      current[gameType] = Math.max(current[gameType] || 0, scoreGained)
-    }
+    current[gameType] = Math.max(current[gameType] || 0, scoreGained)
     vp.currentRunScore = current
+
+    // Auto-mark Daily Progress: Playing in world map counts for Daily Challenge!
+    const dk = getDateKey()
+    const dp = { ...(nextP.daily[dk] ?? { management: false, calculation: false, spatial: false, reaction: false }) }
+
+    // Map 'reaction' to 'management' for daily progress tracking
+    // Also save the score to the daily bucket
+    if (gameType === 'reaction') {
+      dp.management = true
+      nextP = saveDailyScore(nextP, dk, 'management', scoreGained)
+    } else {
+      dp[gameType] = true
+      nextP = saveDailyScore(nextP, dk, gameType, scoreGained)
+    }
+
+    nextP.daily[dk] = dp
   }
 
   if (subId) {

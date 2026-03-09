@@ -46,6 +46,7 @@ function CalculationGameInner() {
   const [question, setQuestion] = useState<CalcQuestion | null>(null)
   const [score, setScore] = useState(0)
   const [total, setTotal] = useState(0)
+  const MAX_QUESTIONS = 15
   const [lastCorrect, setLastCorrect] = useState<boolean | null>(null)
   const [answer, setAnswer] = useState('')
   const [showInfo, setShowInfo] = useState(false)
@@ -85,7 +86,12 @@ function CalculationGameInner() {
       hasSavedVillageRef.current = true
       const accuracy = total > 0 ? (score / total) * 100 : 100
       const duration = (Date.now() - startTime) / 1000
-      const finalScore = score * 25 * (isBonus ? 2 : 1)
+
+      // Target: 15 questions = 100% of Village * 100 base score
+      const targetCorrect = 15
+      const baseScaled = (score / targetCorrect) * (parseInt(villageId, 10) * 100)
+      const finalScore = Math.floor(baseScaled * (isBonus ? 2 : 1))
+
       recordPlay(parseInt(villageId, 10), finalScore, 'calculation', subId, accuracy, duration)
     }
   }, [phase, mode, villageId, score, subId, total, startTime, recordPlay])
@@ -164,8 +170,13 @@ function CalculationGameInner() {
     setTimeout(() => {
       setLastCorrect(null)
       setAnswer('')
-      setQuestion(level.generate_problem())
-    }, 500)
+      if (total + 1 >= MAX_QUESTIONS) {
+        setIsRunning(false)
+        setPhase('done')
+      } else {
+        setQuestion(level.generate_problem())
+      }
+    }, 400)
   }, [answer, question, isTimeUp, level])
 
   // ── Cheat Mode ─────────────────────────────────────────────────────────────
@@ -217,7 +228,7 @@ function CalculationGameInner() {
             <p className="text-slate-600 font-bold flex items-center justify-center gap-2">
               <span className={`text-2xl ${level.level === 10 ? 'animate-bounce' : ''}`}>⏱️</span>
               <span>
-                <span className={`${level.level === 10 ? 'text-amber-600' : 'text-blue-600'} font-black`}>ภารกิจ:</span> {level.level === 10 ? 'ระวังตัวกวน! ' : ''}ตอบให้ได้มากที่สุดใน <span className="text-slate-900 font-black">1 นาที</span>
+                <span className={`${level.level === 10 ? 'text-amber-600' : 'text-blue-600'} font-black`}>ภารกิจ:</span> {level.level === 10 ? 'ระวังตัวกวน! ' : ''}ตอบให้ถูกต้อง <span className="text-slate-900 font-black">15 ข้อ</span> ภายใน <span className="text-slate-900 font-black">1 นาที</span>
               </span>
               {mode === 'daily' && <span className="px-2 py-1 bg-yellow-400 text-yellow-950 rounded-lg text-xs font-black shrink-0 shadow-[2px_2px_0_#000] border border-black/10">🌟 DAILY</span>}
             </p>
@@ -282,9 +293,9 @@ function CalculationGameInner() {
               <span className="font-serif italic font-black text-sm">i</span>
             </button>
           </div>
-          <div className="bg-white/90 backdrop-blur-md px-4 md:px-8 py-2 rounded-2xl border border-white/20 flex items-center gap-2 md:gap-4 shadow-xl">
-            <span className="text-slate-400 text-[10px] md:text-xs font-black uppercase tracking-widest hidden xs:block">Score</span>
-            <span className="text-xl md:text-3xl font-black text-blue-600">{score}</span>
+          <div className="bg-white/90 backdrop-blur-md px-4 md:px-8 py-2 rounded-2xl border border-white/20 flex flex-col items-center shadow-xl">
+            <span className="text-slate-400 text-[10px] md:text-xs font-black uppercase tracking-widest">Question</span>
+            <span className="text-xl md:text-3xl font-black text-blue-600">{total + 1} / {MAX_QUESTIONS}</span>
           </div>
         </div>
 
@@ -330,9 +341,9 @@ function CalculationGameInner() {
 
           <div className="flex flex-col justify-center mb-6 md:mb-10">
             <div className="scale-90 md:scale-110 relative">
-              <Timer isRunning={isRunning} initialSeconds={60} onTimeUp={handleTimeUp} />
+              <Timer isRunning={isRunning} initialSeconds={60} onTimeUp={handleTimeUp} mode="down" />
               <div className={`absolute -top-3 md:-top-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-white text-[8px] md:text-[10px] font-black px-2 py-0.5 rounded-full animate-pulse uppercase tracking-wider ${level.level === 10 ? 'bg-red-500' : 'bg-blue-600 shadow-[0_4px_12px_rgba(79,70,229,0.3)]'}`}>
-                {level.level === 10 ? '⚠️ Interference Active ⚠️' : '⏱️ Mission: 1 Minute!'}
+                {level.level === 10 ? '⚠️ Interference Active ⚠️' : '⏱️ Mission: 15 Questions / 1 Minute'}
               </div>
             </div>
           </div>
@@ -361,29 +372,29 @@ function CalculationGameInner() {
                       </div>
                     ) : typeof value === 'number' ? (
                       /* 3. Normal Number */
-                      <span className="text-xl md:text-3xl lg:text-5xl font-black text-slate-800 tracking-tighter shrink-0">{value}</span>
+                      <span className="text-3xl md:text-7xl lg:text-9xl font-black text-slate-800 tracking-tighter shrink-0">{value}</span>
                     ) : (
                       /* 4. Dice Image */
-                      <div className="p-1 md:p-2 bg-white rounded-xl border border-slate-100 shadow-sm flex items-center justify-center w-[40px] h-[30px] md:w-[75px] md:h-[55px] shrink-0">
-                        <Image src={(value as any).path} width={60} height={45} className="rounded-lg object-contain w-full h-full" alt={(value as any).name} />
+                      <div className="p-1 md:p-2 bg-white rounded-2xl border-2 border-slate-100 shadow-sm flex items-center justify-center w-[60px] h-[50px] md:w-[120px] md:h-[100px] shrink-0 transform hover:scale-105 transition-transform">
+                        <Image src={(value as any).path} width={100} height={80} className="rounded-xl object-contain w-full h-full" alt={(value as any).name} />
                       </div>
                     )}
 
                     {/* Operator between operands */}
                     {index < question.operators.length && (
-                      <span className={`${level.level === 10 ? 'text-xl md:text-3xl text-indigo-400/50' : 'text-xl md:text-3xl text-indigo-400'} font-black shrink-0`}>
+                      <span className={`${level.level === 10 ? 'text-2xl md:text-5xl text-indigo-400/50' : 'text-2xl md:text-5xl text-indigo-400'} font-black shrink-0 px-1 md:px-2`}>
                         {question.operators[index].name}
                       </span>
                     )}
 
                     {/* Show equals sign at the end */}
                     {index === question.operands.length - 1 && (
-                      <div className="flex items-center gap-1 md:gap-3 ml-1 md:ml-2 shrink-0">
-                        <span className="text-lg md:text-3xl font-black text-indigo-400">=</span>
+                      <div className="flex items-center gap-2 md:gap-4 ml-2 md:ml-4 shrink-0">
+                        <span className="text-2xl md:text-5xl font-black text-indigo-400">=</span>
                         {question.final_result !== undefined ? (
-                          <span className="text-xl md:text-4xl lg:text-5xl font-black text-slate-800 tracking-tighter">{question.final_result}</span>
+                          <span className="text-3xl md:text-7xl lg:text-8xl font-black text-slate-800 tracking-tighter">{question.final_result}</span>
                         ) : (
-                          <div className="w-8 h-8 md:w-12 md:h-12 flex items-center justify-center bg-blue-50 border-2 md:border-4 border-dashed border-blue-200 rounded-xl text-xl md:text-3xl text-blue-600 font-black">?</div>
+                          <div className="w-12 h-12 md:w-24 md:h-24 flex items-center justify-center bg-blue-50 border-4 md:border-8 border-dashed border-blue-200 rounded-2xl md:rounded-3xl text-3xl md:text-6xl text-blue-600 font-black">?</div>
                         )}
                       </div>
                     )}
@@ -393,13 +404,13 @@ function CalculationGameInner() {
             </div>
           </div>
 
-          <div className="relative z-10 w-full max-w-sm mx-auto">
-            <div className="flex flex-col items-center gap-5">
+          <div className="relative z-10 w-full max-w-md mx-auto">
+            <div className="flex flex-col items-center gap-6 md:gap-8">
               <input
                 autoFocus
                 inputMode="numeric"
                 pattern="[0-9]*"
-                className={`w-full bg-slate-50 border-[3px] md:border-[6px] rounded-[1rem] md:rounded-[1.5rem] py-3 md:py-5 px-4 md:px-8 text-2xl md:text-4xl font-black text-center outline-none transition-all ${lastCorrect === true ? 'border-green-500 text-green-600 bg-green-50/50' : lastCorrect === false ? 'border-red-500 text-red-600 animate-shake bg-red-50/50' : 'border-slate-100 focus:border-blue-400 text-blue-700'}`}
+                className={`w-full bg-slate-50 border-[4px] md:border-[10px] rounded-[1.5rem] md:rounded-[2.5rem] py-5 md:py-8 px-6 md:px-12 text-4xl md:text-7xl font-black text-center outline-none transition-all shadow-inner ${lastCorrect === true ? 'border-green-500 text-green-600 bg-green-50/50' : lastCorrect === false ? 'border-red-500 text-red-600 animate-shake bg-red-50/50' : 'border-slate-100 focus:border-blue-400 text-blue-700 focus:shadow-[0_0_0_10px_rgba(59,130,246,0.1)]'}`}
                 placeholder="?"
                 value={answer}
                 disabled={isTimeUp}
@@ -407,11 +418,11 @@ function CalculationGameInner() {
                 onChange={(e) => setAnswer(e.target.value)}
               />
               <button
-                className={`w-full py-4 rounded-[1.25rem] md:rounded-[1.5rem] font-black text-lg md:text-xl transition-all ${isTimeUp ? 'bg-slate-100 text-slate-300' : 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-xl hover:shadow-blue-500/20 active:scale-95'}`}
+                className={`w-full py-5 md:py-8 rounded-[1.5rem] md:rounded-[2.5rem] font-black text-2xl md:text-5xl transition-all ${isTimeUp ? 'bg-slate-100 text-slate-300' : 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-[0_10px_0_#2563eb] md:shadow-[0_15px_0_#2563eb] hover:translate-y-[2px] hover:shadow-[0_8px_0_#2563eb] active:translate-y-[6px] md:active:translate-y-[10px] active:shadow-none'}`}
                 disabled={isTimeUp}
                 onClick={handleSubmit}
               >
-                OK
+                SUBMIT
               </button>
             </div>
           </div>

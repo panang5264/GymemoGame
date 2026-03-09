@@ -13,6 +13,9 @@ import {
 import { getExpPercent } from '@/lib/scoring'
 import PreviousRunPreview from '@/components/PreviousRunPreview'
 import { useProgress } from '@/contexts/ProgressContext'
+import { getDateKey, getCountdownToReset } from '@/lib/dailyChallenge'
+import { getDailyProgress, isDailyComplete } from '@/lib/levelSystem'
+import Link from 'next/link'
 
 const TOTAL_STAGES = 10
 
@@ -72,6 +75,9 @@ export default function WorldPage() {
   const [selectedVillage, setSelectedVillage] = useState<number | null>(null)
   const [showTutorial, setShowTutorial] = useState(false)
   const [userName, setUserName] = useState('')
+  const [dailyStatus, setDailyStatus] = useState({ management: false, calculation: false, spatial: false })
+  const [isDailyDone, setIsDailyDone] = useState(false)
+  const [dailyCountdown, setDailyCountdown] = useState('')
 
   const { progress, saveProgress, isLoading } = useProgress()
 
@@ -92,6 +98,10 @@ export default function WorldPage() {
     if (expMap[10] >= 100) {
       setShowEnding(true)
     }
+    // Daily Check
+    const dk = getDateKey()
+    setDailyStatus(getDailyProgress(p, dk))
+    setIsDailyDone(isDailyComplete(p, dk))
   }, [progress, isLoading])
 
   useEffect(() => {
@@ -109,7 +119,15 @@ export default function WorldPage() {
     }
     tick()
     const id = setInterval(tick, 1000)
-    return () => clearInterval(id)
+
+    const dTick = () => setDailyCountdown(getCountdownToReset())
+    dTick()
+    const dId = setInterval(dTick, 1000)
+
+    return () => {
+      clearInterval(id)
+      clearInterval(dId)
+    }
   }, [mounted, progress, isLoading])
 
   function closeIntro() {
@@ -347,6 +365,26 @@ export default function WorldPage() {
           <h1 className={styles.mapTitle}>🗺️ ยินดีต้อนรับ, {userName}</h1>
           <p className="text-black/60 text-xs sm:text-sm font-black uppercase tracking-widest mt-1">เป้าหมาย: ฟื้นฟูให้ครบ 10 หมู่บ้าน</p>
         </div>
+
+        {/* Daily Mission Widget */}
+        <Link href="/daily-challenge" className="flex items-center gap-2 md:gap-4 bg-white/90 backdrop-blur-md px-3 py-2 md:px-6 md:py-3 rounded-2xl border-2 border-black shadow-[4px_4px_0_#000] hover:translate-y-[-2px] transition-all group shrink-0">
+          <div className="flex flex-col">
+            <span className="text-[8px] md:text-[10px] font-black text-black/40 uppercase tracking-widest leading-none">Daily</span>
+            <div className="flex gap-1 mt-1">
+              <div className={`w-2 h-2 md:w-3 md:h-3 rounded-full border border-black/20 ${dailyStatus.management ? 'bg-green-500' : 'bg-slate-200'}`} />
+              <div className={`w-2 h-2 md:w-3 md:h-3 rounded-full border border-black/20 ${dailyStatus.calculation ? 'bg-green-500' : 'bg-slate-200'}`} />
+              <div className={`w-2 h-2 md:w-3 md:h-3 rounded-full border border-black/20 ${dailyStatus.spatial ? 'bg-green-500' : 'bg-slate-200'}`} />
+            </div>
+          </div>
+          <div className="h-6 md:h-8 w-[1px] md:w-[2px] bg-black/10 mx-0.5" />
+          <div className="flex flex-col items-end">
+            <span className={`text-[10px] md:text-sm font-black leading-none ${isDailyDone ? 'text-green-600' : 'text-orange-500'}`}>
+              {isDailyDone ? 'ครบ! ✨' : 'ภารกิจ...'}
+            </span>
+          </div>
+          <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-black text-white flex items-center justify-center text-[10px] group-hover:scale-110 transition-transform hidden sm:flex">➔</div>
+        </Link>
+
         <div className={styles.topActions}>
           <button className={styles.actionBtn} onClick={() => router.push('/leaderboard')}>
             🏆 อันดับ

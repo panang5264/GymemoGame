@@ -108,13 +108,8 @@ export default function DailyChallengePage() {
 
 
   const startNextMode = () => {
-    if (!todayModes.management) {
-      router.push(`/minigame/management?mode=daily&villageId=${userRank}&level=${userRank}&subId=1`)
-    } else if (!todayModes.calculation) {
-      router.push(`/minigame/calculation?mode=daily&villageId=${userRank}&level=${userRank}&subId=1`)
-    } else if (!todayModes.spatial) {
-      router.push(`/minigame/spatial?mode=daily&villageId=${userRank}&level=${userRank}&subId=1`)
-    }
+    // Go to world map where missions are now integrated!
+    router.push('/world')
   }
 
   const { currentKeys } = getKeys()
@@ -216,7 +211,7 @@ export default function DailyChallengePage() {
               onClick={startNextMode}
               className="w-full py-4 md:py-6 bg-[var(--border-dark)] text-[var(--text-on-dark)] rounded-2xl md:rounded-[2rem] font-black text-xl md:text-3xl shadow-[0_6px_0_rgba(0,0,0,0.2)] md:shadow-[0_10px_0_rgba(0,0,0,0.2)] transition-all hover:-translate-y-1 active:scale-95 border-2 border-black"
             >
-              เริ่มภารกิจต่อไป 🚀
+              ไปทำภารกิจในแผนที่โลก 🗺️
             </button>
             <div className="flex items-center justify-center gap-3 text-[var(--text-muted)] py-4 opacity-50">
               <span className="w-12 h-[2px] bg-[var(--border-dark)]"></span>
