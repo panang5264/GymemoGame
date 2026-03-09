@@ -170,18 +170,18 @@ const MG_BASE = '/Asset ด้าน/บริหารจัดการ'
 // Village 1 assets – Red & Round
 // Village 1 assets – Red & Round
 const V1_RED = [
-  { id: 'r1', label: 'แอปเปิ้ล', emoji: '🍎', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686404.jpg` },
-  { id: 'r2', label: 'สตรอว์เบอร์รี', emoji: '🍓', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686405.jpg` },
-  { id: 'r3', label: 'ลูกโป่ง', emoji: '🎈', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686407.jpg` },
-  { id: 'r4', label: 'ดอกกุหลาบ', emoji: '🌹', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686408.jpg` },
-  { id: 'r5', label: 'หัวใจ', emoji: '❤️', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3702788.jpg` },
+  { id: 'r1', label: 'รถดับเพลิง', emoji: '🚒', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/หมวดสีแดง/รถดับเพลิง.jpg` },
+  { id: 'r2', label: 'ป้ายหยุด', emoji: '🛑', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/หมวดสีแดง/ป้ายหยุด.jpg` },
+  { id: 'r3', label: 'ตู้ไปรษณีย์', emoji: '📮', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/หมวดสีแดง/ตู้ไปรษณีย์.jpg` },
+  { id: 'r4', label: 'พริก', emoji: '�️', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/หมวดสีแดง/พริก.jpg` },
+  { id: 'r5', label: 'ดอกกุหลาบ', emoji: '🌹', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/หมวดสีแดง/ดอกกุหลาบ.jpg` },
 ]
 const V1_ROUND = [
-  { id: 'ro1', label: 'ลูกฟุตบอล', emoji: '⚽', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702790.jpg` },
-  { id: 'ro2', label: 'ลูกบาสเกตบอล', emoji: '🏀', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702791.jpg` },
-  { id: 'ro3', label: 'พระจันทร์', emoji: '🌕', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702792.jpg` },
-  { id: 'ro4', label: 'วงกลมสีส้ม', emoji: '🟠', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702793.jpg` },
-  { id: 'ro5', label: 'แผ่นซีดี', emoji: '💿', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702794.jpg` },
+  { id: 'ro1', label: 'ลูกบาสเกตบอล', emoji: '🏀', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/ทรงกลม/ลูกบาสเกตบอล.jpg` },
+  { id: 'ro2', label: 'โลก', emoji: '�', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/ทรงกลม/โลก.jpg` },
+  { id: 'ro3', label: 'ดวงจันทร์', emoji: '🌕', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/ทรงกลม/ดวงะจันทร์.jpg` },
+  { id: 'ro4', label: 'ดาวศุกร์', emoji: '🌑', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/ทรงกลม/ดาวศุกร์.jpg` },
+  { id: 'ro5', label: 'ดาวอังคาร', emoji: '�', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/ทรงกลม/ดาวอังคาร.jpg` },
 ]
 
 // Village 2 images – 4-legged animals & Scrubbers
@@ -200,16 +200,16 @@ const V2_SCRUBBERS = [
   { id: 'sc5', label: 'ไม้ถู', emoji: '🧹', tags: ['scrubber'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 4/ไม้ถู.png` },
 ]
 const DISTRACTORS = [
-  { id: 'd1', label: 'กระบองเพชร', emoji: '🌵', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4144.png` },
-  { id: 'd2', label: 'กีตาร์', emoji: '🎸', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4145.png` },
-  { id: 'd3', label: 'ไอศกรีม', emoji: '🍦', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4146.png` },
-  { id: 'd4', label: 'หมวกแก๊ป', emoji: '🧢', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4147.png` },
-  { id: 'd5', label: 'โซฟา', emoji: '🛋️', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4148.png` },
-  { id: 'd6', label: 'จักรยาน', emoji: '🚲', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4149.png` },
-  { id: 'd7', label: 'ถุงมือ', emoji: '🧤', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4150.png` },
-  { id: 'd8', label: 'กระเป๋าเป้', emoji: '🎒', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4151.png` },
-  { id: 'd9', label: 'ว่าว', emoji: '🪁', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4152.png` },
-  { id: 'd10', label: 'ร่ม', emoji: '🌂', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4153.png` },
+  { id: 'd1', label: 'กล้วย', emoji: '�', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/กล้วย.png` },
+  { id: 'd2', label: 'กางเกง', emoji: '👖', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/กางเกง.png` },
+  { id: 'd3', label: 'กีตาร์', emoji: '�', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/กีตาร์.png` },
+  { id: 'd4', label: 'กุญแจ', emoji: '🔑', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/กุญแจ.png` },
+  { id: 'd5', label: 'งู', emoji: '�', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/งู.png` },
+  { id: 'd6', label: 'นกแก้ว', emoji: '🦜', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/นกแก้ว.png` },
+  { id: 'd7', label: 'ร่ม', emoji: '☂️', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/ร่ม.png` },
+  { id: 'd8', label: 'สมุด', emoji: '📖', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/สมุด.png` },
+  { id: 'd9', label: 'เครื่องบิน', emoji: '✈️', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/เครื่องบิน.png` },
+  { id: 'd10', label: 'แว่นตา', emoji: '👓', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/แว่นตา.png` },
 ]
 
 function getLevelConfig(level: number) {
@@ -239,10 +239,11 @@ function getLevelConfig(level: number) {
 
     case 3:
       instruction = 'แยก 4 หมวดหมู่! ภาชนะจะสลับทุก 2 ครั้ง (30 ชิ้น)'
-      // Start with Holes set
+      // Prompt Requirement: Hole 1: 4-legged animals, Hole 2: Cleaning tools, Box 1: Red... Box 2: Round...
+      // Start with the "Holes" set
       categories = [
-        { id: 'animal4', title: 'สัตว์ 4 ขา 🐾', emoji: '🕳️', accepts: i => i.tags.includes('animal4') },
-        { id: 'scrubber', title: 'อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', accepts: i => i.tags.includes('scrubber') },
+        { id: 'animal4', title: 'หลุม 1: สัตว์ 4 ขา 🐾', emoji: '🕳️', accepts: i => i.tags.includes('animal4') },
+        { id: 'scrubber', title: 'หลุม 2: อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', accepts: i => i.tags.includes('scrubber') },
       ]
       items = [...V2_ANIMALS, ...V2_SCRUBBERS, ...V1_RED, ...V1_ROUND, ...DISTRACTORS.slice(0, 10)]
       break
@@ -443,20 +444,20 @@ function ManagementGameInner() {
       setCorrectCount(prev => {
         const newCount = prev + 1
         if (levelParam === 3 && newCount % 2 === 0) {
-          // Check current set to swap
+          // Prompt: "Only two containers (either the two holes OR the two boxes) are visible at a time. The visible set swaps every two correct sorts."
           const isHoleSet = config.categories.some(c => c.emoji === '🕳️')
           const newCategories: Category[] = isHoleSet
             ? [
-              { id: 'red', title: 'วัตถุสีแดง 🔴', emoji: '📦', accepts: i => i.tags.includes('red') },
-              { id: 'round', title: 'วัตถุทรงกลม ⚪', emoji: '📦', accepts: i => i.tags.includes('round') },
+              { id: 'red', title: 'กล่อง 1: วัตถุสีแดง 🔴', emoji: '📦', accepts: i => i.tags.includes('red') },
+              { id: 'round', title: 'กล่อง 2: วัตถุทรงกลม ⚪', emoji: '📦', accepts: i => i.tags.includes('round') },
             ]
             : [
-              { id: 'animal4', title: 'สัตว์ 4 ขา 🐾', emoji: '🕳️', accepts: i => i.tags.includes('animal4') },
-              { id: 'scrubber', title: 'อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', accepts: i => i.tags.includes('scrubber') },
+              { id: 'animal4', title: 'หลุม 1: สัตว์ 4 ขา 🐾', emoji: '🕳️', accepts: i => i.tags.includes('animal4') },
+              { id: 'scrubber', title: 'หลุม 2: อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', accepts: i => i.tags.includes('scrubber') },
             ]
 
           setConfig(prevCfg => ({ ...prevCfg, categories: newCategories }))
-          setFeedback({ type: 'correct', message: '🔄 สลับภาชนะ!' })
+          setFeedback({ type: 'correct', message: '🔄 สับเปลี่ยนภาชนะ!' })
         }
         return newCount
       })
@@ -933,10 +934,14 @@ function ManagementGameInner() {
                   <div className="h-44 w-full flex justify-center gap-12 md:gap-24 px-10 pb-8">
                     {config.categories.map(cat => (
                       <div key={cat.id} onDragOver={(e) => e.preventDefault()} onDrop={(e) => handleSortItem(e.dataTransfer.getData('itemId'), cat.id)} className="flex flex-col items-center group">
-                        <div className="w-32 h-20 md:w-48 md:h-32 bg-white rounded-[24px] md:rounded-[32px] border-4 border-dashed border-slate-300 shadow-2xl flex items-center justify-center group-hover:border-blue-400 transition-all relative">
-                          <span className="text-6xl md:text-8xl drop-shadow-xl transition-transform duration-500 group-hover:scale-110">
-                            {cat.emoji || '📦'}
-                          </span>
+                        <div className="w-32 h-20 md:w-48 md:h-32 bg-white rounded-[24px] md:rounded-[32px] border-4 border-dashed border-slate-300 shadow-2xl flex items-center justify-center group-hover:border-blue-400 transition-all relative overflow-hidden">
+                          {cat.imageUrl ? (
+                            <img src={cat.imageUrl} className="w-full h-full object-cover" alt={cat.title} />
+                          ) : (
+                            <span className="text-6xl md:text-8xl drop-shadow-xl transition-transform duration-500 group-hover:scale-110">
+                              {cat.emoji || '📦'}
+                            </span>
+                          )}
                         </div>
                         <div className="mt-3 bg-white px-8 py-2.5 rounded-2xl shadow-xl border-b-4 border-slate-200 text-base md:text-lg font-black text-slate-800 uppercase tracking-tighter">
                           {cat.title}
