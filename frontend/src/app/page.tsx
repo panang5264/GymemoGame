@@ -109,14 +109,27 @@ export default function Home() {
       if (res.success) {
         // Log the user in with the token
         await login(res.data.token, res.data)
-        // Refresh local stats info AFTER sync completes
-        if (progress.userName || res.data.name) {
-          setName(progress.userName || res.data.name)
-          if (res.data.name && !progress.userName) {
-            const p = { ...progress, userName: res.data.name }
-            saveProgress(p)
+
+        // กรองสิทธิ์และนำทางไปยังหน้าใหม่
+        if (res.data.role === 'admin') {
+          router.push('/admin')
+          return
+        }
+
+        if (res.data.name || progress.userName) {
+          const userName = res.data.name || progress.userName
+          setName(userName)
+
+          if (!progress.userName) {
+            saveProgress({ ...progress, userName })
           }
-          setPhase('profile')
+
+          // ถ้าเคยดูเนื้อเรื่องแล้ว ให้เข้าหน้าแผนที่เลย
+          if (progress.introSeen) {
+            router.push('/world')
+          } else {
+            setPhase('profile')
+          }
         } else {
           setPhase('name')
         }
