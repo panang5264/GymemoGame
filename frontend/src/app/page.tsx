@@ -51,7 +51,7 @@ export default function Home() {
       if (isEditMode) {
         setPhase('edit_profile')
       } else if (!progress.introSeen) {
-        setPhase('grandmother')
+        setPhase('intro')
       } else {
         setPhase('profile')
       }
@@ -151,7 +151,11 @@ export default function Home() {
 
   const nextPhase = () => {
     if (phase === 'profile') {
-      setPhase('intro') // Go to Intro PDF next, don't skip to world
+      if (progress.introSeen) {
+        router.push('/world')
+      } else {
+        setPhase('intro')
+      }
     }
     else if (phase === 'intro') setPhase('grandmother')
     else if (phase === 'grandmother') setPhase('tutorial_summary')
