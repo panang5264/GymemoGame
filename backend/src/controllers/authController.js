@@ -43,6 +43,7 @@ const register = async (req, res) => {
         name: user.name,
         username: user.username,
         highScore: user.highScore,
+        role: user.role,
         token
       }
     })
@@ -105,6 +106,7 @@ const login = async (req, res) => {
         name: user.name,
         username: user.username,
         highScore: user.highScore,
+        role: user.role,
         token
       }
     })
