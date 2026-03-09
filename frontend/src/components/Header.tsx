@@ -65,9 +65,9 @@ export default function Header() {
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-2">
                 <Link
-                  href="/"
+                  href={isAdmin ? '/admin' : '/'}
                   className="flex items-center gap-2 bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-200 rounded-full pl-1.5 pr-4 py-1 transition-all group shadow-sm"
-                  title="ดูสถิติส่วนตัว"
+                  title={isAdmin ? 'หน้าจัดการระบบ' : 'ดูสถิติส่วนตัว'}
                 >
                   <img
                     src={getAvatarPath(user.avatar)}
@@ -75,18 +75,20 @@ export default function Header() {
                     className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-slate-100 object-cover shadow-sm group-hover:scale-105 transition-transform"
                   />
                   <div className="flex flex-col text-left">
-                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">สวัสดีคุณ</span>
+                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">{isAdmin ? 'จัดการ' : 'สวัสดีคุณ'}</span>
                     <span className="text-base md:text-lg font-black text-slate-700 leading-none group-hover:text-indigo-600 transition-colors uppercase">{user.name}</span>
                   </div>
                 </Link>
 
-                <Link
-                  href="/?edit=true"
-                  className="w-8 h-8 md:w-10 md:h-10 bg-orange-100 text-orange-600 hover:bg-orange-500 hover:text-white rounded-full flex items-center justify-center text-lg transition-all border-2 border-orange-200 hover:border-orange-400 shadow-sm"
-                  title="แก้ไขโปรไฟล์"
-                >
-                  ✏️
-                </Link>
+                {!isAdmin && (
+                  <Link
+                    href="/?edit=true"
+                    className="w-8 h-8 md:w-10 md:h-10 bg-orange-100 text-orange-600 hover:bg-orange-500 hover:text-white rounded-full flex items-center justify-center text-lg transition-all border-2 border-orange-200 hover:border-orange-400 shadow-sm"
+                    title="แก้ไขโปรไฟล์"
+                  >
+                    ✏️
+                  </Link>
+                )}
               </div>
 
               <div className="w-[1px] h-6 bg-slate-200 hidden md:block mx-1" />
