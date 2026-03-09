@@ -183,7 +183,7 @@ export default function Home() {
 
 
   return (
-    <div className="min-h-screen bg-[var(--bg-warm)] flex items-center justify-center p-4 md:p-6 selection:bg-orange-100 selection:text-orange-900 overflow-hidden font-['Supermarket']">
+    <div className="flex-1 w-full flex flex-col items-center justify-center p-4 md:p-6 bg-[var(--bg-warm)] selection:bg-orange-100 selection:text-orange-900 font-['Supermarket'] overflow-y-auto">
       {/* Background Decor */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-5%] right-[-5%] w-[30%] h-[30%] bg-orange-100/50 blur-[100px] rounded-full" />
@@ -199,7 +199,7 @@ export default function Home() {
             {!showForgot && (
               <button
                 onClick={() => setShowGuide(true)}
-                className="absolute top-6 right-6 w-12 h-12 rounded-full bg-indigo-50 border-2 border-indigo-100 flex items-center justify-center text-2xl hover:bg-indigo-100 transition-colors shadow-sm z-20"
+                className="absolute top-3 right-3 w-10 h-10 text-xl md:top-6 md:right-6 md:w-12 md:h-12 md:text-2xl rounded-full bg-indigo-50 border-2 border-indigo-100 flex items-center justify-center hover:bg-indigo-100 transition-colors shadow-sm z-20"
                 title="คู่มือการผจญภัย"
               >
                 ❓
@@ -352,39 +352,40 @@ export default function Home() {
 
         {/* Guide Popup Modal */}
         {showGuide && (
-          <div className="fixed inset-0 z-[120] flex items-start justify-center p-4 bg-slate-900/40 backdrop-blur-[2px] animate-in fade-in duration-300 pt-24 overflow-y-auto">
-            <div className="bg-white border-4 border-[#1a1a1a] rounded-[3rem] shadow-[15px_15px_0_#1a1a1a] max-w-md w-full p-8 animate-in zoom-in duration-300 my-auto">
-              <div className="text-center mb-6">
-                <div className="text-5xl mb-4">📖</div>
-                <h2 className="text-3xl font-black text-[#1a1a1a]">คู่มือการผจญภัย</h2>
+          <div className="fixed inset-0 z-[120] flex items-center justify-center p-3 md:p-4 bg-slate-900/50 backdrop-blur-[2px] animate-in fade-in duration-300">
+            <div className="bg-white border-[3px] md:border-4 border-[#1a1a1a] rounded-[2rem] md:rounded-[3rem] shadow-[6px_6px_0_#1a1a1a] md:shadow-[15px_15px_0_#1a1a1a] max-w-sm md:max-w-md w-full p-5 md:p-8 animate-in zoom-in duration-300 my-auto max-h-[85vh] flex flex-col">
+
+              <div className="text-center mb-3 md:mb-6 shrink-0">
+                <div className="text-3xl md:text-5xl mb-1 md:mb-4">📖</div>
+                <h2 className="text-xl md:text-3xl font-black text-[#1a1a1a]">คู่มือการผจญภัย</h2>
               </div>
 
-              <div className="space-y-6">
-                <div className="flex gap-4 p-4 bg-orange-50 border-2 border-orange-100 rounded-2xl">
-                  <div className="w-10 h-10 shrink-0 bg-orange-400 rounded-full flex items-center justify-center font-black text-white text-xl">!</div>
-                  <p className="text-orange-900 font-bold">หากคุณยังไม่เคยเข้าเล่น โปรด "สมัครสมาชิก" เพื่อสร้างประวัติการผจญภัยของคุณก่อนนะครับ</p>
+              <div className="space-y-3 md:space-y-6 overflow-y-auto pr-1 shrink">
+                <div className="flex gap-2 md:gap-4 p-3 md:p-4 bg-orange-50 border-2 border-orange-100 rounded-xl md:rounded-2xl">
+                  <div className="w-6 h-6 md:w-10 md:h-10 shrink-0 bg-orange-400 rounded-full flex items-center justify-center font-black text-white text-sm md:text-xl">!</div>
+                  <p className="text-orange-900 font-bold text-xs md:text-base leading-tight">หากคุณยังไม่เคยเข้าเล่น โปรด "สมัครสมาชิก" เพื่อสร้างประวัติการผจญภัยของคุณก่อนนะครับ</p>
                 </div>
-                <div className="flex gap-4 px-2">
-                  <div className="w-10 h-10 shrink-0 bg-indigo-100 rounded-full flex items-center justify-center font-black text-indigo-600">1</div>
-                  <p className="text-slate-600 font-bold">เข้าสู่ระบบด้วยเบอร์โทรศัพท์และรหัสผ่านที่คุณสมัครไว้</p>
+                <div className="flex gap-2 md:gap-4 px-1 md:px-2 items-start">
+                  <div className="w-6 h-6 md:w-10 md:h-10 mt-0.5 shrink-0 bg-indigo-100 rounded-full flex items-center justify-center font-black text-indigo-600 text-sm md:text-lg">1</div>
+                  <p className="text-slate-600 font-bold text-xs md:text-base leading-snug">เข้าสู่ระบบด้วยเบอร์โทรศัพท์และรหัสผ่านที่คุณสมัครไว้</p>
                 </div>
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 shrink-0 bg-indigo-100 rounded-full flex items-center justify-center font-black text-indigo-600">2</div>
-                  <p className="text-slate-600 font-bold">ออกเดินทางสำรวจหมู่บ้านต่างๆ เพื่อค้นหายาฟื้นฟูสมอง</p>
+                <div className="flex gap-2 md:gap-4 px-1 md:px-2 items-start">
+                  <div className="w-6 h-6 md:w-10 md:h-10 mt-0.5 shrink-0 bg-indigo-100 rounded-full flex items-center justify-center font-black text-indigo-600 text-sm md:text-lg">2</div>
+                  <p className="text-slate-600 font-bold text-xs md:text-base leading-snug">ออกเดินทางสำรวจหมู่บ้านต่างๆ เพื่อค้นหายาฟื้นฟูสมอง</p>
                 </div>
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 shrink-0 bg-indigo-100 rounded-full flex items-center justify-center font-black text-indigo-600">3</div>
-                  <p className="text-slate-600 font-bold">ฝึกฝนทักษะการตัดสินใจ การคำนวณ และความทรงจำผ่านมินิเกม</p>
+                <div className="flex gap-2 md:gap-4 px-1 md:px-2 items-start">
+                  <div className="w-6 h-6 md:w-10 md:h-10 mt-0.5 shrink-0 bg-indigo-100 rounded-full flex items-center justify-center font-black text-indigo-600 text-sm md:text-lg">3</div>
+                  <p className="text-slate-600 font-bold text-xs md:text-base leading-snug">ฝึกฝนทักษะการตัดสินใจ การคำนวณ และความทรงจำผ่านมินิเกม</p>
                 </div>
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 shrink-0 bg-indigo-100 rounded-full flex items-center justify-center font-black text-indigo-600">4</div>
-                  <p className="text-slate-600 font-bold">สะสมคะแนนเพื่อชิงอันดับหนึ่งในกระดานผู้นำโลก!</p>
+                <div className="flex gap-2 md:gap-4 px-1 md:px-2 items-start">
+                  <div className="w-6 h-6 md:w-10 md:h-10 mt-0.5 shrink-0 bg-indigo-100 rounded-full flex items-center justify-center font-black text-indigo-600 text-sm md:text-lg">4</div>
+                  <p className="text-slate-600 font-bold text-xs md:text-base leading-snug">สะสมคะแนนเพื่อชิงอันดับหนึ่งในกระดานผู้นำโลก!</p>
                 </div>
               </div>
 
               <button
                 onClick={() => setShowGuide(false)}
-                className="w-full mt-10 py-4 bg-indigo-600 text-white rounded-full font-black text-xl shadow-[0_6px_0_#312e81] hover:translate-y-[-2px] active:translate-y-1 active:shadow-none transition-all"
+                className="w-full mt-5 md:mt-10 py-3 md:py-4 bg-indigo-600 text-white rounded-full font-black text-base md:text-xl shadow-[0_3px_0_#312e81] md:shadow-[0_6px_0_#312e81] hover:translate-y-[-2px] active:translate-y-1 active:shadow-none transition-all shrink-0"
               >
                 เข้าใจแล้ว พร้อมลุย!
               </button>

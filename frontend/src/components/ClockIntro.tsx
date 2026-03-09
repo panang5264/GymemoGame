@@ -193,11 +193,11 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
                 )}
 
                 {isDone && (
-                    <div className="mt-6 p-6 bg-white/10 rounded-3xl border border-white/20 animate-in zoom-in duration-500 text-center">
-                        <div className={`text-4xl font-black mb-2 ${evalResult.color}`}>
-                            {evalResult.title} (คะแนน: {evalResult.score}/5)
+                    <div className="mt-4 md:mt-6 p-4 md:p-6 bg-white/10 rounded-2xl md:rounded-3xl border border-white/20 animate-in zoom-in duration-500 text-center shadow-lg">
+                        <div className={`text-2xl md:text-4xl font-black mb-3 ${evalResult.color} drop-shadow-sm`}>
+                            {evalResult.title} <span className="text-lg md:text-2xl opacity-90">(คะแนน: {evalResult.score}/5)</span>
                         </div>
-                        <p className="text-white text-sm md:text-base font-bold leading-relaxed px-2">
+                        <p className="text-white text-[15px] md:text-lg font-bold leading-relaxed opacity-95">
                             {evalResult.text}
                         </p>
                     </div>
