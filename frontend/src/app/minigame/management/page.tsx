@@ -903,26 +903,26 @@ function ManagementGameInner() {
                           e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)';
                           e.currentTarget.style.zIndex = '10';
                         }}
-                        className="absolute w-36 h-36 md:w-48 md:h-48 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing z-10 select-none animate-in fade-in zoom-in transition-transform duration-200"
+                        className="absolute w-28 h-28 md:w-40 md:h-40 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing z-10 select-none animate-in fade-in zoom-in transition-transform duration-200"
                         style={{ left: `${item.x}%`, top: `${item.y}%`, transform: 'translate(-50%, -50%)' }}
                       >
                         <div className="transition-transform duration-300 transform group-hover:-translate-y-2">
                           {item.imageUrl ? (
-                            <div className="w-32 h-32 md:w-56 md:h-56 bg-white rounded-3xl shadow-2xl flex items-center justify-center border-4 border-indigo-100 overflow-hidden pointer-events-none">
+                            <div className="w-24 h-24 md:w-36 md:h-36 bg-white rounded-2xl shadow-xl flex items-center justify-center border-4 border-indigo-100 overflow-hidden pointer-events-none">
                               <img
                                 src={item.imageUrl}
-                                className="w-[90%] h-[90%] object-cover mix-blend-multiply"
+                                className="w-[85%] h-[85%] object-cover mix-blend-multiply"
                                 style={{ filter: 'contrast(1.1) brightness(1.05) saturate(1.1)', imageRendering: 'crisp-edges' }}
                                 alt={item.label}
                               />
                             </div>
                           ) : (
-                            <div className="w-32 h-32 md:w-56 md:h-56 bg-white rounded-3xl shadow-2xl flex items-center justify-center border-4 border-indigo-100 pointer-events-none">
-                              <span className="text-8xl md:text-[10rem] drop-shadow-lg">{item.emoji}</span>
+                            <div className="w-24 h-24 md:w-36 md:h-36 bg-white rounded-2xl shadow-xl flex items-center justify-center border-4 border-indigo-100 pointer-events-none">
+                              <span className="text-6xl md:text-8xl drop-shadow-lg">{item.emoji}</span>
                             </div>
                           )}
                         </div>
-                        <div className="mt-3 bg-white px-4 py-1.5 md:px-6 md:py-2.5 rounded-full shadow-md text-base md:text-2xl font-black text-indigo-900 border-2 border-slate-100 tracking-wide text-center">
+                        <div className="mt-2 bg-white px-3 py-1 md:px-5 md:py-2 rounded-full shadow-md text-sm md:text-xl font-black text-indigo-900 border-2 border-slate-100 tracking-wide text-center">
                           {item.label}
                         </div>
                         <div className="absolute -bottom-4 left-4 right-4 h-2.5 bg-slate-200 rounded-full overflow-hidden border-2 border-white shadow-sm">
@@ -934,16 +934,16 @@ function ManagementGameInner() {
                   <div className="h-44 w-full flex justify-center gap-12 md:gap-24 px-10 pb-8">
                     {config.categories.map(cat => (
                       <div key={cat.id} onDragOver={(e) => e.preventDefault()} onDrop={(e) => handleSortItem(e.dataTransfer.getData('itemId'), cat.id)} className="flex flex-col items-center group">
-                        <div className="w-32 h-20 md:w-48 md:h-32 bg-white rounded-[24px] md:rounded-[32px] border-4 border-dashed border-slate-300 shadow-2xl flex items-center justify-center group-hover:border-blue-400 transition-all relative overflow-hidden">
+                        <div className="w-28 h-16 md:w-40 md:h-28 bg-white rounded-[20px] md:rounded-[28px] border-4 border-dashed border-slate-300 shadow-2xl flex items-center justify-center group-hover:border-blue-400 transition-all relative overflow-hidden">
                           {cat.imageUrl ? (
                             <img src={cat.imageUrl} className="w-full h-full object-cover" alt={cat.title} />
                           ) : (
-                            <span className="text-6xl md:text-8xl drop-shadow-xl transition-transform duration-500 group-hover:scale-110">
+                            <span className="text-5xl md:text-7xl drop-shadow-xl transition-transform duration-500 group-hover:scale-110">
                               {cat.emoji || '📦'}
                             </span>
                           )}
                         </div>
-                        <div className="mt-3 bg-white px-8 py-2.5 rounded-2xl shadow-xl border-b-4 border-slate-200 text-base md:text-lg font-black text-slate-800 uppercase tracking-tighter">
+                        <div className="mt-2 bg-white px-6 py-2 rounded-2xl shadow-xl border-b-4 border-slate-200 text-sm md:text-base font-black text-slate-800 uppercase tracking-tighter">
                           {cat.title}
                         </div>
                       </div>

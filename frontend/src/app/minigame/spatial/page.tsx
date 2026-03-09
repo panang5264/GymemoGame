@@ -467,12 +467,12 @@ function SpatialGameInner() {
             {questionData && !questionData.isPairMatching && questionData.options && (
               <div className="w-full flex flex-col items-center">
                 {/* Main block image */}
-                <div className="mb-6 md:mb-8 relative p-3 md:p-5 bg-white/60 backdrop-blur-md rounded-2xl md:rounded-[2rem] border-2 md:border-4 border-indigo-200 shadow-xl flex items-center justify-center w-full max-w-[280px] sm:max-w-[330px] md:max-w-md">
-                  <div className="text-[9px] md:text-[11px] font-black text-indigo-400 uppercase tracking-widest absolute top-2 left-3">โจทย์ 📦</div>
+                <div className="mb-4 md:mb-6 relative p-2 md:p-4 bg-white/60 backdrop-blur-md rounded-xl md:rounded-[1.5rem] border-2 md:border-3 border-indigo-200 shadow-xl flex items-center justify-center w-full max-w-[240px] sm:max-w-[280px] md:max-w-[350px]">
+                  <div className="text-[8px] md:text-[10px] font-black text-indigo-400 uppercase tracking-widest absolute top-2 left-3">โจทย์ 📦</div>
                   <img
                     src={questionData.targetImage}
                     style={DIP_STYLE}
-                    className="w-full h-[150px] sm:h-[190px] md:h-[240px] object-contain mt-3"
+                    className="w-full h-[120px] sm:h-[150px] md:h-[200px] object-contain mt-3"
                     alt="target block"
                   />
                 </div>
@@ -502,7 +502,7 @@ function SpatialGameInner() {
                       <img
                         src={opt}
                         style={DIP_STYLE}
-                        className="max-w-[70px] max-h-[70px] sm:max-w-[90px] sm:max-h-[90px] md:max-w-[120px] md:max-h-[120px] object-contain group-hover:scale-105 transition-transform"
+                        className="max-w-[60px] max-h-[60px] sm:max-w-[80px] sm:max-h-[80px] md:max-w-[100px] md:max-h-[100px] object-contain group-hover:scale-105 transition-transform"
                         alt={`option ${idx}`}
                       />
                       <div className="absolute -top-2 -right-2 w-7 h-7 bg-slate-100 rounded-full border-2 border-white text-slate-500 font-black flex items-center justify-center text-xs group-hover:bg-indigo-500 group-hover:text-white transition-colors shadow">

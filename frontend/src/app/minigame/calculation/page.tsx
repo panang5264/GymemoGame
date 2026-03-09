@@ -372,11 +372,11 @@ function CalculationGameInner() {
                       </div>
                     ) : typeof value === 'number' ? (
                       /* 3. Normal Number */
-                      <span className="text-3xl md:text-7xl lg:text-9xl font-black text-slate-800 tracking-tighter shrink-0">{value}</span>
+                      <span className="text-3xl md:text-6xl lg:text-7xl font-black text-slate-800 tracking-tighter shrink-0">{value}</span>
                     ) : (
                       /* 4. Dice Image */
-                      <div className="p-1 md:p-2 bg-white rounded-2xl border-2 border-slate-100 shadow-sm flex items-center justify-center w-[60px] h-[50px] md:w-[120px] md:h-[100px] shrink-0 transform hover:scale-105 transition-transform">
-                        <Image src={(value as any).path} width={100} height={80} className="rounded-xl object-contain w-full h-full" alt={(value as any).name} />
+                      <div className="p-1 md:p-2 bg-white rounded-xl border-2 border-slate-100 shadow-sm flex items-center justify-center w-[50px] h-[40px] md:w-[90px] md:h-[80px] shrink-0 transform hover:scale-105 transition-transform">
+                        <Image src={(value as any).path} width={80} height={60} className="rounded-lg object-contain w-full h-full" alt={(value as any).name} />
                       </div>
                     )}
 
@@ -392,9 +392,9 @@ function CalculationGameInner() {
                       <div className="flex items-center gap-2 md:gap-4 ml-2 md:ml-4 shrink-0">
                         <span className="text-2xl md:text-5xl font-black text-indigo-400">=</span>
                         {question.final_result !== undefined ? (
-                          <span className="text-3xl md:text-7xl lg:text-8xl font-black text-slate-800 tracking-tighter">{question.final_result}</span>
+                          <span className="text-3xl md:text-6xl lg:text-7xl font-black text-slate-800 tracking-tighter">{question.final_result}</span>
                         ) : (
-                          <div className="w-12 h-12 md:w-24 md:h-24 flex items-center justify-center bg-blue-50 border-4 md:border-8 border-dashed border-blue-200 rounded-2xl md:rounded-3xl text-3xl md:text-6xl text-blue-600 font-black">?</div>
+                          <div className="w-10 h-10 md:w-20 md:h-20 flex items-center justify-center bg-blue-50 border-4 md:border-6 border-dashed border-blue-200 rounded-xl md:rounded-2xl text-2xl md:text-5xl text-blue-600 font-black">?</div>
                         )}
                       </div>
                     )}
@@ -410,7 +410,7 @@ function CalculationGameInner() {
                 autoFocus
                 inputMode="numeric"
                 pattern="[0-9]*"
-                className={`w-full bg-slate-50 border-[4px] md:border-[10px] rounded-[1.5rem] md:rounded-[2.5rem] py-5 md:py-8 px-6 md:px-12 text-4xl md:text-7xl font-black text-center outline-none transition-all shadow-inner ${lastCorrect === true ? 'border-green-500 text-green-600 bg-green-50/50' : lastCorrect === false ? 'border-red-500 text-red-600 animate-shake bg-red-50/50' : 'border-slate-100 focus:border-blue-400 text-blue-700 focus:shadow-[0_0_0_10px_rgba(59,130,246,0.1)]'}`}
+                className={`w-full bg-slate-50 border-[4px] md:border-[8px] rounded-[1.25rem] md:rounded-[2rem] py-4 md:py-6 px-5 md:px-10 text-3xl md:text-5xl font-black text-center outline-none transition-all shadow-inner ${lastCorrect === true ? 'border-green-500 text-green-600 bg-green-50/50' : lastCorrect === false ? 'border-red-500 text-red-600 animate-shake bg-red-50/50' : 'border-slate-100 focus:border-blue-400 text-blue-700 focus:shadow-[0_0_0_8px_rgba(59,130,246,0.1)]'}`}
                 placeholder="?"
                 value={answer}
                 disabled={isTimeUp}
@@ -418,7 +418,7 @@ function CalculationGameInner() {
                 onChange={(e) => setAnswer(e.target.value)}
               />
               <button
-                className={`w-full py-5 md:py-8 rounded-[1.5rem] md:rounded-[2.5rem] font-black text-2xl md:text-5xl transition-all ${isTimeUp ? 'bg-slate-100 text-slate-300' : 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-[0_10px_0_#2563eb] md:shadow-[0_15px_0_#2563eb] hover:translate-y-[2px] hover:shadow-[0_8px_0_#2563eb] active:translate-y-[6px] md:active:translate-y-[10px] active:shadow-none'}`}
+                className={`w-full py-4 md:py-6 rounded-[1.25rem] md:rounded-[2rem] font-black text-xl md:text-3xl transition-all ${isTimeUp ? 'bg-slate-100 text-slate-300' : 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-[0_8px_0_#2563eb] md:shadow-[0_12px_0_#2563eb] hover:translate-y-[2px] hover:shadow-[0_6px_0_#2563eb] active:translate-y-[6px] md:active:translate-y-[8px] active:shadow-none'}`}
                 disabled={isTimeUp}
                 onClick={handleSubmit}
               >
