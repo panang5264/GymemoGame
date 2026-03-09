@@ -278,7 +278,7 @@ function SpatialGameInner() {
         ]
 
       setQuestionData({ isPairMatching: true, pairs, basePath })
-      setQuestionText('โยงเส้นจับคู่ภาพที่สัมพันธ์กันให้ถูกต้อง 🎯')
+      setQuestionText('จับคู่รูปทรงต้นแบบที่มีรอยแหว่งกับชิ้นส่วนที่หายไป 🧩')
     } else {
       // Village 3+: Use Box asset images, randomized
       const { q, numOptions } = pickBoxQuestion(levelParam)

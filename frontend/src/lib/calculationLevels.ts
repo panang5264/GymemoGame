@@ -84,20 +84,29 @@ export const CALC_LEVELS: CalcLevel[] = [
   {
     level: 1,
     name: 'บวก/ลบแต้มลูกเต๋า 2 ลูก',
-    description: 'บวกหรือลบแต้มจากลูกเต๋า 2 ลูก',
+    description: 'บวกหรือลบแต้มจากลูกเต๋า 2 ลูก (ผลบวก < 10)',
     maxNumber: 10,
     generate_problem(): CalcQuestion {
-      const val1 = calGame.RandomDice()
-      const val2 = calGame.RandomDice()
       const ope = calGame.RandomOperator()
-      // Ensure result >= 0 for dice subtraction
-      let operands = [val1, val2]
-      if (ope.name === '-' && val1.value < val2.value) {
-        operands = [val2, val1]
+      let val1 = calGame.RandomDice()
+      let val2 = calGame.RandomDice()
+
+      if (ope.name === '+') {
+        // Ensure sum < 10
+        while (val1.value + val2.value >= 10) {
+          val1 = calGame.RandomDice()
+          val2 = calGame.RandomDice()
+        }
+      } else {
+        // Ensure result >= 0
+        if (val1.value < val2.value) {
+          [val1, val2] = [val2, val1]
+        }
       }
-      const [result] = calGame.Calculate({ operands, operators: [ope] })
+
+      const [result] = calGame.Calculate({ operands: [val1, val2], operators: [ope] })
       return {
-        operands,
+        operands: [val1, val2],
         operators: [ope],
         expect_result: result,
       }
