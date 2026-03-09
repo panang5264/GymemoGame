@@ -11,6 +11,7 @@ interface User {
     highScore: number
     createdAt: string
     avatar?: string
+    role?: 'user' | 'admin'
 }
 
 interface AuthContextType {

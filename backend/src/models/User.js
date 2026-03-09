@@ -7,11 +7,12 @@ const userSchema = new mongoose.Schema({
     required: [true, 'กรุณาระบุชื่อ'],
     maxlength: [50, 'ชื่อต้องไม่เกิน 50 ตัวอักษร']
   },
-  phone: {
+  username: {
     type: String,
-    required: [true, 'กรุณาระบุเบอร์โทรศัพท์'],
+    required: [true, 'กรุณาระบุชื่อผู้ใช้'],
     unique: true,
-    match: [/^0\d{9}$/, 'เบอร์โทรศัพท์ไม่ถูกต้อง (ต้องเป็น 0xxxxxxxxx)']
+    trim: true,
+    minlength: [3, 'ชื่อผู้ใช้ต้องมีความยาวอย่างน้อย 3 ตัวอักษร']
   },
   password: {
     type: String,
@@ -34,6 +35,11 @@ const userSchema = new mongoose.Schema({
   privacyMode: {
     type: Boolean,
     default: false
+  },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user'
   }
 }, {
   timestamps: true

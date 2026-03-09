@@ -6,29 +6,29 @@ const User = require('../models/User')
 // @access  Public
 const register = async (req, res) => {
   try {
-    const { name, phone, password } = req.body
+    const { name, username, password } = req.body
 
     // ตรวจสอบข้อมูล
-    if (!name || !phone || !password) {
+    if (!name || !username || !password) {
       return res.status(400).json({
         success: false,
         message: 'กรุณากรอกข้อมูลให้ครบถ้วน'
       })
     }
 
-    // ตรวจสอบว่ามีเบอร์โทรนี้แล้วหรือไม่
-    const userExists = await User.findOne({ phone })
+    // ตรวจสอบว่ามีชื่อผู้ใช้นี้แล้วหรือไม่
+    const userExists = await User.findOne({ username })
     if (userExists) {
       return res.status(400).json({
         success: false,
-        message: 'เบอร์โทรศัพท์นี้ถูกใช้งานแล้ว'
+        message: 'ชื่อผู้ใช้นี้ถูกใช้งานแล้ว'
       })
     }
 
     // สร้าง user ใหม่
     const user = await User.create({
       name,
-      phone,
+      username,
       password
     })
 
@@ -41,7 +41,7 @@ const register = async (req, res) => {
       data: {
         _id: user._id,
         name: user.name,
-        phone: user.phone,
+        username: user.username,
         highScore: user.highScore,
         token
       }
@@ -64,23 +64,23 @@ const register = async (req, res) => {
 // @access  Public
 const login = async (req, res) => {
   try {
-    const { phone, password } = req.body
+    const { username, password } = req.body
 
     // ตรวจสอบข้อมูล
-    if (!phone || !password) {
+    if (!username || !password) {
       return res.status(400).json({
         success: false,
-        message: 'กรุณากรอกเบอร์โทรและรหัสผ่าน'
+        message: 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน'
       })
     }
 
     // หา user และดึง password ด้วย
-    const user = await User.findOne({ phone }).select('+password')
+    const user = await User.findOne({ username }).select('+password')
 
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง'
+        message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง'
       })
     }
 
@@ -90,7 +90,7 @@ const login = async (req, res) => {
     if (!isPasswordCorrect) {
       return res.status(401).json({
         success: false,
-        message: 'เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง'
+        message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง'
       })
     }
 
@@ -103,7 +103,7 @@ const login = async (req, res) => {
       data: {
         _id: user._id,
         name: user.name,
-        phone: user.phone,
+        username: user.username,
         highScore: user.highScore,
         token
       }
@@ -136,11 +136,12 @@ const getProfile = async (req, res) => {
       data: {
         _id: user._id,
         name: user.name,
-        phone: user.phone,
+        username: user.username,
         highScore: user.highScore,
         avatar: user.avatar,
         privacyMode: user.privacyMode,
-        createdAt: user.createdAt
+        createdAt: user.createdAt,
+        role: user.role
       }
     })
   } catch (error) {
@@ -176,7 +177,7 @@ const updateProfile = async (req, res) => {
       data: {
         _id: user._id,
         name: user.name,
-        phone: user.phone,
+        username: user.username,
         avatar: user.avatar,
         privacyMode: user.privacyMode,
         highScore: user.highScore
@@ -193,21 +194,21 @@ const updateProfile = async (req, res) => {
 // @access  Public
 const forgotPassword = async (req, res) => {
   try {
-    const { phone, newPassword } = req.body
+    const { username, newPassword } = req.body
 
-    if (!phone || !newPassword) {
+    if (!username || !newPassword) {
       return res.status(400).json({
         success: false,
-        message: 'กรุณากรอกเบอร์โทรและรหัสผ่านใหม่'
+        message: 'กรุณากรอกชื่อผู้ใช้และรหัสผ่านใหม่'
       })
     }
 
-    const user = await User.findOne({ phone })
+    const user = await User.findOne({ username })
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'ไม่พบผู้ใช้ที่ผูกกับเบอร์โทรศัพท์นี้'
+        message: 'ไม่พบผู้ใช้ที่ผูกกับชื่อผู้ใช้นี้'
       })
     }
 

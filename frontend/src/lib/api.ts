@@ -34,22 +34,22 @@ export async function unlockVillage(guestId: string, villageId: number) {
 
 // --- Auth API ---
 
-export async function loginUser(phone: string, password: string) {
+export async function loginUser(username: string, password: string) {
   const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ phone, password }),
+    body: JSON.stringify({ username, password }),
   })
   const data = await res.json()
   if (!res.ok) throw new Error(data.message || 'Failed to login')
   return data
 }
 
-export async function registerUser(name: string, phone: string, password: string) {
+export async function registerUser(name: string, username: string, password: string) {
   const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, phone, password }),
+    body: JSON.stringify({ name, username, password }),
   })
   const data = await res.json()
   if (!res.ok) throw new Error(data.message || 'Failed to register')
@@ -138,5 +138,84 @@ export async function getLeaderboard(limit: number = 10) {
   })
   const data = await res.json()
   if (!res.ok) throw new Error(data.message || 'Failed to fetch leaderboard')
+  return data
+}
+// --- Admin API ---
+
+export async function adminGetUsers(token: string) {
+  const res = await fetch(`${API_BASE_URL}/api/admin/users`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Failed to fetch users')
+  return data
+}
+
+export async function adminGetGuests(token: string) {
+  const res = await fetch(`${API_BASE_URL}/api/admin/guests`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Failed to fetch guests')
+  return data
+}
+
+export async function adminGetStats(token: string) {
+  const res = await fetch(`${API_BASE_URL}/api/admin/stats`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Failed to fetch stats')
+  return data
+}
+
+export async function adminDeleteUser(token: string, userId: string) {
+  const res = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Failed to delete user')
+  return data
+}
+
+export async function adminGetExportScores(token: string) {
+  const res = await fetch(`${API_BASE_URL}/api/admin/export/scores`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Failed to fetch export scores')
+  return data
+}
+
+export async function adminGetExportAnalysis(token: string) {
+  const res = await fetch(`${API_BASE_URL}/api/admin/export/analysis`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Failed to fetch export analysis')
   return data
 }

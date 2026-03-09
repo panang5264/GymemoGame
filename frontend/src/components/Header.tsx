@@ -16,6 +16,10 @@ export default function Header() {
     { name: 'อันดับผู้นำ', href: '/leaderboard', icon: '🏆' },
   ]
 
+  if (user && user.role === 'admin') {
+    navLinks.push({ name: 'จัดการ', href: '/admin', icon: '👑' })
+  }
+
   return (
     <header className="header bg-white/90 backdrop-blur-md sticky top-0 z-[100] border-b-2 border-slate-100 shadow-sm py-1.5">
       <div className="container max-w-7xl px-4 flex flex-col md:flex-row justify-between items-center gap-2">

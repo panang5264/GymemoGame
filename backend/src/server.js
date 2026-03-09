@@ -55,12 +55,15 @@ app.get('/', (req, res) => {
   })
 })
 
+const adminRoutes = require('./routes/adminRoutes')
+
 // Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/scores', scoreRoutes)
 app.use('/api/progression', progressionRoutes)
 app.use('/api/analysis', analysisRoutes)
 app.use('/api/daily', dailyRoutes)
+app.use('/api/admin', adminRoutes)
 
 // Error Handler Middleware
 app.use(errorHandler)

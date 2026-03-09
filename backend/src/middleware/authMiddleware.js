@@ -16,28 +16,39 @@ const protect = async (req, res, next) => {
       req.user = await User.findById(decoded.id).select('-password')
 
       if (!req.user) {
-        return res.status(401).json({ 
-          success: false, 
-          message: 'ไม่พบผู้ใช้งาน' 
+        return res.status(401).json({
+          success: false,
+          message: 'ไม่พบผู้ใช้งาน'
         })
       }
 
       next()
     } catch (error) {
       console.error(error)
-      return res.status(401).json({ 
-        success: false, 
-        message: 'ไม่ได้รับอนุญาต, token ไม่ถูกต้อง' 
+      return res.status(401).json({
+        success: false,
+        message: 'ไม่ได้รับอนุญาต, token ไม่ถูกต้อง'
       })
     }
   }
 
   if (!token) {
-    return res.status(401).json({ 
-      success: false, 
-      message: 'ไม่ได้รับอนุญาต, ไม่มี token' 
+    return res.status(401).json({
+      success: false,
+      message: 'ไม่ได้รับอนุญาต, ไม่มี token'
     })
   }
 }
 
-module.exports = { protect }
+const admin = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next()
+  } else {
+    res.status(403).json({
+      success: false,
+      message: 'ไม่มีสิทธิ์เข้าถึงส่วนนี้ (Admin Only)'
+    })
+  }
+}
+
+module.exports = { protect, admin }
