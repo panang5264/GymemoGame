@@ -141,6 +141,45 @@ function generateMaze(rows: number, cols: number, hasKey: boolean, hasBombs: boo
   return maze
 }
 
+// ─── Asset Paths ─────────────────────────────────────────────────────────────
+const MG_BASE = '/Asset ด้าน/บริหารจัดการ'
+
+// Village 1 images – หมู่บ้านที่ 1/รอบที่ 1
+const V1_ANIMALS = [
+  { id: 'a1', label: 'สัตว์ 1', emoji: '🐾', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686404.jpg` },
+  { id: 'a2', label: 'สัตว์ 2', emoji: '🐾', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686405.jpg` },
+  { id: 'a3', label: 'สัตว์ 3', emoji: '🐾', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686407.jpg` },
+  { id: 'a4', label: 'สัตว์ 4', emoji: '🐾', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686408.jpg` },
+  { id: 'a5', label: 'สัตว์ 5', emoji: '🐾', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3702788.jpg` },
+]
+const V1_SCRUBBERS = [
+  { id: 'sc1', label: 'อุปกรณ์ 1', emoji: '🧹', tags: ['scrubber'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702790.jpg` },
+  { id: 'sc2', label: 'อุปกรณ์ 2', emoji: '🧹', tags: ['scrubber'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702791.jpg` },
+  { id: 'sc3', label: 'อุปกรณ์ 3', emoji: '🧹', tags: ['scrubber'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702792.jpg` },
+  { id: 'sc4', label: 'อุปกรณ์ 4', emoji: '🧹', tags: ['scrubber'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702793.jpg` },
+  { id: 'sc5', label: 'อุปกรณ์ 5', emoji: '🧹', tags: ['scrubber'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702794.jpg` },
+]
+
+// Village 2 images – หมู่บ้านที่ 2/รอบที่1
+const V2_ANIMALS = [
+  { id: 'a1', label: 'จรเข้', emoji: '🐊', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่1(สัตว์4ขา)/จรเข้.png` },
+  { id: 'a2', label: 'ช้าง', emoji: '🐘', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่1(สัตว์4ขา)/ช้าง.png` },
+  { id: 'a3', label: 'ม้าลาย', emoji: '🦓', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่1(สัตว์4ขา)/ม้าลาย.png` },
+  { id: 'a4', label: 'ยีราฟ', emoji: '🦒', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่1(สัตว์4ขา)/ยีราฟ.png` },
+  { id: 'a5', label: 'หมู', emoji: '🐷', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่1(สัตว์4ขา)/หมู.jpg` },
+]
+const V2_SCRUBBERS = [
+  { id: 'sc1', label: 'ฝอยขัดหม้อ', emoji: '🧽', tags: ['scrubber'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่2(อุปกรณ์ที่ใช้ขัด)/ฝอยขัดหม้อ.png` },
+  { id: 'sc2', label: 'ฟองน้ำ', emoji: '🧽', tags: ['scrubber'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่2(อุปกรณ์ที่ใช้ขัด)/ฟองน้ำ.png` },
+  { id: 'sc3', label: 'แปรงขัดส้วม', emoji: '🧹', tags: ['scrubber'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่2(อุปกรณ์ที่ใช้ขัด)/แปรงขัดส้วม.png` },
+  { id: 'sc4', label: 'แปรงสีฟัน', emoji: '🪥', tags: ['scrubber'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่2(อุปกรณ์ที่ใช้ขัด)/แปรงสีฟัน.png` },
+  { id: 'sc5', label: 'ไม้ถู', emoji: '🧹', tags: ['scrubber'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่2(อุปกรณ์ที่ใช้ขัด)/ไม้ถู.png` },
+]
+const V2_OUTLIERS = [
+  { id: 'o1', label: 'ไม่เข้าพวก 1', emoji: '❓', tags: [] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่3(ไม่เข้าพวก)/ไม่มีชื่อ 17_20260303222748.png` },
+  { id: 'o2', label: 'ไม่เข้าพวก 2', emoji: '❓', tags: [] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่3(ไม่เข้าพวก)/ไม่มีชื่อ 23_20260305134355.png` },
+]
+
 function getLevelConfig(level: number) {
   let mode: GameMode = 'sorting'
   let items: Item[] = []
@@ -149,72 +188,43 @@ function getLevelConfig(level: number) {
 
   switch (level) {
     case 1:
-      instruction = 'จงแยกวัตถุที่มีสีแดง และวัตถุทรงกลม'
+      instruction = 'แยกสัตว์ 4 ขา และ อุปกรณ์ที่ใช้ขัด'
       categories = [
-        { id: 'red', title: 'สีแดง 🔴', emoji: '📦', accepts: i => i.tags.includes('red') },
-        { id: 'sphere', title: 'ทรงกลม 🔵', emoji: '📦', accepts: i => i.tags.includes('sphere') },
+        { id: 'animal4', title: 'สัตว์ 4 ขา 🐾', emoji: '📦', accepts: i => i.tags.includes('animal4') },
+        { id: 'scrubber', title: 'อุปกรณ์ขัด/แปรง 🧽', emoji: '📦', accepts: i => i.tags.includes('scrubber') },
       ]
-      items = [
-        { id: 'r1', label: 'รถดับเพลิง', emoji: '🚒', tags: ['red'] },
-        { id: 'r2', label: 'ป้ายหยุด', emoji: '🛑', tags: ['red'] },
-        { id: 'r3', label: 'พริก', emoji: '🌶️', tags: ['red'] },
-        { id: 'r4', label: 'ตู้ไปรษณีย์', emoji: '📮', tags: ['red'] },
-        { id: 'r5', label: 'ดอกกุหลาบ', emoji: '🌹', tags: ['red'] },
-        { id: 's1', label: 'บาสเกตบอล', emoji: '🏀', tags: ['sphere'] },
-        { id: 's2', label: 'โลก', emoji: '🌍', tags: ['sphere'] },
-        { id: 's3', label: 'ลูกกอล์ฟ', emoji: '⛳', tags: ['sphere'] },
-        { id: 's4', label: 'ลูกแก้ว', emoji: '🔮', tags: ['sphere'] },
-        { id: 's5', label: 'พระจันทร์', emoji: '🌙', tags: ['sphere'] },
-        { id: 'o1', label: 'กล้วย', emoji: '🍌', tags: [] },
-        { id: 'o2', label: 'บรอกโคลี', emoji: '🥦', tags: [] },
-        { id: 'o3', label: 'จักรยาน', emoji: '🚲', tags: [] },
-        { id: 'o4', label: 'หนังสือ', emoji: '📚', tags: [] },
-        { id: 'o5', label: 'กุญแจ', emoji: '🔑', tags: [] },
-      ]
+      items = [...V1_ANIMALS, ...V1_SCRUBBERS]
       break
 
     case 2:
-      instruction = 'แยกสัตว์ที่เดิน 4 ขา และวัตถุที่ใช้ขัด/แปรง'
+      instruction = 'แยกสัตว์ 4 ขา และ อุปกรณ์ที่ใช้ขัด (ระวังตัวหลอก!)'
       categories = [
-        { id: 'animal4', title: 'สัตว์ 4 ขา 🐕', emoji: '📦', accepts: i => i.tags.includes('animal4') },
-        { id: 'scrubber', title: 'วัตถุขัด/แปรง 🧽', emoji: '📦', accepts: i => i.tags.includes('scrubber') },
+        { id: 'animal4', title: 'สัตว์ 4 ขา 🐾', emoji: '📦', accepts: i => i.tags.includes('animal4') },
+        { id: 'scrubber', title: 'อุปกรณ์ขัด/แปรง 🧽', emoji: '📦', accepts: i => i.tags.includes('scrubber') },
       ]
-      items = [
-        { id: 'a1', label: 'จระเข้', emoji: '🐊', tags: ['animal4'] },
-        { id: 'a2', label: 'ช้าง', emoji: '🐘', tags: ['animal4'] },
-        { id: 'a3', label: 'ม้าลาย', emoji: '🦓', tags: ['animal4'] },
-        { id: 'a4', label: 'ยีราฟ', emoji: '🦒', tags: ['animal4'] },
-        { id: 'a5', label: 'หมู', emoji: '🐷', tags: ['animal4'] },
-        { id: 'sc1', label: 'แปรงสีฟัน', emoji: '🪥', tags: ['scrubber'] },
-        { id: 'sc2', label: 'ฟองน้ำ', emoji: '🧽', tags: ['scrubber'] },
-        { id: 'sc3', label: 'ฝอยขัดหม้อ', emoji: '🧼', tags: ['scrubber'] },
-        { id: 'sc4', label: 'แปรงขัดส้วม', emoji: '🧹', tags: ['scrubber'] },
-        { id: 'sc5', label: 'ไม้ถูพื้น', emoji: '🧹', tags: ['scrubber'] },
-      ]
+      items = [...V2_ANIMALS, ...V2_SCRUBBERS, ...V2_OUTLIERS]
       break
 
     case 3:
       instruction = 'สลับภาชนะทุกครั้งที่จัดถูก 2 ครั้ง'
       categories = [
-        { id: 'animal4', title: 'สัตว์ 4 ขา', emoji: '📦', accepts: i => i.tags.includes('animal4') },
-        { id: 'scrubber', title: 'วัตถุขัด/แปรง', emoji: '📦', accepts: i => i.tags.includes('scrubber') },
+        { id: 'animal4', title: 'สัตว์ 4 ขา 🐾', emoji: '📦', accepts: i => i.tags.includes('animal4') },
+        { id: 'scrubber', title: 'อุปกรณ์ขัด/แปรง 🧽', emoji: '📦', accepts: i => i.tags.includes('scrubber') },
       ]
       items = [
-        { id: 'a1', label: 'จรเข้', emoji: '�', tags: ['animal4'], imageUrl: "/assets_employer/assess/management/cat3/crocodile.png" },
-        { id: 'a2', label: 'ช้าง', emoji: '�', tags: ['animal4'], imageUrl: "/assets_employer/assess/management/cat3/elephant.png" },
-        { id: 'a3', label: 'ม้าลาย', emoji: '🦓', tags: ['animal4'], imageUrl: "/assets_employer/assess/management/cat3/zebra.png" },
-        { id: 'a4', label: 'ยีราฟ', emoji: '🦒', tags: ['animal4'], imageUrl: "/assets_employer/assess/management/cat3/giraffe.png" },
-        { id: 'a5', label: 'หมู', emoji: '�', tags: ['animal4'], imageUrl: "/assets_employer/assess/management/cat3/pig.png" },
-        { id: 'sc1', label: 'ฝอยขัดหม้อ', emoji: '�', tags: ['scrubber'], imageUrl: "/assets_employer/assess/management/cat4/steel-wool.png" },
-        { id: 'sc2', label: 'ฟองน้ำ', emoji: '🧽', tags: ['scrubber'], imageUrl: "/assets_employer/assess/management/cat4/sponge.png" },
-        { id: 'sc3', label: 'แปรงขัดส้วม', emoji: '🚽', tags: ['scrubber'], imageUrl: "/assets_employer/assess/management/cat4/toilet-brush.png" },
-        { id: 'sc4', label: 'แปรงสีฟัน', emoji: '�', tags: ['scrubber'], imageUrl: "/assets_employer/assess/management/cat4/toothbrush.png" },
-        { id: 'sc5', label: 'ไม้ถู', emoji: '🧹', tags: ['scrubber'], imageUrl: "/assets_employer/assess/management/cat4/mop.png" },
-        { id: 'r1', label: 'พริก', emoji: '🌶️', tags: ['red', 'animal4'] },
-        { id: 's1', label: 'ลูกบอล', emoji: '⚽', tags: ['sphere', 'scrubber'] },
+        { id: 'a1', label: 'จรเข้', emoji: '🐊', tags: ['animal4'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 3/จรเข้.png` },
+        { id: 'a2', label: 'ช้าง', emoji: '🐘', tags: ['animal4'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 3/ช้าง.png` },
+        { id: 'a3', label: 'ม้าลาย', emoji: '🦓', tags: ['animal4'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 3/ม้าลาย.png` },
+        { id: 'a4', label: 'ยีราฟ', emoji: '🦒', tags: ['animal4'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 3/ยีราฟ.png` },
+        { id: 'a5', label: 'หมู', emoji: '🐷', tags: ['animal4'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 3/หมู.png` },
+        { id: 'sc1', label: 'ฝอยขัดหม้อ', emoji: '🧽', tags: ['scrubber'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 4/ฝอยขัดหม้อ.png` },
+        { id: 'sc2', label: 'ฟองน้ำ', emoji: '🧽', tags: ['scrubber'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 4/ฟองน้ำ.png` },
+        { id: 'sc3', label: 'แปรงขัดส้วม', emoji: '🪣', tags: ['scrubber'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 4/แปรงขัดส้วม.png` },
+        { id: 'sc4', label: 'แปรงสีฟัน', emoji: '🪥', tags: ['scrubber'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 4/แปรงสีฟัน.png` },
+        { id: 'sc5', label: 'ไม้ถู', emoji: '🧹', tags: ['scrubber'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 4/ไม้ถู.png` },
+        { id: 'o1', label: 'ไม่เข้าพวก', emoji: '❓', tags: [], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่3(ไม่เข้าพวก)/ไม่มีชื่อ 17_20260303222748.png` },
       ].sort(() => Math.random() - 0.5)
-      break
-
+      break
     case 4:
     case 5:
       mode = 'cooking'
@@ -812,7 +822,12 @@ function ManagementGameInner() {
                         style={{ left: `${item.x}%`, top: `${item.y}%`, transform: 'translate(-50%, -50%)' }}
                       >
                         {item.imageUrl ? (
-                          <img src={item.imageUrl} className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-2xl" alt={item.label} />
+                          <img
+                            src={item.imageUrl}
+                            className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-2xl"
+                            style={{ filter: 'contrast(1.1) brightness(1.05) saturate(1.1)', imageRendering: 'crisp-edges' }}
+                            alt={item.label}
+                          />
                         ) : (
                           <span className="text-5xl md:text-6xl drop-shadow-2xl">{item.emoji}</span>
                         )}

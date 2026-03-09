@@ -59,9 +59,20 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
     }
 
     const getEvaluation = () => {
-        if (attempts <= 1) return { text: 'ดีมาก', color: 'text-green-400' }
-        if (attempts <= 3) return { text: 'โอเค', color: 'text-blue-400' }
-        return { text: 'ควรฝึกฝน', color: 'text-amber-400' }
+        if (attempts <= 1) {
+            return {
+                title: 'ดีมาก',
+                score: 5,
+                text: 'สมองของคุณตอนนี้ไม่มีภาวะการรู้คิดบกพร่อง แต่อย่าชะล่าใจไป ในอนาคตทุกคนสามารถมีภาวะเสี่ยงความรู้คิดบกพร่องได้ทุกคน เมื่ออายุมากขึ้น คุณลองมาเล่นกับเกมกับเราสิ มาบริหารสมองเพื่อป้องกันภาวะความรู้คิดบกพร่องกัน',
+                color: 'text-green-400'
+            }
+        }
+        return {
+            title: 'โอ้ !',
+            score: 3,
+            text: 'คุณมีความเสี่ยงที่จะเกิดภาวะความรู้คิดบกพร่อง แต่ไม่ต้องตกใจไป ในอนาคตเมื่ออายุมากขึ้นทุกคนมีความเสี่ยงมากขึ้นอยู่แล้ว มาเล่นเกมกับเราสิ่ มาบริหารสมองเพื่อป้องกันภาวะความรู้คิดบกพร่องกันเถอะ !',
+            color: 'text-amber-400'
+        }
     }
 
     const evalResult = getEvaluation()
@@ -182,9 +193,13 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
                 )}
 
                 {isDone && (
-                    <div className="mt-6 p-6 bg-white/10 rounded-3xl border border-white/20 animate-in zoom-in duration-500">
-                        <h3 className="text-3xl font-black text-white">ยอดเยี่ยม! เตรียมตัวให้พร้อม</h3>
-                        <p className="text-white/40 text-[10px] mt-2 font-bold italic">ความแม่นยำและการตัดสินใจของคุณอยู่ในเกณฑ์ดี</p>
+                    <div className="mt-6 p-6 bg-white/10 rounded-3xl border border-white/20 animate-in zoom-in duration-500 text-center">
+                        <div className={`text-4xl font-black mb-2 ${evalResult.color}`}>
+                            {evalResult.title} (คะแนน: {evalResult.score}/5)
+                        </div>
+                        <p className="text-white text-sm md:text-base font-bold leading-relaxed px-2">
+                            {evalResult.text}
+                        </p>
                     </div>
                 )}
                 {/* Dynamic Hint */}

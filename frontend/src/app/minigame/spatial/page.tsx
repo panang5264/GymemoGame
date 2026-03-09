@@ -1,13 +1,205 @@
 'use client'
 
-import Image from 'next/image'
-import { useState, useEffect, use, Suspense, useRef } from 'react'
+import { useState, useEffect, Suspense, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useProgress } from '@/contexts/ProgressContext'
 import { useLevelSystem } from '@/hooks/useLevelSystem'
 import ClockIntro from '@/components/ClockIntro'
 import { getDateKey } from '@/lib/dailyChallenge'
 import PairMatchingGame from './PairMatchingGame'
+
+// ── DIP image style: brightness/contrast/sharpness filter ──────────────────
+const DIP_STYLE: React.CSSProperties = {
+  filter: 'contrast(1.1) brightness(1.05) saturate(1.1)',
+  imageRendering: 'crisp-edges' as any,
+}
+
+// ── Box Asset Database (from /public/Asset ด้าน/มิติสัมพันธ์/Box) ──────────
+//  Each entry: { block: path to main image, correct: correct choice, wrongs: wrong choices }
+
+const BASE = '/Asset ด้าน/มิติสัมพันธ์/Box'
+
+interface BoxQuestion {
+  block: string
+  correct: string
+  wrongs: string[]
+  direction: string
+}
+
+// Boxlv3 — sub-set id 1.1, 1.2
+const BOX_LV3: BoxQuestion[] = [
+  {
+    block: `${BASE}/Boxlv3/โจทบล็อก 1.1 .png`,
+    correct: `${BASE}/Boxlv3/Correct1.1.png`,
+    wrongs: [`${BASE}/Boxlv3/Wrong1.1.png`, `${BASE}/Boxlv3/Wrong1.2.png`],
+    direction: 'มองจากบนลงล่าง ⬇️',
+  },
+  {
+    block: `${BASE}/Boxlv3/โจทบล็อก 1.2.png`,
+    correct: `${BASE}/Boxlv3/Correct1.2.png`,
+    wrongs: [`${BASE}/Boxlv3/Wrong1.2.png`, `${BASE}/Boxlv3/Wrong1.1.png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+]
+
+// Boxlv4 — sub-set id 2.1, 2.2, 2.3
+const BOX_LV4: BoxQuestion[] = [
+  {
+    block: `${BASE}/Boxlv4/โจทบล็อก2.1.png`,
+    correct: `${BASE}/Boxlv4/Correct 2.1.png`,
+    wrongs: [`${BASE}/Boxlv4/Wrong 2.1.png`, `${BASE}/Boxlv4/Wrong2.2.png`],
+    direction: 'มองจากบนลงล่าง ⬇️',
+  },
+  {
+    block: `${BASE}/Boxlv4/โจทบล็อก2.2.png`,
+    correct: `${BASE}/Boxlv4/Correct 2.2.png`,
+    wrongs: [`${BASE}/Boxlv4/Wrong2.2.png`, `${BASE}/Boxlv4/Wrong 2.3.png`],
+    direction: 'มองจากด้านซ้าย ➡️',
+  },
+  {
+    block: `${BASE}/Boxlv4/Block2.3.png`,
+    correct: `${BASE}/Boxlv4/Correct 2.3.png`,
+    wrongs: [`${BASE}/Boxlv4/Wrong 2.3.png`, `${BASE}/Boxlv4/Wrong 2.1.png`],
+    direction: 'มองจากล่างขึ้นบน ⬆️',
+  },
+]
+
+// Boxlv5 — sub-set 3.1, 3.2
+const BOX_LV5: BoxQuestion[] = [
+  {
+    block: `${BASE}/Boxlv5/Block 3.1.png`,
+    correct: `${BASE}/Boxlv5/Correct 3.1.png`,
+    wrongs: [`${BASE}/Boxlv5/Wrong 3.1.png`, `${BASE}/Boxlv5/Wrong 3.2.png`],
+    direction: 'มองจากบนลงล่าง ⬇️',
+  },
+  {
+    block: `${BASE}/Boxlv5/Block 3.2.png`,
+    correct: `${BASE}/Boxlv5/Correct 3.2.png`,
+    wrongs: [`${BASE}/Boxlv5/Wrong 3.2.png`, `${BASE}/Boxlv5/Wrong 3.1.png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+]
+
+// Boxlv6 — sub-set 4.2 (only 1 available)
+const BOX_LV6: BoxQuestion[] = [
+  {
+    block: `${BASE}/Boxlv6/Block4.2.png`,
+    correct: `${BASE}/Boxlv6/Correct 4.2.png`,
+    wrongs: [`${BASE}/Boxlv6/Wrong4.2.png`, `${BASE}/Boxlv6/Wrong_1_4.2.png`],
+    direction: 'มองจากบนลงล่าง ⬇️',
+  },
+]
+
+// Boxlv7 — sub-set 5.1, 5.2, 5.3
+const BOX_LV7: BoxQuestion[] = [
+  {
+    block: `${BASE}/Boxlv7/Block5.1.png`,
+    correct: `${BASE}/Boxlv7/Correct5.1.png`,
+    wrongs: [`${BASE}/Boxlv7/Wrong5.1.png`, `${BASE}/Boxlv7/Wrong_1_5.1.png`, `${BASE}/Boxlv7/Wrong5.2.png`],
+    direction: 'มองจากบนลงล่าง ⬇️',
+  },
+  {
+    block: `${BASE}/Boxlv7/Block5.2.png`,
+    correct: `${BASE}/Boxlv7/Correct5.2.png`,
+    wrongs: [`${BASE}/Boxlv7/Wrong5.2.png`, `${BASE}/Boxlv7/Wrong_1_5.2.png`, `${BASE}/Boxlv7/Wrong5.1.png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+  {
+    block: `${BASE}/Boxlv7/Block5.3.png`,
+    correct: `${BASE}/Boxlv7/Correct5.3.png`,
+    wrongs: [`${BASE}/Boxlv7/Wrong5.3.png`, `${BASE}/Boxlv7/Wrong_1_5.2.png`, `${BASE}/Boxlv7/Wrong5.2.png`],
+    direction: 'มองจากล่างขึ้นบน ⬆️',
+  },
+]
+
+// Boxlv8 — sub-set 6.1, 6.2, 6.3
+const BOX_LV8: BoxQuestion[] = [
+  {
+    block: `${BASE}/Boxlv8/Block 6.1.png`,
+    correct: `${BASE}/Boxlv8/Correct 6.1.png`,
+    wrongs: [`${BASE}/Boxlv8/Wrong 6.1.png`, `${BASE}/Boxlv8/Wrong_1 6.1.png`, `${BASE}/Boxlv8/Wrong 6.2.png`],
+    direction: 'มองจากบนลงล่าง ⬇️',
+  },
+  {
+    block: `${BASE}/Boxlv8/Block 6.2.png`,
+    correct: `${BASE}/Boxlv8/Correct 6.2.png`,
+    wrongs: [`${BASE}/Boxlv8/Wrong 6.2.png`, `${BASE}/Boxlv8/Wrong_1 6.2.png`, `${BASE}/Boxlv8/Wrong 6.1.png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+  {
+    block: `${BASE}/Boxlv8/Block6.3.jpeg`,
+    correct: `${BASE}/Boxlv8/Correct6.3.jpeg`,
+    wrongs: [`${BASE}/Boxlv8/Wrong6.3.jpeg`, `${BASE}/Boxlv8/Wrong_1_6.3.jpeg`, `${BASE}/Boxlv8/Wrong_2_6.3.jpeg`],
+    direction: 'มองจากล่างขึ้นบน ⬆️',
+  },
+]
+
+// Boxlv9 — sub-set 7.1, 7.2, 7.3
+const BOX_LV9: BoxQuestion[] = [
+  {
+    block: `${BASE}/Boxlv9/Block7.1.png`,
+    correct: `${BASE}/Boxlv9/Correct7.1.png`,
+    wrongs: [`${BASE}/Boxlv9/Wrong7.1.png`, `${BASE}/Boxlv9/Wrong_1_7.1.png`, `${BASE}/Boxlv9/Wrong 7.2.png`],
+    direction: 'มองจากบนลงล่าง ⬇️',
+  },
+  {
+    block: `${BASE}/Boxlv9/Block 7.2.png`,
+    correct: `${BASE}/Boxlv9/Corrrect 7.2.png`,
+    wrongs: [`${BASE}/Boxlv9/Wrong 7.2.png`, `${BASE}/Boxlv9/Wrong_1 7.2.png`, `${BASE}/Boxlv9/Wrong_2 7.2.png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+  {
+    block: `${BASE}/Boxlv9/Block 7.3.png`,
+    correct: `${BASE}/Boxlv9/Correct 7.3.png`,
+    wrongs: [`${BASE}/Boxlv9/Wrong 7.3.png`, `${BASE}/Boxlv9/Wrong_1 7.3.png`, `${BASE}/Boxlv9/Wrong_2 7.3.png`],
+    direction: 'มองจากล่างขึ้นบน ⬆️',
+  },
+]
+
+// Boxlv10 — sub-set 8.1, 8.2
+const BOX_LV10: BoxQuestion[] = [
+  {
+    block: `${BASE}/Boxlv10/Block 8.1.png`,
+    correct: `${BASE}/Boxlv10/Correct 8.1.png`,
+    wrongs: [
+      `${BASE}/Boxlv10/Wrong 8.1.png`,
+      `${BASE}/Boxlv10/Wrong_1 8.1.png`,
+      `${BASE}/Boxlv10/Wrong_2 8.1.png`,
+    ],
+    direction: 'มองจากบนลงล่าง ⬇️',
+  },
+  {
+    block: `${BASE}/Boxlv10/Block 8.2.png`,
+    correct: `${BASE}/Boxlv10/Correct 8.2.png`,
+    wrongs: [
+      `${BASE}/Boxlv10/Wrong 8.2.png`,
+      `${BASE}/Boxlv10/Wrong_1 8.2.png`,
+      `${BASE}/Boxlv10/Wrong_2 8.2.png`,
+    ],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+]
+
+function getBoxBank(level: number): BoxQuestion[] {
+  if (level === 3) return BOX_LV3
+  if (level === 4) return BOX_LV4
+  if (level === 5) return BOX_LV5
+  if (level === 6) return BOX_LV6
+  if (level === 7) return BOX_LV7
+  if (level === 8) return BOX_LV8
+  if (level === 9) return BOX_LV9
+  return BOX_LV10
+}
+
+function pickBoxQuestion(level: number): { q: BoxQuestion; numOptions: number } {
+  const bank = getBoxBank(level)
+  const q = bank[Math.floor(Math.random() * bank.length)]
+  // Number of answer choices scales with level
+  const numOptions = level <= 5 ? 2 : level <= 7 ? 3 : 4
+  return { q, numOptions }
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
 
 function SpatialGameInner() {
   const router = useRouter()
@@ -27,18 +219,18 @@ function SpatialGameInner() {
   const levelTexts = [
     'จับคู่รูปทรงต้นแบบที่มีรอยแหว่งกับชิ้นส่วนที่หายไป 1',
     'จับคู่รูปทรงต้นแบบที่มีรอยแหว่งกับชิ้นส่วนที่หายไป 2',
-    'การมองภาพตามหัวลูกศร (2 ตัวเลือก)',
-    'การมองภาพตามหัวลูกศร (2 ตัวเลือก)',
-    'การมองภาพตามหัวลูกศร (2 ตัวเลือก)',
-    'การมองภาพตามหัวลูกศร (3 ตัวเลือก)',
-    'การมองภาพตามหัวลูกศร (3 ตัวเลือก)',
-    'การมองภาพตามหัวลูกศร (3 ตัวเลือก)',
-    'การมองภาพตามหัวลูกศร (4 ตัวเลือก)',
-    'การมองภาพตามหัวลูกศร (4 ตัวเลือก)'
+    'มองภาพบล็อก 3D แล้วเลือกมุมมองที่ถูกต้อง (2 ตัวเลือก)',
+    'มองภาพบล็อก 3D แล้วเลือกมุมมองที่ถูกต้อง (2 ตัวเลือก)',
+    'มองภาพบล็อก 3D ระดับยากขึ้น (2 ตัวเลือก)',
+    'มองภาพบล็อก 3D ระดับกลาง (3 ตัวเลือก)',
+    'มองภาพบล็อก 3D ระดับกลาง (3 ตัวเลือก)',
+    'มองภาพบล็อก 3D ระดับยาก (3 ตัวเลือก)',
+    'มองภาพบล็อก 3D ระดับยากมาก (4 ตัวเลือก)',
+    'มองภาพบล็อก 3D ระดับสูงสุด (4 ตัวเลือก)',
   ]
   const diffDesc = levelTexts[Math.min(Math.max(levelParam - 1, 0), 9)]
 
-  const [feedback, setFeedback] = useState<{ type: 'correct' | 'wrong', message: string } | null>(null)
+  const [feedback, setFeedback] = useState<{ type: 'correct' | 'wrong'; message: string } | null>(null)
   const [questionText, setQuestionText] = useState<string>('')
   const [isGameOver, setIsGameOver] = useState(false)
   const [errorCount, setErrorCount] = useState(0)
@@ -47,134 +239,57 @@ function SpatialGameInner() {
   const isComplete = isGameOver
 
   const [questionData, setQuestionData] = useState<{
-    targetView?: string[] | string;
-    targetImage?: string;
-    options?: (string[] | string)[];
-    correctIndex?: number;
-    arrow?: 'N' | 'S' | 'E' | 'W';
-    displayGrid?: string[][];
-    isPairMatching?: boolean;
-    pairs?: { target: string, correct: string }[];
-    basePath?: string;
+    // For pair matching (levels 1-2)
+    isPairMatching?: boolean
+    pairs?: { target: string; correct: string }[]
+    basePath?: string
+    // For box selection (levels 3+)
+    targetImage?: string
+    options?: string[]
+    correctIndex?: number
   } | null>(null)
 
   const hasSavedRef = useRef(false)
 
   useEffect(() => {
     hasSavedRef.current = false
-    let mode: 'match' | 'select' | 'find' = 'match'
     setFeedback(null)
     setIsGameOver(false)
-
-    const CHOICES_BASE = "/assets_employer/assess/spatial/choices_cropped"
-    const TARGETS_BASE = "/assets_employer/assess/spatial"
 
     if (levelParam <= 2) {
       // Village 1-2: Interactive Image Matching Pair game
       const isLevel1 = levelParam === 1
       const basePath = `/assets/level1andlevel2/relation1-${isLevel1 ? '1' : '2'}`
 
-      const pairs = isLevel1 ? [
-        { target: 'left1.PNG', correct: 'right4.PNG' },
-        { target: 'left2.PNG', correct: 'right3.PNG' },
-        { target: 'left3.PNG', correct: 'right1.PNG' },
-        { target: 'left4.PNG', correct: 'right5.PNG' },
-        { target: 'left5.PNG', correct: 'right2.PNG' }
-      ] : [
-        { target: 'left1.PNG', correct: 'right3.PNG' },
-        { target: 'left2.PNG', correct: 'right5.PNG' },
-        { target: 'left3.PNG', correct: 'right4.PNG' },
-        { target: 'left4.PNG', correct: 'right2.PNG' },
-        { target: 'left5.PNG', correct: 'right1.PNG' }
-      ]
+      const pairs = isLevel1
+        ? [
+          { target: 'left1.PNG', correct: 'right4.PNG' },
+          { target: 'left2.PNG', correct: 'right3.PNG' },
+          { target: 'left3.PNG', correct: 'right1.PNG' },
+          { target: 'left4.PNG', correct: 'right5.PNG' },
+          { target: 'left5.PNG', correct: 'right2.PNG' },
+        ]
+        : [
+          { target: 'left1.PNG', correct: 'right3.PNG' },
+          { target: 'left2.PNG', correct: 'right5.PNG' },
+          { target: 'left3.PNG', correct: 'right4.PNG' },
+          { target: 'left4.PNG', correct: 'right2.PNG' },
+          { target: 'left5.PNG', correct: 'right1.PNG' },
+        ]
 
-      setQuestionData({
-        isPairMatching: true,
-        pairs: pairs,
-        basePath: basePath
-      })
+      setQuestionData({ isPairMatching: true, pairs, basePath })
       setQuestionText('โยงเส้นจับคู่ภาพที่สัมพันธ์กันให้ถูกต้อง 🎯')
-    } else if (levelParam <= 4) {
-      // Village 3-4: Box unfolding Level 1 (easy Q1-Q4, 2 choices)
-      const EASY_BANK = [
-        {
-          target: `${TARGETS_BASE}/q1.png`,
-          correct: `${CHOICES_BASE}/q1_correct.png`,
-          wrongs: [`${CHOICES_BASE}/q1_wrong1.png`],
-          direction: 'มองจากบนลงล่าง ⬇️'
-        },
-        {
-          target: `${TARGETS_BASE}/q2.png`,
-          correct: `${CHOICES_BASE}/q2_correct.png`,
-          wrongs: [`${CHOICES_BASE}/q2_wrong1.png`],
-          direction: 'มองจากล่างขึ้นบน ⬆️'
-        },
-        {
-          target: `${TARGETS_BASE}/q3.png`,
-          correct: `${CHOICES_BASE}/q3_correct.png`,
-          wrongs: [`${CHOICES_BASE}/q3_wrong1.png`],
-          direction: 'มองจากด้านข้างซ้าย ➡️'
-        },
-        {
-          target: `${TARGETS_BASE}/q4.png`,
-          correct: `${CHOICES_BASE}/q4_correct.png`,
-          wrongs: [`${CHOICES_BASE}/q4_wrong1.png`, `${CHOICES_BASE}/q4_wrong2.png`],
-          direction: 'มองจากบนลงล่าง ⬇️'
-        },
-      ]
-      const q = EASY_BANK[Math.floor(Math.random() * EASY_BANK.length)]
-      const options = [q.correct, q.wrongs[0]].sort(() => Math.random() - 0.5)
-
-      setQuestionData({
-        targetImage: q.target,
-        options,
-        correctIndex: options.indexOf(q.correct)
-      })
-      setQuestionText(`ถ้า${q.direction} คุณจะเห็นรูปไหน? 📦`)
-
     } else {
-      // Village 5+: Box unfolding Level 2 (harder Q5-Q8, 3-4 choices)
-      const HARD_BANK = [
-        {
-          target: `${TARGETS_BASE}/q5.png`,
-          correct: `${CHOICES_BASE}/q5_correct.png`,
-          wrongs: [`${CHOICES_BASE}/q5_wrong1.png`, `${CHOICES_BASE}/q5_wrong2.png`],
-          direction: 'มองจากบนลงล่าง ⬇️'
-        },
-        {
-          target: `${TARGETS_BASE}/q6.png`,
-          correct: `${CHOICES_BASE}/q6_correct.png`,
-          wrongs: [`${CHOICES_BASE}/q6_wrong1.png`, `${CHOICES_BASE}/q6_wrong2.png`],
-          direction: 'มองจากล่างขึ้นบน ⬆️'
-        },
-        {
-          target: `${TARGETS_BASE}/q7.png`,
-          correct: `${CHOICES_BASE}/q7_correct.png`,
-          wrongs: [`${CHOICES_BASE}/q7_wrong1.png`, `${CHOICES_BASE}/q7_wrong2.png`, `${CHOICES_BASE}/q7_wrong3.png`],
-          direction: 'มองจากด้านข้าง ↔️'
-        },
-        {
-          target: `${TARGETS_BASE}/q8.png`,
-          correct: `${CHOICES_BASE}/q8_correct.png`,
-          wrongs: [`${CHOICES_BASE}/q8_wrong1.png`, `${CHOICES_BASE}/q8_wrong2.png`, `${CHOICES_BASE}/q8_wrong3.png`],
-          direction: 'มองจากบนลงล่าง ⬇️'
-        },
-      ]
+      // Village 3+: Use Box asset images, randomized
+      const { q, numOptions } = pickBoxQuestion(levelParam)
+      const availableWrongs = [...q.wrongs].sort(() => Math.random() - 0.5)
+      const wrongsToUse = availableWrongs.slice(0, Math.min(numOptions - 1, availableWrongs.length))
+      const options = [q.correct, ...wrongsToUse].sort(() => Math.random() - 0.5)
+      const correctIndex = options.indexOf(q.correct)
 
-      const numOptions = levelParam <= 7 ? 3 : 4
-      const eligible = HARD_BANK.filter(q => q.wrongs.length >= numOptions - 1)
-      const q = eligible[Math.floor(Math.random() * eligible.length)]
-      const wrongPool = [...q.wrongs].sort(() => Math.random() - 0.5).slice(0, numOptions - 1)
-      const options = [q.correct, ...wrongPool].sort(() => Math.random() - 0.5)
-
-      setQuestionData({
-        targetImage: q.target,
-        options,
-        correctIndex: options.indexOf(q.correct)
-      })
-      setQuestionText(`ถ้า${q.direction} คุณจะเห็นรูปไหน? 📦`)
+      setQuestionData({ targetImage: q.block, options, correctIndex })
+      setQuestionText(`ถ้า${q.direction} คุณจะเห็นหน้าตาบล็อกเป็นแบบใด? 📦`)
     }
-
   }, [levelParam, subId])
 
   const { progress, saveProgress } = useProgress()
@@ -185,13 +300,12 @@ function SpatialGameInner() {
     if (isComplete && !hasSavedRef.current) {
       hasSavedRef.current = true
       if (mode === 'village') {
-        const accuracy = errorCount === 0 ? 100 : Math.max(0, 100 - (errorCount * 25))
+        const accuracy = errorCount === 0 ? 100 : Math.max(0, 100 - errorCount * 25)
         const duration = (Date.now() - startTime) / 1000
         const finalScore = 100 * (isBonus ? 2 : 1)
         recordPlay(villageId, finalScore, 'spatial', subId, accuracy, duration)
       } else if (mode === 'daily') {
         const dateKey = getDateKey()
-
         if (progress && active) {
           import('@/lib/levelSystem').then(({ saveDailyScore: rawSaveDailyScore, markDailyMode: rawMarkDailyMode }) => {
             let nextP = { ...progress }
@@ -200,9 +314,8 @@ function SpatialGameInner() {
             saveProgress(nextP)
           })
         }
-
         if (progress?.guestId && active) {
-          const accuracy = errorCount === 0 ? 100 : Math.max(0, 100 - (errorCount * 25))
+          const accuracy = errorCount === 0 ? 100 : Math.max(0, 100 - errorCount * 25)
           const duration = (Date.now() - startTime) / 1000
           const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
           fetch(`${API_BASE_URL}/api/analysis/record`, {
@@ -215,8 +328,8 @@ function SpatialGameInner() {
               subLevelId: 0,
               score: 100,
               accuracy,
-              timeTaken: duration
-            })
+              timeTaken: duration,
+            }),
           }).catch(err => console.error('Failed to log daily analytics:', err))
         }
       }
@@ -224,11 +337,9 @@ function SpatialGameInner() {
     return () => { active = false }
   }, [isComplete, mode, villageId, subId, errorCount, startTime, progress, saveProgress])
 
-  // ── Cheat Mode ─────────────────────────────────────────────────────────────
+  // Cheat Mode
   useEffect(() => {
-    const handleCheat = () => {
-      setIsGameOver(true)
-    }
+    const handleCheat = () => setIsGameOver(true)
     window.addEventListener('gymemo:cheat_complete', handleCheat)
     return () => window.removeEventListener('gymemo:cheat_complete', handleCheat)
   }, [])
@@ -275,20 +386,18 @@ function SpatialGameInner() {
 
   return (
     <div className="min-h-[calc(100vh-140px)] py-6 flex flex-col items-center relative overflow-hidden font-['Supermarket']">
-
       <div className="max-w-4xl w-full px-4 relative z-10">
+        {/* Header */}
         <div className="bg-white p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm border border-slate-200 mb-4 md:mb-6">
           <h1 className="text-lg md:text-2xl font-black text-slate-800 text-center mb-1 relative inline-block w-full">
-            {mode === 'daily' ? '🌟 ภารกิจรายวัน: พื้นที่' : `🗺️ Spatial — ด่าน ${subId}`}
+            {mode === 'daily' ? '🌟 ภารกิจรายวัน: พื้นที่' : `📦 มิติสัมพันธ์ — ด่าน ${subId}`}
             {isBonus && (
               <span className="absolute -top-3 right-0 bg-yellow-400 text-yellow-900 text-[10px] md:text-xs font-black px-2 py-0.5 rounded-full border border-yellow-500 shadow-sm animate-pulse">
                 x2 BONUS
               </span>
             )}
           </h1>
-          <p className="text-center text-slate-500 font-bold uppercase tracking-wider text-xs md:text-sm">
-            {diffDesc}
-          </p>
+          <p className="text-center text-slate-500 font-bold uppercase tracking-wider text-xs md:text-sm">{diffDesc}</p>
         </div>
 
         {isComplete ? (
@@ -316,7 +425,6 @@ function SpatialGameInner() {
                     </button>
                   ) : null}
                   <button className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-black text-lg transition-all" onClick={() => router.push(`/world/${villageId}?showSummary=1`)}>
-
                     กลับสู่แผนที่ 🗺️
                   </button>
                 </>
@@ -325,6 +433,7 @@ function SpatialGameInner() {
           </div>
         ) : (
           <div className="w-full flex flex-col items-center h-full">
+            {/* Feedback / Question Text */}
             <div className="mb-6 md:mb-8 min-h-[40px] md:min-h-[50px] text-center w-full mt-2 md:mt-4">
               {feedback && (
                 <div className={`inline-block px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 rounded-full font-black text-xs sm:text-sm md:text-lg shadow-lg border-2 md:border-4 ${feedback.type === 'correct' ? 'bg-green-500 text-white border-green-300' : 'bg-red-500 text-white border-red-300 animate-shake'}`}>
@@ -338,7 +447,8 @@ function SpatialGameInner() {
               )}
             </div>
 
-            {questionData && questionData.isPairMatching ? (
+            {/* Pair matching (Level 1-2) */}
+            {questionData?.isPairMatching && (
               <PairMatchingGame
                 pairs={questionData.pairs || []}
                 basePath={questionData.basePath || ''}
@@ -348,23 +458,30 @@ function SpatialGameInner() {
                 }}
                 onError={() => setErrorCount(e => e + 1)}
               />
-            ) : questionData && questionData.options ? (
+            )}
+
+            {/* Box Image selection (Level 3+) */}
+            {questionData && !questionData.isPairMatching && questionData.options && (
               <div className="w-full flex flex-col items-center">
-                {/* 1. Target Area (Image or Emoji) */}
-                <div className="mb-6 md:mb-8 relative p-4 md:p-6 bg-white/40 backdrop-blur-md rounded-2xl md:rounded-[2rem] border-2 md:border-4 border-white/50 shadow-xl flex items-center justify-center min-h-[140px] md:min-h-[200px] w-full max-w-[240px] sm:max-w-[280px] md:max-w-sm">
-                  {questionData.targetView ? (
-                    <div className="text-5xl sm:text-6xl md:text-8xl drop-shadow-2xl animate-bounce">{questionData.targetView}</div>
-                  ) : questionData.targetImage ? (
-                    <img src={questionData.targetImage} className="w-full h-[120px] sm:h-[160px] md:h-[220px] object-contain drop-shadow-md" alt="target" />
-                  ) : null}
+                {/* Main block image */}
+                <div className="mb-6 md:mb-8 relative p-3 md:p-5 bg-white/60 backdrop-blur-md rounded-2xl md:rounded-[2rem] border-2 md:border-4 border-indigo-200 shadow-xl flex items-center justify-center w-full max-w-[280px] sm:max-w-[330px] md:max-w-md">
+                  <div className="text-[9px] md:text-[11px] font-black text-indigo-400 uppercase tracking-widest absolute top-2 left-3">โจทย์ 📦</div>
+                  <img
+                    src={questionData.targetImage}
+                    style={DIP_STYLE}
+                    className="w-full h-[150px] sm:h-[190px] md:h-[240px] object-contain mt-3"
+                    alt="target block"
+                  />
                 </div>
 
-                {/* 2. Options Area */}
-                <div className={`grid gap-3 sm:gap-4 md:gap-6 w-full max-w-2xl px-2 sm:px-4 pb-20 ${questionData.options.length === 2 ? 'grid-cols-2' :
-                  questionData.options.length === 3 ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' :
-                    'grid-cols-2'
+                {/* Answer choices */}
+                <div className={`grid gap-3 sm:gap-4 md:gap-5 w-full max-w-2xl px-2 sm:px-4 pb-8 ${questionData.options.length === 2
+                    ? 'grid-cols-2'
+                    : questionData.options.length === 3
+                      ? 'grid-cols-3'
+                      : 'grid-cols-2 md:grid-cols-4'
                   }`}>
-                  {questionData.options.map((opt: (string[] | string), idx: number) => (
+                  {questionData.options.map((opt: string, idx: number) => (
                     <button
                       key={idx}
                       onClick={() => {
@@ -377,28 +494,34 @@ function SpatialGameInner() {
                           setTimeout(() => setFeedback(null), 1000)
                         }
                       }}
-                      className="group relative p-2 sm:p-3 md:p-6 bg-white hover:bg-blue-50 border-b-4 md:border-b-8 border-slate-200 hover:border-blue-200 rounded-xl md:rounded-[2rem] shadow-md md:shadow-lg transition-all active:scale-95 flex flex-col items-center justify-center min-h-[100px] sm:min-h-[120px] md:min-h-[160px]"
+                      className="group relative p-2 sm:p-3 md:p-4 bg-white hover:bg-indigo-50 border-b-4 md:border-b-8 border-slate-200 hover:border-indigo-300 rounded-xl md:rounded-[2rem] shadow-md md:shadow-lg transition-all active:scale-95 flex flex-col items-center justify-center min-h-[100px] sm:min-h-[120px] md:min-h-[150px]"
                     >
-                      <div className="flex gap-1 sm:gap-2 w-full h-full items-center justify-center">
-                        {typeof opt === 'string' && opt.startsWith('/') ? (
-                          <img src={opt as string} className="max-w-[60px] max-h-[60px] sm:max-w-[80px] sm:max-h-[80px] md:max-w-[120px] md:max-h-[120px] object-contain drop-shadow-sm group-hover:scale-105 transition-transform" alt={`option ${idx}`} />
-                        ) : Array.isArray(opt) ? opt.map((emoji, i) => (
-                          <span key={i} className="text-xl sm:text-2xl md:text-4xl drop-shadow-md group-hover:scale-110 transition-transform">{emoji}</span>
-                        )) : (
-                          <span className="text-3xl sm:text-4xl md:text-6xl drop-shadow-md group-hover:scale-110 transition-transform">{opt as string}</span>
-                        )}
-                      </div>
-                      <div className="absolute -top-2 -right-2 w-8 h-8 bg-slate-100 rounded-full border-2 border-white text-slate-400 font-black flex items-center justify-center text-xs group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                      <img
+                        src={opt}
+                        style={DIP_STYLE}
+                        className="max-w-[70px] max-h-[70px] sm:max-w-[90px] sm:max-h-[90px] md:max-w-[120px] md:max-h-[120px] object-contain group-hover:scale-105 transition-transform"
+                        alt={`option ${idx}`}
+                      />
+                      <div className="absolute -top-2 -right-2 w-7 h-7 bg-slate-100 rounded-full border-2 border-white text-slate-500 font-black flex items-center justify-center text-xs group-hover:bg-indigo-500 group-hover:text-white transition-colors shadow">
                         {String.fromCharCode(65 + idx)}
                       </div>
                     </button>
                   ))}
                 </div>
               </div>
-            ) : null}
+            )}
           </div>
         )}
       </div>
+
+      <style jsx>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-6px); }
+          75% { transform: translateX(6px); }
+        }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+      `}</style>
     </div>
   )
 }
