@@ -88,7 +88,7 @@ function MazeGameInner() {
             if (mode === 'village') {
                 const timeTaken = (Date.now() - startTime) / 1000
                 const score = Math.max(10, Math.floor(1000 / (timeTaken + 1)))
-                recordPlay(parseInt(villageIdParam), score, undefined, subId)
+                recordPlay(parseInt(villageIdParam), score, 'reaction', subId, 100, timeTaken)
 
                 // ถือว่าทำภารกิจรายวันโหมด management ควบคู่ไปด้วย (เนื่องจาก Reaction เป็นส่วนหนึ่งของหมู่บ้าน)
                 const dk = getDateKey()

@@ -12,13 +12,37 @@ export function useLevelSystem() {
     const recordPlay = async (
         villageId: number,
         scoreGained: number,
-        gameType?: 'management' | 'calculation' | 'spatial',
+        gameType?: 'management' | 'calculation' | 'spatial' | 'reaction',
         subId?: number,
         accuracy?: number,
         timeTaken?: number
     ) => {
         const nextProgress = LevelSystem.recordPlay(progress, villageId, scoreGained, gameType, subId, accuracy, timeTaken)
         await saveProgress(nextProgress)
+
+        // Additionally sync to analysis backend if guestId exists
+        if (nextProgress.guestId && gameType) {
+            const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
+            try {
+                // Ensure we use a conservative normalized score if needed, or the backend handles it
+                // Based on analysisService.js, it expects raw score and normalizes it there.
+                await fetch(`${API_BASE_URL}/api/analysis/record`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        guestId: nextProgress.guestId,
+                        gameType: gameType,
+                        level: villageId,
+                        subLevelId: subId || 0,
+                        score: scoreGained,
+                        accuracy: accuracy || 100,
+                        timeTaken: timeTaken || 0
+                    })
+                })
+            } catch (err) {
+                console.error('Failed to sync to analysis backend:', err)
+            }
+        }
     }
 
     const recordVillageRun = async (

@@ -15,6 +15,8 @@ interface ProgressContextType {
 
 const ProgressContext = createContext<ProgressContextType | undefined>(undefined)
 
+const STORAGE_KEY = 'gymemo_progress_v2'
+
 export function ProgressProvider({ children }: { children: ReactNode }) {
     const { token } = useAuth()
     const [progress, setProgress] = useState<GymemoProgressV2>(getDefaultProgress())
@@ -53,13 +55,26 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
                     setProgress(getDefaultProgress())
                 }
             } else {
-                const defaultP = getDefaultProgress()
-                // Guest mode: load history from local
-                const localHistory = localStorage.getItem('gymemo_history')
-                if (localHistory) {
-                    try { defaultP.history = JSON.parse(localHistory) } catch (e) { }
+                // Guest mode: load full state from local storage first
+                const saved = localStorage.getItem(STORAGE_KEY)
+                let initialP = getDefaultProgress()
+
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved)
+                        initialP = { ...initialP, ...parsed }
+                    } catch (e) {
+                        console.error('Failed to parse saved guest progress:', e)
+                    }
                 }
-                setProgress(defaultP)
+
+                // Fallback history loading if not in main object
+                const localHistory = localStorage.getItem('gymemo_history')
+                if (localHistory && (!initialP.history || initialP.history.length === 0)) {
+                    try { initialP.history = JSON.parse(localHistory) } catch (e) { }
+                }
+
+                setProgress(initialP)
             }
             setIsLoading(false)
         }
@@ -112,6 +127,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
             } catch (err) {
                 console.error('Failed to sync progress to DB:', err)
             }
+        } else {
+            // Guest mode: persist to local storage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedWithHistory))
         }
     }
 

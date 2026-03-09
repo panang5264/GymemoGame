@@ -475,6 +475,10 @@ export default function Home() {
                       onClick={async () => {
                         if (window.confirm('คุณต้องการรีเซ็ตความก้าวหน้าใช่หรือไม่? (ประวัติความสำเร็จของคุณทั้งหมดจะยังคงถูกเก็บไว้)')) {
                           const defaultP = getDefaultProgress()
+                          // Preserve identity and history
+                          defaultP.userName = progress.userName
+                          defaultP.guestId = progress.guestId
+
                           // Deep copy history to preserve it through the reset
                           if (progress.history) {
                             defaultP.history = [...progress.history]

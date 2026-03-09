@@ -23,6 +23,7 @@ export interface VillageProgress {
     management: number
     calculation: number
     spatial: number
+    reaction?: number
   }
   subLevelScores?: Record<number, number>
 }
@@ -36,6 +37,7 @@ export interface DailyModeCompletion {
   management: boolean
   calculation: boolean
   spatial: boolean
+  reaction?: boolean
 }
 
 export interface GymemoProgressV2 {
@@ -44,24 +46,14 @@ export interface GymemoProgressV2 {
   unlockedVillages: number[]
   keys: KeyState
   daily: Record<string, DailyModeCompletion>
-  dailyScores: Record<string, { management: number, calculation: number, spatial: number }>
+  dailyScores: Record<string, { management: number, calculation: number, spatial: number, reaction?: number }>
   totalScore: number
   userName: string
   guestId?: string
   history?: any[]
 }
 
-// Fallback UUID generator if crypto.randomUUID is not available
-function generateUUID() {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
+import { getGuestId } from './guestId'
 
 export function getDefaultProgress(): GymemoProgressV2 {
   return {
@@ -73,7 +65,7 @@ export function getDefaultProgress(): GymemoProgressV2 {
     dailyScores: {},
     totalScore: 0,
     userName: '',
-    guestId: typeof window !== 'undefined' ? generateUUID() : undefined,
+    guestId: getGuestId(),
     history: []
   }
 }
@@ -86,7 +78,7 @@ export function recordPlay(
   p: GymemoProgressV2,
   villageId: number,
   scoreGained: number,
-  gameType?: 'management' | 'calculation' | 'spatial',
+  gameType?: 'management' | 'calculation' | 'spatial' | 'reaction',
   subId?: number,
   accuracy?: number,
   timeTaken?: number
@@ -98,8 +90,10 @@ export function recordPlay(
   const tubeFilled = newPlays >= PLAYS_PER_VILLAGE
 
   if (gameType) {
-    const current = { ...(vp.currentRunScore ?? { management: 0, calculation: 0, spatial: 0 }) }
-    current[gameType] = Math.max(current[gameType] || 0, scoreGained)
+    const current = { ...(vp.currentRunScore ?? { management: 0, calculation: 0, spatial: 0, reaction: 0 }) }
+    if (gameType !== 'reaction' || current.reaction !== undefined) {
+      current[gameType] = Math.max(current[gameType] || 0, scoreGained)
+    }
     vp.currentRunScore = current
   }
 
@@ -158,13 +152,13 @@ export function recordVillageRun(
 export function accumulateRunScore(
   p: GymemoProgressV2,
   villageId: number,
-  gameType: 'management' | 'calculation' | 'spatial',
+  gameType: 'management' | 'calculation' | 'spatial' | 'reaction',
   score: number
 ): GymemoProgressV2 {
   const nextP = { ...p, villages: { ...p.villages } }
   const key = String(villageId)
   const vp = { ...(nextP.villages[key] ?? { playsCompleted: 0, expTubeFilled: false }) }
-  const current = { ...(vp.currentRunScore ?? { management: 0, calculation: 0, spatial: 0 }) }
+  const current = { ...(vp.currentRunScore ?? { management: 0, calculation: 0, spatial: 0, reaction: 0 }) }
   current[gameType] = Math.max(current[gameType] || 0, score)
   vp.currentRunScore = current
   nextP.villages[key] = vp
@@ -204,7 +198,7 @@ export function consumeKey(p: GymemoProgressV2): GymemoProgressV2 | false {
 }
 
 export function getDailyProgress(p: GymemoProgressV2, dateKey: string): DailyModeCompletion {
-  return p.daily[dateKey] ?? { management: false, calculation: false, spatial: false }
+  return p.daily[dateKey] ?? { management: false, calculation: false, spatial: false, reaction: false }
 }
 
 export function addKeys(p: GymemoProgressV2, count: number): GymemoProgressV2 {
@@ -220,10 +214,10 @@ export function addKeys(p: GymemoProgressV2, count: number): GymemoProgressV2 {
 export function markDailyMode(
   p: GymemoProgressV2,
   dateKey: string,
-  mode: 'management' | 'calculation' | 'spatial'
+  mode: 'management' | 'calculation' | 'spatial' | 'reaction'
 ): GymemoProgressV2 {
   const nextP = { ...p, daily: { ...p.daily } }
-  const dp = { ...(nextP.daily[dateKey] ?? { management: false, calculation: false, spatial: false }) }
+  const dp = { ...(nextP.daily[dateKey] ?? { management: false, calculation: false, spatial: false, reaction: false }) }
   dp[mode] = true
   nextP.daily[dateKey] = dp
   return nextP
@@ -232,13 +226,13 @@ export function markDailyMode(
 export function saveDailyScore(
   p: GymemoProgressV2,
   seed: string,
-  minigame: 'management' | 'calculation' | 'spatial',
+  minigame: 'management' | 'calculation' | 'spatial' | 'reaction',
   score: number,
   total: number = 0
 ): GymemoProgressV2 {
   const nextP = { ...p, dailyScores: { ...(p.dailyScores || {}) } }
   if (!nextP.dailyScores[seed]) {
-    nextP.dailyScores[seed] = { management: 0, calculation: 0, spatial: 0 }
+    nextP.dailyScores[seed] = { management: 0, calculation: 0, spatial: 0, reaction: 0 }
   } else {
     nextP.dailyScores[seed] = { ...nextP.dailyScores[seed] }
   }

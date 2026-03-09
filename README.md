@@ -1,265 +1,110 @@
-# 🧠 GymemoGame
+# 🧠 GymemoGame: Cognitive Adventure
 
-เกมฝึกสมอง — จับคู่การ์ดเพื่อฝึกความจำ พัฒนาสมองไปพร้อมกับความสนุก!
+**GymemoGame** คือแพลตฟอร์มเกมฝึกฝนทักษะสมอง (Cognitive Training) ที่ผสมผสานระบบการผจญภัย (Adventure) เข้ากับหลักการทางจิตวิทยา เพื่อช่วยพัฒนาทักษะด้านความจำ การตัดสินใจ และความรวดเร็วในการประมวลผล
+
+---
+
+## 🌟 ฟีเจอร์เด่น
+- **🗺️ Adventure Mode**: ผจญภัยผ่าน 10 หมู่บ้านในแผนที่โลก เพื่อทำภารกิจฟื้นฟูความทรงจำ
+- **📊 Cognitive Profile**: วิเคราะห์พัฒนาการสมอง 4 ด้าน (Executive Function, Working Memory, Processing Speed, Attention) แสดงผลผ่าน Radar Chart
+- **🎮 Multi-Domain Minigames**: 
+  - **Management**: ฝึกทักษะการบริหารจัดการและการแยกแยะ (Executive Function)
+  - **Calculation**: ฝึกความรวดเร็วในการคิดคำนวณ (Processing Speed)
+  - **Spatial**: ฝึกความจำขณะทำงานและมิติสัมพันธ์ (Working Memory)
+  - **Reaction**: ฝึกการตอบสนองและสมาธิ (Attention)
+- **👥 Guest Persistence**: ระบบจดจำตัวตนผู้เล่นแม้ไม่ได้เข้าสู่ระบบ (Persistent Guest ID) เพื่อให้ความก้าวหน้าไม่หายไป
+- **🏆 Global Leaderboard**: แข่งขันกับผู้เล่นทั่วโลกเพื่อชิงอันดับสูงสุด
 
 ---
 
 ## 📋 สารบัญ
-
 - [สิ่งที่ต้องติดตั้งก่อน](#สิ่งที่ต้องติดตั้งก่อน)
 - [วิธีรันโปรเจกต์](#วิธีรันโปรเจกต์)
 - [โครงสร้างโปรเจกต์](#โครงสร้างโปรเจกต์)
 - [API Endpoints](#api-endpoints)
-- [Database Schema](#database-schema)
-- [Tech Stack](#tech-stack)
+- [เทคโนโลยีที่ใช้](#เทคโนโลยีที่ใช้)
 
 ---
 
 ## สิ่งที่ต้องติดตั้งก่อน
-
 | ซอฟต์แวร์ | เวอร์ชัน | ลิงก์ |
 |-----------|---------|------|
 | Node.js | v18 ขึ้นไป | [nodejs.org](https://nodejs.org) |
-| MongoDB | v6 ขึ้นไป | [mongodb.com](https://www.mongodb.com/try/download/community) หรือใช้ [MongoDB Atlas](https://www.mongodb.com/atlas) |
+| MongoDB | v6 ขึ้นไป | [mongodb.com](https://www.mongodb.com) |
 
 ---
 
 ## วิธีรันโปรเจกต์
 
 ### 1. Clone โปรเจกต์
-
 ```bash
 git clone https://github.com/panang5264/GymemoGame.git
 cd GymemoGame
 ```
 
 ### 2. ตั้งค่า Backend
-
 ```bash
 cd backend
 npm install
-cp .env.example .env
-```
-
-แก้ไขไฟล์ `.env` ตามต้องการ:
-
-```env
-PORT=3001
-MONGODB_URI=mongodb://localhost:27017/gymemo
-JWT_SECRET=ใส่_secret_ของคุณ_ตรงนี้
-NODE_ENV=development
-```
-
-> 💡 ถ้าใช้ MongoDB Atlas ให้เปลี่ยน `MONGODB_URI` เป็น connection string ของ Atlas
-
-รัน Backend:
-
-```bash
+# คัดเลือก .env และตั้งค่า MONGODB_URI, JWT_SECRET
 npm run dev
 ```
 
-✅ สำเร็จจะเห็น:
-
-```
-🚀 Gymemo Backend running on port 3001
-✅ MongoDB Connected: localhost
-```
-
-### 3. ใส่ข้อมูลตัวอย่าง (Optional)
-
-```bash
-npm run seed
-```
-
-จะได้ข้อมูลตัวอย่าง 3 users + 5 scores พร้อม login credentials
-
-### 4. ตั้งค่า Frontend
-
-เปิด **terminal ใหม่** แล้วรัน:
-
+### 3. ตั้งค่า Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-
-✅ สำเร็จจะเห็น:
-
-```
-▲ Next.js 14.1.0
-- Local: http://localhost:3000
-```
-
-### 5. เปิดเล่น! 🎮
-
-เปิดเบราว์เซอร์ไปที่ **http://localhost:3000**
-
-> ⚠️ **สำคัญ**: ต้องรัน **ทั้ง Backend และ Frontend** พร้อมกัน (เปิด 2 terminals)
-
----
-
-## สรุป Commands
-
-| ทำอะไร | คำสั่ง | Directory |
-|--------|--------|-----------|
-| รัน Backend (dev) | `npm run dev` | `backend/` |
-| รัน Frontend (dev) | `npm run dev` | `frontend/` |
-| Seed ข้อมูลตัวอย่าง | `npm run seed` | `backend/` |
-| Build Frontend | `npm run build` | `frontend/` |
-| รัน Backend (prod) | `npm start` | `backend/` |
-| รัน Frontend (prod) | `npm start` | `frontend/` |
-
-## Ports
-
-| Service | URL |
-|---------|-----|
-| Frontend (Next.js) | `http://localhost:3000` |
-| Backend API (Express) | `http://localhost:3001` |
-| MongoDB | `mongodb://localhost:27017/gymemo` |
+เปิดเบราว์เซอร์ไปที่ **http://localhost:3000** 🚀
 
 ---
 
 ## โครงสร้างโปรเจกต์
-
 ```
 GymemoGame/
-├── Gymemo.md
-│
-├── frontend/                     # Next.js 14 + TypeScript
-│   ├── package.json
-│   ├── next.config.js
-│   ├── tsconfig.json
-│   └── src/
-│       ├── app/
-│       │   ├── layout.tsx        # Root Layout
-│       │   ├── page.tsx          # หน้า Index (Home)
-│       │   ├── globals.css       # Global Styles
-│       │   └── game/
-│       │       └── page.tsx      # หน้าเล่นเกม
-│       └── components/
-│           ├── Header.tsx        # แถบนำทาง
-│           ├─��� Footer.tsx        # ส่วนท้าย
-│           ├── GameBoard.tsx     # กระดานเกม
-│           ├── GameCard.tsx      # การ์ดในเกม
-│           ├── ScoreBoard.tsx    # แสดงคะแนน
-│           └── Timer.tsx         # ตัวจับเวลา
-│
-├── backend/                      # Express + Mongoose
-│   ├── package.json
-│   ├── .env.example
-│   └── src/
-│       ├── server.js             # Entry point
-│       ├── config/
-│       │   └── db.js             # เชื่อมต่อ MongoDB
-│       ├── models/
-│       │   ├── User.js           # Schema ผู้ใช้
-│       │   └── Score.js          # Schema คะแนน
-│       ├── controllers/
-│       │   ├── authController.js # Logic สมัคร/เข้าสู่ระบบ
-│       │   └── scoreController.js# Logic คะแนน
-│       ├── routes/
-│       │   ├── authRoutes.js     # เส้นทาง Auth
-│       │   └── scoreRoutes.js    # เส้นทาง Score
-│       └── middleware/
-│           └── authMiddleware.js # ตรวจสอบ JWT
-│
-└── database/
-    ├── README.md                 # เอกสาร Schema
-    └── seed.js                   # ข้อมูลตัวอย่าง
+├── frontend/                     # Next.js 14 + Tailwind/Vanilla CSS
+│   ├── src/
+│   │   ├── app/                  # App Router & Pages
+│   │   │   ├── minigame/         # รวมมินิเกมแยกตาม Domain
+│   │   │   ├── world/            # แผนที่โลกและด่านหมู่บ้าน
+│   │   │   └── leaderboard/      # ระบบจัดอันดับ
+│   │   ├── components/           # UI Components (RadarChart, Timer, etc.)
+│   │   ├── contexts/             # State Management (Auth, Progress)
+│   │   └── lib/                  # Logic (Level System, API Client)
+│   
+├── backend/                      # Node.js + Express + MongoDB
+│   ├── src/
+│   │   ├── models/               # Schema (User, GameAnalysis, CognitiveProfile)
+│   │   ├── routes/               # Routes (Auth, Score, Analysis)
+│   │   ├── services/             # Business Logic (Analysis Recalculation)
+│   │   └── controllers/          # Request Handlers
 ```
 
 ---
 
-## API Endpoints
+## API Endpoints (หลัก)
 
-### 🔐 Auth (การยืนยันตัวตน)
+### 🧠 Analysis (วิเคราะห์สมอง)
+- `GET /api/analysis/profile/:guestId` - ดึงข้อมูลสรุปทักษะสมองรายบุคคล
+- `POST /api/analysis/record` - บันทึกผลการเล่นและ recalculate ทักษะสมอง
 
-| Method | Endpoint | Auth | คำอธิบาย | Body |
-|--------|----------|------|----------|------|
-| `POST` | `/api/auth/register` | ❌ | สมัครสมาชิก | `{ name, phone, password }` |
-| `POST` | `/api/auth/login` | ❌ | เข้าสู่ระบบ | `{ phone, password }` |
-| `GET` | `/api/auth/profile` | ✅ | ดูโปรไฟล์ | - |
+### 🔐 Auth & Progress
+- `POST /api/auth/login` - เข้าสู่ระบบ
+- `GET /api/progression/sync` - ดึงข้อมูลความก้าวหน้า (หมู่บ้าน, คะแนน)
 
-### 🏆 Scores (คะแนน)
-
-| Method | Endpoint | Auth | คำอธิบาย | Body |
-|--------|----------|------|----------|------|
-| `POST` | `/api/scores` | ✅ | ส่งคะแนน | `{ score, moves, timeTaken }` |
-| `GET` | `/api/scores/leaderboard` | ❌ | กระดานผู้นำ (Top 10) | - |
-| `GET` | `/api/scores/my-scores` | ✅ | คะแนนของฉัน | - |
-
-### วิธีใช้ JWT Token
-
-```
-1. สมัคร/เข้าสู่ระบบ → ได้ token กลับมาใน response
-2. ส่ง token ใน Header ของ request ที่ต้องการ Auth:
-   Authorization: Bearer <token>
-```
-
-ตัวอย่างการเรียก API ด้วย curl:
-
-```bash
-# สมัครสมาชิก
-curl -X POST http://localhost:3001/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"name": "ทดสอบ", "phone": "0812345678", "password": "123456"}'
-
-# เข้าสู่ระบบ
-curl -X POST http://localhost:3001/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"phone": "0812345678", "password": "123456"}'
-
-# ส่งคะแนน (ต้องมี Token)
-curl -X POST http://localhost:3001/api/scores \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <your_token>" \
-  -d '{"score": 80, "moves": 12, "timeTaken": 45}'
-
-# ดู Leaderboard
-curl http://localhost:3001/api/scores/leaderboard
-```
+### 🏆 Scores
+- `GET /api/scores/leaderboard` - ดึงกระดานผู้นำสูงสุด
 
 ---
 
-## Database Schema
-
-### Users Collection
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | String | ✅ | ชื่อผู้ใช้ (สูงสุด 50 ตัวอักษร) |
-| `phone` | String | ✅ | เบอร์โทรศัพท์ (unique, ใช้เข้าสู่ระบบ) |
-| `password` | String | ✅ | รหัสผ่าน (hashed ด้วย bcrypt) |
-| `highScore` | Number | ❌ | คะแนนสูงสุด (default: 0) |
-| `createdAt` | Date | auto | วันที่สร้าง |
-| `updatedAt` | Date | auto | วันที่อัปเดตล่าสุด |
-
-### Scores Collection
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `user` | ObjectId | ✅ | อ้างอิง Users Collection |
-| `score` | Number | ✅ | คะแนนที่ได้ |
-| `moves` | Number | ✅ | จำนวนครั้งที่เปิดการ์ด |
-| `timeTaken` | Number | ✅ | เวลาที่ใช้ (วินาที) |
-| `createdAt` | Date | auto | วันที่เล่น |
-| `updatedAt` | Date | auto | วันที่อัปเดตล่าสุด |
-
-### Relationships
-
-```
-Users (1) ──── (N) Scores
-ผู้ใช้ 1 คนมีได้หลายคะแนน (ทุกครั้งที่เล่นจบ)
-```
+## เทคโนโลยีที่ใช้ (Tech Stack)
+- **Frontend**: Next.js 14, TypeScript, React Context, Lucide/Framer Motion (สำหรับ Animation)
+- **Backend**: Express.js, Mongoose, JWT, Node-cron
+- **Database**: MongoDB (Atlas)
+- **Design Style**: Rich Aesthetics, Glassmorphism, Premium Modern Web Design
 
 ---
 
-## Tech Stack
+© 2024 GymemoGame Team - ผจญภัยเพื่อสมองที่แข็งแรง 🧠✨
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 14, React 18, TypeScript |
-| Backend | Express.js, Node.js |
-| Database | MongoDB + Mongoose |
-| Auth | JWT (jsonwebtoken) + bcryptjs |
-| HTTP Client | Axios |
