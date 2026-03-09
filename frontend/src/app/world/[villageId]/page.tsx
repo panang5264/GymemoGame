@@ -190,32 +190,45 @@ function VillagePageInner({ params }: { params: Promise<{ villageId: string }> }
                 }}
                 className={`absolute w-12 h-12 md:w-16 md:h-16 flex items-center justify-center cursor-pointer transition-all duration-300 z-10 
                   ${!isUnlocked
-                    ? 'bg-slate-300 opacity-50 grayscale cursor-not-allowed'
-                    : isCurrent
-                      ? 'bg-white scale-125 z-20 shadow-[0_0_20px_rgba(255,255,255,0.8)]'
-                      : isPassed
-                        ? 'bg-blue-50 hover:scale-110 active:scale-95'
-                        : 'bg-[var(--card-bg)] hover:scale-110 active:scale-95'
+                    ? 'bg-slate-300 opacity-50 grayscale cursor-not-allowed border-3 border-[var(--border-dark)]'
+                    : isBonus
+                      ? isCurrent
+                        ? 'bg-gradient-to-br from-yellow-100 to-amber-300 scale-125 z-30 border-4 border-amber-500 shadow-[0_0_25px_rgba(251,191,36,1)] animate-pulse' // Active Bonus
+                        : isPassed
+                          ? 'bg-amber-50 border-3 border-amber-400 hover:scale-110 shadow-[4px_4px_0_rgba(251,191,36,0.5)]' // Passed Bonus
+                          : 'bg-gradient-to-br from-amber-400 to-orange-500 hover:scale-110 border-4 border-white shadow-[0_0_30px_rgba(245,158,11,0.8)] z-20 animate-bounce' // Upcoming Bonus
+                      : isCurrent
+                        ? 'bg-white scale-125 z-20 border-3 border-[var(--border-dark)] shadow-[0_0_20px_rgba(255,255,255,0.8)]' // Normal Active
+                        : isPassed
+                          ? 'bg-blue-50 hover:scale-110 active:scale-95 border-3 border-[var(--border-dark)] shadow-[4px_4px_0_var(--border-dark)]' // Normal Passed
+                          : 'bg-[var(--card-bg)] hover:scale-110 active:scale-95 border-3 border-[var(--border-dark)] shadow-[4px_4px_0_var(--border-dark)]' // Normal Upcoming
                   } 
-                  border-3 border-[var(--border-dark)] rounded-2xl shadow-[4px_4px_0_var(--border-dark)]
+                  rounded-2xl
                 `}
                 style={{
                   top: node.top,
                   left: node.left,
                   transform: 'translate(-50%, -50%)',
                 }}
-                title={!isUnlocked ? '🔒 ยังไม่ถึงด่านนี้' : `ด่านที่ ${node.id}${isBonus ? ' (โบนัส x2)' : ''}`}
+                title={!isUnlocked ? '🔒 ยังไม่ถึงด่านนี้' : `ด่านที่ ${node.id}${isBonus ? ' (ด่านพิเศษ โบนัส x2)' : ''}`}
               >
-                <div className="text-2xl md:text-3xl">
-                  {!isUnlocked ? '🔒' : isBonus && isPassed ? '✅' : isBonus ? '🎁' : isPassed ? '✅' : '⭐'}
+                {isBonus && !isPassed && isUnlocked && (
+                  <div className="absolute -top-6 bg-red-600 text-white text-[9px] md:text-[10px] font-black uppercase px-2 py-0.5 rounded-full border border-white shadow-md animate-pulse whitespace-nowrap">
+                    ⭐ ด่านพิเศษ!
+                  </div>
+                )}
+
+                <div className="text-2xl md:text-3xl drop-shadow-sm">
+                  {!isUnlocked ? '🔒' : isPassed ? '✅' : isBonus ? '🎁' : '⭐'}
                 </div>
+
                 {isPassed && score !== undefined && (
-                  <div className={`absolute -top-2 -left-2 ${isBonus ? 'bg-yellow-500' : 'bg-indigo-600'} text-white text-[10px] px-2 py-0.5 rounded-full font-black border-2 border-white shadow-sm z-30`}>
+                  <div className={`absolute -top-2 -left-2 ${isBonus ? 'bg-amber-500 border-white text-white shadow-[0_0_10px_rgba(245,158,11,0.6)]' : 'bg-indigo-600 border-white text-white'} text-[10px] px-2 py-0.5 rounded-full font-black border-2 z-30`}>
                     {score}
                   </div>
                 )}
                 {isCurrent && (
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[var(--border-dark)] animate-ping" />
+                  <div className={`absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-[var(--border-dark)] animate-ping ${isBonus ? 'bg-amber-400' : 'bg-green-500'}`} />
                 )}
               </div>
             )

@@ -41,7 +41,7 @@ export default function LeaderboardPage() {
     const [unlockedCount, setUnlockedCount] = useState(0)
     const [globalEntries, setGlobalEntries] = useState<GlobalEntry[]>([])
     const [loadingGlobal, setLoadingGlobal] = useState(true)
-    const [modeScores, setModeScores] = useState({ management: 0, calculation: 0, spatial: 0 })
+    const [cognitiveData, setCognitiveData] = useState<any>(null)
     const [selectedUserEntry, setSelectedUserEntry] = useState<(GlobalEntry & { displayRank: number }) | null>(null)
     const [searchTerm, setSearchTerm] = useState('')
 
@@ -54,37 +54,17 @@ export default function LeaderboardPage() {
         setUserName(p.userName || 'นักเดินทาง')
         setUnlockedCount(p.unlockedVillages.length)
 
-        // Aggregate mode scores from all villages and daily plays
-        let mScore = 0
-        let cScore = 0
-        let sScore = 0
-
-        if (p.villages) {
-            Object.values(p.villages).forEach(vp => {
-                if (vp.runHistory) {
-                    vp.runHistory.forEach(run => {
-                        mScore += (run.managementScore || 0)
-                        cScore += (run.calculationScore || 0)
-                        sScore += (run.spatialScore || 0)
-                    })
-                }
-                if (vp.currentRunScore) {
-                    mScore += (vp.currentRunScore.management || 0)
-                    cScore += (vp.currentRunScore.calculation || 0)
-                    sScore += (vp.currentRunScore.spatial || 0)
-                }
-            })
+        // Fetch cognitive data from backend (same as Home page)
+        if (p.guestId) {
+            fetch(`${API_BASE_URL}/api/analysis/profile/${p.guestId}`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success && res.data) {
+                        setCognitiveData(res.data)
+                    }
+                })
+                .catch(err => console.error('Failed to fetch profile analysis:', err))
         }
-
-        if (p.dailyScores) {
-            Object.values(p.dailyScores).forEach(ds => {
-                mScore += (ds.management || 0)
-                cScore += (ds.calculation || 0)
-                sScore += (ds.spatial || 0)
-            })
-        }
-
-        setModeScores({ management: mScore, calculation: cScore, spatial: sScore })
 
         // Build per-village stats from local progress
         const entries: LocalEntry[] = []
@@ -277,37 +257,42 @@ export default function LeaderboardPage() {
                                 <div className="flex-1 flex justify-center py-2 md:py-4">
                                     <BrainRadarChart
                                         data={[
-                                            { label: 'การจัดการ', value: Math.round((modeScores.management / Math.max(modeScores.management, modeScores.calculation, modeScores.spatial, 1)) * 100), color: '#f97316' },
-                                            { label: 'การคำนวณ', value: Math.round((modeScores.calculation / Math.max(modeScores.management, modeScores.calculation, modeScores.spatial, 1)) * 100), color: '#3b82f6' },
-                                            { label: 'มิติสัมพันธ์', value: Math.round((modeScores.spatial / Math.max(modeScores.management, modeScores.calculation, modeScores.spatial, 1)) * 100), color: '#22c55e' }
+                                            { label: 'การจัดการ', value: cognitiveData?.averages?.executiveFunction || 0, color: '#4f46e5' },
+                                            { label: 'การคำนวณ', value: cognitiveData?.averages?.processingSpeed || 0, color: '#3b82f6' },
+                                            { label: 'มิติสัมพันธ์', value: cognitiveData?.averages?.workingMemory || 0, color: '#10b981' },
+                                            { label: 'การตอบสนอง', value: cognitiveData?.averages?.attention || 0, color: '#f59e0b' }
                                         ]}
-                                        size={200}
+                                        size={220}
                                     />
                                 </div>
-                                <div className="w-full xl:w-[450px] grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3 md:gap-4">
+                                <div className="w-full xl:w-[480px] grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                                     <div className="bg-white p-4 md:p-5 rounded-3xl shadow-sm border-2 border-indigo-100/50 flex flex-col justify-center">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-[10px] md:text-xs font-black text-indigo-400 uppercase tracking-widest">การบริหารจัดการ</span>
-                                            <div className="w-4 h-4 rounded-full border border-indigo-200 flex items-center justify-center text-[10px] font-bold text-indigo-400 cursor-help bg-slate-50" title="ทักษะการตัดสินใจ การวางแผน และจัดลำดับความสำคัญ">i</div>
+                                            <span className="text-[10px] md:text-[11px] font-black text-indigo-400 uppercase tracking-widest">การบริหารจัดการ</span>
                                         </div>
-                                        <div className="text-2xl md:text-3xl font-black text-indigo-600 leading-tight">โหมดจัดการ</div>
-                                        <div className="text-3xl md:text-4xl font-black text-indigo-700 mt-1">{modeScores.management.toLocaleString()} <span className="text-lg md:text-xl">คะแนน</span></div>
+                                        <div className="text-xl md:text-2xl font-black text-indigo-600 leading-tight">โหมดจัดการ</div>
+                                        <div className="text-3xl md:text-4xl font-black text-indigo-700 mt-1 tabular-nums">{Math.round(cognitiveData?.averages?.executiveFunction || 0)}%</div>
                                     </div>
                                     <div className="bg-white p-4 md:p-5 rounded-3xl shadow-sm border-2 border-emerald-100/50 flex flex-col justify-center">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-[10px] md:text-xs font-black text-emerald-400 uppercase tracking-widest">ความจำขณะทำงาน</span>
-                                            <div className="w-4 h-4 rounded-full border border-emerald-200 flex items-center justify-center text-[10px] font-bold text-emerald-400 cursor-help bg-slate-50" title="ความสามารถในการประมวลผลข้อมูลควบคู่กับการมองภาพมิติในใจ">i</div>
+                                            <span className="text-[10px] md:text-[11px] font-black text-emerald-400 uppercase tracking-widest">ความจำขณะทำงาน</span>
                                         </div>
-                                        <div className="text-2xl md:text-3xl font-black text-emerald-600 leading-tight">โหมดมิติสัมพันธ์</div>
-                                        <div className="text-3xl md:text-4xl font-black text-emerald-700 mt-1">{modeScores.spatial.toLocaleString()} <span className="text-lg md:text-xl">คะแนน</span></div>
+                                        <div className="text-xl md:text-2xl font-black text-emerald-600 leading-tight">โหมดมิติสัมพันธ์</div>
+                                        <div className="text-3xl md:text-4xl font-black text-emerald-700 mt-1 tabular-nums">{Math.round(cognitiveData?.averages?.workingMemory || 0)}%</div>
                                     </div>
-                                    <div className="bg-white p-4 md:p-5 rounded-3xl shadow-sm border-2 border-blue-100/50 flex flex-col justify-center sm:col-span-2 xl:col-span-1">
+                                    <div className="bg-white p-4 md:p-5 rounded-3xl shadow-sm border-2 border-blue-100/50 flex flex-col justify-center">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-[10px] md:text-xs font-black text-blue-400 uppercase tracking-widest">ความรวดเร็วในการคิด</span>
-                                            <div className="w-4 h-4 rounded-full border border-blue-200 flex items-center justify-center text-[10px] font-bold text-blue-400 cursor-help bg-slate-50" title="ความไวในการตีความโจทย์และหาคำตอบอย่างแม่นยำ">i</div>
+                                            <span className="text-[10px] md:text-[11px] font-black text-blue-400 uppercase tracking-widest">ความรวดเร็วในการคิด</span>
                                         </div>
-                                        <div className="text-2xl md:text-3xl font-black text-blue-600 leading-tight">โหมดคำนวณ</div>
-                                        <div className="text-3xl md:text-4xl font-black text-blue-700 mt-1">{modeScores.calculation.toLocaleString()} <span className="text-lg md:text-xl">คะแนน</span></div>
+                                        <div className="text-xl md:text-2xl font-black text-blue-600 leading-tight">โหมดคำนวณ</div>
+                                        <div className="text-3xl md:text-4xl font-black text-blue-700 mt-1 tabular-nums">{Math.round(cognitiveData?.averages?.processingSpeed || 0)}%</div>
+                                    </div>
+                                    <div className="bg-white p-4 md:p-5 rounded-3xl shadow-sm border-2 border-orange-100/50 flex flex-col justify-center">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="text-[10px] md:text-[11px] font-black text-orange-400 uppercase tracking-widest">ความรวดเร็วในการตอบสนอง</span>
+                                        </div>
+                                        <div className="text-xl md:text-2xl font-black text-orange-600 leading-tight">โหมดตอบสนอง</div>
+                                        <div className="text-3xl md:text-4xl font-black text-orange-700 mt-1 tabular-nums">{Math.round(cognitiveData?.averages?.attention || 0)}%</div>
                                     </div>
                                 </div>
                             </div>

@@ -40,8 +40,8 @@ const MAZE_FADE_TIME = 3000
 
 function getRandomPos() {
   return {
-    x: 15 + Math.random() * 70,
-    y: 15 + Math.random() * 50,
+    x: 10 + Math.random() * 80,
+    y: 10 + Math.random() * 55,
   }
 }
 
@@ -144,21 +144,7 @@ function generateMaze(rows: number, cols: number, hasKey: boolean, hasBombs: boo
 // ─── Asset Paths ─────────────────────────────────────────────────────────────
 const MG_BASE = '/Asset ด้าน/บริหารจัดการ'
 
-// Village 1 images – หมู่บ้านที่ 1/รอบที่ 1
-const V1_ANIMALS = [
-  { id: 'a1', label: 'สัตว์ 1', emoji: '🐾', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686404.jpg` },
-  { id: 'a2', label: 'สัตว์ 2', emoji: '🐾', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686405.jpg` },
-  { id: 'a3', label: 'สัตว์ 3', emoji: '🐾', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686407.jpg` },
-  { id: 'a4', label: 'สัตว์ 4', emoji: '🐾', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686408.jpg` },
-  { id: 'a5', label: 'สัตว์ 5', emoji: '🐾', tags: ['animal4'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3702788.jpg` },
-]
-const V1_SCRUBBERS = [
-  { id: 'sc1', label: 'อุปกรณ์ 1', emoji: '🧹', tags: ['scrubber'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702790.jpg` },
-  { id: 'sc2', label: 'อุปกรณ์ 2', emoji: '🧹', tags: ['scrubber'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702791.jpg` },
-  { id: 'sc3', label: 'อุปกรณ์ 3', emoji: '🧹', tags: ['scrubber'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702792.jpg` },
-  { id: 'sc4', label: 'อุปกรณ์ 4', emoji: '🧹', tags: ['scrubber'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702793.jpg` },
-  { id: 'sc5', label: 'อุปกรณ์ 5', emoji: '🧹', tags: ['scrubber'] as string[], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702794.jpg` },
-]
+// V1 Images were poorly cropped, replaced with V2 assets for clearer gameplay
 
 // Village 2 images – หมู่บ้านที่ 2/รอบที่1
 const V2_ANIMALS = [
@@ -193,7 +179,7 @@ function getLevelConfig(level: number) {
         { id: 'animal4', title: 'สัตว์ 4 ขา 🐾', emoji: '📦', accepts: i => i.tags.includes('animal4') },
         { id: 'scrubber', title: 'อุปกรณ์ขัด/แปรง 🧽', emoji: '📦', accepts: i => i.tags.includes('scrubber') },
       ]
-      items = [...V1_ANIMALS, ...V1_SCRUBBERS]
+      items = [...V2_ANIMALS, ...V2_SCRUBBERS]
       break
 
     case 2:
@@ -224,7 +210,8 @@ function getLevelConfig(level: number) {
         { id: 'sc5', label: 'ไม้ถู', emoji: '🧹', tags: ['scrubber'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 4/ไม้ถู.png` },
         { id: 'o1', label: 'ไม่เข้าพวก', emoji: '❓', tags: [], imageUrl: `${MG_BASE}/หมู่บ้านที่ 2/รอบที่1/หมวดที่3(ไม่เข้าพวก)/ไม่มีชื่อ 17_20260303222748.png` },
       ].sort(() => Math.random() - 0.5)
-      break
+      break
+
     case 4:
     case 5:
       mode = 'cooking'
@@ -816,25 +803,40 @@ function ManagementGameInner() {
                       <div
                         key={item.id}
                         draggable
-                        onDragStart={(e) => { e.dataTransfer.setData('itemId', item.id); e.currentTarget.style.opacity = '0.4' }}
-                        onDragEnd={(e) => { e.currentTarget.style.opacity = '1' }}
-                        className="absolute w-28 h-28 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing z-10 select-none animate-in fade-in zoom-in"
+                        onDragStart={(e) => {
+                          e.dataTransfer.setData('itemId', item.id);
+                          e.currentTarget.style.opacity = '0.6';
+                          e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.1) rotate(5deg)';
+                          e.currentTarget.style.zIndex = '50';
+                        }}
+                        onDragEnd={(e) => {
+                          e.currentTarget.style.opacity = '1';
+                          e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)';
+                          e.currentTarget.style.zIndex = '10';
+                        }}
+                        className="absolute w-36 h-36 md:w-48 md:h-48 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing z-10 select-none animate-in fade-in zoom-in transition-transform duration-200"
                         style={{ left: `${item.x}%`, top: `${item.y}%`, transform: 'translate(-50%, -50%)' }}
                       >
-                        {item.imageUrl ? (
-                          <img
-                            src={item.imageUrl}
-                            className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-2xl"
-                            style={{ filter: 'contrast(1.1) brightness(1.05) saturate(1.1)', imageRendering: 'crisp-edges' }}
-                            alt={item.label}
-                          />
-                        ) : (
-                          <span className="text-5xl md:text-6xl drop-shadow-2xl">{item.emoji}</span>
-                        )}
-                        <div className="mt-1 bg-white/90 px-2 py-0.5 md:px-3 md:py-1 rounded-xl shadow-lg text-[10px] md:text-xs font-black text-slate-600">
+                        <div className="transition-transform duration-300 transform group-hover:-translate-y-2">
+                          {item.imageUrl ? (
+                            <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-3xl shadow-2xl flex items-center justify-center border-4 border-indigo-100 overflow-hidden pointer-events-none">
+                              <img
+                                src={item.imageUrl}
+                                className="w-[85%] h-[85%] object-cover mix-blend-multiply"
+                                style={{ filter: 'contrast(1.1) brightness(1.05) saturate(1.1)', imageRendering: 'crisp-edges' }}
+                                alt={item.label}
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-3xl shadow-2xl flex items-center justify-center border-4 border-indigo-100 pointer-events-none">
+                              <span className="text-6xl md:text-8xl drop-shadow-lg">{item.emoji}</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="mt-2 bg-white px-3 py-1 md:px-4 md:py-1.5 rounded-full shadow-md text-sm md:text-base font-black text-indigo-900 border-2 border-slate-100 tracking-wide text-center">
                           {item.label}
                         </div>
-                        <div className="absolute -bottom-4 left-4 right-4 h-2 bg-slate-100 rounded-full overflow-hidden border border-white">
+                        <div className="absolute -bottom-4 left-4 right-4 h-2.5 bg-slate-200 rounded-full overflow-hidden border-2 border-white shadow-sm">
                           <div className="h-full bg-pink-500 transition-all linear" style={{ width: `${Math.max(0, 100 - ((Date.now() - (item.createdAt || 0)) / ITEM_LIFETIME * 100))}%` }} />
                         </div>
                       </div>
