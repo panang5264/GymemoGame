@@ -168,19 +168,20 @@ const MG_BASE = '/Asset ด้าน/บริหารจัดการ'
 // V1 Images were poorly cropped, replaced with V2 assets for clearer gameplay
 
 // Village 1 assets – Red & Round
+// Village 1 assets – Red & Round
 const V1_RED = [
-  { id: 'r1', label: 'สีแดง 1', emoji: '🍎', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686404.jpg` },
-  { id: 'r2', label: 'สีแดง 2', emoji: '🍓', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686405.jpg` },
-  { id: 'r3', label: 'สีแดง 3', emoji: '🎈', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686407.jpg` },
-  { id: 'r4', label: 'สีแดง 4', emoji: '🌹', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686408.jpg` },
-  { id: 'r5', label: 'สีแดง 5', emoji: '❤️', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3702788.jpg` },
+  { id: 'r1', label: 'แอปเปิ้ล', emoji: '🍎', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686404.jpg` },
+  { id: 'r2', label: 'สตรอว์เบอร์รี', emoji: '🍓', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686405.jpg` },
+  { id: 'r3', label: 'ลูกโป่ง', emoji: '🎈', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686407.jpg` },
+  { id: 'r4', label: 'ดอกกุหลาบ', emoji: '🌹', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3686408.jpg` },
+  { id: 'r5', label: 'หัวใจ', emoji: '❤️', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/S__3702788.jpg` },
 ]
 const V1_ROUND = [
-  { id: 'ro1', label: 'ทรงกลม 1', emoji: '⚽', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702790.jpg` },
-  { id: 'ro2', label: 'ทรงกลม 2', emoji: '🏀', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702791.jpg` },
-  { id: 'ro3', label: 'ทรงกลม 3', emoji: '🌕', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702792.jpg` },
-  { id: 'ro4', label: 'ทรงกลม 4', emoji: '🟠', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702793.jpg` },
-  { id: 'ro5', label: 'ทรงกลม 5', emoji: '💿', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702794.jpg` },
+  { id: 'ro1', label: 'ลูกฟุตบอล', emoji: '⚽', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702790.jpg` },
+  { id: 'ro2', label: 'ลูกบาสเกตบอล', emoji: '🏀', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702791.jpg` },
+  { id: 'ro3', label: 'พระจันทร์', emoji: '🌕', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702792.jpg` },
+  { id: 'ro4', label: 'วงกลมสีส้ม', emoji: '🟠', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702793.jpg` },
+  { id: 'ro5', label: 'แผ่นซีดี', emoji: '💿', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/S__3702794.jpg` },
 ]
 
 // Village 2 images – 4-legged animals & Scrubbers
@@ -189,7 +190,7 @@ const V2_ANIMALS = [
   { id: 'a2', label: 'ช้าง', emoji: '🐘', tags: ['animal4'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 3/ช้าง.png` },
   { id: 'a3', label: 'ม้าลาย', emoji: '🦓', tags: ['animal4'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 3/ม้าลาย.png` },
   { id: 'a4', label: 'ยีราฟ', emoji: '🦒', tags: ['animal4'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 3/ยีราฟ.png` },
-  { id: 'a5', label: 'หมู', emoji: '�', tags: ['animal4'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 3/หมู.png` },
+  { id: 'a5', label: 'หมู', emoji: '🐷', tags: ['animal4'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 3/หมู.png` },
 ]
 const V2_SCRUBBERS = [
   { id: 'sc1', label: 'ฝอยขัดหม้อ', emoji: '🧽', tags: ['scrubber'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 4/ฝอยขัดหม้อ.png` },
@@ -199,16 +200,16 @@ const V2_SCRUBBERS = [
   { id: 'sc5', label: 'ไม้ถู', emoji: '🧹', tags: ['scrubber'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 4/ไม้ถู.png` },
 ]
 const DISTRACTORS = [
-  { id: 'd1', label: 'ของหลอก 1', emoji: '🌵', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4144.png` },
-  { id: 'd2', label: 'ของหลอก 2', emoji: '🎸', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4145.png` },
-  { id: 'd3', label: 'ของหลอก 3', emoji: '🍦', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4146.png` },
-  { id: 'd4', label: 'ของหลอก 4', emoji: '�', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4147.png` },
-  { id: 'd5', label: 'ของหลอก 5', emoji: '�️', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4148.png` },
-  { id: 'd6', label: 'ของหลอก 6', emoji: '🚲', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4149.png` },
-  { id: 'd7', label: 'ของหลอก 7', emoji: '�', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4150.png` },
-  { id: 'd8', label: 'ของหลอก 8', emoji: '🎒', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4151.png` },
-  { id: 'd9', label: 'ของหลอก 9', emoji: '�', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4152.png` },
-  { id: 'd10', label: 'ของหลอก 10', emoji: '🌂', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4153.png` },
+  { id: 'd1', label: 'กระบองเพชร', emoji: '🌵', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4144.png` },
+  { id: 'd2', label: 'กีตาร์', emoji: '🎸', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4145.png` },
+  { id: 'd3', label: 'ไอศกรีม', emoji: '🍦', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4146.png` },
+  { id: 'd4', label: 'หมวกแก๊ป', emoji: '🧢', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4147.png` },
+  { id: 'd5', label: 'โซฟา', emoji: '🛋️', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4148.png` },
+  { id: 'd6', label: 'จักรยาน', emoji: '🚲', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4149.png` },
+  { id: 'd7', label: 'ถุงมือ', emoji: '🧤', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4150.png` },
+  { id: 'd8', label: 'กระเป๋าเป้', emoji: '🎒', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4151.png` },
+  { id: 'd9', label: 'ว่าว', emoji: '🪁', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4152.png` },
+  { id: 'd10', label: 'ร่ม', emoji: '🌂', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/IMG_4153.png` },
 ]
 
 function getLevelConfig(level: number) {
@@ -906,7 +907,7 @@ function ManagementGameInner() {
                       >
                         <div className="transition-transform duration-300 transform group-hover:-translate-y-2">
                           {item.imageUrl ? (
-                            <div className="w-28 h-28 md:w-40 md:h-40 bg-white rounded-3xl shadow-2xl flex items-center justify-center border-4 border-indigo-100 overflow-hidden pointer-events-none">
+                            <div className="w-32 h-32 md:w-56 md:h-56 bg-white rounded-3xl shadow-2xl flex items-center justify-center border-4 border-indigo-100 overflow-hidden pointer-events-none">
                               <img
                                 src={item.imageUrl}
                                 className="w-[90%] h-[90%] object-cover mix-blend-multiply"
@@ -915,12 +916,12 @@ function ManagementGameInner() {
                               />
                             </div>
                           ) : (
-                            <div className="w-28 h-28 md:w-40 md:h-40 bg-white rounded-3xl shadow-2xl flex items-center justify-center border-4 border-indigo-100 pointer-events-none">
-                              <span className="text-7xl md:text-9xl drop-shadow-lg">{item.emoji}</span>
+                            <div className="w-32 h-32 md:w-56 md:h-56 bg-white rounded-3xl shadow-2xl flex items-center justify-center border-4 border-indigo-100 pointer-events-none">
+                              <span className="text-8xl md:text-[10rem] drop-shadow-lg">{item.emoji}</span>
                             </div>
                           )}
                         </div>
-                        <div className="mt-2 bg-white px-3 py-1 md:px-4 md:py-1.5 rounded-full shadow-md text-sm md:text-base font-black text-indigo-900 border-2 border-slate-100 tracking-wide text-center">
+                        <div className="mt-3 bg-white px-4 py-1.5 md:px-6 md:py-2.5 rounded-full shadow-md text-base md:text-2xl font-black text-indigo-900 border-2 border-slate-100 tracking-wide text-center">
                           {item.label}
                         </div>
                         <div className="absolute -bottom-4 left-4 right-4 h-2.5 bg-slate-200 rounded-full overflow-hidden border-2 border-white shadow-sm">
