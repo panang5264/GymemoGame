@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   getCountdownToReset,
@@ -19,8 +18,8 @@ export default function DailyChallengePage() {
   const [rewardClaimed, setRewardClaimed] = useState(false)
   const [hasSynced, setHasSynced] = useState(false)
 
-  const { progress, isLoading } = useProgress()
-  const { saveProgress, getDailyProgress, isDailyComplete, addKeys, getKeys } = useLevelSystem()
+  const { progress, isLoading, saveProgress } = useProgress()
+  const { getDailyProgress, isDailyComplete, addKeys, getKeys } = useLevelSystem()
 
   // Results from Context/Backend
   const [scores, setScores] = useState({ management: 0, calculation: 0, spatial: 0 })
@@ -36,11 +35,9 @@ export default function DailyChallengePage() {
   useEffect(() => {
     if (isLoading || !progress) return
 
-    // 1. Calculations
     const dk = getDateKey()
     const maxUnlocked = Math.max(...(progress.unlockedVillages || [1]), 1)
 
-    // Only update states if they have actually changed to avoid infinite loops
     if (userRank !== maxUnlocked) {
       setUserRank(maxUnlocked)
     }
@@ -48,22 +45,20 @@ export default function DailyChallengePage() {
     const currentLocalModes = getDailyProgress(dk)
     const currentIsDone = isDailyComplete(dk)
 
-    // Initial load from context (only if not synced yet)
+    // Initial load from local context
     if (!hasSynced) {
       setTodayModes(currentLocalModes)
       setIsDone(currentIsDone)
 
-      if (currentIsDone) {
-        const dailyScores = progress.dailyScores?.[dk] || { management: 0, calculation: 0, spatial: 0 }
-        setScores({
-          management: dailyScores.management || 0,
-          calculation: dailyScores.calculation || 0,
-          spatial: dailyScores.spatial || 0
-        })
-      }
+      const dailyScores = progress.dailyScores?.[dk] || { management: 0, calculation: 0, spatial: 0 }
+      setScores({
+        management: dailyScores.management || 0,
+        calculation: dailyScores.calculation || 0,
+        spatial: dailyScores.spatial || 0
+      })
     }
 
-    // 2. Asynchronous Sync with Backend (only once)
+    // Async sync with backend
     if (progress.guestId && !hasSynced) {
       setHasSynced(true)
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
@@ -73,25 +68,35 @@ export default function DailyChallengePage() {
         .then(res => {
           if (res.success && res.data) {
             const dbModes = res.data.completedModes
-            setTodayModes(dbModes)
-            setIsDone(res.data.allDone)
+
+            // Merge logic: prefer completed status from either source
+            const mergedModes = {
+              management: currentLocalModes.management || dbModes.management,
+              calculation: currentLocalModes.calculation || dbModes.calculation,
+              spatial: currentLocalModes.spatial || dbModes.spatial
+            }
+
+            setTodayModes(mergedModes)
+            setIsDone(res.data.allDone || currentIsDone)
             if (res.data.rewardClaimed) setRewardClaimed(true)
 
-            // Sync back to context only if remote is ahead
-            if (JSON.stringify(currentLocalModes) !== JSON.stringify(dbModes)) {
-              // Note: Use the functional version of path or a careful merge
-              const nextP = { ...progress, daily: { ...progress.daily, [dk]: dbModes } }
+            // If backend has more info, sync it to local
+            const dbCount = Object.values(dbModes).filter(v => v).length
+            const localCount = Object.values(currentLocalModes).filter(v => v).length
+
+            if (dbCount > localCount) {
+              const nextP = { ...progress, daily: { ...progress.daily, [dk]: mergedModes } }
               saveProgress(nextP)
             }
           }
         })
-        .catch(err => console.error('Failed to sync daily status with backend', err))
+        .catch(err => console.error('Failed to sync daily status:', err))
     }
   }, [isLoading, progress?.guestId, progress?.unlockedVillages, hasSynced])
 
   const handleClaimReward = () => {
     if (rewardClaimed) return
-    addKeys(3) // Match backend reward (3 keys)
+    addKeys(3)
     setRewardClaimed(true)
 
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
@@ -106,9 +111,7 @@ export default function DailyChallengePage() {
     alert('ยินดีด้วย! คุณได้รับกุญแจ 🗝️ 3 ดอก เป็นรางวัลสำหรับภารกิจวันนี้!')
   }
 
-
   const startNextMode = () => {
-    // Go to world map where missions are now integrated!
     router.push('/world')
   }
 
@@ -116,122 +119,102 @@ export default function DailyChallengePage() {
 
   return (
     <div className="min-h-[calc(100vh-140px)] flex flex-col items-center py-10 px-4 font-['Supermarket']">
+      {/* Scoring Hint */}
+      <div className="w-full max-w-2xl bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 mb-4 text-amber-800 text-xs font-bold shadow-sm flex items-center gap-3">
+        <span className="text-xl">💡</span>
+        <p>
+          <span className="font-black">เคล็ดลับการสะสมคะแนน:</span> หากเล่นผ่านด่านโดยไม่ข้าม (กุญแจครบ) จะได้รับโบนัส <span className="text-orange-600 font-black">+50 x จำนวนกุญแจ</span>
+          <br />หากใช้กุญแจข้ามจะได้เพียง 50 คะแนนเท่านั้น!
+        </p>
+      </div>
+
       <div className="w-full max-w-2xl bg-[var(--card-bg)] rounded-[3rem] shadow-[15px_15px_0_rgba(0,0,0,0.05)] overflow-hidden border-4 border-[var(--border-dark)] p-8 md:p-12 relative">
-
-        {/* Header Section */}
-        <div className="text-center mb-6 md:mb-10">
-          <div className="inline-block px-4 md:px-6 py-1 md:py-2 bg-[var(--bg-warm)] text-[var(--text-main)] border-2 border-[var(--border-dark)] rounded-full font-black text-xs md:text-sm uppercase tracking-widest mb-4">
-            Today's Mission
+        <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+          <div className="text-center md:text-left">
+            <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter mb-1">
+              ภารกิจรายวัน 📅
+            </h1>
+            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">DAILY MISSION PROGRESS</p>
           </div>
-          <h1 className="text-3xl md:text-5xl font-black text-[var(--text-main)] tracking-tight mb-2 uppercase">
-            🌟 ภารกิจรายวัน
-          </h1>
-          <p className="text-[var(--text-muted)] font-bold text-sm md:text-base">ฝึกฝนทักษะให้ครบ 3 ด้าน เพื่อรับรางวัลพิเศษ</p>
+          <div className="bg-white/50 backdrop-blur-sm px-6 py-3 rounded-2xl border-2 border-slate-100 flex flex-col items-center shadow-inner">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">RESET IN</span>
+            <span className="text-xl font-black text-blue-600 tabular-nums">{countdown}</span>
+          </div>
         </div>
 
-        {/* Progress Checklist Area */}
-        <div className="bg-[var(--bg-warm)]/30 rounded-3xl md:rounded-[2.5rem] p-4 md:p-8 mb-6 md:mb-8 border-2 border-[var(--border-dark)]">
-          <h2 className="text-[var(--text-muted)] font-black text-[10px] md:text-[12px] uppercase tracking-widest mb-4 md:mb-6 px-2 opacity-60">Checkpoint Checklist</h2>
-
-          <div className="grid gap-3 md:gap-4">
-            {/* Management Task */}
-            <div className={`flex items-center justify-between p-5 rounded-2xl border-3 transition-all ${todayModes.management ? 'bg-green-100 border-green-600' : 'bg-[var(--card-bg)] border-[var(--border-dark)]'}`}>
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-xl border-2 border-current flex items-center justify-center text-2xl ${todayModes.management ? 'bg-green-500 text-white border-green-700' : 'bg-[var(--bg-warm)] text-[var(--text-muted)] border-[var(--border-dark)]'}`}>
-                  {todayModes.management ? '✅' : '📦'}
-                </div>
-                <div>
-                  <h3 className={`font-black text-xl ${todayModes.management ? 'text-green-800' : 'text-[var(--text-main)]'}`}>📋 การจัดการ</h3>
-                  <p className="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-widest opacity-60">Management Challenge</p>
-                </div>
+        {/* Mission Status Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+          {[
+            { id: 'management', label: 'การจัดการ', emoji: '🍱', color: 'blue' },
+            { id: 'calculation', label: 'การคำนวณ', emoji: '🧮', color: 'orange' },
+            { id: 'spatial', label: 'มิติสัมพันธ์', emoji: '🧩', color: 'indigo' },
+          ].map((m) => (
+            <div key={m.id} className={`p-6 rounded-3xl border-2 transition-all ${todayModes[m.id as keyof typeof todayModes] ? 'bg-green-50 border-green-200' : 'bg-white border-slate-100 opacity-60'}`}>
+              <div className="text-3xl mb-2">{m.emoji}</div>
+              <div className="font-black text-slate-800 mb-1">{m.label}</div>
+              <div className="flex items-center gap-2">
+                {todayModes[m.id as keyof typeof todayModes] ? (
+                  <span className="text-green-600 font-black text-sm flex items-center gap-1">
+                    <span className="text-lg">✓</span> สำเร็จ
+                  </span>
+                ) : (
+                  <span className="text-slate-400 font-bold text-sm">ยังไม่เริ่ม</span>
+                )}
               </div>
-              {todayModes.management && <span className="text-green-600 font-black text-sm">DONE</span>}
             </div>
+          ))}
+        </div>
 
-            {/* Calculation Task */}
-            <div className={`flex items-center justify-between p-5 rounded-2xl border-3 transition-all ${todayModes.calculation ? 'bg-green-100 border-green-600' : 'bg-[var(--card-bg)] border-[var(--border-dark)]'}`}>
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-xl border-2 border-current flex items-center justify-center text-2xl ${todayModes.calculation ? 'bg-green-500 text-white border-green-700' : 'bg-[var(--bg-warm)] text-[var(--text-muted)] border-[var(--border-dark)]'}`}>
-                  {todayModes.calculation ? '✅' : '🧮'}
-                </div>
-                <div>
-                  <h3 className={`font-black text-xl ${todayModes.calculation ? 'text-green-800' : 'text-[var(--text-main)]'}`}>🧮 การคำนวณ</h3>
-                  <p className="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-widest opacity-60">Calculation Challenge</p>
-                </div>
-              </div>
-              {todayModes.calculation && <span className="text-green-600 font-black text-sm">DONE</span>}
+        <div className="bg-slate-50/50 rounded-3xl p-6 mb-10 border-2 border-slate-100/50">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-black text-slate-800 flex items-center gap-2 underline decoration-blue-200 decoration-4">
+              <span>🏆 คะแนนรวมวันนี้</span>
+            </h3>
+            <span className="text-3xl font-black text-blue-600">
+              {scores.management + scores.calculation + scores.spatial}
+            </span>
+          </div>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between text-slate-500 font-bold">
+              <span>การจัดการ:</span> <span className="text-slate-800">{scores.management}</span>
             </div>
-
-            {/* Spatial Task */}
-            <div className={`flex items-center justify-between p-5 rounded-2xl border-3 transition-all ${todayModes.spatial ? 'bg-green-100 border-green-600' : 'bg-[var(--card-bg)] border-[var(--border-dark)]'}`}>
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-xl border-2 border-current flex items-center justify-center text-2xl ${todayModes.spatial ? 'bg-green-500 text-white border-green-700' : 'bg-[var(--bg-warm)] text-[var(--text-muted)] border-[var(--border-dark)]'}`}>
-                  {todayModes.spatial ? '✅' : '🧭'}
-                </div>
-                <div>
-                  <h3 className={`font-black text-xl ${todayModes.spatial ? 'text-green-800' : 'text-[var(--text-main)]'}`}>🧭 พื้นที่</h3>
-                  <p className="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-widest opacity-60">Spatial Challenge</p>
-                </div>
-              </div>
-              {todayModes.spatial && <span className="text-green-600 font-black text-sm">DONE</span>}
+            <div className="flex justify-between text-slate-500 font-bold">
+              <span>การคำนวณ:</span> <span className="text-slate-800">{scores.calculation}</span>
+            </div>
+            <div className="flex justify-between text-slate-500 font-bold">
+              <span>มิติสัมพันธ์:</span> <span className="text-slate-800">{scores.spatial}</span>
             </div>
           </div>
         </div>
 
-        {/* Reward Area */}
         {isDone ? (
-          <div className="text-center animate-in zoom-in">
-            {!rewardClaimed ? (
-              <div className="bg-[var(--border-dark)] rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 text-[var(--text-on-dark)] shadow-xl">
-                <div className="text-5xl md:text-6xl mb-4">🔑</div>
-                <h4 className="text-2xl md:text-3xl font-black mb-2 italic uppercase">Congratulation!</h4>
-                <p className="opacity-80 font-bold mb-4 md:mb-6 text-sm md:text-base">คุณทำสำเร็จครบทุกภารกิจแล้ว! รับกุญแจรางวัลของคุณเลย</p>
-                <button
-                  onClick={handleClaimReward}
-                  className="w-full bg-[var(--card-bg)] text-[var(--border-dark)] py-4 rounded-xl md:rounded-2xl font-black text-xl md:text-2xl hover:translate-y-[-4px] transition-all shadow-[0_6px_0_#000] md:shadow-[0_8px_0_#000] active:translate-y-0 active:shadow-none border-2 border-black"
-                >
-                  รับกุญแจ 🗝️ (+1 Key)
-                </button>
+          <div className="space-y-4">
+            {rewardClaimed ? (
+              <div className="bg-green-100 border-2 border-green-200 rounded-3xl p-6 text-center animate-in zoom-in duration-300">
+                <div className="text-4xl mb-2">🎉</div>
+                <p className="text-green-800 font-black text-lg">รับรางวัลเรียบร้อยแล้ว!</p>
+                <p className="text-green-600 font-bold text-sm">มาสู้ใหม่ในวันพรุ่งนี้นะ</p>
               </div>
             ) : (
-              <div className="bg-[var(--bg-warm)] rounded-3xl md:rounded-[2.5rem] p-6 md:p-8 border-4 border-[var(--border-dark)]">
-                <div className="text-4xl md:text-5xl mb-4">✨</div>
-                <h4 className="text-xl md:text-2xl font-black mb-2 uppercase">ภารกิจวันนี้เสร็จสิ้น</h4>
-                <p className="text-[var(--text-muted)] text-xs md:text-sm mb-4 md:mb-6 font-bold">คุณได้รับรางวัลของวันไปแล้ว พักผ่อนและกลับมาใหม่ในวันถัดไป!</p>
-                <div className="flex flex-col items-center justify-center gap-1 bg-[var(--card-bg)] py-2 md:py-3 px-4 md:px-6 rounded-xl md:rounded-2xl border-2 border-[var(--border-dark)] inline-flex">
-                  <span className="text-[8px] md:text-[10px] uppercase font-black tracking-widest opacity-50">Resetting In</span>
-                  <span className="text-2xl md:text-3xl tabular-nums font-black">{countdown}</span>
-                </div>
-              </div>
+              <button
+                onClick={handleClaimReward}
+                className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-black py-6 rounded-3xl text-2xl shadow-[0_10px_0_#d97706] hover:translate-y-1 hover:shadow-[0_6px_0_#d97706] active:translate-y-[10px] active:shadow-none transition-all"
+              >
+                รับรางวัลกุญแจ 🗝️ x3
+              </button>
             )}
           </div>
         ) : (
-          <div className="flex flex-col gap-3 md:gap-4">
+          <div className="space-y-4">
             <button
               onClick={startNextMode}
-              className="w-full py-4 md:py-6 bg-[var(--border-dark)] text-[var(--text-on-dark)] rounded-2xl md:rounded-[2rem] font-black text-xl md:text-3xl shadow-[0_6px_0_rgba(0,0,0,0.2)] md:shadow-[0_10px_0_rgba(0,0,0,0.2)] transition-all hover:-translate-y-1 active:scale-95 border-2 border-black"
+              className="w-full bg-blue-600 text-white font-black py-6 rounded-3xl text-2xl shadow-[0_10px_0_#1d4ed8] hover:translate-y-1 hover:shadow-[0_6px_0_#1d4ed8] active:translate-y-[10px] active:shadow-none transition-all flex items-center justify-center gap-3"
             >
               ไปทำภารกิจในแผนที่โลก 🗺️
             </button>
-            <div className="flex items-center justify-center gap-3 text-[var(--text-muted)] py-4 opacity-50">
-              <span className="w-12 h-[2px] bg-[var(--border-dark)]"></span>
-              <span className="text-xs font-black uppercase tracking-widest">Village {userRank} Difficulty</span>
-              <span className="w-12 h-[2px] bg-[var(--border-dark)]"></span>
-            </div>
+            <p className="text-center text-slate-400 font-bold text-sm">ปัจจุบันคุณมีกุญแจ {currentKeys} ดอก</p>
           </div>
         )}
-
-        <div className="mt-6 md:mt-8 pt-6 md:pt-8 border-t-2 border-[var(--border-dark)] flex items-center justify-between px-2">
-          <div className="flex flex-col">
-            <span className="text-[8px] md:text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest opacity-60">Current Keys</span>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl md:text-3xl font-black text-[var(--text-main)]">{currentKeys}</span>
-              <span className="text-xl md:text-2xl">🔑</span>
-            </div>
-          </div>
-          <Link href="/world" className="bg-[var(--bg-warm)] border-2 border-[var(--border-dark)] px-3 md:px-4 py-2 rounded-full font-black text-xs md:text-sm hover:translate-y-[-2px] transition-all shadow-[2px_2px_0_#000] md:shadow-[3px_3px_0_#000]">ไปยังแผนที่โลก 🌏</Link>
-        </div>
-
       </div>
     </div>
   )

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import ConfirmUseKeyModal from '@/components/ConfirmUseKeyModal'
 import { getDateKey } from '@/lib/dailyChallenge'
 import { useProgress } from '@/contexts/ProgressContext'
-import { getKeys, recordPlay as rawRecordPlay, markDailyMode as rawMarkDailyMode } from '@/lib/levelSystem'
+import { getKeys, recordPlay as rawRecordPlay } from '@/lib/levelSystem'
 
 function getMinigameUrl(villageId: number, subId: number): string {
   const difficulty = Math.min(villageId, 10)
@@ -69,15 +69,9 @@ export default function SubLevelPage({
     }
     let nextP = { ...progress, keys: { ...progress.keys, currentKeys: currentKeys - 1 } }
 
-    // ให้ EXP ถือว่าผ่านไปเลย 1 ครั้ง
-    nextP = rawRecordPlay(nextP, villageId, 50, undefined, subLevelId) // ให้แต้มข้ามด่านเล็กน้อย
-
-    // เช็คภารกิจรายวัน: ถ้าใช้กุญแจข้าม ก็ให้ถือว่าทำภารกิจโหมดนั้นเสร็จด้วย
-    const modes = ['management', 'calculation', 'spatial']
-    const modeIndex = (subLevelId - 1) % 3
-    const currentMode = modes[modeIndex] as 'management' | 'calculation' | 'spatial'
-    const dk = getDateKey() // YYYY-MM-DD
-    nextP = rawMarkDailyMode(nextP, dk, currentMode)
+    // SKIP LOGIC: 50 points, Key count decreases
+    // Note: recordPlay handles point calculation (50 pts for skips)
+    nextP = rawRecordPlay(nextP, villageId, 50, undefined, subLevelId)
 
     saveProgress(nextP)
     setModalOpen(false)

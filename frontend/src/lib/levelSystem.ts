@@ -90,27 +90,45 @@ export function recordPlay(
   const newPlays = Math.min(vp.playsCompleted + 1, PLAYS_PER_VILLAGE * 99)
   const tubeFilled = newPlays >= PLAYS_PER_VILLAGE
 
+  // SCORING LOGIC REFINEMENT:
+  // 1. Play Normally (gameType provided): 
+  //    Score = Performance Score + (50 * Current Keys)
+  // 2. Skip with Key (gameType undefined):
+  //    Score = Fixed 50 points
+
+  let bonus = 0;
+  const { currentKeys } = getKeys(nextP);
+
   if (gameType) {
+    // Manual Play bonus: reward players for NOT using keys
+    bonus = 50 * currentKeys;
     const current = { ...(vp.currentRunScore ?? { management: 0, calculation: 0, spatial: 0, reaction: 0 }) }
-    current[gameType] = Math.max(current[gameType] || 0, scoreGained)
+    current[gameType] = Math.max(current[gameType] || 0, scoreGained + bonus)
     vp.currentRunScore = current
 
-    // Auto-mark Daily Progress: Playing in world map counts for Daily Challenge!
+    // Auto-mark Daily Progress
     const dk = getDateKey()
     const dp = { ...(nextP.daily[dk] ?? { management: false, calculation: false, spatial: false, reaction: false }) }
 
-    // Map 'reaction' to 'management' for daily progress tracking
-    // Also save the score to the daily bucket
     if (gameType === 'reaction') {
       dp.management = true
-      nextP = saveDailyScore(nextP, dk, 'management', scoreGained)
+      nextP = saveDailyScore(nextP, dk, 'management', scoreGained + bonus)
     } else {
       dp[gameType] = true
-      nextP = saveDailyScore(nextP, dk, gameType, scoreGained)
+      nextP = saveDailyScore(nextP, dk, gameType, scoreGained + bonus)
     }
-
     nextP.daily[dk] = dp
+  } else {
+    // Skip logic: only 50 points
+    scoreGained = 50;
   }
+
+  const finalScoreToAdd = scoreGained + bonus;
+  nextP.totalScore += finalScoreToAdd;
+  vp.playsCompleted = newPlays;
+  vp.expTubeFilled = tubeFilled;
+  nextP.villages[key] = vp;
+
 
   if (subId) {
     if (subId === 1 && vp.playsCompleted % PLAYS_PER_VILLAGE === 0) {
@@ -120,11 +138,6 @@ export function recordPlay(
     scores[subId] = scoreGained
     vp.subLevelScores = scores
   }
-
-  vp.playsCompleted = newPlays
-  vp.expTubeFilled = tubeFilled
-  nextP.villages[key] = vp
-  nextP.totalScore += scoreGained
 
   if (tubeFilled && villageId < 10 && !nextP.unlockedVillages.includes(villageId + 1)) {
     nextP.unlockedVillages = [...nextP.unlockedVillages, villageId + 1]
