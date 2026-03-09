@@ -313,6 +313,7 @@ function ManagementGameInner() {
   const [errorCount, setErrorCount] = useState(0)
   const [startTime] = useState(Date.now())
   const [playedRounds, setPlayedRounds] = useState(1)
+  const [selectedSortItemId, setSelectedSortItemId] = useState<string | null>(null)
   const [accumulatedScore, setAccumulatedScore] = useState(0)
 
   // Cooking State
@@ -882,24 +883,13 @@ function ManagementGameInner() {
                     {activePool.map(item => (
                       <div
                         key={item.id}
-                        draggable
-                        onDragStart={(e) => {
-                          e.dataTransfer.setData('itemId', item.id);
-                          e.currentTarget.style.opacity = '0.6';
-                          e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.1) rotate(5deg)';
-                          e.currentTarget.style.zIndex = '50';
-                        }}
-                        onDragEnd={(e) => {
-                          e.currentTarget.style.opacity = '1';
-                          e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)';
-                          e.currentTarget.style.zIndex = '10';
-                        }}
-                        className="absolute w-28 h-28 md:w-40 md:h-40 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing z-10 select-none animate-in fade-in zoom-in transition-transform duration-200"
+                        onClick={() => setSelectedSortItemId(prev => prev === item.id ? null : item.id)}
+                        className={`absolute w-28 h-28 md:w-40 md:h-40 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing z-10 select-none animate-in fade-in zoom-in transition-all duration-300 ${selectedSortItemId === item.id ? 'scale-110 -translate-y-4 filter drop-shadow-[0_0_20px_rgba(79,70,229,0.5)]' : ''}`}
                         style={{ left: `${item.x}%`, top: `${item.y}%`, transform: 'translate(-50%, -50%)' }}
                       >
-                        <div className="transition-transform duration-300 transform group-hover:-translate-y-2">
+                        <div className={`transition-all duration-300 transform ${selectedSortItemId === item.id ? 'scale-110' : 'group-hover:-translate-y-2'}`}>
                           {item.imageUrl ? (
-                            <div className="w-24 h-24 md:w-36 md:h-36 bg-white rounded-2xl shadow-xl flex items-center justify-center border-4 border-indigo-100 overflow-hidden pointer-events-none">
+                            <div className={`w-24 h-24 md:w-36 md:h-36 bg-white rounded-2xl shadow-xl flex items-center justify-center border-4 overflow-hidden pointer-events-none transition-colors ${selectedSortItemId === item.id ? 'border-indigo-500' : 'border-indigo-100'}`}>
                               <img
                                 src={item.imageUrl}
                                 className="w-[85%] h-[85%] object-cover mix-blend-multiply"
@@ -924,8 +914,22 @@ function ManagementGameInner() {
                   </div>
                   <div className="h-44 w-full flex justify-center gap-12 md:gap-24 px-10 pb-8">
                     {config.categories.map(cat => (
-                      <div key={cat.id} onDragOver={(e) => e.preventDefault()} onDrop={(e) => handleSortItem(e.dataTransfer.getData('itemId'), cat.id)} className="flex flex-col items-center group">
-                        <div className="w-28 h-16 md:w-40 md:h-28 bg-white rounded-[20px] md:rounded-[28px] border-4 border-dashed border-slate-300 shadow-2xl flex items-center justify-center group-hover:border-blue-400 transition-all relative overflow-hidden">
+                      <div
+                        key={cat.id}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => {
+                          handleSortItem(e.dataTransfer.getData('itemId'), cat.id);
+                          setSelectedSortItemId(null);
+                        }}
+                        onClick={() => {
+                          if (selectedSortItemId) {
+                            handleSortItem(selectedSortItemId, cat.id);
+                            setSelectedSortItemId(null);
+                          }
+                        }}
+                        className={`flex flex-col items-center group cursor-pointer transition-all ${selectedSortItemId ? 'animate-bounce-gentle' : ''}`}
+                      >
+                        <div className={`w-28 h-16 md:w-40 md:h-28 bg-white rounded-[20px] md:rounded-[28px] border-4 border-dashed shadow-2xl flex items-center justify-center transition-all relative overflow-hidden ${selectedSortItemId ? 'border-indigo-400 bg-indigo-50/30' : 'border-slate-300 group-hover:border-blue-400'}`}>
                           {cat.imageUrl ? (
                             <img src={cat.imageUrl} className="w-full h-full object-cover" alt={cat.title} />
                           ) : (
@@ -1063,12 +1067,14 @@ function ManagementGameInner() {
         </div>
       </div>
       <style jsx global>{`
+        @keyframes bounce-gentle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        .animate-bounce-gentle { animation: bounce-gentle 1.5s ease-in-out infinite; }
         @keyframes jiggle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
         .animate-jiggle { animation: jiggle 2s ease-in-out infinite; }
         .animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
       `}</style>
-    </div>
+    </div >
   )
 }
 

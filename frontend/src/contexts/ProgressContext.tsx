@@ -43,8 +43,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
                             }
                         }
 
-                        setProgress(merged)
-                        syncHistory(merged)
+                        const updatedHistory = getUpdatedHistory(merged)
+                        const finalMerged = { ...merged, history: updatedHistory }
+                        setProgress(finalMerged)
                     } else {
                         const defaultP = getDefaultProgress()
                         setProgress(defaultP)
@@ -82,10 +83,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         initProgress()
     }, [token])
 
-    const syncHistory = (p: GymemoProgressV2) => {
+    const getUpdatedHistory = (p: GymemoProgressV2) => {
         let historyArray = p.history || []
 
-        // Add current state as a snapshot if totalScore > 0 or at least one play
         if (p.totalScore > 0) {
             const lastEntry = historyArray[0]
             const currentVillages = p.unlockedVillages.length
@@ -99,12 +99,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
                     lastVillage: p.unlockedVillages[p.unlockedVillages.length - 1]
                 }
                 const updatedHistory = [newEntry, ...historyArray].slice(0, 15)
-
-                // Save to local storage for guest/backup
                 localStorage.setItem('gymemo_history', JSON.stringify(updatedHistory))
-
-                // Update progress object (this will be synced to DB on next save)
-                setProgress(prev => ({ ...prev, history: updatedHistory }))
                 return updatedHistory
             }
         }
@@ -112,24 +107,27 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     }
 
     const saveProgress = async (newProgress: GymemoProgressV2) => {
-        // Ensure history is updated in the new progress
-        const updatedWithHistory = { ...newProgress }
-        if (!updatedWithHistory.history) {
-            updatedWithHistory.history = progress.history || []
+        // 1. Get updated history based on the new progress
+        const finalHistory = getUpdatedHistory(newProgress)
+
+        // 2. Prepare the final state object
+        const finalProgress = {
+            ...newProgress,
+            history: finalHistory
         }
 
-        setProgress(updatedWithHistory)
-        syncHistory(updatedWithHistory)
+        // 3. Update state once
+        setProgress(finalProgress)
 
+        // 4. Persistence
         if (token) {
             try {
-                await updateSyncProgress(token, updatedWithHistory)
+                await updateSyncProgress(token, finalProgress)
             } catch (err) {
                 console.error('Failed to sync progress to DB:', err)
             }
         } else {
-            // Guest mode: persist to local storage
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedWithHistory))
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(finalProgress))
         }
     }
 

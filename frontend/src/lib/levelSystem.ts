@@ -122,8 +122,8 @@ export function recordPlay(
     }
     nextP.daily[dk] = dp
   } else {
-    // Skip logic: only 50 points
-    scoreGained = 50;
+    // Skip logic: only 0 points
+    scoreGained = 0;
   }
 
   const finalScoreToAdd = scoreGained + bonus;
