@@ -6,27 +6,21 @@ const fixRoles = async () => {
         await mongoose.connect(process.env.MONGODB_URI);
         const db = mongoose.connection.db;
 
-        // 1. เปลี่ยน "เจ๋ง" (jeng) ให้เป็น user ปกติ
-        const jengResult = await db.collection('users').updateOne(
-            { name: 'jeng' },
+        // หาไอดีที่มี username = 'admin' หรือ เคยมี phone = '0888888888'
+        // และเปลี่ยน role กลับเป็น user ธรรมดา (แต่ไม่เอา System Admin)
+        const result = await db.collection('users').updateMany(
+            {
+                name: { $ne: 'System Admin' }, // ไม่แตะ System Admin
+                role: 'admin'                  // ทุกคนที่เป็น admin ที่ไม่ใช่ System Admin
+            },
             { $set: { role: 'user' } }
         );
-        console.log('✅ jeng -> role: user |', jengResult.modifiedCount, 'updated');
+        console.log(`✅ เปลี่ยนกลับเป็น user: ${result.modifiedCount} ไอดี`);
 
-        // 2. เปลี่ยนไอดีเบอร์ 0888888888 ให้เป็น admin (พร้อมตั้ง username = admin)
-        const adminResult = await db.collection('users').updateOne(
-            { phone: '0888888888' },
-            { $set: { role: 'admin', username: 'admin' } }
-        );
-        console.log('✅ 0888888888 -> role: admin |', adminResult.modifiedCount, 'updated');
-
-        // แสดงสถานะปัจจุบัน
-        console.log('\n--- สถานะไอดีทั้งสอง ---');
-        const jeng = await db.collection('users').findOne({ name: 'jeng' });
-        const admin = await db.collection('users').findOne({ phone: '0888888888' });
-
-        if (jeng) console.log('jeng:', { name: jeng.name, username: jeng.username, role: jeng.role });
-        if (admin) console.log('admin:', { name: admin.name, username: admin.username, phone: admin.phone, role: admin.role });
+        // แสดงผลสรุป
+        const admins = await db.collection('users').find({ role: 'admin' }).toArray();
+        console.log('\n--- Admin ที่เหลืออยู่ ---');
+        admins.forEach(u => console.log(`  - ${u.name} (${u.username || u.phone}) role: ${u.role}`));
 
         process.exit(0);
     } catch (error) {
