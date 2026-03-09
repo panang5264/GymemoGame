@@ -7,12 +7,11 @@ const userSchema = new mongoose.Schema({
     required: [true, 'กรุณาระบุชื่อ'],
     maxlength: [50, 'ชื่อต้องไม่เกิน 50 ตัวอักษร']
   },
-  username: {
+  phone: {
     type: String,
-    required: [true, 'กรุณาระบุชื่อผู้ใช้'],
+    required: [true, 'กรุณาระบุเบอร์โทรศัพท์หรือชื่อเข้าสู่ระบบ'],
     unique: true,
     trim: true,
-    minlength: [3, 'ชื่อผู้ใช้ต้องมีความยาวอย่างน้อย 3 ตัวอักษร']
   },
   password: {
     type: String,

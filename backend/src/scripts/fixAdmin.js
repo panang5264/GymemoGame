@@ -1,26 +1,23 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-const fixRoles = async () => {
+const fixAdmin = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_URI);
         const db = mongoose.connection.db;
 
-        // หาไอดีที่มี username = 'admin' หรือ เคยมี phone = '0888888888'
-        // และเปลี่ยน role กลับเป็น user ธรรมดา (แต่ไม่เอา System Admin)
-        const result = await db.collection('users').updateMany(
+        // ย้าย admin ให้ใช้ phone='admin' แทน username
+        const result = await db.collection('users').updateOne(
+            { name: 'System Admin' },
             {
-                name: { $ne: 'System Admin' }, // ไม่แตะ System Admin
-                role: 'admin'                  // ทุกคนที่เป็น admin ที่ไม่ใช่ System Admin
-            },
-            { $set: { role: 'user' } }
+                $set: { phone: 'admin' },
+                $unset: { username: '' }
+            }
         );
-        console.log(`✅ เปลี่ยนกลับเป็น user: ${result.modifiedCount} ไอดี`);
+        console.log('Admin user updated:', result.modifiedCount, 'record(s)');
 
-        // แสดงผลสรุป
-        const admins = await db.collection('users').find({ role: 'admin' }).toArray();
-        console.log('\n--- Admin ที่เหลืออยู่ ---');
-        admins.forEach(u => console.log(`  - ${u.name} (${u.username || u.phone}) role: ${u.role}`));
+        const admin = await db.collection('users').findOne({ name: 'System Admin' });
+        console.log('Admin record:', { name: admin.name, phone: admin.phone, role: admin.role });
 
         process.exit(0);
     } catch (error) {
@@ -29,4 +26,4 @@ const fixRoles = async () => {
     }
 };
 
-fixRoles();
+fixAdmin();

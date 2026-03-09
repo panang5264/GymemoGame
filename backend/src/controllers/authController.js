@@ -6,33 +6,24 @@ const User = require('../models/User')
 // @access  Public
 const register = async (req, res) => {
   try {
-    const { name, username, password } = req.body
+    const { name, phone, password } = req.body
 
-    // ตรวจสอบข้อมูล
-    if (!name || !username || !password) {
+    if (!name || !phone || !password) {
       return res.status(400).json({
         success: false,
         message: 'กรุณากรอกข้อมูลให้ครบถ้วน'
       })
     }
 
-    // ตรวจสอบว่ามีชื่อผู้ใช้นี้แล้วหรือไม่
-    const userExists = await User.findOne({ username })
+    const userExists = await User.findOne({ phone })
     if (userExists) {
       return res.status(400).json({
         success: false,
-        message: 'ชื่อผู้ใช้นี้ถูกใช้งานแล้ว'
+        message: 'เบอร์โทรศัพท์นี้ถูกใช้งานแล้ว'
       })
     }
 
-    // สร้าง user ใหม่
-    const user = await User.create({
-      name,
-      username,
-      password
-    })
-
-    // สร้าง token
+    const user = await User.create({ name, phone, password })
     const token = generateToken(user._id)
 
     res.status(201).json({
@@ -41,7 +32,7 @@ const register = async (req, res) => {
       data: {
         _id: user._id,
         name: user.name,
-        username: user.username,
+        phone: user.phone,
         highScore: user.highScore,
         role: user.role,
         token
@@ -53,10 +44,7 @@ const register = async (req, res) => {
       return res.status(400).json({ success: false, message: messages[0] })
     }
     console.error(error)
-    res.status(500).json({
-      success: false,
-      message: 'เกิดข้อผิดพลาดในการสมัครสมาชิก'
-    })
+    res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาดในการสมัครสมาชิก' })
   }
 }
 
@@ -65,37 +53,32 @@ const register = async (req, res) => {
 // @access  Public
 const login = async (req, res) => {
   try {
-    const { username, password } = req.body
+    const { phone, password } = req.body
 
-    // ตรวจสอบข้อมูล
-    if (!username || !password) {
+    if (!phone || !password) {
       return res.status(400).json({
         success: false,
-        message: 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน'
+        message: 'กรุณากรอกเบอร์โทรและรหัสผ่าน'
       })
     }
 
-    // หา user และดึง password ด้วย
-    const user = await User.findOne({ username }).select('+password')
+    const user = await User.findOne({ phone }).select('+password')
 
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง'
+        message: 'เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง'
       })
     }
 
-    // ตรวจสอบรหัสผ่าน
     const isPasswordCorrect = await user.comparePassword(password)
-
     if (!isPasswordCorrect) {
       return res.status(401).json({
         success: false,
-        message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง'
+        message: 'เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง'
       })
     }
 
-    // สร้าง token
     const token = generateToken(user._id)
 
     res.json({
@@ -104,7 +87,7 @@ const login = async (req, res) => {
       data: {
         _id: user._id,
         name: user.name,
-        username: user.username,
+        phone: user.phone,
         highScore: user.highScore,
         role: user.role,
         token
@@ -112,10 +95,7 @@ const login = async (req, res) => {
     })
   } catch (error) {
     console.error(error)
-    res.status(500).json({
-      success: false,
-      message: 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ'
-    })
+    res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ' })
   }
 }
 
@@ -127,10 +107,7 @@ const getProfile = async (req, res) => {
     const user = await User.findById(req.user._id)
 
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'ไม่พบผู้ใช้งาน'
-      })
+      return res.status(404).json({ success: false, message: 'ไม่พบผู้ใช้งาน' })
     }
 
     res.json({
@@ -138,7 +115,7 @@ const getProfile = async (req, res) => {
       data: {
         _id: user._id,
         name: user.name,
-        username: user.username,
+        phone: user.phone,
         highScore: user.highScore,
         avatar: user.avatar,
         privacyMode: user.privacyMode,
@@ -148,10 +125,7 @@ const getProfile = async (req, res) => {
     })
   } catch (error) {
     console.error(error)
-    res.status(500).json({
-      success: false,
-      message: 'เกิดข้อผิดพลาดในการดึงข้อมูล'
-    })
+    res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาดในการดึงข้อมูล' })
   }
 }
 
@@ -179,7 +153,7 @@ const updateProfile = async (req, res) => {
       data: {
         _id: user._id,
         name: user.name,
-        username: user.username,
+        phone: user.phone,
         avatar: user.avatar,
         privacyMode: user.privacyMode,
         highScore: user.highScore
@@ -191,57 +165,44 @@ const updateProfile = async (req, res) => {
   }
 }
 
-// @desc    ลืมรหัสผ่าน (รีเซ็ตรหัสผ่านแบบง่าย)
+// @desc    ลืมรหัสผ่าน
 // @route   POST /api/auth/forgot-password
 // @access  Public
 const forgotPassword = async (req, res) => {
   try {
-    const { username, newPassword } = req.body
+    const { phone, newPassword } = req.body
 
-    if (!username || !newPassword) {
+    if (!phone || !newPassword) {
       return res.status(400).json({
         success: false,
-        message: 'กรุณากรอกชื่อผู้ใช้และรหัสผ่านใหม่'
+        message: 'กรุณากรอกเบอร์โทรและรหัสผ่านใหม่'
       })
     }
 
-    const user = await User.findOne({ username })
+    const user = await User.findOne({ phone })
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'ไม่พบผู้ใช้ที่ผูกกับชื่อผู้ใช้นี้'
+        message: 'ไม่พบผู้ใช้ที่ผูกกับเบอร์โทรนี้'
       })
     }
 
-    // อัปเดตรหัสผ่านใหม่
     user.password = newPassword
     await user.save()
 
     res.json({
       success: true,
-      message: 'รีเซ็ตรหัสผ่านสำเร็จ ท่านสามารถเข้าสู่ระบบด้วยรหัสผ่านใหม่ได้ทันที'
+      message: 'รีเซ็ตรหัสผ่านสำเร็จ ท่านสามารถเข้าสู่ระบบได้ทันที'
     })
   } catch (error) {
     console.error(error)
-    res.status(500).json({
-      success: false,
-      message: 'เกิดข้อผิดพลาดในการรีเซ็ตรหัสผ่าน'
-    })
+    res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาดในการรีเซ็ตรหัสผ่าน' })
   }
 }
 
-// Helper function สร้าง JWT token
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '7d'
-  })
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' })
 }
 
-module.exports = {
-  register,
-  login,
-  getProfile,
-  updateProfile,
-  forgotPassword
-}
+module.exports = { register, login, getProfile, updateProfile, forgotPassword }

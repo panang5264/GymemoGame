@@ -34,22 +34,22 @@ export async function unlockVillage(guestId: string, villageId: number) {
 
 // --- Auth API ---
 
-export async function loginUser(username: string, password: string) {
+export async function loginUser(phone: string, password: string) {
   const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ phone, password }),
   })
   const data = await res.json()
   if (!res.ok) throw new Error(data.message || 'Failed to login')
   return data
 }
 
-export async function registerUser(name: string, username: string, password: string) {
+export async function registerUser(name: string, phone: string, password: string) {
   const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, username, password }),
+    body: JSON.stringify({ name, phone, password }),
   })
   const data = await res.json()
   if (!res.ok) throw new Error(data.message || 'Failed to register')

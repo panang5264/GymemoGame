@@ -7,7 +7,7 @@ import { getUserProfile } from '@/lib/api'
 interface User {
     _id: string
     name: string
-    username: string
+    phone: string
     highScore: number
     createdAt: string
     avatar?: string

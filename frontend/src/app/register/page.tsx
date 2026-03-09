@@ -12,7 +12,7 @@ export default function RegisterPage() {
 
     const [formData, setFormData] = useState({
         name: '',
-        username: '',
+        phone: '',
         password: '',
         confirmPassword: ''
     })
@@ -35,7 +35,7 @@ export default function RegisterPage() {
 
         try {
             setLoading(true)
-            const res = await registerUser(formData.name, formData.username, formData.password)
+            const res = await registerUser(formData.name, formData.phone, formData.password)
             if (res.success) {
                 // Log the user in with the token
                 await login(res.data.token, res.data)
@@ -69,7 +69,7 @@ export default function RegisterPage() {
                         <p className="text-indigo-600 uppercase tracking-[0.3em] text-sm mb-2">แนวทางการเป็นนักสำรวจ 📋</p>
                         <ul className="list-disc pl-6 space-y-3 leading-relaxed">
                             <li>กรอกชื่อเล่นหรือชื่อจริง (ใช้แสดงในอันดับ)</li>
-                            <li>ใช้ชื่อผู้ใช้ที่จำได้ง่ายเพื่อใช้ในการเข้าสู่ระบบ</li>
+                            <li>ใช้เบอร์โทรศัพท์จริงเพื่อใช้เข้าสู่ระบบ (เบอร์ใช้ได้เลย)</li>
                             <li>ตั้งรหัสผ่านที่จำได้ง่ายแต่ปลอดภัย</li>
                         </ul>
                     </div>
@@ -94,13 +94,13 @@ export default function RegisterPage() {
                         </div>
 
                         <div className="relative group">
-                            <div className="absolute left-7 top-1/2 -translate-y-1/2 text-xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">👤</div>
+                            <div className="absolute left-7 top-1/2 -translate-y-1/2 text-xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">📞</div>
                             <input
-                                type="text"
-                                name="username"
-                                placeholder="ชื่อผู้ใช้ (USERNAME)"
+                                type="tel"
+                                name="phone"
+                                placeholder="เบอร์โทรศัพท์ (0xxxxxxxxx)"
                                 className="pill-input pill-input-icon w-full py-4 text-lg"
-                                value={formData.username}
+                                value={formData.phone}
                                 onChange={handleChange}
                                 required
                             />

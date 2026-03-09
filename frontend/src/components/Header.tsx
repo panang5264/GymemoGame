@@ -9,16 +9,16 @@ export default function Header() {
   const { user, logout } = useAuth()
   const pathname = usePathname()
 
-  const navLinks = [
-    { name: 'หน้าแรก', href: '/', icon: '🏠' },
-    { name: 'แผนที่', href: '/world', icon: '🗺️' },
-    { name: 'ภารกิจรายวัน', href: '/daily-challenge', icon: '🌟' },
-    { name: 'อันดับผู้นำ', href: '/leaderboard', icon: '🏆' },
-  ]
+  const isAdmin = user?.role === 'admin'
 
-  if (user && user.role === 'admin') {
-    navLinks.push({ name: 'จัดการ', href: '/admin', icon: '👑' })
-  }
+  const navLinks = isAdmin
+    ? [{ name: 'จัดการระบบ', href: '/admin', icon: '👑' }]
+    : [
+      { name: 'หน้าแรก', href: '/', icon: '🏠' },
+      { name: 'แผนที่', href: '/world', icon: '🗺️' },
+      { name: 'ภารกิจรายวัน', href: '/daily-challenge', icon: '🌟' },
+      { name: 'อันดับผู้นำ', href: '/leaderboard', icon: '🏆' },
+    ]
 
   return (
     <header className="header bg-white/90 backdrop-blur-md sticky top-0 z-[100] border-b-2 border-slate-100 shadow-sm py-1.5">

@@ -135,7 +135,7 @@ export default function Home() {
         }
       }
     } catch (err: any) {
-      setError(err.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง')
+      setError(err.message || 'เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง')
     } finally {
       setLoading(false)
     }
@@ -281,7 +281,7 @@ export default function Home() {
                   <div className="absolute left-7 top-1/2 -translate-y-1/2 text-2xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">📞</div>
                   <input
                     type="tel"
-                    placeholder="ระบุชื่อผู้ใช้ที่สมัคร"
+                    placeholder="ระบุเบอร์โทรที่สมัคร"
                     className="pill-input pill-input-icon w-full py-4 text-lg"
                     value={username}
                     onChange={e => setUsername(e.target.value)}
@@ -320,10 +320,10 @@ export default function Home() {
                   </div>
                 )}
                 <div className="relative group">
-                  <div className="absolute left-7 top-1/2 -translate-y-1/2 text-2xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">👤</div>
+                  <div className="absolute left-7 top-1/2 -translate-y-1/2 text-2xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">📞</div>
                   <input
-                    type="text"
-                    placeholder="ชื่อผู้ใช้ (USERNAME)"
+                    type="tel"
+                    placeholder="เบอร์โทรศัพท์"
                     className="pill-input pill-input-icon w-full py-4 text-lg"
                     value={username}
                     onChange={e => setUsername(e.target.value)}
@@ -390,7 +390,7 @@ export default function Home() {
                 </div>
                 <div className="flex gap-2 md:gap-4 px-1 md:px-2 items-start">
                   <div className="w-6 h-6 md:w-10 md:h-10 mt-0.5 shrink-0 bg-indigo-100 rounded-full flex items-center justify-center font-black text-indigo-600 text-sm md:text-lg">1</div>
-                  <p className="text-slate-600 font-bold text-xs md:text-base leading-snug">เข้าสู่ระบบด้วยชื่อผู้ใช้และรหัสผ่านที่คุณสมัครไว้</p>
+                  <p className="text-slate-600 font-bold text-xs md:text-base leading-snug">เข้าสู่ระบบด้วยเบอร์โทรศัพท์และรหัสผ่านที่คุณสมัครไว้</p>
                 </div>
                 <div className="flex gap-2 md:gap-4 px-1 md:px-2 items-start">
                   <div className="w-6 h-6 md:w-10 md:h-10 mt-0.5 shrink-0 bg-indigo-100 rounded-full flex items-center justify-center font-black text-indigo-600 text-sm md:text-lg">2</div>

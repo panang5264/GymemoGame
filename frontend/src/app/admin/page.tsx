@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { adminGetUsers, adminGetGuests, adminGetStats, adminDeleteUser, adminGetExportScores, adminGetExportAnalysis } from '@/lib/api'
+import { getAvatarPath } from '@/lib/avatars'
 
 export default function AdminDashboard() {
     const { user, token } = useAuth()
@@ -119,9 +120,9 @@ export default function AdminDashboard() {
         document.body.removeChild(link)
     }
 
-    const filteredUsers = users.filter(u =>
+    const filteredUsers = users.filter((u: any) =>
         u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.username?.toLowerCase().includes(searchTerm.toLowerCase())
+        u.phone?.includes(searchTerm)
     )
 
     const filteredGuests = guests.filter(g =>
@@ -273,7 +274,7 @@ export default function AdminDashboard() {
                                         {filteredUsers.map((u: any) => (
                                             <tr key={u._id} className="hover:bg-slate-50 transition-colors">
                                                 <td className="px-6 py-4 flex items-center gap-3">
-                                                    <img src={`/assets_employer/avatars/${u.avatar || 'avatar-1'}.png`} alt="" className="w-8 h-8 rounded-full bg-indigo-50" />
+                                                    <img src={getAvatarPath(u.avatar)} alt="" className="w-8 h-8 rounded-full bg-indigo-50 object-cover" />
                                                     {u.name}
                                                 </td>
                                                 <td className="px-6 py-4 text-slate-500">{u.username}</td>
