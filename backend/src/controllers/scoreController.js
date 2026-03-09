@@ -68,9 +68,9 @@ const getLeaderboard = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10
 
-    // Fetch the top users ranked by their highScore
-    const topUsers = await User.find({ highScore: { $gt: 0 } })
-      .select('name phone highScore')
+    // Fetch the top users ranked by their highScore, excluding those with privacyMode: true
+    const topUsers = await User.find({ highScore: { $gt: 0 }, privacyMode: { $ne: true } })
+      .select('name phone highScore avatar')
       .sort({ highScore: -1 })
       .limit(limit)
 

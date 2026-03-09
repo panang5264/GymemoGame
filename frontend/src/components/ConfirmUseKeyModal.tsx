@@ -67,6 +67,9 @@ export default function ConfirmUseKeyModal({
             <span>กุญแจคงเหลือ:</span>
             <span className="font-black">{keysLeft} ดอก</span>
           </div>
+          <p className="text-[10px] text-indigo-600 font-black uppercase tracking-wider mt-2 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
+            💡 เล่นเองจะได้รับโบนัสคะแนนเพิ่ม {keysLeft * 100} แต้ม! (จากกุญแจที่คุณถืออยู่)
+          </p>
         </div>
 
         {!canPay && (

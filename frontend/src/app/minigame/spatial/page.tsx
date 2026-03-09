@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect, Suspense, useRef } from 'react'
+import { useState, useEffect, useCallback, Suspense, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useProgress } from '@/contexts/ProgressContext'
 import { useLevelSystem } from '@/hooks/useLevelSystem'
 import ClockIntro from '@/components/ClockIntro'
 import { getDateKey } from '@/lib/dailyChallenge'
 import PairMatchingGame from './PairMatchingGame'
+import MemoryRecallChallenge from '@/components/MemoryRecallChallenge'
 
 // ── DIP image style: brightness/contrast/sharpness filter ──────────────────
 const DIP_STYLE: React.CSSProperties = {
@@ -193,7 +194,20 @@ function getBoxBank(level: number): BoxQuestion[] {
 
 function pickBoxQuestion(level: number): { q: BoxQuestion; numOptions: number } {
   const bank = getBoxBank(level)
-  const q = bank[Math.floor(Math.random() * bank.length)]
+  let q = bank[Math.floor(Math.random() * bank.length)]
+
+  if (typeof window !== 'undefined') {
+    const lastSeen = sessionStorage.getItem(`lastSeenBox_lv${level}`)
+    if (lastSeen && bank.length > 1) {
+      let tries = 0;
+      while (q.block === lastSeen && tries < 10) {
+        q = bank[Math.floor(Math.random() * bank.length)]
+        tries++
+      }
+    }
+    sessionStorage.setItem(`lastSeenBox_lv${level}`, q.block)
+  }
+
   // Number of answer choices scales with level
   const numOptions = level <= 5 ? 2 : level <= 7 ? 3 : 4
   return { q, numOptions }
@@ -210,7 +224,8 @@ function SpatialGameInner() {
   const mode = searchParams.get('mode')
   const isBonus = searchParams.get('isBonus') === '1'
 
-  const [phase, setPhase] = useState<'intro' | 'clock' | 'play'>('intro')
+  const [phase, setPhase] = useState<'intro' | 'memorize' | 'clock' | 'recall' | 'play'>('intro')
+  const [memoryWords, setMemoryWords] = useState<string[]>([])
   const [clockTarget] = useState(() => ({
     h: Math.floor(Math.random() * 12) + 1,
     m: [0, 15, 30, 45][Math.floor(Math.random() * 4)]
@@ -235,6 +250,8 @@ function SpatialGameInner() {
   const [isGameOver, setIsGameOver] = useState(false)
   const [errorCount, setErrorCount] = useState(0)
   const [startTime] = useState(Date.now())
+  const [questionCount, setQuestionCount] = useState(0)
+  const MAX_QUESTIONS = levelParam <= 2 ? 1 : 3
 
   const isComplete = isGameOver
 
@@ -250,12 +267,8 @@ function SpatialGameInner() {
   } | null>(null)
 
   const hasSavedRef = useRef(false)
-
-  useEffect(() => {
-    hasSavedRef.current = false
+  const nextQuestion = useCallback(() => {
     setFeedback(null)
-    setIsGameOver(false)
-
     if (levelParam <= 2) {
       // Village 1-2: Interactive Image Matching Pair game
       const isLevel1 = levelParam === 1
@@ -291,6 +304,13 @@ function SpatialGameInner() {
       setQuestionText(`ถ้า${q.direction} คุณจะเห็นหน้าตาบล็อกเป็นแบบใด? 📦`)
     }
   }, [levelParam, subId])
+
+  useEffect(() => {
+    hasSavedRef.current = false
+    setIsGameOver(false)
+    setQuestionCount(0)
+    nextQuestion()
+  }, [levelParam, subId, nextQuestion])
 
   const { progress, saveProgress } = useProgress()
   const { recordPlay } = useLevelSystem()
@@ -365,8 +385,7 @@ function SpatialGameInner() {
           )}
           <button
             onClick={() => {
-              if (mode === 'village') setPhase('play')
-              else setPhase('clock')
+              setPhase('play')
             }}
             className={`w-full py-4 text-white rounded-[20px] font-black text-xl shadow-xl hover:scale-105 transition-all active:scale-95 ${mode === 'daily' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}
           >
@@ -377,15 +396,6 @@ function SpatialGameInner() {
     )
   }
 
-  if (phase === 'clock') {
-    return (
-      <ClockIntro
-        targetHour={clockTarget.h}
-        targetMinute={clockTarget.m}
-        onComplete={() => setPhase('play')}
-      />
-    )
-  }
 
   return (
     <div className="min-h-[calc(100vh-140px)] py-6 flex flex-col items-center relative overflow-hidden font-['Supermarket']">
@@ -394,6 +404,9 @@ function SpatialGameInner() {
         <div className="bg-white p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm border border-slate-200 mb-4 md:mb-6">
           <h1 className="text-lg md:text-2xl font-black text-slate-800 text-center mb-1 relative inline-block w-full">
             {mode === 'daily' ? '🌟 ภารกิจรายวัน: พื้นที่' : `📦 มิติสัมพันธ์ — ด่าน ${subId}`}
+            <span className="ml-4 text-sm md:text-base text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100 italic">
+              ข้อ {questionCount + 1} / {MAX_QUESTIONS}
+            </span>
             {isBonus && (
               <span className="absolute -top-3 right-0 bg-yellow-400 text-yellow-900 text-[10px] md:text-xs font-black px-2 py-0.5 rounded-full border border-yellow-500 shadow-sm animate-pulse">
                 x2 BONUS
@@ -490,7 +503,14 @@ function SpatialGameInner() {
                       onClick={() => {
                         if (idx === questionData.correctIndex) {
                           setFeedback({ type: 'correct', message: '✨ ถูกต้องแล้ว! เก่งมาก' })
-                          setTimeout(() => setIsGameOver(true), 1200)
+                          setTimeout(() => {
+                            if (questionCount + 1 >= MAX_QUESTIONS) {
+                              setIsGameOver(true)
+                            } else {
+                              setQuestionCount(prev => prev + 1)
+                              nextQuestion()
+                            }
+                          }, 1200)
                         } else {
                           setErrorCount(e => e + 1)
                           setFeedback({ type: 'wrong', message: '❌ ยังไม่ใช่นะ ลองดูอีกที' })

@@ -19,6 +19,17 @@ const diceImages: Dice[] = [
   { name: "dice6", path: path_to_dice + "dice6.png", value: 6 },
 ]
 
+const path_to_dot = "/Asset ด้าน/คำนวณ/ภาพจุด/"
+const dotImages: Dice[] = [
+  { name: "dot6", path: path_to_dot + "6.PNG", value: 6 },
+  { name: "dot7", path: path_to_dot + "7.PNG", value: 7 },
+  { name: "dot8", path: path_to_dot + "8.PNG", value: 8 },
+  { name: "dot9", path: path_to_dot + "9.PNG", value: 9 },
+  { name: "dot10", path: path_to_dot + "10.PNG", value: 10 },
+  { name: "dot11", path: path_to_dot + "11.PNG", value: 11 },
+  { name: "dot12", path: path_to_dot + "12.PNG", value: 12 },
+]
+
 const operatorImages: Operator[] = [
   { name: "+", path: path_to_dice + "plus.png" },
   { name: "-", path: path_to_dice + "minus.png" },
@@ -55,6 +66,22 @@ export function Random(maxNumber: number): Operand {
 
 export function RandomDice(): Dice {
   const val1 = diceImages[Math.floor(Math.random() * diceImages.length)]
+  return val1
+}
+
+export function RandomDotImage(): Dice {
+  let val1 = dotImages[Math.floor(Math.random() * dotImages.length)]
+  if (typeof window !== 'undefined') {
+    const last = sessionStorage.getItem('lastDotImage')
+    if (last && dotImages.length > 1) {
+      let tries = 0
+      while (val1.name === last && tries < 10) {
+        val1 = dotImages[Math.floor(Math.random() * dotImages.length)]
+        tries++
+      }
+    }
+    sessionStorage.setItem('lastDotImage', val1.name)
+  }
   return val1
 }
 

@@ -232,8 +232,8 @@ export const CALC_LEVELS: CalcLevel[] = [
     description: 'นับแต้มจากภาพแล้วนำมาคำนวณบวกหรือลบ',
     maxNumber: 10,
     generate_problem(): CalcQuestion {
-      const val1 = calGame.RandomDice()
-      const val2 = calGame.RandomDice()
+      const val1 = calGame.RandomDotImage()
+      const val2 = calGame.RandomDotImage()
       const ope = calGame.RandomOperator()
       let operands: calGame.Operand[] = [val1, val2]
       if (ope.name === '-' && val1.value < val2.value) {
@@ -252,7 +252,7 @@ export const CALC_LEVELS: CalcLevel[] = [
   {
     level: 8,
     name: 'สมการ 2 ฝั่ง (หาค่าที่หายไป)',
-    description: 'สมดุลสมการสองฝั่ง โดยหาตัวที่หายไป (A op B = C op ?)',
+    description: 'สมดุลสมการสองฝั่ง ย้ายข้างสมการเพื่อหาคำตอบ (? + B = C + D)',
     maxNumber: 9,
     generate_problem(): CalcQuestion {
       const vA = calGame.RandomValue(9, 1)
@@ -265,11 +265,15 @@ export const CALC_LEVELS: CalcLevel[] = [
       const vC = calGame.RandomValue(Math.min(targetSum - 1, 9), 1)
       const missing = targetSum - vC
 
+      const terms = [vA, vB, vC, missing]
+      const hidden_index = Math.floor(Math.random() * 4) // randomize where "?" is
+      const opEq = { name: "=", path: "" } as calGame.Operator
+
       return {
-        operands: [vA, vB, vC],
-        operators: [op1, op2], // Repr: A + B = C + ?
-        expect_result: missing,
-        hidden_index: 3 // Virtual index for the missing one
+        operands: terms,
+        operators: [op1, opEq, op2],
+        expect_result: terms[hidden_index] as number,
+        hidden_index: hidden_index
       }
     },
   },
@@ -293,9 +297,11 @@ export const CALC_LEVELS: CalcLevel[] = [
       const [result] = calGame.Calculate({ operands, operators: [op] })
 
       return {
-        operands: [operands[0], result],
+        operands: operands,
         operators: [op],
-        expect_result: operands[1] === result ? operands[0] instanceof Object ? (operands[0] as calGame.Dice).value : (operands[0] as number) : operands[1] instanceof Object ? (operands[1] as calGame.Dice).value : (operands[1] as number), // Wait this is confusing
+        expect_result: operands[1] instanceof Object ? (operands[1] as calGame.Dice).value : (operands[1] as number),
+        final_result: result,
+        hidden_index: 1
       }
     },
   },

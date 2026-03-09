@@ -6,9 +6,17 @@ interface ClockIntroProps {
     onComplete: () => void
     targetHour?: number
     targetMinute?: number
+    showResult?: boolean
+    onEvaluation?: (score: number, title: string, text: string) => void
 }
 
-export default function ClockIntro({ onComplete, targetHour = 10, targetMinute = 30 }: ClockIntroProps) {
+export default function ClockIntro({
+    onComplete,
+    targetHour = 10,
+    targetMinute = 30,
+    showResult = true,
+    onEvaluation
+}: ClockIntroProps) {
     const [hourAngle, setHourAngle] = useState(0)
     const [minuteAngle, setMinuteAngle] = useState(0)
     const [activeHand, setActiveHand] = useState<'hour' | 'minute' | null>(null)
@@ -53,13 +61,19 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
         if (currentHour === targetHour && Math.abs(currentMinute - targetMinute) < 2) {
             setIsDone(true)
             setFeedback('ถูกต้องยอดเยี่ยม!')
+            const evalRes = getEvaluation(attempts + 1);
+            if (onEvaluation) onEvaluation(evalRes.score, evalRes.title, evalRes.text);
+            if (!showResult) {
+                // Auto-complete if not showing result
+                setTimeout(onComplete, 1000);
+            }
         } else {
             setFeedback('ยังไม่ถูกต้อง ลองตรวจสอบเข็มนาฬิกาอีกครั้ง')
         }
     }
 
-    const getEvaluation = () => {
-        if (attempts <= 1) {
+    const getEvaluation = (attCount = attempts) => {
+        if (attCount <= 1) {
             return {
                 title: 'ดีมาก',
                 score: 5,
@@ -192,7 +206,7 @@ export default function ClockIntro({ onComplete, targetHour = 10, targetMinute =
                     <p className="mt-4 text-red-400 font-bold animate-shake">{feedback}</p>
                 )}
 
-                {isDone && (
+                {isDone && showResult && (
                     <div className="mt-4 md:mt-6 p-4 md:p-6 bg-white/10 rounded-2xl md:rounded-3xl border border-white/20 animate-in zoom-in duration-500 text-center shadow-lg">
                         <div className={`text-2xl md:text-4xl font-black mb-3 ${evalResult.color} drop-shadow-sm`}>
                             {evalResult.title} <span className="text-lg md:text-2xl opacity-90">(คะแนน: {evalResult.score}/5)</span>

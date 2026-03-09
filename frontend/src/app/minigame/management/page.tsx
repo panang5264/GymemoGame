@@ -6,6 +6,7 @@ import ClockIntro from '@/components/ClockIntro'
 import { getDateKey } from '@/lib/dailyChallenge'
 import { useLevelSystem } from '@/hooks/useLevelSystem'
 import { useProgress } from '@/contexts/ProgressContext'
+import MemoryRecallChallenge from '@/components/MemoryRecallChallenge'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -291,7 +292,8 @@ function ManagementGameInner() {
   const isBonus = searchParams.get('isBonus') === '1'
 
   // Phase State
-  const [phase, setPhase] = useState<'intro' | 'clock' | 'play' | 'done'>('intro')
+  const [phase, setPhase] = useState<'intro' | 'memorize' | 'clock' | 'recall' | 'play' | 'done'>('intro')
+  const [memoryWords, setMemoryWords] = useState<string[]>([])
   const [clockTarget] = useState(() => ({
     h: Math.floor(Math.random() * 12) + 1,
     m: [0, 15, 30, 45][Math.floor(Math.random() * 4)]
@@ -367,7 +369,7 @@ function ManagementGameInner() {
     }
 
     if (c.mode === 'cooking') {
-      const recipes = levelParam === 5 ? [...COOKING_RECIPES].sort(() => Math.random() - 0.5) : COOKING_RECIPES
+      const recipes = (levelParam === 4 || levelParam === 5) ? [...COOKING_RECIPES].sort(() => Math.random() - 0.5) : COOKING_RECIPES
       setShuffledRecipes(recipes)
       setDishIndex(0)
       startNewCookingDish(0, recipes)
@@ -801,24 +803,13 @@ function ManagementGameInner() {
                   </>
                 )}
                 <button
-                  onClick={() => {
-                    if (levelParam === 1 && modeParam !== 'village') setPhase('clock')
-                    else setPhase('play')
-                  }}
+                  onClick={() => setPhase('play')}
                   className={`w-full py-5 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95 ${modeParam === 'daily' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-slate-800'}`}
                 >
                   {modeParam === 'daily' ? 'เริ่มภารกิจ! 🚀' : 'เริ่มเล่น 🚀'}
                 </button>
               </div>
             </div>
-          )}
-
-          {phase === 'clock' && (
-            <ClockIntro
-              targetHour={clockTarget.h}
-              targetMinute={clockTarget.m}
-              onComplete={() => setPhase('play')}
-            />
           )}
 
           {phase === 'done' && (

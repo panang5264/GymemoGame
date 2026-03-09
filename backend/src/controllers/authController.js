@@ -138,6 +138,8 @@ const getProfile = async (req, res) => {
         name: user.name,
         phone: user.phone,
         highScore: user.highScore,
+        avatar: user.avatar,
+        privacyMode: user.privacyMode,
         createdAt: user.createdAt
       }
     })
@@ -164,6 +166,7 @@ const updateProfile = async (req, res) => {
 
     if (name) user.name = name
     if (avatar) user.avatar = avatar
+    if (req.body.privacyMode !== undefined) user.privacyMode = req.body.privacyMode
 
     await user.save()
 
@@ -175,6 +178,7 @@ const updateProfile = async (req, res) => {
         name: user.name,
         phone: user.phone,
         avatar: user.avatar,
+        privacyMode: user.privacyMode,
         highScore: user.highScore
       }
     })

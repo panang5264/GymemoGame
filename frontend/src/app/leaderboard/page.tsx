@@ -45,7 +45,7 @@ export default function LeaderboardPage() {
     const [selectedUserEntry, setSelectedUserEntry] = useState<(GlobalEntry & { displayRank: number }) | null>(null)
     const [searchTerm, setSearchTerm] = useState('')
 
-    const { progress, isLoading } = useProgress()
+    const { progress, saveProgress, isLoading } = useProgress()
 
     useEffect(() => {
         if (isLoading || !progress) return
@@ -80,10 +80,10 @@ export default function LeaderboardPage() {
         }
         setVillageEntries(entries)
 
-        // Fetch Global Leaderboard
+        // Fetch Global Leaderboard (Top 5 only)
         const fetchGlobal = async () => {
             try {
-                const res = await getLeaderboard(20)
+                const res = await getLeaderboard(5)
                 if (res.success) {
                     setGlobalEntries(res.data)
                 }
@@ -225,9 +225,48 @@ export default function LeaderboardPage() {
                                         <span className="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-sm font-black uppercase tracking-widest border-2 border-slate-200">
                                             🗺️ ปลดล็อก {unlockedCount}/10
                                         </span>
-                                        <span className="bg-indigo-50 text-indigo-600 px-4 py-1.5 rounded-full text-sm font-black uppercase tracking-widest border-2 border-indigo-100">
-                                            🏆 อันดับ -
+                                        <span className="bg-indigo-50 text-indigo-600 px-4 py-1.5 rounded-full text-sm font-black uppercase tracking-widest border-2 border-indigo-100 italic">
+                                            {progress?.privacyMode ? '🕵️ โหมดส่วนตัว' : '🌍 สาธารณะ'}
                                         </span>
+                                    </div>
+
+                                    {/* PDPA Privacy Toggle */}
+                                    <div className="mt-4 flex flex-col items-center md:items-start gap-2">
+                                        <label className="flex items-center gap-3 cursor-pointer group bg-slate-50 hover:bg-slate-100 px-4 py-2 rounded-2xl border-2 border-slate-100 transition-all">
+                                            <div className="relative inline-flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    className="sr-only peer"
+                                                    checked={!!progress?.privacyMode}
+                                                    onChange={async (e) => {
+                                                        if (!progress) return
+                                                        const newVal = e.target.checked
+                                                        const nextP = { ...progress, privacyMode: newVal }
+
+                                                        // Update Backend for immediate effect if possible
+                                                        const { updateProfile } = await import('@/lib/api')
+                                                        const token = localStorage.getItem('gymemo_token')
+                                                        if (token) {
+                                                            try {
+                                                                await updateProfile(token, { privacyMode: newVal } as any)
+                                                            } catch (err) {
+                                                                console.error('Failed to update privacy mode:', err)
+                                                            }
+                                                        }
+
+                                                        // Update Context
+                                                        saveProgress(nextP)
+                                                    }}
+                                                />
+                                                <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                            </div>
+                                            <span className="text-xs font-black text-slate-500 uppercase tracking-widest group-hover:text-slate-700">
+                                                {progress?.privacyMode ? 'ปิดโหมดส่วนตัว (แสดงบนกระดาน)' : 'เปิดโหมดส่วนตัว (PDPA)'}
+                                            </span>
+                                        </label>
+                                        <p className="text-[9px] text-slate-400 font-bold italic ml-2">
+                                            * เมื่อเปิดโหมดส่วนตัว คะแนนของคุณจะถูกซ่อนจากกระดานผู้นำสาธารณะ
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="bg-gradient-to-br from-indigo-600 to-blue-700 text-white px-6 md:px-10 py-4 md:py-6 rounded-[2rem] md:rounded-[3rem] shadow-xl md:shadow-2xl border-4 border-white/20 transform hover:scale-105 transition-transform w-full md:w-auto text-center">

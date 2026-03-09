@@ -1,7 +1,7 @@
 const STORAGE_KEY = 'gymemo_progress_v2'
 import { getDateKey } from './dailyChallenge'
 
-export const PLAYS_PER_VILLAGE = 126
+export const PLAYS_PER_VILLAGE = 12;
 export const MAX_KEYS = 9
 export const REGEN_INTERVAL_MS = 30 * 60 * 1000
 
@@ -51,6 +51,7 @@ export interface GymemoProgressV2 {
   totalScore: number
   userName: string
   guestId?: string
+  privacyMode?: boolean
   history?: any[]
 }
 
@@ -67,6 +68,7 @@ export function getDefaultProgress(): GymemoProgressV2 {
     totalScore: 0,
     userName: '',
     guestId: getGuestId(),
+    privacyMode: false,
     history: []
   }
 }
@@ -101,7 +103,8 @@ export function recordPlay(
 
   if (gameType) {
     // Manual Play bonus: reward players for NOT using keys
-    bonus = 50 * currentKeys;
+    // Increased to 100 per key to make keys more impactful on score
+    bonus = 100 * currentKeys;
     const current = { ...(vp.currentRunScore ?? { management: 0, calculation: 0, spatial: 0, reaction: 0 }) }
     current[gameType] = Math.max(current[gameType] || 0, scoreGained + bonus)
     vp.currentRunScore = current

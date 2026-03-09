@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     default: 'avatar-1'
+  },
+  privacyMode: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true

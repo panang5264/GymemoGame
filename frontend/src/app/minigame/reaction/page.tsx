@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { getDateKey } from '@/lib/dailyChallenge'
 import { useProgress } from '@/contexts/ProgressContext'
 import { useLevelSystem } from '@/hooks/useLevelSystem'
+import ClockIntro from '@/components/ClockIntro'
+import MemoryRecallChallenge from '@/components/MemoryRecallChallenge'
 
 // ─── Maze Generation Logic (Recursive Backtracker) ──────────────────────────
 
@@ -48,7 +50,12 @@ function MazeGameInner() {
     const mode = searchParams.get('mode') || 'practice'
     const levelParam = parseInt(searchParams.get('level') || (mode === 'village' ? villageIdParam : '1'), 10)
 
-    const [phase, setPhase] = useState<'intro' | 'play' | 'done'>('intro')
+    const [phase, setPhase] = useState<'intro' | 'memorize' | 'clock' | 'recall' | 'play' | 'done'>('intro')
+    const [memoryWords, setMemoryWords] = useState<string[]>([])
+    const [clockTarget] = useState(() => ({
+        h: Math.floor(Math.random() * 12) + 1,
+        m: [0, 15, 30, 45][Math.floor(Math.random() * 4)]
+    }))
     const [maze, setMaze] = useState<number[][]>([])
     const [playerPos, setPlayerPos] = useState<Cell>({ r: 1, c: 1 })
     const [startTime, setStartTime] = useState(0)
@@ -63,6 +70,10 @@ function MazeGameInner() {
     const cols = 11 + Math.min(levelParam, 5) * 2
 
     const initGame = useCallback(() => {
+        setPhase('memorize')
+    }, [])
+
+    const startRealGame = useCallback(() => {
         const newMaze = generateMaze(rows, cols)
         setMaze(newMaze)
         setPlayerPos({ r: 1, c: 1 })
@@ -151,13 +162,14 @@ function MazeGameInner() {
                             <h2 className="text-3xl font-black text-slate-800 mb-6 uppercase tracking-tighter">เขาวงกตพรีเมียม</h2>
                             <p className="text-slate-500 font-bold mb-12 text-lg max-w-sm">ใช้ปุ่มลูกศรหรือ WASD เพื่อหาทางออกให้เร็วที่สุด!</p>
                             <button
-                                onClick={initGame}
+                                onClick={startRealGame}
                                 className="px-16 py-5 bg-indigo-600 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95"
                             >
                                 เริ่มเดินทาง 🚀
                             </button>
                         </div>
                     )}
+
 
                     {phase === 'play' && (
                         <div className="flex flex-col items-center">

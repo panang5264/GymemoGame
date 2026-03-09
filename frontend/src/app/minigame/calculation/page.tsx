@@ -21,6 +21,7 @@ import ClockIntro from '@/components/ClockIntro'
 import { getDateKey } from '@/lib/dailyChallenge'
 import { useProgress } from '@/contexts/ProgressContext'
 import { useLevelSystem } from '@/hooks/useLevelSystem'
+import MemoryRecallChallenge from '@/components/MemoryRecallChallenge'
 
 // ─── Inner component (needs useSearchParams inside Suspense) ──────────────────
 
@@ -40,8 +41,9 @@ function CalculationGameInner() {
   const { progress, saveProgress } = useProgress()
   const { recordPlay } = useLevelSystem()
 
-  type Phase = 'intro' | 'clock' | 'countdown' | 'play' | 'done'
+  type Phase = 'intro' | 'memorize' | 'clock' | 'recall' | 'countdown' | 'play' | 'done'
   const [phase, setPhase] = useState<Phase>('intro')
+  const [memoryWords, setMemoryWords] = useState<string[]>([])
   const [countdown, setCountdown] = useState(3)
   const [question, setQuestion] = useState<CalcQuestion | null>(null)
   const [score, setScore] = useState(0)
@@ -135,11 +137,7 @@ function CalculationGameInner() {
   const startGame = useCallback(() => {
     hasSavedVillageRef.current = false
     hasSavedDailyRef.current = false
-    if (levelParam === 1 && mode !== 'village') {
-      setPhase('clock')
-    } else {
-      setPhase('countdown')
-    }
+    setPhase('countdown')
     setCountdown(3)
     setScore(0)
     setTotal(0)
@@ -190,16 +188,6 @@ function CalculationGameInner() {
     return () => window.removeEventListener('gymemo:cheat_complete', handleCheat)
   }, [])
 
-  // ── Render: Clock Intro ───────────────────────────────────────────────────
-  if (phase === 'clock') {
-    return (
-      <ClockIntro
-        targetHour={clockTarget.h}
-        targetMinute={clockTarget.m}
-        onComplete={() => setPhase('countdown')}
-      />
-    )
-  }
 
   // ── Render: intro ─────────────────────────────────────────────────────────
   if (phase === 'intro') {
@@ -375,8 +363,8 @@ function CalculationGameInner() {
                       <span className="text-3xl md:text-6xl lg:text-7xl font-black text-slate-800 tracking-tighter shrink-0">{value}</span>
                     ) : (
                       /* 4. Dice Image */
-                      <div className="p-1 md:p-2 bg-white rounded-xl border-2 border-slate-100 shadow-sm flex items-center justify-center w-[50px] h-[40px] md:w-[90px] md:h-[80px] shrink-0 transform hover:scale-105 transition-transform">
-                        <Image src={(value as any).path} width={80} height={60} className="rounded-lg object-contain w-full h-full" alt={(value as any).name} />
+                      <div className="p-1 md:p-2 bg-white rounded-xl border-2 border-slate-100 shadow-sm flex items-center justify-center w-[65px] h-[55px] md:w-[120px] md:h-[110px] shrink-0 transform hover:scale-105 transition-transform">
+                        <Image src={(value as any).path} width={110} height={100} className="rounded-lg object-contain w-full h-full" alt={(value as any).name} />
                       </div>
                     )}
 
@@ -388,7 +376,7 @@ function CalculationGameInner() {
                     )}
 
                     {/* Show equals sign at the end */}
-                    {index === question.operands.length - 1 && (
+                    {index === question.operands.length - 1 && !question.operators.some(op => op.name === '=') && (
                       <div className="flex items-center gap-2 md:gap-4 ml-2 md:ml-4 shrink-0">
                         <span className="text-2xl md:text-5xl font-black text-indigo-400">=</span>
                         {question.final_result !== undefined ? (
