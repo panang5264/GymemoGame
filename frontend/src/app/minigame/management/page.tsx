@@ -179,6 +179,10 @@ function generateMaze(rows: number, cols: number, hasKey: boolean, hasBombs: boo
       for (const [dr, dc] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
         const nr = r + dr, nc = c + dc
         if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && currentMaze[nr][nc] !== 1 && currentMaze[nr][nc] !== 4 && !v[nr][nc]) {
+          // Cannot pass through the exit (2) if it's not the final destination
+          if (currentMaze[nr][nc] === 2 && (nr !== endR || nc !== endC)) {
+            continue;
+          }
           v[nr][nc] = true
           q.push([nr, nc])
         }
