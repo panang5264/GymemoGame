@@ -81,13 +81,58 @@ const BOX_LV5: BoxQuestion[] = [
   },
 ]
 
-// Boxlv6 — sub-set 4.2 (only 1 available)
+// Boxlv6 — Updated with folders 2, 3, and 4
 const BOX_LV6: BoxQuestion[] = [
+  // Folder 2
   {
-    block: `${BASE}/Boxlv6/Block4.2.png`,
-    correct: `${BASE}/Boxlv6/Correct 4.2.png`,
-    wrongs: [`${BASE}/Boxlv6/Wrong4.2.png`, `${BASE}/Boxlv6/Wrong_1_4.2.png`],
-    direction: 'มองจากบนลงล่าง ⬇️',
+    block: `${BASE}/Boxlv6/2/2.2/โจทย์.png`,
+    correct: `${BASE}/Boxlv6/2/2.2/✅.png`,
+    wrongs: [`${BASE}/Boxlv6/2/2.2/❌.png`, `${BASE}/Boxlv6/2/2.2/❌(1).png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+  {
+    block: `${BASE}/Boxlv6/2/2.3/โจทย์.png`,
+    correct: `${BASE}/Boxlv6/2/2.3/✅.png`,
+    wrongs: [`${BASE}/Boxlv6/2/2.3/❌.png`, `${BASE}/Boxlv6/2/2.3/❌(1).png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+  // Folder 3
+  {
+    block: `${BASE}/Boxlv6/3/3.1/โจทย์.png`,
+    correct: `${BASE}/Boxlv6/3/3.1/✅.png`,
+    wrongs: [`${BASE}/Boxlv6/3/3.1/❌.png`, `${BASE}/Boxlv6/3/3.1/❌(1).png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+  {
+    block: `${BASE}/Boxlv6/3/3.2/โจทย์.png`,
+    correct: `${BASE}/Boxlv6/3/3.2/✅.png`,
+    wrongs: [`${BASE}/Boxlv6/3/3.2/❌.png`, `${BASE}/Boxlv6/3/3.2/❌(1).png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+  {
+    block: `${BASE}/Boxlv6/3/3.3/โจทย์.png`,
+    correct: `${BASE}/Boxlv6/3/3.3/✅.png`,
+    wrongs: [`${BASE}/Boxlv6/3/3.3/❌.png`, `${BASE}/Boxlv6/3/3.3/❌(1).png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+  // Folder 4
+  {
+    block: `${BASE}/Boxlv6/4/4.1/โจทย์.png`,
+    correct: `${BASE}/Boxlv6/4/4.1/✅.png`,
+    wrongs: [`${BASE}/Boxlv6/4/4.1/❌.png`, `${BASE}/Boxlv6/4/4.1/❌(1).png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+  {
+    block: `${BASE}/Boxlv6/4/4.2/โจทย์.png`,
+    correct: `${BASE}/Boxlv6/4/4.2/✅.png`,
+    wrongs: [`${BASE}/Boxlv6/4/4.2/❌.png`, `${BASE}/Boxlv6/4/4.2/❌(1).png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+  {
+    block: `${BASE}/Boxlv6/4/4.3/โจทย์.png`,
+    correct: `${BASE}/Boxlv6/4/4.3/✅.png`,
+    wrongs: [`${BASE}/Boxlv6/4/4.3/❌.png`, `${BASE}/Boxlv6/4/4.3/❌(1).png`],
+    direction: 'มองจากด้านข้าง ↔️',
   },
 ]
 
@@ -423,7 +468,7 @@ function SpatialGameInner() {
 
 
   return (
-    <div className="min-h-[calc(100vh-140px)] py-6 flex flex-col items-center relative overflow-hidden font-['Supermarket']">
+    <div className="min-h-[calc(100vh-140px)] bg-white py-6 flex flex-col items-center relative overflow-hidden font-['Supermarket']">
       <div className="max-w-4xl w-full px-4 relative z-10">
         {/* Header */}
         <div className="bg-white p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm border border-slate-200 mb-4 md:mb-6">
