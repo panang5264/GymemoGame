@@ -42,15 +42,9 @@ const BOX_LV3: BoxQuestion[] = [
     direction: 'มองจากด้านข้าง ↔️',
   },
   {
-    block: `${BASE}/Boxlv3/2/1.1/โจทย์.png`,
-    correct: `${BASE}/Boxlv3/2/1.1/✅.png`,
-    wrongs: [`${BASE}/Boxlv3/2/1.1/❌.png`, `${BASE}/Boxlv3/2/1.1/❌(1).png`],
-    direction: 'มองจากด้านข้าง ↔️',
-  },
-  {
-    block: `${BASE}/Boxlv3/2/1.2/โจทย์.png`,
-    correct: `${BASE}/Boxlv3/2/1.2/✅.png`,
-    wrongs: [`${BASE}/Boxlv3/2/1.2/❌.png`, `${BASE}/Boxlv3/2/1.2/❌(1).png`],
+    block: `${BASE}/Boxlv3/2/2.1/1.png`,
+    correct: `${BASE}/Boxlv3/2/2.1/✅.png`,
+    wrongs: [`${BASE}/Boxlv3/2/2.1/3.png`],
     direction: 'มองจากด้านข้าง ↔️',
   },
 ]

@@ -581,7 +581,7 @@ function ManagementGameInner() {
     })).sort(() => Math.random() - 0.5)
 
     setCookingItems(items)
-    setTimeout(() => setShowCookingOrder(false), 2500)
+    setTimeout(() => setShowCookingOrder(false), 4000)
   }
 
   const handleCookIngredient = (ing: string) => {
@@ -1051,7 +1051,7 @@ function ManagementGameInner() {
                       <button
                         onClick={() => {
                           setShowHint(true);
-                          setTimeout(() => setShowHint(false), 2000);
+                          setTimeout(() => setShowHint(false), 3000);
                         }}
                         disabled={showHint}
                         className={`mb-2 md:mb-4 px-4 md:px-6 py-1 md:py-2 rounded-full text-[10px] md:text-sm font-black transition-all shadow-md active:scale-95 border-2 ${showHint ? 'bg-indigo-100 text-indigo-400 border-indigo-200' : 'bg-white text-indigo-600 border-indigo-300 hover:bg-indigo-50 animate-bounce-gentle'}`}
