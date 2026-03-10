@@ -1,19 +1,23 @@
-# /backend/Dockerfile
+# Base image
 FROM node:18-alpine
 
+# create app directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# install dependencies first (better cache)
+COPY backend/package*.json ./
 
-# Install dependencies
-RUN npm ci
+# install only production dependencies
+RUN npm ci --omit=dev
 
-# Copy source code
-COPY . .
+# copy source code
+COPY backend/ .
 
-# Expose port
+# environment
+ENV NODE_ENV=production
+
+# expose port
 EXPOSE 3001
 
-# Start command
-CMD ["npm", "start"]
+# run server
+CMD ["node", "src/server.js"]

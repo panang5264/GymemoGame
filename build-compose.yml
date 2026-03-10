@@ -10,10 +10,9 @@ services:
       - gymemo_net
 
   backend:
-    # build:
-    #   context: .
-    #   dockerfile: backend/Dockerfile
-    image: pasitkku/gymemo-backend:v1
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -28,10 +27,9 @@ services:
       - gymemo_net
 
   frontend:
-    # build:
-    # context: .
-    # dockerfile: frontend/Dockerfile
-    image: pasitkku/gymemo-frontend:v1
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     restart: unless-stopped
     environment:
       NODE_ENV: production

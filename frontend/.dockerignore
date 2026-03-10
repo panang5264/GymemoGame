@@ -1,8 +1,30 @@
-Dockerfile
-.dockerignore
+# dependencies
 node_modules
-npm-debug.log
-README.md
+
+# next build
 .next
-.git
+.next/cache
+
+# logs
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# env files
+.env
 .env*.local
+
+# git
+.git
+.gitignore
+
+# docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# misc
+.DS_Store
+coverage
+dist
+README.md
