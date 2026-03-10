@@ -424,6 +424,14 @@ function ManagementGameInner() {
   const spawnQueueRef = useRef(spawnQueue)
   useEffect(() => { spawnQueueRef.current = spawnQueue }, [spawnQueue])
 
+  useEffect(() => {
+    if (phase === 'play' && config.mode === 'cooking') {
+      setShowCookingOrder(true)
+      const timer = setTimeout(() => setShowCookingOrder(false), 6000)
+      return () => clearTimeout(timer)
+    }
+  }, [phase, config.mode, dishIndex])
+
   // Initialization
   useEffect(() => {
     hasSavedRef.current = false
@@ -581,7 +589,8 @@ function ManagementGameInner() {
     })).sort(() => Math.random() - 0.5)
 
     setCookingItems(items)
-    setTimeout(() => setShowCookingOrder(false), 4000)
+
+    // Timer is now fully handled by the useEffect watching dishIndex and phase
   }
 
   const handleCookIngredient = (ing: string) => {
@@ -848,24 +857,26 @@ function ManagementGameInner() {
       <div className="w-full max-w-5xl bg-white rounded-[32px] md:rounded-[40px] shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-140px)] min-h-[550px] max-h-[850px] relative border border-slate-100">
 
         {/* Header Bar */}
-        <div className="h-16 md:h-20 bg-white border-b-2 border-slate-50 flex items-center justify-between px-4 md:px-10 shrink-0">
-          <div className="flex items-center gap-2 md:gap-4">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-50 rounded-lg md:rounded-2xl flex items-center justify-center text-xl md:text-3xl relative">
+        <div className="min-h-[4.5rem] md:min-h-[5.5rem] py-3 md:py-4 bg-white border-b border-slate-100 flex flex-row items-center justify-between px-3 md:px-8 shrink-0 z-20 rounded-t-[32px] md:rounded-t-[40px] shadow-sm relative">
+          <div className="flex items-center gap-3 md:gap-5 flex-1 pr-2">
+            <div className="w-10 h-10 md:w-14 md:h-14 bg-indigo-50/80 rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-3xl relative shrink-0 border border-indigo-100 shadow-inner">
               {levelParam <= 3 ? '📦' : levelParam <= 5 ? '🍳' : levelParam <= 9 ? '🧭' : '📝'}
               {isBonus && (
-                <div className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-[8px] md:text-[10px] font-black px-1.5 py-0.5 rounded-full border border-yellow-500 shadow-sm animate-pulse">
+                <div className="absolute -top-2 -right-3 bg-yellow-400 text-yellow-900 text-[9px] md:text-xs font-black px-2 py-0.5 rounded-full border border-yellow-500 shadow-sm animate-pulse">
                   x2
                 </div>
               )}
             </div>
-            <h1 className="text-sm md:text-2xl font-black text-slate-800 tracking-tight leading-tight max-w-[150px] md:max-w-none">
-              {config.instruction}
-            </h1>
+            <div className="flex flex-col flex-1 pb-1">
+              <h1 className="text-xs min-[360px]:text-[13px] sm:text-base md:text-xl lg:text-2xl font-black text-slate-800 tracking-tight leading-[1.35] break-words line-clamp-3 sm:line-clamp-none drop-shadow-sm">
+                {config.instruction}
+              </h1>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col items-end">
-              <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Score</span>
-              <span className="text-2xl md:text-4xl font-black text-indigo-600 tabular-nums">{score}</span>
+          <div className="flex items-center shrink-0 pl-3 md:pl-5 border-l-2 border-slate-100 h-10 md:h-12">
+            <div className="flex flex-col items-center justify-center">
+              <span className="text-[9px] md:text-xs font-black text-slate-400 uppercase tracking-widest leading-none">Score</span>
+              <span className="text-2xl md:text-4xl font-black text-indigo-600 tabular-nums leading-none mt-1">{score}</span>
             </div>
           </div>
         </div>
@@ -1042,7 +1053,7 @@ function ManagementGameInner() {
               )}
 
               {config.mode === 'cooking' && (
-                <div className="w-full h-full flex flex-col items-center justify-center p-4 md:p-10">
+                <div className="w-full h-full flex flex-col items-center justify-center p-2 sm:p-4 md:p-10">
                   <div className="absolute top-2 md:top-6 left-1/2 -translate-x-1/2 flex flex-col items-center z-20 w-fit">
                     <span className="bg-amber-500 text-white px-4 md:px-6 py-1 md:py-2 rounded-full font-black text-xs md:text-xl mb-2 md:mb-4 shadow-lg border-2 border-amber-300 whitespace-nowrap">
                       เมนู: {shuffledRecipes[dishIndex]?.name}
@@ -1061,12 +1072,25 @@ function ManagementGameInner() {
                     )}
 
                     {(showCookingOrder || showHint) && (
-                      <div className="flex flex-wrap justify-center gap-1.5 md:gap-2 p-2.5 md:p-4 bg-white rounded-2xl md:rounded-3xl shadow-2xl border-2 md:border-4 border-indigo-400 animate-in zoom-in max-w-[280px] md:max-w-lg">
-                        {currentOrder.map((ing, i) => (
-                          <div key={i} className="px-2.5 md:px-4 py-1 md:py-2 bg-indigo-50 rounded-xl md:rounded-2xl text-indigo-700 font-black text-xs md:text-xl border-2 border-indigo-100 shadow-sm animate-in fade-in slide-in-from-bottom-2">
-                            {ing}
-                          </div>
-                        ))}
+                      <div className="bg-white rounded-xl sm:rounded-3xl shadow-2xl border-2 sm:border-4 border-indigo-400 animate-in zoom-in max-w-[300px] sm:max-w-lg overflow-hidden flex flex-col">
+                        <div className="flex flex-wrap justify-center gap-1 sm:gap-2 p-2 sm:p-4 pb-3">
+                          {currentOrder.map((ing, i) => (
+                            <div key={i} className="px-2 sm:px-4 py-0.5 sm:py-2 bg-indigo-50 rounded-lg sm:rounded-2xl text-indigo-700 font-black text-[10px] sm:text-xl border-2 border-indigo-100 shadow-sm animate-in fade-in slide-in-from-bottom-2">
+                              {ing}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="w-full h-1.5 sm:h-2 bg-indigo-100/50">
+                          <div
+                            className="h-full bg-indigo-500 rounded-r-full"
+                            style={{ 
+                              animationName: 'shrinkWidth', 
+                              animationDuration: showCookingOrder ? '6s' : '3s', 
+                              animationTimingFunction: 'linear', 
+                              animationFillMode: 'forwards' 
+                            }}
+                          />
+                        </div>
                       </div>
                     )}
 
@@ -1080,38 +1104,40 @@ function ManagementGameInner() {
                     )}
                   </div>
 
-                  <div className="flex-1 flex flex-col items-center justify-center mt-12 md:mt-32">
-                    <div className="relative mb-6 md:mb-16">
-                      <div className="w-64 h-24 md:w-[600px] md:h-48 bg-slate-200/50 rounded-full border-b-[8px] md:border-b-[12px] border-slate-300 flex items-center justify-center relative overflow-hidden shadow-inner">
-                        <div className="flex flex-wrap justify-center gap-2 md:gap-3 p-3 md:p-6">
-                          {collectedIngredients.map((ing, i) => (
-                            <div key={i} className="w-10 h-10 md:w-20 md:h-20 bg-white rounded-lg md:rounded-xl shadow-sm flex items-center justify-center p-1 animate-in bounce-in overflow-hidden relative group border-2 border-slate-100">
-                              <img src={getIngPath(ing, shuffledRecipes[dishIndex]?.round || 1)} className="w-full h-full object-contain" alt={ing} />
-                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                <span className="text-[8px] md:text-xs text-white font-bold">{ing}</span>
+                  <div className="flex-1 flex flex-col items-center justify-end pb-4 min-[400px]:pb-8 md:justify-center mt-2 md:mt-16 w-full max-h-[85%]">
+                    <div className="mb-2 min-[400px]:mb-6 sm:mb-10 w-full flex justify-center">
+                      <div className="relative">
+                        <div className="w-56 h-12 min-[400px]:h-14 sm:w-[480px] sm:h-36 lg:w-[600px] lg:h-48 bg-slate-200/50 rounded-full border-b-[4px] sm:border-b-[8px] lg:border-b-[12px] border-slate-300 flex items-center justify-center relative overflow-hidden shadow-inner z-10">
+                          <div className="flex flex-wrap justify-center gap-1.5 min-[400px]:gap-2 md:gap-3 p-2 min-[400px]:p-3 md:p-6">
+                            {collectedIngredients.map((ing, i) => (
+                              <div key={i} className="w-7 h-7 min-[400px]:w-8 min-[400px]:h-8 sm:w-14 sm:h-14 lg:w-20 lg:h-20 bg-white rounded-lg md:rounded-xl shadow-sm flex items-center justify-center p-1 animate-in bounce-in overflow-hidden relative group border-2 border-slate-100">
+                                <img src={getIngPath(ing, shuffledRecipes[dishIndex]?.round || 1)} className="w-full h-full object-contain" alt={ing} />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                  <span className="text-[6px] lg:text-xs text-white font-bold">{ing}</span>
+                                </div>
                               </div>
-                            </div>
-                          ))}
-                          {collectedIngredients.length < currentOrder.length && !showCookingOrder && !isExtraPhase && (
-                            <div className="text-slate-400 font-black text-xl md:text-2xl animate-pulse">?</div>
-                          )}
+                            ))}
+                            {collectedIngredients.length < currentOrder.length && !showCookingOrder && !isExtraPhase && (
+                              <div className="text-slate-400 font-black text-sm min-[400px]:text-xl md:text-2xl animate-pulse">?</div>
+                            )}
+                          </div>
                         </div>
+                        {/* Pan handle or decor */}
+                        <div className="absolute top-1/2 -right-8 sm:-right-12 lg:-right-20 w-12 sm:w-20 lg:w-32 h-3 sm:h-4 lg:h-6 bg-slate-400 rounded-full -translate-y-1/2 shadow-md z-0"></div>
                       </div>
-                      {/* Pan handle or decor */}
-                      <div className="absolute top-1/2 -right-12 md:-right-24 w-16 md:w-32 h-3 md:h-6 bg-slate-400 rounded-full -translate-y-1/2 shadow-md"></div>
                     </div>
 
-                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 md:gap-3 max-w-3xl px-2 md:px-4">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-1.5 min-[400px]:gap-2 lg:gap-3 w-full max-w-[90%] lg:max-w-3xl px-1 min-[400px]:px-2 shrink-0">
                       {cookingItems.map((item, i) => (
                         <button
                           key={i}
                           onClick={() => handleCookIngredient(item.name)}
-                          className="group flex flex-col items-center gap-1.5 md:gap-3 p-1.5 md:p-3 bg-white rounded-2xl md:rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-2 active:translate-y-0 active:shadow-none transition-all border-b-[4px] md:border-b-[6px] border-slate-200"
+                          className="group flex flex-col items-center gap-1 min-[400px]:gap-1.5 lg:gap-3 p-1 min-[400px]:p-1.5 lg:p-3 bg-white rounded-xl lg:rounded-3xl shadow-md hover:shadow-xl hover:-translate-y-1 lg:hover:-translate-y-2 active:translate-y-0 active:shadow-none transition-all border-b-[3px] lg:border-b-[6px] border-slate-200"
                         >
-                          <div className="w-16 h-16 sm:w-24 sm:h-24 md:w-40 md:h-40 bg-slate-50 rounded-xl md:rounded-2xl flex items-center justify-center p-2 md:p-3 border-2 border-slate-100">
+                          <div className="w-12 h-12 min-[400px]:w-14 min-[400px]:h-14 sm:w-20 sm:h-20 lg:w-32 lg:h-32 bg-slate-50 rounded-lg min-[400px]:rounded-xl lg:rounded-2xl flex items-center justify-center p-1.5 min-[400px]:p-2 lg:p-3 border-2 border-slate-100">
                             <img src={item.image} className="w-full h-full object-contain group-hover:scale-110 transition-transform" alt={item.name} />
                           </div>
-                          <div className="px-3 md:px-6 py-1 md:py-2 bg-indigo-50 rounded-full border-2 border-indigo-100 text-indigo-800 font-black text-[10px] md:text-xl shadow-sm whitespace-nowrap">
+                          <div className="px-2 lg:px-6 py-0.5 lg:py-2 bg-indigo-50 rounded-full border border-indigo-100 text-indigo-800 font-black text-[8px] min-[400px]:text-[9px] lg:text-lg shadow-sm whitespace-nowrap">
                             {item.name}
                           </div>
                         </button>
@@ -1191,6 +1217,7 @@ function ManagementGameInner() {
         .animate-jiggle { animation: jiggle 2s ease-in-out infinite; }
         .animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        @keyframes shrinkWidth { from { width: 100%; } to { width: 0%; } }
       `}</style>
     </div >
   )

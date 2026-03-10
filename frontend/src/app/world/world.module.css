@@ -145,6 +145,10 @@
     border-radius: 1.5rem;
     border-width: 3px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    /* Safe zone for icons: icons use percentages within this padded area */
+    padding: 20px 30px; 
+    box-sizing: border-box;
+    background-origin: border-box; /* Map stays edge-to-edge */
   }
 }
 
@@ -181,12 +185,21 @@
 }
 
 .stageNode.current .stageIcon {
-  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
   animation: float 3s ease-in-out infinite;
 }
 
 .stageNode.completed .stageIcon {
-  filter: drop-shadow(0 0 10px rgba(74, 222, 128, 0.4));
+  filter: drop-shadow(0 0 5px rgba(74, 222, 128, 0.4));
+}
+
+@media (min-width: 768px) {
+  .stageNode.current .stageIcon {
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
+  }
+  .stageNode.completed .stageIcon {
+    filter: drop-shadow(0 0 10px rgba(74, 222, 128, 0.4));
+  }
 }
 
 @keyframes float {
@@ -238,8 +251,8 @@
 
 @media (max-width: 600px) {
   .stageIcon {
-    width: 45px;
-    height: 45px;
+    width: 36px;
+    height: 36px;
     border-width: 2px;
   }
 }
