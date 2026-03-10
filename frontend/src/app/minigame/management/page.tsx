@@ -187,7 +187,7 @@ function generateMaze(rows: number, cols: number, hasKey: boolean, hasBombs: boo
 
   if (hasBombs) {
     let bombAttempts = 0
-    while (bombAttempts < 50) { // Try placing bombs up to 50 times to ensure reachability
+    while (bombAttempts < 200) { // Increased attempts for higher reliability
       const tempMaze = maze.map(row => [...row]) // Create a temporary maze for bomb placement
       const keyPos = hasKey ? (() => {
         for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) if (tempMaze[r][c] === 3) return { r, c };
@@ -220,6 +220,13 @@ function generateMaze(rows: number, cols: number, hasKey: boolean, hasBombs: boo
 
 // ─── Asset Paths ─────────────────────────────────────────────────────────────
 const MG_BASE = '/Asset ด้าน/บริหารจัดการ'
+const MAZE_ASSETS_BASE = `${MG_BASE}/เกมเขาวงกต หมู่บ้านที่ 6-7-8-9/ICON อื่นๆ`
+
+const MAZE_ICONS = {
+  key: `${MAZE_ASSETS_BASE}/กุญแจ.png`,
+  bomb: `${MAZE_ASSETS_BASE}/ลูกระเบิด.png`,
+  lock: `${MAZE_ASSETS_BASE}/แม่กุญแจ.png`
+}
 
 // V1 Images were poorly cropped, replaced with V2 assets for clearer gameplay
 
@@ -412,8 +419,8 @@ function ManagementGameInner() {
     setSpawnQueue(c.items)
 
     if (c.mode === 'maze') {
-      const rows = 9 + (levelParam > 7 ? 2 : 0)
-      const cols = 9 + (levelParam > 7 ? 2 : 0)
+      const rows = 9 + (levelParam > 7 ? 2 : 0) + Math.floor(Math.random() * 2)
+      const cols = 9 + (levelParam > 7 ? 2 : 0) + Math.floor(Math.random() * 2)
       const needsKey = levelParam >= 7
       const needsBombs = levelParam >= 8
 
@@ -1116,35 +1123,52 @@ function ManagementGameInner() {
               )}
 
               {config.mode === 'maze' && (
-                <div className={`w-full h-full flex flex-col items-center justify-center p-6 transition-all duration-1000 ${isMazeHidden ? 'bg-slate-900' : 'bg-white'}`}>
-                  <div className="bg-white p-2 rounded-[40px] shadow-2xl border-4 border-slate-800">
-                    <div className="grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${maze[0]?.length || 0}, minmax(0, 1fr))` }}>
+                <div className={`w-full h-full flex flex-col items-center justify-center p-6 bg-white transition-all duration-1000 relative`}>
+                  <div className="bg-white p-2 md:p-4 rounded-xl md:rounded-2xl shadow-2xl border-2 md:border-4 border-slate-800 transition-colors duration-500 overflow-hidden relative z-10">
+                    <div className="grid gap-0" style={{ gridTemplateColumns: `repeat(${maze[0]?.length || 1}, minmax(0, 1fr))` }}>
                       {maze.map((row, r) => row.map((cell, c) => (
-                        <div key={`${r}-${c}`} className={`w-8 h-8 md:w-10 md:h-10 border border-slate-100 flex items-center justify-center text-xl md:text-2xl ${cell === 1 ? 'bg-slate-800' : 'bg-white'}`}>
+                        <div
+                          key={`${r}-${c}`}
+                          className={`w-7 h-7 md:w-10 md:h-10 flex items-center justify-center transition-all duration-300 ${cell === 1
+                            ? 'bg-slate-900'
+                            : 'bg-white'
+                            }`}
+                        >
                           {playerPos.r === r && playerPos.c === c && (
-                            <img src="/assets_employer/logo.png" className="w-[80%] h-[80%] object-contain animate-bounce" alt="brain" />
+                            <div className="w-[85%] h-[85%] relative z-30 transition-all transform duration-200">
+                              <img src="/assets_employer/logo.png" className="w-full h-full object-contain animate-bounce-gentle drop-shadow-md" alt="player" />
+                            </div>
                           )}
                           {cell === 2 && (
-                            <div className={`relative w-full h-full flex items-center justify-center ${levelParam >= 7 && !hasKey ? 'grayscale opacity-30 brightness-50' : ''}`}>
-                              <span className="drop-shadow-lg">�</span>
+                            <div className={`relative w-[85%] h-[85%] flex items-center justify-center z-20 ${levelParam >= 7 && !hasKey ? 'grayscale opacity-30 brightness-50' : 'animate-bounce'}`}>
+                              <span className="text-2xl md:text-3xl drop-shadow-md">🚩</span>
                             </div>
                           )}
                           {cell === 3 && (
-                            <span className="scale-125">🔑</span>
+                            <img src={MAZE_ICONS.key} className="w-full h-full object-contain animate-jiggle p-1 z-20" alt="key" />
                           )}
                           {cell === 4 && showBombs && (
-                            <span className="scale-125">💣</span>
+                            <img src={MAZE_ICONS.bomb} className="w-full h-full object-contain p-1 z-20" alt="bomb" />
                           )}
                         </div>
                       )))}
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 mt-6">
-                    <div /><button onClick={() => handleMazeMove(-1, 0)} className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">🔼</button><div />
-                    <button onClick={() => handleMazeMove(0, -1)} className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">◀️</button>
-                    <button onClick={() => handleMazeMove(1, 0)} className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">🔽</button>
-                    <button onClick={() => handleMazeMove(0, 1)} className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">▶️</button>
+
+                  <div className="grid grid-cols-3 gap-2 mt-8 relative z-10">
+                    <div />
+                    <button onClick={() => handleMazeMove(-1, 0)} className="w-14 h-14 bg-slate-800 text-white rounded-2xl shadow-xl flex items-center justify-center text-2xl active:scale-90 transition-all">🔼</button>
+                    <div />
+                    <button onClick={() => handleMazeMove(0, -1)} className="w-14 h-14 bg-slate-800 text-white rounded-2xl shadow-xl flex items-center justify-center text-2xl active:scale-90 transition-all">◀️</button>
+                    <button onClick={() => handleMazeMove(1, 0)} className="w-14 h-14 bg-slate-800 text-white rounded-2xl shadow-xl flex items-center justify-center text-2xl active:scale-90 transition-all">🔽</button>
+                    <button onClick={() => handleMazeMove(0, 1)} className="w-14 h-14 bg-slate-800 text-white rounded-2xl shadow-xl flex items-center justify-center text-2xl active:scale-90 transition-all">▶️</button>
                   </div>
+
+                  {isMazeHidden && !feedback && (
+                    <div className="mt-4 px-6 py-2 bg-slate-900 text-white rounded-full font-black animate-pulse z-10">
+                      พรางตัวอยู่... ขยับเพื่อดูทาง 🧭
+                    </div>
+                  )}
                 </div>
               )}
 
