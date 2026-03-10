@@ -103,8 +103,8 @@ export function recordPlay(
 
   if (gameType) {
     // Manual Play bonus: reward players for NOT using keys
-    // Increased to 100 per key to make keys more impactful on score
-    bonus = 100 * currentKeys;
+    // Scale bonus with village level to prevent early-game score inflation (max 90% boost)
+    bonus = 10 * currentKeys * villageId;
     const current = { ...(vp.currentRunScore ?? { management: 0, calculation: 0, spatial: 0, reaction: 0 }) }
     current[gameType] = Math.max(current[gameType] || 0, scoreGained + bonus)
     vp.currentRunScore = current

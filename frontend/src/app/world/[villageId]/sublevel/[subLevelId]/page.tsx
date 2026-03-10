@@ -102,6 +102,7 @@ export default function SubLevelPage({
       <ConfirmUseKeyModal
         open={modalOpen}
         keysLeft={keysLeft}
+        villageId={villageId}
         onCancel={handleCancel}
         onConfirm={handleConfirm}
         onPlay={handlePlayNoKey}
