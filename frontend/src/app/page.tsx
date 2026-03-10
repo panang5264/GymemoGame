@@ -10,7 +10,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import BrainRadarChart from '@/components/BrainRadarChart'
 import WeeklySummaryChart from '@/components/WeeklySummaryChart'
 import { useProgress } from '@/contexts/ProgressContext'
-import { getDefaultProgress } from '@/lib/levelSystem'
+import { getDefaultProgress, resetGameProgress } from '@/lib/levelSystem'
 import { getCognitiveAnalysis, getWeeklyTrends } from '@/lib/profile'
 
 type AuthPhase = 'login' | 'name' | 'profile' | 'intro' | 'grandmother' | 'tutorial_summary' | 'assessment' | 'edit_profile' | 'grandpa_assessment'
@@ -496,17 +496,9 @@ export default function Home() {
                     </button>
                     <button
                       onClick={async () => {
-                        if (window.confirm('คุณต้องการรีเซ็ตความก้าวหน้าใช่หรือไม่? (ประวัติความสำเร็จของคุณทั้งหมดจะยังคงถูกเก็บไว้)')) {
-                          const defaultP = getDefaultProgress()
-                          // Preserve identity and history
-                          defaultP.userName = progress.userName
-                          defaultP.guestId = progress.guestId
-
-                          // Deep copy history to preserve it through the reset
-                          if (progress.history) {
-                            defaultP.history = [...progress.history]
-                          }
-                          await saveProgress(defaultP)
+                        if (window.confirm('คุณต้องการรีเซ็ตการเล่นใหม่ใช่หรือไม่? (ความสำเร็จและเควสรายวันจะยังคงถูกเก็บไว้)')) {
+                          const fresh = resetGameProgress(progress)
+                          await saveProgress(fresh)
                           window.location.reload()
                         }
                       }}

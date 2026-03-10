@@ -1,4 +1,5 @@
 const UserProgress = require('../models/UserProgress')
+const User = require('../models/User')
 
 // @desc    Get synced progress for current user
 // @route   GET /api/progression/sync
@@ -53,6 +54,21 @@ const updateSyncProgress = async (req, res) => {
                 progressData
             })
         }
+
+        // --- NEW: Sync totalScore to User highscore for Leaderboard ---
+        try {
+            if (progressData && progressData.totalScore !== undefined) {
+                const user = await User.findById(req.user._id)
+                if (user && progressData.totalScore > user.highScore) {
+                    user.highScore = progressData.totalScore
+                    await user.save()
+                }
+            }
+        } catch (scoreErr) {
+            console.error('Failed to sync highScore during progress update:', scoreErr)
+            // non-fatal
+        }
+        // ----------------------------------------------------------------
 
         res.json({
             success: true,

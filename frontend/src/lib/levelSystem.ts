@@ -279,3 +279,44 @@ export function isDailyComplete(p: GymemoProgressV2, dateKey: string): boolean {
 export function isVillageUnlocked(p: GymemoProgressV2, villageId: number): boolean {
   return p.unlockedVillages.includes(villageId)
 }
+
+export function resetGameProgress(p: GymemoProgressV2): GymemoProgressV2 {
+  const fresh = getDefaultProgress()
+
+  // 1. Preserve Identity
+  fresh.userName = p.userName
+  fresh.guestId = p.guestId
+  fresh.privacyMode = p.privacyMode
+
+  // 2. Preserve Daily Progress (IMPORTANT)
+  fresh.daily = p.daily || {}
+  fresh.dailyScores = p.dailyScores || {}
+
+  // 3. Preserve Global Stats & History
+  fresh.totalScore = p.totalScore
+  fresh.history = p.history || []
+
+  // 4. Preserve Keys (Don't penalize user for resetting)
+  fresh.keys = p.keys
+
+  // 5. Preserve Village Best Scores & History, but reset current progress
+  Object.keys(p.villages).forEach(key => {
+    const cv = p.villages[key]
+    if (cv) {
+      fresh.villages[key] = {
+        playsCompleted: 0,
+        expTubeFilled: false,
+        bestScore: cv.bestScore,
+        runHistory: cv.runHistory || [],
+        subLevelScores: {} // Reset current run sub-levels
+      }
+    }
+  })
+
+  // 6. Reset World Progress
+  fresh.unlockedVillages = [1]
+  fresh.introSeen = false // Let them see intro again if they want
+
+  return fresh
+}
+

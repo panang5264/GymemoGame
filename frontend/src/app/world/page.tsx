@@ -9,6 +9,7 @@ import {
   isVillageUnlocked,
   PLAYS_PER_VILLAGE,
   MAX_KEYS,
+  resetGameProgress,
 } from '@/lib/levelSystem'
 import { getExpPercent } from '@/lib/scoring'
 import PreviousRunPreview from '@/components/PreviousRunPreview'
@@ -141,28 +142,8 @@ export default function WorldPage() {
 
   function resetProgress() {
     if (!progress) return
-    const current = progress
-    const fresh = getDefaultProgress()
-
-    // Preserve Identity and High Scores
-    fresh.userName = current.userName
-    fresh.guestId = current.guestId
-    fresh.totalScore = current.totalScore
-    fresh.introSeen = false // Allow seeing intro again if they reset
-
-    // Preserve best scores for each village
-    Object.keys(current.villages).forEach(key => {
-      const cv = current.villages[key]
-      if (cv && cv.bestScore) {
-        fresh.villages[key] = {
-          playsCompleted: 0,
-          expTubeFilled: false,
-          bestScore: cv.bestScore,
-          runHistory: cv.runHistory || []
-        }
-      }
-    })
-
+    if (!confirm('ต้องการเริ่มการเดินทางครั้งใหม่เพื่อฝึกฝนอีกรอบใช่หรือไม่? (ความสำเร็จและเควสรายวันจะยังคงถูกเก็บไว้)')) return
+    const fresh = resetGameProgress(progress)
     saveProgress(fresh)
     setUnlockedVillages(fresh.unlockedVillages)
     setVillageExp({})
