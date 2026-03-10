@@ -476,22 +476,22 @@ function SpatialGameInner() {
 
 
   return (
-    <div className="min-h-[calc(100vh-140px)] py-6 flex flex-col items-center relative overflow-hidden font-['Supermarket']">
-      <div className="max-w-4xl w-full px-4 relative z-10">
+    <div className="min-h-[calc(100vh-140px)] py-4 sm:py-6 flex flex-col items-center relative overflow-hidden font-['Supermarket']">
+      <div className="max-w-4xl w-full px-2 sm:px-4 relative z-10">
         {/* Header */}
-        <div className="bg-white p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm border border-slate-200 mb-4 md:mb-6">
-          <h1 className="text-lg md:text-2xl font-black text-slate-800 text-center mb-1 relative inline-block w-full">
+        <div className="bg-white p-2.5 sm:p-4 rounded-xl md:rounded-2xl shadow-sm border border-slate-200 mb-2 sm:mb-6">
+          <h1 className="text-base sm:text-2xl font-black text-slate-800 text-center mb-1 relative inline-block w-full">
             {mode === 'daily' ? '🌟 ภารกิจรายวัน: พื้นที่' : `📦 มิติสัมพันธ์ — ด่าน ${subId}`}
-            <span className="ml-4 text-sm md:text-base text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100 italic">
+            <span className="ml-2 sm:ml-4 text-[10px] sm:text-base text-indigo-500 bg-indigo-50 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border border-indigo-100 italic">
               ข้อ {questionCount + 1} / {MAX_QUESTIONS}
             </span>
             {isBonus && (
-              <span className="absolute -top-3 right-0 bg-yellow-400 text-yellow-900 text-[10px] md:text-xs font-black px-2 py-0.5 rounded-full border border-yellow-500 shadow-sm animate-pulse">
+              <span className="absolute -top-3 right-0 bg-yellow-400 text-yellow-900 text-[8px] md:text-xs font-black px-2 py-0.5 rounded-full border border-yellow-500 shadow-sm animate-pulse">
                 x2 BONUS
               </span>
             )}
           </h1>
-          <p className="text-center text-slate-500 font-bold uppercase tracking-wider text-xs md:text-sm">{diffDesc}</p>
+          <p className="text-center text-slate-500 font-bold uppercase tracking-wider text-[10px] sm:text-sm">{diffDesc}</p>
         </div>
 
         {isComplete ? (
@@ -528,14 +528,14 @@ function SpatialGameInner() {
         ) : (
           <div className="w-full flex flex-col items-center h-full">
             {/* Feedback / Question Text */}
-            <div className="mb-6 md:mb-8 min-h-[40px] md:min-h-[50px] text-center w-full mt-2 md:mt-4">
+            <div className="mb-3 sm:mb-8 min-h-[30px] sm:min-h-[50px] text-center w-full mt-1 sm:mt-4">
               {feedback && (
-                <div className={`inline-block px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 rounded-full font-black text-xs sm:text-sm md:text-lg shadow-lg border-2 md:border-4 ${feedback.type === 'correct' ? 'bg-green-500 text-white border-green-300' : 'bg-red-500 text-white border-red-300 animate-shake'}`}>
+                <div className={`inline-block px-3 sm:px-8 py-1.5 sm:py-2.5 rounded-full font-black text-[10px] sm:text-lg shadow-lg border-2 md:border-4 ${feedback.type === 'correct' ? 'bg-green-500 text-white border-green-300' : 'bg-red-500 text-white border-red-300 animate-shake'}`}>
                   {feedback.message}
                 </div>
               )}
               {!feedback && questionText && (
-                <div className="inline-block px-4 sm:px-6 md:px-10 py-2 sm:py-3 rounded-full font-bold text-slate-600 bg-white/80 backdrop-blur-sm border-2 border-white/50 shadow-sm text-sm sm:text-base">
+                <div className="inline-block px-4 sm:px-10 py-1.5 sm:py-3 rounded-full font-bold text-slate-600 bg-white/80 backdrop-blur-sm border-2 border-white/50 shadow-sm text-xs sm:text-base">
                   💡 {questionText}
                 </div>
               )}
@@ -565,12 +565,12 @@ function SpatialGameInner() {
             {questionData && !questionData.isPairMatching && questionData.options && (
               <div className="w-full flex flex-col items-center">
                 {/* Main block image */}
-                <div className="mb-4 md:mb-6 relative p-2 md:p-4 bg-white/60 backdrop-blur-md rounded-xl md:rounded-[1.5rem] border-2 md:border-3 border-indigo-200 shadow-xl flex items-center justify-center w-full max-w-[240px] sm:max-w-[280px] md:max-w-[350px]">
-                  <div className="text-[8px] md:text-[10px] font-black text-indigo-400 uppercase tracking-widest absolute top-2 left-3">โจทย์ 📦</div>
+                <div className="mb-3 sm:mb-6 relative p-1.5 sm:p-4 bg-white/60 backdrop-blur-md rounded-xl md:rounded-[1.5rem] border-2 md:border-3 border-indigo-200 shadow-xl flex items-center justify-center w-full max-w-[200px] sm:max-w-[350px]">
+                  <div className="text-[7px] md:text-[10px] font-black text-indigo-400 uppercase tracking-widest absolute top-1 sm:top-2 left-2 sm:left-3">โจทย์ 📦</div>
                   <img
                     src={questionData.targetImage}
                     style={DIP_STYLE}
-                    className="w-full h-[120px] sm:h-[150px] md:h-[200px] object-contain mt-3"
+                    className="w-full h-[100px] sm:h-[200px] object-contain mt-2 sm:mt-3"
                     alt="target block"
                   />
                 </div>
@@ -602,15 +602,15 @@ function SpatialGameInner() {
                           setTimeout(() => setFeedback(null), 1000)
                         }
                       }}
-                      className="group relative p-2 sm:p-3 md:p-4 bg-white hover:bg-indigo-50 border-b-4 md:border-b-8 border-slate-200 hover:border-indigo-300 rounded-xl md:rounded-[2rem] shadow-md md:shadow-lg transition-all active:scale-95 flex flex-col items-center justify-center min-h-[100px] sm:min-h-[120px] md:min-h-[150px]"
+                      className="group relative p-1.5 sm:p-4 bg-white hover:bg-indigo-50 border-b-2 sm:border-b-8 border-slate-200 hover:border-indigo-300 rounded-lg sm:rounded-[2rem] shadow-sm sm:shadow-lg transition-all active:scale-95 flex flex-col items-center justify-center min-h-[70px] sm:min-h-[150px]"
                     >
                       <img
                         src={opt}
                         style={DIP_STYLE}
-                        className="max-w-[60px] max-h-[60px] sm:max-w-[80px] sm:max-h-[80px] md:max-w-[100px] md:max-h-[100px] object-contain group-hover:scale-105 transition-transform"
+                        className="max-w-[40px] max-h-[40px] sm:max-w-[100px] sm:max-h-[100px] object-contain group-hover:scale-105 transition-transform"
                         alt={`option ${idx}`}
                       />
-                      <div className="absolute -top-2 -right-2 w-7 h-7 bg-slate-100 rounded-full border-2 border-white text-slate-500 font-black flex items-center justify-center text-xs group-hover:bg-indigo-500 group-hover:text-white transition-colors shadow">
+                      <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-7 sm:h-7 bg-slate-100 rounded-full border sm:border-2 border-white text-slate-500 font-black flex items-center justify-center text-[8px] sm:text-xs group-hover:bg-indigo-500 group-hover:text-white transition-colors shadow">
                         {String.fromCharCode(65 + idx)}
                       </div>
                     </button>
