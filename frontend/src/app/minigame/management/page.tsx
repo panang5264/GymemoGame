@@ -48,32 +48,87 @@ function getRandomPos() {
 
 // ─── Level Definitions ───────────────────────────────────────────────────────
 
-const COOKING_RECIPES = [
+interface CookingRecipe {
+  name: string
+  ingredients: string[]
+  extra: string
+  thought: string
+  round: number
+}
+
+const COOKING_RECIPES: CookingRecipe[] = [
+  // Round 1
   {
-    name: 'แตงกวาผัดไข่',
-    ingredients: ['แตงกวา', 'ไข่ไก่', 'กระเทียม', 'น้ำตาล', 'น้ำปลา', 'พริกไทย'],
-    extra: 'น้ำตาล',
-    thought: 'อยากได้ความหวานเพิ่มจัง... (ใส่น้ำตาลเพิ่ม)'
+    name: 'กะเพราหมูสับ',
+    ingredients: ['กระเทียม', 'พริกแดง', 'หมูสับ', 'กะเพรา', 'น้ำปลา', 'น้ำตาล'],
+    extra: 'พริกแดง',
+    thought: 'อยากได้ความเผ็ดเพิ่มจัง... (ใส่พริกแดงเพิ่ม)',
+    round: 1
   },
   {
     name: 'ผัดไทยกุ้ง',
-    ingredients: ['เส้นจันท์', 'กุ้ง', 'น้ำตาล', 'น้ำปลา', 'กุยช่าย', 'เต้าหู้', 'ถั่วงอก'],
+    ingredients: ['เต้าหู้', 'กุ้ง', 'เส้นจันท์', 'ถั่วงอก', 'กุยช่าย', 'น้ำปลา', 'น้ำตาล'],
     extra: 'น้ำปลา',
-    thought: 'อยากได้ความเค็มเพิ่มจัง... (ใส่น้ำปลาเพิ่ม)'
+    thought: 'อยากได้ความเค็มเพิ่มจัง... (ใส่น้ำปลาเพิ่ม)',
+    round: 1
   },
   {
-    name: 'กะเพราหมูสับ',
-    ingredients: ['ข้าว', 'หมูสับ', 'กะเพรา', 'น้ำปลา', 'น้ำตาล', 'พริกแดง'],
-    extra: 'พริกแดง',
-    thought: 'อยากได้ความเผ็ดเพิ่มจัง... (ใส่พริกแดงเพิ่ม)'
+    name: 'แตงกวาผัดไข่',
+    ingredients: ['กระเทียม', 'แตงกวา', 'ไข่ไก่', 'น้ำปลา', 'น้ำตาล'],
+    extra: 'น้ำตาล',
+    thought: 'อยากได้ความหวานเพิ่มจัง... (ใส่น้ำตาลเพิ่ม)',
+    round: 1
   },
+  // Round 2
+  {
+    name: 'หมูสับทอดกระเทียม',
+    ingredients: ['หมูสับ', 'กระเทียม', 'น้ำปลา', 'น้ำตาล'],
+    extra: 'กระเทียม',
+    thought: 'อยากได้ความหอมกระเทียมเพิ่มจัง... (ใส่กระเทียมเพิ่ม)',
+    round: 2
+  },
+  {
+    name: 'ไข่เจียวหมูสับ',
+    ingredients: ['ไข่ไก่', 'หมูสับ', 'น้ำปลา'],
+    extra: 'น้ำปลา',
+    thought: 'อยากได้ความเค็มเพิ่มจัง... (ใส่น้ำปลาเพิ่ม)',
+    round: 2
+  },
+  {
+    name: 'ต้มยำกุ้ง',
+    ingredients: ['กุ้ง', 'พริกแดง', 'น้ำปลา', 'น้ำตาล'],
+    extra: 'พริกแดง',
+    thought: 'อยากได้ความเผ็ดร้อนเพิ่มจัง... (ใส่พริกแดงเพิ่ม)',
+    round: 2
+  },
+  // Round 3
+  {
+    name: 'ข้าวผัดกุ้ง',
+    ingredients: ['ข้าวสวย', 'ไข่ไก่', 'กุ้ง', 'แตงกวา', 'น้ำปลา', 'น้ำตาล'],
+    extra: 'น้ำตาล',
+    thought: 'อยากได้ความกลมกล่อมเพิ่มจัง... (ใส่น้ำตาลเพิ่ม)',
+    round: 3
+  },
+  {
+    name: 'ส้มตำ',
+    ingredients: ['กระเทียม', 'พริกแดง', 'น้ำตาล', 'น้ำปลา'],
+    extra: 'น้ำปลา',
+    thought: 'อยากได้ความนัวเพิ่มจัง... (ใส่น้ำปลาเพิ่ม)',
+    round: 3
+  }
 ]
 
-const ALL_INGREDIENTS = [
-  'ข้าว', 'เส้นจันท์', 'แตงกวา', 'กุ้ง', 'ไข่ไก่',
-  'หมูสับ', 'กระเทียม', 'พริกแดง', 'กะเพรา', 'น้ำตาล',
-  'น้ำปลา', 'พริกไทย', 'ถั่วงอก', 'กุยช่าย', 'เต้าหู้'
-]
+const ROUND_INGREDIENTS_LIST: Record<number, string[]> = {
+  1: ['กระเทียม', 'กะเพรา', 'กุยช่าย', 'กุ้ง', 'ข้าวสวย', 'ถั่วงอก', 'น้ำตาล', 'น้ำปลา', 'พริกแดง', 'หมูสับ', 'เต้าหู้', 'เส้นจันท์', 'แตงกวา', 'ไข่ไก่'],
+  2: ['กระเทียม', 'กุ้ง', 'น้ำตาล', 'น้ำปลา', 'พริกแดง', 'หมูสับ', 'ไข่ไก่'],
+  3: ['กระเทียม', 'กุ้ง', 'ข้าวสวย', 'น้ำตาล', 'น้ำปลา', 'พริกแดง', 'แตงกวา', 'ไข่ไก่'],
+  4: ['กระเทียม', 'กุ้ง', 'น้ำตาล', 'น้ำปลา', 'พริกแดง', 'หมูสับ', 'ไข่ไก่'] // Fallback for Round 4
+}
+
+function getIngPath(name: string, round: number) {
+  const ext = name === 'ข้าวสวย' ? 'jpg' : 'png'
+  return `/Asset ด้าน/บริหารจัดการ/หมู่บ้านที่ 4/รอบที่ ${round}/วัตถุดิบ/${name}.${ext}`
+}
 
 // ─── Procedural Maze Generator ──────────────────────────────────────────────
 
@@ -321,10 +376,11 @@ function ManagementGameInner() {
   const [showCookingOrder, setShowCookingOrder] = useState(false)
   const [currentOrder, setCurrentOrder] = useState<string[]>([])
   const [collectedIngredients, setCollectedIngredients] = useState<string[]>([])
-  const [cookingItems, setCookingItems] = useState<string[]>([])
+  const [cookingItems, setCookingItems] = useState<{ name: string, image: string }[]>([])
   const [isExtraPhase, setIsExtraPhase] = useState(false)
   const [thoughtBubble, setThoughtBubble] = useState<string | null>(null)
-  const [shuffledRecipes, setShuffledRecipes] = useState<typeof COOKING_RECIPES>([...COOKING_RECIPES])
+  const [shuffledRecipes, setShuffledRecipes] = useState<CookingRecipe[]>([])
+  const [hintsUsed, setHintsUsed] = useState(0)
 
   // Maze State
   const [maze, setMaze] = useState<number[][]>([])
@@ -370,7 +426,12 @@ function ManagementGameInner() {
     }
 
     if (c.mode === 'cooking') {
-      const recipes = (levelParam === 4 || levelParam === 5) ? [...COOKING_RECIPES].sort(() => Math.random() - 0.5) : COOKING_RECIPES
+      let rounds = [1]
+      if (villageId === 4) rounds = [1, 3]
+      else if (villageId === 5) rounds = [2, 4]
+      else rounds = [1, 2, 3]
+
+      const recipes = COOKING_RECIPES.filter(r => rounds.includes(r.round)).sort(() => Math.random() - 0.5)
       setShuffledRecipes(recipes)
       setDishIndex(0)
       startNewCookingDish(0, recipes)
@@ -488,11 +549,19 @@ function ManagementGameInner() {
     setIsExtraPhase(false)
     setThoughtBubble(null)
     setFeedback(null)
+    setHintsUsed(0)
 
-    // Pool of all 15 ingredients
-    setCookingItems([...ALL_INGREDIENTS].sort(() => Math.random() - 0.5))
+    // Pool of ingredients for THIS round, filtered to be easier (dish ingredients + 3 distractors)
+    const roundIngs = ROUND_INGREDIENTS_LIST[recipe.round] || ROUND_INGREDIENTS_LIST[1]
+    const distractors = roundIngs.filter(ing => !recipe.ingredients.includes(ing)).sort(() => Math.random() - 0.5).slice(0, 3)
 
-    setTimeout(() => setShowCookingOrder(false), 5000)
+    const items = [...recipe.ingredients, ...distractors].map(name => ({
+      name,
+      image: getIngPath(name, recipe.round)
+    })).sort(() => Math.random() - 0.5)
+
+    setCookingItems(items)
+    setTimeout(() => setShowCookingOrder(false), 7000)
   }
 
   const handleCookIngredient = (ing: string) => {
@@ -726,7 +795,12 @@ function ManagementGameInner() {
     }
 
     if (c.mode === 'cooking') {
-      const recipes = levelParam === 5 ? [...COOKING_RECIPES].sort(() => Math.random() - 0.5) : COOKING_RECIPES
+      let rounds = [1]
+      if (villageId === 4) rounds = [1, 3]
+      else if (villageId === 5) rounds = [2, 4]
+      else rounds = [1, 2, 3]
+
+      const recipes = COOKING_RECIPES.filter(r => rounds.includes(r.round)).sort(() => Math.random() - 0.5)
       setShuffledRecipes(recipes)
       setDishIndex(0)
       startNewCookingDish(0, recipes)
@@ -750,8 +824,8 @@ function ManagementGameInner() {
   // ─── Render Components ──────────────────────────────────────────────────────
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 selection:bg-indigo-100 h-full w-full font-['Supermarket']">
-      <div className="w-full max-w-5xl bg-white rounded-[32px] md:rounded-[40px] shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-140px)] min-h-[550px] max-h-[850px] relative border border-slate-100">
+    <div className="flex flex-col items-center justify-center p-2 md:p-6 selection:bg-indigo-100 min-h-screen w-full font-['Supermarket'] bg-slate-100/50">
+      <div className="w-full max-w-7xl bg-white rounded-[32px] md:rounded-[48px] shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-40px)] md:h-[calc(100vh-80px)] min-h-[550px] relative border border-slate-100">
 
         {/* Header Bar */}
         <div className="h-16 md:h-20 bg-white border-b-2 border-slate-50 flex items-center justify-between px-4 md:px-10 shrink-0">
@@ -955,13 +1029,35 @@ function ManagementGameInner() {
                     </span>
 
                     {showCookingOrder && (
-                      <div className="flex flex-wrap justify-center gap-2 p-4 bg-white rounded-3xl shadow-2xl border-4 border-indigo-400 animate-in zoom-in max-w-lg">
+                      <div className="flex flex-wrap justify-center gap-2 p-4 bg-white rounded-3xl shadow-2xl border-4 border-indigo-400 animate-in zoom-in max-w-lg relative">
+                        <button
+                          onClick={() => setShowCookingOrder(false)}
+                          className="absolute -top-3 -right-3 w-8 h-8 bg-indigo-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-indigo-600 transition-colors z-10"
+                        >
+                          ✕
+                        </button>
                         {currentOrder.map((ing, i) => (
-                          <div key={i} className="px-3 py-1.5 bg-indigo-50 rounded-xl text-indigo-700 font-black text-sm md:text-lg border-2 border-indigo-100">
+                          <div key={i} className="px-4 py-2 bg-indigo-50 rounded-2xl text-indigo-700 font-black text-sm md:text-xl border-2 border-indigo-100 shadow-sm animate-in fade-in slide-in-from-bottom-2">
                             {ing}
                           </div>
                         ))}
                       </div>
+                    )}
+
+                    {!showCookingOrder && !isExtraPhase && hintsUsed < 2 && (
+                      <button
+                        onClick={() => {
+                          setShowCookingOrder(true);
+                          setHintsUsed(prev => prev + 1);
+                          setTimeout(() => setShowCookingOrder(false), 3000);
+                        }}
+                        className="mt-2 px-6 py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-600 rounded-full font-black text-sm md:text-base border-2 border-indigo-200 shadow-sm transition-all hover:scale-105 active:scale-95 flex flex-col items-center"
+                      >
+                        <div className="flex items-center gap-2">
+                          💡 ดูสูตรอีกครั้ง
+                        </div>
+                        <span className="text-[10px] opacity-70">เหลืออีก {2 - hintsUsed} ครั้ง (โชว์ 3 วิ)</span>
+                      </button>
                     )}
 
                     {thoughtBubble && (
@@ -976,15 +1072,18 @@ function ManagementGameInner() {
 
                   <div className="flex-1 flex flex-col items-center justify-center mt-24 md:mt-32">
                     <div className="relative mb-12 md:mb-16">
-                      <div className="w-64 h-24 md:w-96 md:h-32 bg-slate-200/50 rounded-full border-b-[12px] border-slate-300 flex items-center justify-center relative overflow-hidden shadow-inner">
-                        <div className="flex flex-wrap justify-center gap-2 p-4">
+                      <div className="w-72 h-32 md:w-[28rem] md:h-44 bg-slate-200/50 rounded-full border-b-[12px] border-slate-300 flex items-center justify-center relative overflow-hidden shadow-inner px-8">
+                        <div className="flex flex-wrap justify-center gap-3 p-4">
                           {collectedIngredients.map((ing, i) => (
-                            <div key={i} className="px-3 py-1.5 bg-white rounded-xl text-slate-800 font-black text-xs md:text-sm shadow-md animate-in bounce-in">
-                              {ing}
+                            <div key={i} className="w-12 h-12 md:w-20 md:h-20 bg-white/80 rounded-2xl shadow-sm flex items-center justify-center p-1.5 animate-in bounce-in overflow-hidden relative group border-2 border-white">
+                              <img src={getIngPath(ing, shuffledRecipes[dishIndex]?.round || 1)} className="w-[120%] h-[120%] max-w-none object-contain scale-125" alt={ing} />
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                <span className="text-[10px] text-white font-bold">{ing}</span>
+                              </div>
                             </div>
                           ))}
                           {collectedIngredients.length < currentOrder.length && !showCookingOrder && !isExtraPhase && (
-                            <div className="text-slate-400 font-black text-xl animate-pulse">?</div>
+                            <div className="text-slate-400 font-black text-4xl md:text-6xl animate-pulse">?</div>
                           )}
                         </div>
                       </div>
@@ -992,14 +1091,23 @@ function ManagementGameInner() {
                       <div className="absolute top-1/2 -right-16 md:-right-24 w-20 md:w-32 h-4 md:h-6 bg-slate-400 rounded-full -translate-y-1/2 shadow-md"></div>
                     </div>
 
-                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 max-w-3xl px-4">
-                      {cookingItems.map((ing, i) => (
+                    <div className="grid grid-cols-3 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 md:gap-4 max-w-4xl px-2 md:px-4">
+                      {cookingItems.map((item, i) => (
                         <button
                           key={i}
-                          onClick={() => handleCookIngredient(ing)}
-                          className="px-4 py-3 md:px-6 md:py-4 bg-white rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 active:translate-y-0 active:shadow-none transition-all border-b-4 border-slate-200 font-black text-slate-700 text-sm md:text-lg flex items-center justify-center"
+                          onClick={() => handleCookIngredient(item.name)}
+                          className="group flex flex-col items-center gap-1.5 md:gap-3 p-1.5 md:p-3 bg-white rounded-2xl md:rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 active:shadow-none transition-all border-b-[4px] md:border-b-[6px] border-slate-200"
                         >
-                          {ing}
+                          <div className="w-full aspect-square bg-slate-50 rounded-xl md:rounded-2xl flex items-center justify-center border-2 border-slate-100 overflow-hidden relative">
+                            <img
+                              src={item.image}
+                              className="w-full h-full object-contain scale-[1.35] md:scale-[1.5] group-hover:scale-[1.5] md:group-hover:scale-[1.65] transition-transform"
+                              alt={item.name}
+                            />
+                          </div>
+                          <div className="px-2 md:px-5 py-1 md:py-1.5 bg-indigo-50 rounded-full border-2 border-indigo-100 text-indigo-800 font-extrabold text-[10px] sm:text-xs md:text-lg shadow-sm w-full text-center leading-tight">
+                            {item.name}
+                          </div>
                         </button>
                       ))}
                     </div>
