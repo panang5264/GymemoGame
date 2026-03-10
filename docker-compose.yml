@@ -1,47 +1,52 @@
-version: '3.8'
-
 services:
   mongo:
-    image: mongo:6
-    container_name: gymemo-mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
+    image: mongo:6.0
     restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
     environment:
       MONGO_INITDB_DATABASE: gymemo
+    networks:
+      - gymemo_net
 
   backend:
-    build: 
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: gymemo-backend
+    # build:
+    #   context: .
+    #   dockerfile: backend/Dockerfile
+    image: pasitkku/gymemo-backend:v1
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      MONGODB_URI: mongodb://mongo:27017/gymemo
+      JWT_SECRET: 6c06c7c527490ad80653edeb673cfe8e
     ports:
       - "3001:3001"
-    environment:
-      - PORT=3001
-      - MONGODB_URI=mongodb://mongo:27017/gymemo
-      - JWT_SECRET=your_production_secret_key_here
-      - NODE_ENV=production
     depends_on:
       - mongo
-    restart: unless-stopped
+    networks:
+      - gymemo_net
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        - NEXT_PUBLIC_API_BASE_URL=http://localhost:3001
-    container_name: gymemo-frontend
+    # build:
+    # context: .
+    # dockerfile: frontend/Dockerfile
+    image: pasitkku/gymemo-frontend:v1
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: http://localhost:3001
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
     depends_on:
       - backend
-    restart: unless-stopped
+    networks:
+      - gymemo_net
 
 volumes:
-  mongo-data:
+  mongo_data:
+
+networks:
+  gymemo_net:
+    driver: bridge
