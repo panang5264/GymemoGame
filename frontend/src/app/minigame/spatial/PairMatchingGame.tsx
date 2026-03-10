@@ -29,6 +29,9 @@ export default function PairMatchingGame({ pairs, basePath, onComplete, onError 
 
         setLeftItems(shuffledLeft)
         setRightItems(shuffledRight)
+        setMatchedPairs({})
+        setSelectedLeft(null)
+        setSelectedRight(null)
     }, [pairs])
 
     const updateLines = () => {

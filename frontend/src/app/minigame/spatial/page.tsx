@@ -240,15 +240,15 @@ const MATCH_BASE = '/Asset ด้าน/มิติสัมพันธ์/mat
 const V1_MATCH_BANK = [
   { folder: '1', items: ['1.1', '1.1(1)'] },
   { folder: '2', items: ['1.2', '1.2(1)'] },
-  { folder: '3', items: ['ด่าน1-1', 'ด่าน1-2'] },
-  { folder: '4', items: ['ด่าน1-3', 'ด่าน1-3(1)'] },
+  { folder: '3', items: ['1-1', '1-2'] },
+  { folder: '4', items: ['1-3', '1-3(1)'] },
 ]
 
 const V2_MATCH_BANK = [
   { folder: '1', items: ['2.1', '2.2'] },
   { folder: '2', items: ['2.1', '2.2'] },
-  { folder: '3', items: ['ด่าน2-1', 'ด่าน2-2'] },
-  { folder: '4', items: ['ด่าน2-3', 'ด่าน2-3(1)'] },
+  { folder: '3', items: ['2.1', '2.2'] },
+  { folder: '4', items: ['2-3', '2-3(1)'] },
 ]
 
 function getBoxBank(level: number): BoxQuestion[] {
@@ -321,7 +321,7 @@ function SpatialGameInner() {
   const [errorCount, setErrorCount] = useState(0)
   const [startTime] = useState(Date.now())
   const [questionCount, setQuestionCount] = useState(0)
-  const MAX_QUESTIONS = levelParam <= 2 ? 2 : 3
+  const MAX_QUESTIONS = levelParam <= 2 ? 1 : 3
 
   const isComplete = isGameOver
 
@@ -362,8 +362,8 @@ function SpatialGameInner() {
       // Generate pairs (5 rows for V1, 6 rows for V2)
       const rows = isLevel1 ? 5 : 6
       const pairs = Array.from({ length: rows }, (_, i) => ({
-        target: `${selectedImageName}_row${i + 1}_left.png`,
-        correct: `${selectedImageName}_row${i + 1}_right.png`,
+        target: `${selectedImageName}/${i + 1}.png`,
+        correct: `${selectedImageName}/${i + 1}(M).png`,
       }))
 
       const basePath = `${MATCH_BASE}/${villageFolderName}/${v.folder}/cropped`
