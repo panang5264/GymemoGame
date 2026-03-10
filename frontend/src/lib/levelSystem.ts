@@ -222,9 +222,18 @@ export function getKeys(p: GymemoProgressV2, now?: number): { currentKeys: numbe
 }
 
 export function consumeKey(p: GymemoProgressV2): GymemoProgressV2 | false {
-  const { currentKeys } = getKeys(p)
+  const { currentKeys, updatedProgress } = getKeys(p)
   if (currentKeys <= 0) return false
-  const nextP = { ...p, keys: { ...p.keys, currentKeys: currentKeys - 1 } }
+  
+  const baseP = updatedProgress || p
+  const nextP = { ...baseP, keys: { ...baseP.keys } }
+  
+  if (currentKeys >= MAX_KEYS) {
+    // Start regenerating from THIS moment if we were full
+    nextP.keys.lastRegenAt = Date.now()
+  }
+  
+  nextP.keys.currentKeys = currentKeys - 1
   return nextP
 }
 
