@@ -7,6 +7,7 @@ import { getDateKey } from '@/lib/dailyChallenge'
 import { useLevelSystem } from '@/hooks/useLevelSystem'
 import { useProgress } from '@/contexts/ProgressContext'
 import MemoryRecallChallenge from '@/components/MemoryRecallChallenge'
+import Head from 'next/head'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -240,10 +241,100 @@ function generateMaze(rows: number, cols: number, hasKey: boolean, hasBombs: boo
 
 // ─── Asset Paths ─────────────────────────────────────────────────────────────
 const MG_BASE = '/Asset ด้าน/บริหารจัดการ'
+const BOXLV_BASE = `/Asset ด้าน/มิติสัมพันธ์/Box`
+
+// ─── BoxLv Asset Map ──────────────────────────────────────────────────────────
+// Each villageId maps to box-level images with 3 versions to randomly pick from
+// Structure: villageId → boxLv → version[]
+// version[] has 3 entries (index 0,1,2) for random no-repeat selection
+
+type BoxLvDef = {
+  versions: string[]   // 3 image URLs (Block images or representative image per version)
+  label: string
+}
+
+// Returns the folder prefix for a given village's boxlv assets (now mapping to Spatial Box lv)
+// Village mapped to Boxlv:
+// Village 3 -> Boxlv3
+// Village 4 -> Boxlv4
+function getBoxlvFolder(villageId: number): string {
+  const folderMap: Record<number, string> = {
+    3: `${BOXLV_BASE}/Boxlv3`,
+    4: `${BOXLV_BASE}/Boxlv4`,
+    5: `${BOXLV_BASE}/Boxlv5`,
+    6: `${BOXLV_BASE}/Boxlv6`,
+    7: `${BOXLV_BASE}/Boxlv7`,
+    8: `${BOXLV_BASE}/Boxlv8`,
+    9: `${BOXLV_BASE}/Boxlv9`,
+    10: `${BOXLV_BASE}/Boxlv10`,
+  }
+  return folderMap[villageId] || ''
+}
+
+// Get BoxLv block images (BoxLv 1 = the main box image for category display)
+// Returns 3 version image URLs for this village's sorting box
+function getBoxLv1Versions(villageId: number): string[] {
+  const base = getBoxlvFolder(villageId)
+  if (!base) return []
+  const vMap: Record<number, string[]> = {
+    3: [
+      `${base}/โจทบล็อก 1.1.png`,
+      `${base}/โจทบล็อก 1.2.png`,
+      `${base}/โจทบล็อก 1.1.png`, // Only 2 versions available, so repeat one
+    ],
+    4: [
+      `${base}/โจทบล็อก2.1.png`,
+      `${base}/โจทบล็อก2.2.png`,
+      `${base}/Block2.3.png`,
+    ],
+    5: [
+      `${base}/Block 3.1.png`,
+      `${base}/Block 3.2.png`,
+      `${base}/Block 3.1.png`, // Only 2 versions available
+    ],
+    6: [
+      `${base}/2/2.2/โจทย์.png`,
+      `${base}/3/3.1/โจทย์.png`,
+      `${base}/4/4.1/โจทย์.png`,
+    ],
+    7: [
+      `${base}/Block5.1.png`,
+      `${base}/Block5.2.png`,
+      `${base}/Block5.3.png`,
+    ],
+    8: [
+      `${base}/Block 6.1.png`,
+      `${base}/Block 6.2.png`,
+      `${base}/Block6.3.jpeg`,
+    ],
+    9: [
+      `${base}/Block7.1.png`,
+      `${base}/Block 7.2.png`,
+      `${base}/Block 7.3.png`,
+    ],
+    10: [
+      `${base}/Block 8.1.png`,
+      `${base}/Block 8.2.png`,
+      `${base}/Block 8.1.png`, // Only 2 versions available
+    ],
+  }
+  return vMap[villageId] || []
+}
+
+// ─── Version Picker ───────────────────────────────────────────────────────────
+// Picks a version index (0-2) that hasn't been used yet in this session
+// usedSet is a Set of previously used version indices for this boxLv
+function pickFreshVersion(usedSet: Set<number>): number {
+  const available = [0, 1, 2].filter(v => !usedSet.has(v))
+  if (available.length === 0) {
+    // All used - reset and pick any
+    return Math.floor(Math.random() * 3)
+  }
+  return available[Math.floor(Math.random() * available.length)]
+}
 
 // V1 Images were poorly cropped, replaced with V2 assets for clearer gameplay
 
-// Village 1 assets – Red & Round
 // Village 1 assets – Red & Round
 const V1_RED = [
   { id: 'r1', label: 'รถดับเพลิง', emoji: '🚒', tags: ['red'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่1/หมวดสีแดง/รถดับเพลิง.jpg` },
@@ -288,18 +379,27 @@ const DISTRACTORS = [
   { id: 'd10', label: 'แว่นตา', emoji: '👓', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/แว่นตา.png` },
 ]
 
-function getLevelConfig(level: number) {
+function getLevelConfig(
+  level: number,
+  villageId: number = 1,
+  usedBoxVersions: Set<number> = new Set()
+) {
   let mode: GameMode = 'sorting'
   let items: Item[] = []
   let categories: Category[] = []
   let instruction = 'ทำภารกิจให้สำเร็จตามที่กำหนด'
 
+  // Pick a fresh BoxLv version image for this round
+  const boxVersions = getBoxLv1Versions(villageId)
+  const pickedVersionIdx = boxVersions.length > 0 ? pickFreshVersion(usedBoxVersions) : -1
+  const boxImg = pickedVersionIdx >= 0 ? boxVersions[pickedVersionIdx] : ''
+
   switch (level) {
     case 1:
       instruction = 'แยกวัตถุสีแดง และ วัตถุรูปทรงกลม (15 ชิ้น)'
       categories = [
-        { id: 'red', title: 'วัตถุสีแดง 🔴', emoji: '📦', accepts: i => i.tags.includes('red') },
-        { id: 'round', title: 'วัตถุทรงกลม ⚪', emoji: '📦', accepts: i => i.tags.includes('round') },
+        { id: 'red', title: 'วัตถุสีแดง 🔴', emoji: '📦', imageUrl: boxImg || undefined, accepts: i => i.tags.includes('red') },
+        { id: 'round', title: 'วัตถุทรงกลม ⚪', emoji: '📦', imageUrl: boxImg || undefined, accepts: i => i.tags.includes('round') },
       ]
       items = [...V1_RED, ...V1_ROUND, ...DISTRACTORS.slice(0, 5)]
       break
@@ -307,19 +407,17 @@ function getLevelConfig(level: number) {
     case 2:
       instruction = 'แยกสัตว์ 4 ขา และ อุปกรณ์สำหรับขัด/แปรง (15 ชิ้น)'
       categories = [
-        { id: 'animal4', title: 'สัตว์ 4 ขา 🐾', emoji: '🕳️', accepts: i => i.tags.includes('animal4') },
-        { id: 'scrubber', title: 'อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', accepts: i => i.tags.includes('scrubber') },
+        { id: 'animal4', title: 'สัตว์ 4 ขา 🐾', emoji: '🕳️', imageUrl: boxImg || undefined, accepts: i => i.tags.includes('animal4') },
+        { id: 'scrubber', title: 'อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', imageUrl: boxImg || undefined, accepts: i => i.tags.includes('scrubber') },
       ]
       items = [...V2_ANIMALS, ...V2_SCRUBBERS, ...DISTRACTORS.slice(0, 5)]
       break
 
     case 3:
       instruction = 'แยก 4 หมวดหมู่! ภาชนะจะสลับทุก 2 ครั้ง (30 ชิ้น)'
-      // Prompt Requirement: Hole 1: 4-legged animals, Hole 2: Cleaning tools, Box 1: Red... Box 2: Round...
-      // Start with the "Holes" set
       categories = [
-        { id: 'animal4', title: 'หลุม 1: สัตว์ 4 ขา 🐾', emoji: '🕳️', accepts: i => i.tags.includes('animal4') },
-        { id: 'scrubber', title: 'หลุม 2: อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', accepts: i => i.tags.includes('scrubber') },
+        { id: 'animal4', title: 'หลุม 1: สัตว์ 4 ขา 🐾', emoji: '🕳️', imageUrl: boxImg || undefined, accepts: i => i.tags.includes('animal4') },
+        { id: 'scrubber', title: 'หลุม 2: อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', imageUrl: boxImg || undefined, accepts: i => i.tags.includes('scrubber') },
       ]
       items = [...V2_ANIMALS, ...V2_SCRUBBERS, ...V1_RED, ...V1_ROUND, ...DISTRACTORS.slice(0, 10)]
       break
@@ -352,7 +450,13 @@ function getLevelConfig(level: number) {
       break
   }
 
-  return { mode, items: items.sort(() => Math.random() - 0.5), categories, instruction }
+  return {
+    mode,
+    items: items.sort(() => Math.random() - 0.5),
+    categories,
+    instruction,
+    pickedBoxVersionIdx: pickedVersionIdx,
+  }
 }
 
 // ─── Main Component ──────────────────────────────────────────────────────────
@@ -380,8 +484,15 @@ function ManagementGameInner() {
   const { progress, saveProgress } = useProgress()
   const { recordPlay } = useLevelSystem()
 
+  // BoxLv Version Tracking (no-repeat per session)
+  const usedBoxVersionsRef = useRef<Set<number>>(new Set())
+
   // Sorting State
-  const [config, setConfig] = useState(() => getLevelConfig(levelParam))
+  const [config, setConfig] = useState(() => {
+    const cfg = getLevelConfig(levelParam, villageId, usedBoxVersionsRef.current)
+    if (cfg.pickedBoxVersionIdx >= 0) usedBoxVersionsRef.current.add(cfg.pickedBoxVersionIdx)
+    return cfg
+  })
   const [spawnQueue, setSpawnQueue] = useState<Item[]>([])
   const [activePool, setActivePool] = useState<Item[]>([])
   const [correctCount, setCorrectCount] = useState(0)
@@ -427,7 +538,9 @@ function ManagementGameInner() {
   // Initialization
   useEffect(() => {
     hasSavedRef.current = false
-    const c = getLevelConfig(levelParam)
+    usedBoxVersionsRef.current = new Set() // Reset versions on level change
+    const c = getLevelConfig(levelParam, villageId, usedBoxVersionsRef.current)
+    if (c.pickedBoxVersionIdx >= 0) usedBoxVersionsRef.current.add(c.pickedBoxVersionIdx)
     setConfig(c)
     setSpawnQueue(c.items)
 
@@ -795,8 +908,9 @@ function ManagementGameInner() {
     setPhase('intro')
     hasSavedRef.current = false
 
-    // reset config
-    const c = getLevelConfig(levelParam)
+    // reset config — pick next unused box version
+    const c = getLevelConfig(levelParam, villageId, usedBoxVersionsRef.current)
+    if (c.pickedBoxVersionIdx >= 0) usedBoxVersionsRef.current.add(c.pickedBoxVersionIdx)
     setConfig(c)
     setSpawnQueue(c.items)
     setActivePool([])
@@ -844,347 +958,356 @@ function ManagementGameInner() {
   // ─── Render Components ──────────────────────────────────────────────────────
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 selection:bg-indigo-100 h-full w-full font-['Supermarket']">
-      <div className="w-full max-w-5xl bg-white rounded-[32px] md:rounded-[40px] shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-140px)] min-h-[550px] max-h-[850px] relative border border-slate-100">
+    <>
 
-        {/* Header Bar */}
-        <div className="h-16 md:h-20 bg-white border-b-2 border-slate-50 flex items-center justify-between px-4 md:px-10 shrink-0">
-          <div className="flex items-center gap-2 md:gap-4">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-50 rounded-lg md:rounded-2xl flex items-center justify-center text-xl md:text-3xl relative">
-              {levelParam <= 3 ? '📦' : levelParam <= 5 ? '🍳' : levelParam <= 9 ? '🧭' : '📝'}
-              {isBonus && (
-                <div className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-[8px] md:text-[10px] font-black px-1.5 py-0.5 rounded-full border border-yellow-500 shadow-sm animate-pulse">
-                  x2
-                </div>
-              )}
-            </div>
-            <h1 className="text-sm md:text-2xl font-black text-slate-800 tracking-tight leading-tight max-w-[150px] md:max-w-none">
-              {config.instruction}
-            </h1>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col items-end">
-              <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Score</span>
-              <span className="text-2xl md:text-4xl font-black text-indigo-600 tabular-nums">{score}</span>
-            </div>
-          </div>
-        </div>
+      <div className="flex flex-col items-center justify-center p-4 selection:bg-indigo-100 h-full w-full" style={{ fontFamily: "'Sarabun', 'Supermarket', sans-serif" }}>
+        <div className="w-full max-w-5xl bg-white rounded-[32px] md:rounded-[40px] shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-140px)] min-h-[550px] max-h-[850px] relative border border-slate-100">
 
-        {/* Content Area */}
-        <div className="flex-1 relative overflow-hidden bg-slate-50/50">
-
-          {feedback && (
-            <div className={`absolute top-10 left-1/2 -translate-x-1/2 z-[100] px-10 py-3 rounded-full font-black text-xl shadow-2xl transition-all border-4 ${feedback.type === 'correct' ? 'bg-green-500 text-white border-green-300' : 'bg-red-500 text-white border-red-300 animate-shake'
-              }`}>
-              {feedback.message}
-            </div>
-          )}
-
-          {phase === 'intro' && (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-sm p-4 md:p-10">
-              <div className="max-w-md w-full bg-white rounded-3xl md:rounded-[40px] p-8 md:p-10 shadow-2xl border border-slate-100 text-center animate-in zoom-in">
-                <div className="text-7xl md:text-9xl mb-6 md:mb-8 animate-bounce">
-                  {levelParam <= 3 ? '📦' : levelParam <= 5 ? '🍳' : levelParam <= 9 ? '🧭' : '📝'}
-                </div>
-                {modeParam === 'daily' ? (
-                  <>
-                    <h3 className="text-2xl md:text-3xl font-black text-orange-500 mb-2 uppercase tracking-tighter">🌟 ภารกิจรายวัน</h3>
-                    <p className="text-slate-600 font-bold mb-8 md:mb-10 text-sm md:text-lg bg-orange-50 py-2 border-2 border-orange-200 rounded-full">ด่านที่ 1/3: โหมดการจัดการ</p>
-                  </>
-                ) : (
-                  <>
-                    <h3 className="text-xl md:text-2xl font-black text-slate-800 mb-2 md:mb-4 uppercase tracking-tighter">Level {levelParam}</h3>
-                    <p className="text-slate-500 font-bold mb-8 md:mb-12 text-sm md:text-lg">{config.instruction}</p>
-                  </>
+          {/* Header Bar */}
+          <div className="h-16 md:h-20 bg-white border-b-2 border-slate-50 flex items-center justify-between px-4 md:px-10 shrink-0">
+            <div className="flex items-center gap-2 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-50 rounded-lg md:rounded-2xl flex items-center justify-center text-xl md:text-3xl relative">
+                {levelParam <= 3 ? '📦' : levelParam <= 5 ? '🍳' : levelParam <= 9 ? '🧭' : '📝'}
+                {isBonus && (
+                  <div className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-[8px] md:text-[10px] font-black px-1.5 py-0.5 rounded-full border border-yellow-500 shadow-sm animate-pulse">
+                    x2
+                  </div>
                 )}
-                <button
-                  onClick={() => setPhase('play')}
-                  className={`w-full py-5 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95 ${modeParam === 'daily' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-slate-800'}`}
-                >
-                  {modeParam === 'daily' ? 'เริ่มภารกิจ! 🚀' : 'เริ่มเล่น 🚀'}
-                </button>
+              </div>
+              <h1 className="text-sm md:text-2xl font-black text-slate-800 tracking-tight leading-tight max-w-[150px] md:max-w-none">
+                {config.instruction}
+              </h1>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex flex-col items-end">
+                <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Score</span>
+                <span className="text-2xl md:text-4xl font-black text-indigo-600 tabular-nums">{score}</span>
               </div>
             </div>
-          )}
+          </div>
 
-          {phase === 'done' && (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-md p-4 md:p-6">
-              <div className="max-w-[400px] w-full bg-white rounded-3xl md:rounded-[48px] p-8 md:p-12 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] border border-white text-center animate-in zoom-in">
-                <div className="relative mb-4 flex justify-center">
-                  <div className="absolute inset-0 bg-yellow-400 blur-3xl opacity-20 animate-pulse" />
-                  <div className="text-6xl md:text-8xl relative drop-shadow-2xl">🎯</div>
-                </div>
-                <h3 className="text-2xl md:text-4xl font-black text-slate-800 tracking-tight">
-                  คะแนนรอบนี้: {score}
-                </h3>
-                {playedRounds > 1 && (
-                  <p className="text-xl md:text-3xl font-black text-indigo-600 mb-2 mt-4">
-                    คะแนนเฉลี่ย ({playedRounds} รอบ): {Math.round((accumulatedScore + score) / playedRounds)}
-                  </p>
-                )}
-                <p className="text-slate-400 font-bold mt-4 mb-8 uppercase tracking-[0.2em] text-[10px]">เลเวล {levelParam}</p>
-                <div className="flex flex-col gap-3">
-                  {playedRounds < 3 && (
-                    <button
-                      onClick={handleReplay}
-                      className="w-full py-4 bg-sky-100 hover:bg-sky-200 text-sky-700 rounded-[24px] font-black text-xl shadow-md transition-all active:scale-95 border-2 border-sky-300"
-                    >
-                      เล่นซ้ำ (รอบที่ {playedRounds}/3) 🔄
-                    </button>
-                  )}
-                  {modeParam === 'village' ? (
+          {/* Content Area */}
+          <div className="flex-1 relative overflow-hidden bg-slate-50/50">
+
+            {feedback && (
+              <div className={`absolute top-10 left-1/2 -translate-x-1/2 z-[100] px-10 py-3 rounded-full font-black text-xl shadow-2xl transition-all border-4 ${feedback.type === 'correct' ? 'bg-green-500 text-white border-green-300' : 'bg-red-500 text-white border-red-300 animate-shake'
+                }`}>
+                {feedback.message}
+              </div>
+            )}
+
+            {phase === 'intro' && (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-sm p-4 md:p-10">
+                <div className="max-w-md w-full bg-white rounded-3xl md:rounded-[40px] p-8 md:p-10 shadow-2xl border border-slate-100 text-center animate-in zoom-in">
+                  <div className="text-7xl md:text-9xl mb-6 md:mb-8 animate-bounce">
+                    {levelParam <= 3 ? '📦' : levelParam <= 5 ? '🍳' : levelParam <= 9 ? '🧭' : '📝'}
+                  </div>
+                  {modeParam === 'daily' ? (
                     <>
-                      {subId < 12 ? (
-                        <button
-                          onClick={() => handleNext(`/world/${villageId}/sublevel/${subId + 1}`)}
-                          className="w-full py-5 bg-green-500 hover:bg-green-600 text-white rounded-[24px] font-black text-2xl shadow-xl transition-all active:scale-95"
-                        >
-                          ด่านต่อไป 🚀
-                        </button>
-                      ) : villageId < 10 ? (
-                        <button
-                          onClick={() => handleNext(`/world/${villageId + 1}`)}
-                          className="w-full py-5 bg-orange-500 hover:bg-orange-600 text-white rounded-[24px] font-black text-2xl shadow-xl transition-all active:scale-95"
-                        >
-                          หมู่บ้านต่อไป 🏘️
-                        </button>
-                      ) : null}
-                      <button
-                        onClick={() => handleNext(`/world/${villageId}?showSummary=1`)}
-                        className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-[24px] font-black text-lg transition-all"
-                      >
-                        กลับสู่แผนที่ 🗺️
-                      </button>
+                      <h3 className="text-2xl md:text-3xl font-black text-orange-500 mb-2 uppercase tracking-tighter">🌟 ภารกิจรายวัน</h3>
+                      <p className="text-slate-600 font-bold mb-8 md:mb-10 text-sm md:text-lg bg-orange-50 py-2 border-2 border-orange-200 rounded-full">ด่านที่ 1/3: โหมดการจัดการ</p>
                     </>
                   ) : (
-                    <button
-                      onClick={() => handleNext(modeParam === 'daily' ? '/daily-challenge' : '/world')}
-                      className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[24px] font-black text-2xl shadow-[0_12px_24px_-6px_rgba(79,70,229,0.4)] transition-all hover:-translate-y-1 active:scale-95 active:translate-y-0"
-                    >
-                      ตกลง ✨
-                    </button>
+                    <>
+                      <h3 className="text-xl md:text-2xl font-black text-slate-800 mb-2 md:mb-4 uppercase tracking-tighter">Level {levelParam}</h3>
+                      <p className="text-slate-500 font-bold mb-8 md:mb-12 text-sm md:text-lg">{config.instruction}</p>
+                    </>
                   )}
+                  <button
+                    onClick={() => setPhase('play')}
+                    className={`w-full py-5 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95 ${modeParam === 'daily' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-slate-800'}`}
+                  >
+                    {modeParam === 'daily' ? 'เริ่มภารกิจ! 🚀' : 'เริ่มเล่น 🚀'}
+                  </button>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {phase === 'play' && (
-            <div className="w-full h-full">
-              {config.mode === 'sorting' && (
-                <div className="w-full h-full flex flex-col items-center">
-                  <div className="flex-1 w-full relative">
-                    {activePool.map(item => (
-                      <div
-                        key={item.id}
-                        onClick={() => setSelectedSortItemId(prev => prev === item.id ? null : item.id)}
-                        className={`absolute w-28 h-28 md:w-40 md:h-40 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing z-10 select-none animate-in fade-in zoom-in transition-all duration-300 ${selectedSortItemId === item.id ? 'scale-110 -translate-y-4 filter drop-shadow-[0_0_20px_rgba(79,70,229,0.5)]' : ''}`}
-                        style={{ left: `${item.x}%`, top: `${item.y}%`, transform: 'translate(-50%, -50%)' }}
-                      >
-                        <div className={`transition-all duration-300 transform ${selectedSortItemId === item.id ? 'scale-110' : 'group-hover:-translate-y-2'}`}>
-                          {item.imageUrl ? (
-                            <div className={`w-24 h-24 md:w-36 md:h-36 bg-white rounded-2xl shadow-xl flex items-center justify-center border-4 overflow-hidden pointer-events-none transition-colors ${selectedSortItemId === item.id ? 'border-indigo-500' : 'border-indigo-100'}`}>
-                              <img
-                                src={item.imageUrl}
-                                className="w-[85%] h-[85%] object-cover mix-blend-multiply"
-                                style={{ filter: 'contrast(1.1) brightness(1.05) saturate(1.1)', imageRendering: 'crisp-edges' }}
-                                alt={item.label}
-                              />
-                            </div>
-                          ) : (
-                            <div className="w-24 h-24 md:w-36 md:h-36 bg-white rounded-2xl shadow-xl flex items-center justify-center border-4 border-indigo-100 pointer-events-none">
-                              <span className="text-6xl md:text-8xl drop-shadow-lg">{item.emoji}</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="mt-2 bg-white px-3 py-1 md:px-5 md:py-2 rounded-full shadow-md text-sm md:text-xl font-black text-indigo-900 border-2 border-slate-100 tracking-wide text-center">
-                          {item.label}
-                        </div>
-                        <div className="absolute -bottom-4 left-4 right-4 h-2.5 bg-slate-200 rounded-full overflow-hidden border-2 border-white shadow-sm">
-                          <div className="h-full bg-pink-500 transition-all linear" style={{ width: `${Math.max(0, 100 - ((Date.now() - (item.createdAt || 0)) / ITEM_LIFETIME * 100))}%` }} />
-                        </div>
-                      </div>
-                    ))}
+            {phase === 'done' && (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-md p-4 md:p-6">
+                <div className="max-w-[400px] w-full bg-white rounded-3xl md:rounded-[48px] p-8 md:p-12 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] border border-white text-center animate-in zoom-in">
+                  <div className="relative mb-4 flex justify-center">
+                    <div className="absolute inset-0 bg-yellow-400 blur-3xl opacity-20 animate-pulse" />
+                    <div className="text-6xl md:text-8xl relative drop-shadow-2xl">🎯</div>
                   </div>
-                  <div className="h-44 w-full flex justify-center gap-12 md:gap-24 px-10 pb-8">
-                    {config.categories.map(cat => (
-                      <div
-                        key={cat.id}
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={(e) => {
-                          handleSortItem(e.dataTransfer.getData('itemId'), cat.id);
-                          setSelectedSortItemId(null);
-                        }}
-                        onClick={() => {
-                          if (selectedSortItemId) {
-                            handleSortItem(selectedSortItemId, cat.id);
-                            setSelectedSortItemId(null);
-                          }
-                        }}
-                        className={`flex flex-col items-center group cursor-pointer transition-all ${selectedSortItemId ? 'animate-bounce-gentle' : ''}`}
-                      >
-                        <div className={`w-28 h-16 md:w-40 md:h-28 bg-white rounded-[20px] md:rounded-[28px] border-4 border-dashed shadow-2xl flex items-center justify-center transition-all relative overflow-hidden ${selectedSortItemId ? 'border-indigo-400 bg-indigo-50/30' : 'border-slate-300 group-hover:border-blue-400'}`}>
-                          {cat.imageUrl ? (
-                            <img src={cat.imageUrl} className="w-full h-full object-cover" alt={cat.title} />
-                          ) : (
-                            <span className="text-5xl md:text-7xl drop-shadow-xl transition-transform duration-500 group-hover:scale-110">
-                              {cat.emoji || '📦'}
-                            </span>
-                          )}
-                        </div>
-                        <div className="mt-2 bg-white px-6 py-2 rounded-2xl shadow-xl border-b-4 border-slate-200 text-sm md:text-base font-black text-slate-800 uppercase tracking-tighter">
-                          {cat.title}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {config.mode === 'cooking' && (
-                <div className="w-full h-full flex flex-col items-center justify-center p-4 md:p-10">
-                  <div className="absolute top-2 md:top-6 left-1/2 -translate-x-1/2 flex flex-col items-center z-20 w-fit">
-                    <span className="bg-amber-500 text-white px-4 md:px-6 py-1 md:py-2 rounded-full font-black text-xs md:text-xl mb-2 md:mb-4 shadow-lg border-2 border-amber-300 whitespace-nowrap">
-                      เมนู: {shuffledRecipes[dishIndex]?.name}
-                    </span>
-                    {!showCookingOrder && !isExtraPhase && phase === 'play' && (
+                  <h3 className="text-2xl md:text-4xl font-black text-slate-800 tracking-tight">
+                    คะแนนรอบนี้: {score}
+                  </h3>
+                  {playedRounds > 1 && (
+                    <p className="text-xl md:text-3xl font-black text-indigo-600 mb-2 mt-4">
+                      คะแนนเฉลี่ย ({playedRounds} รอบ): {Math.round((accumulatedScore + score) / playedRounds)}
+                    </p>
+                  )}
+                  <p className="text-slate-400 font-bold mt-4 mb-8 uppercase tracking-[0.2em] text-[10px]">เลเวล {levelParam}</p>
+                  <div className="flex flex-col gap-3">
+                    {playedRounds < 3 && (
                       <button
-                        onClick={() => {
-                          setShowHint(true);
-                          setTimeout(() => setShowHint(false), 2000);
-                        }}
-                        disabled={showHint}
-                        className={`mb-2 md:mb-4 px-4 md:px-6 py-1 md:py-2 rounded-full text-[10px] md:text-sm font-black transition-all shadow-md active:scale-95 border-2 ${showHint ? 'bg-indigo-100 text-indigo-400 border-indigo-200' : 'bg-white text-indigo-600 border-indigo-300 hover:bg-indigo-50 animate-bounce-gentle'}`}
+                        onClick={handleReplay}
+                        className="w-full py-4 bg-sky-100 hover:bg-sky-200 text-sky-700 rounded-[24px] font-black text-xl shadow-md transition-all active:scale-95 border-2 border-sky-300"
                       >
-                        {showHint ? '📖 กำลังแสดงสรุปสูตร...' : '💡 ดูสูตรอีกครั้ง'}
+                        เล่นซ้ำ (รอบที่ {playedRounds}/3) 🔄
                       </button>
                     )}
-
-                    {(showCookingOrder || showHint) && (
-                      <div className="flex flex-wrap justify-center gap-1.5 md:gap-2 p-2.5 md:p-4 bg-white rounded-2xl md:rounded-3xl shadow-2xl border-2 md:border-4 border-indigo-400 animate-in zoom-in max-w-[280px] md:max-w-lg">
-                        {currentOrder.map((ing, i) => (
-                          <div key={i} className="px-2.5 md:px-4 py-1 md:py-2 bg-indigo-50 rounded-xl md:rounded-2xl text-indigo-700 font-black text-xs md:text-xl border-2 border-indigo-100 shadow-sm animate-in fade-in slide-in-from-bottom-2">
-                            {ing}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {thoughtBubble && (
-                      <div className="relative p-4 md:p-6 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border-2 md:border-4 border-rose-400 animate-in slide-in-from-top duration-500 max-w-[280px] md:max-w-md">
-                        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-5 h-5 bg-white border-l-2 md:border-l-4 border-t-2 md:border-t-4 border-rose-400 rotate-45"></div>
-                        <p className="text-rose-600 font-black text-sm md:text-2xl text-center">
-                          💭 "{thoughtBubble}"
-                        </p>
-                      </div>
+                    {modeParam === 'village' ? (
+                      <>
+                        {subId < 12 ? (
+                          <button
+                            onClick={() => handleNext(`/world/${villageId}/sublevel/${subId + 1}`)}
+                            className="w-full py-5 bg-green-500 hover:bg-green-600 text-white rounded-[24px] font-black text-2xl shadow-xl transition-all active:scale-95"
+                          >
+                            ด่านต่อไป 🚀
+                          </button>
+                        ) : villageId < 10 ? (
+                          <button
+                            onClick={() => handleNext(`/world/${villageId + 1}`)}
+                            className="w-full py-5 bg-orange-500 hover:bg-orange-600 text-white rounded-[24px] font-black text-2xl shadow-xl transition-all active:scale-95"
+                          >
+                            หมู่บ้านต่อไป 🏘️
+                          </button>
+                        ) : null}
+                        <button
+                          onClick={() => handleNext(`/world/${villageId}?showSummary=1`)}
+                          className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-[24px] font-black text-lg transition-all"
+                        >
+                          กลับสู่แผนที่ 🗺️
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => handleNext(modeParam === 'daily' ? '/daily-challenge' : '/world')}
+                        className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[24px] font-black text-2xl shadow-[0_12px_24px_-6px_rgba(79,70,229,0.4)] transition-all hover:-translate-y-1 active:scale-95 active:translate-y-0"
+                      >
+                        ตกลง ✨
+                      </button>
                     )}
                   </div>
+                </div>
+              </div>
+            )}
 
-                  <div className="flex-1 flex flex-col items-center justify-center mt-12 md:mt-32">
-                    <div className="relative mb-6 md:mb-16">
-                      <div className="w-64 h-24 md:w-[600px] md:h-48 bg-slate-200/50 rounded-full border-b-[8px] md:border-b-[12px] border-slate-300 flex items-center justify-center relative overflow-hidden shadow-inner">
-                        <div className="flex flex-wrap justify-center gap-2 md:gap-3 p-3 md:p-6">
-                          {collectedIngredients.map((ing, i) => (
-                            <div key={i} className="w-10 h-10 md:w-20 md:h-20 bg-white rounded-lg md:rounded-xl shadow-sm flex items-center justify-center p-1 animate-in bounce-in overflow-hidden relative group border-2 border-slate-100">
-                              <img src={getIngPath(ing, shuffledRecipes[dishIndex]?.round || 1)} className="w-full h-full object-contain" alt={ing} />
-                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                <span className="text-[8px] md:text-xs text-white font-bold">{ing}</span>
+            {phase === 'play' && (
+              <div className="w-full h-full">
+                {config.mode === 'sorting' && (
+                  <div className="w-full h-full flex flex-col items-center">
+                    <div className="flex-1 w-full relative">
+                      {activePool.map(item => (
+                        <div
+                          key={item.id}
+                          onClick={() => setSelectedSortItemId(prev => prev === item.id ? null : item.id)}
+                          className={`absolute w-28 h-28 md:w-40 md:h-40 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing z-10 select-none animate-in fade-in zoom-in transition-all duration-300 ${selectedSortItemId === item.id ? 'scale-110 -translate-y-4 filter drop-shadow-[0_0_20px_rgba(79,70,229,0.5)]' : ''}`}
+                          style={{ left: `${item.x}%`, top: `${item.y}%`, transform: 'translate(-50%, -50%)' }}
+                        >
+                          <div className={`transition-all duration-300 transform ${selectedSortItemId === item.id ? 'scale-110' : 'group-hover:-translate-y-2'}`}>
+                            {item.imageUrl ? (
+                              <div className={`w-24 h-24 md:w-36 md:h-36 bg-white rounded-2xl shadow-xl flex items-center justify-center border-4 overflow-hidden pointer-events-none transition-colors ${selectedSortItemId === item.id ? 'border-indigo-500' : 'border-indigo-100'}`}>
+                                <img
+                                  src={item.imageUrl}
+                                  className="w-[85%] h-[85%] object-cover mix-blend-multiply"
+                                  style={{ filter: 'contrast(1.1) brightness(1.05) saturate(1.1)', imageRendering: 'crisp-edges' }}
+                                  alt={item.label}
+                                />
                               </div>
+                            ) : (
+                              <div className="w-24 h-24 md:w-36 md:h-36 bg-white rounded-2xl shadow-xl flex items-center justify-center border-4 border-indigo-100 pointer-events-none">
+                                <span className="text-6xl md:text-8xl drop-shadow-lg">{item.emoji}</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="mt-2 bg-white px-3 py-1 md:px-5 md:py-2 rounded-full shadow-md text-sm md:text-xl font-black text-indigo-900 border-2 border-slate-100 tracking-wide text-center">
+                            {item.label}
+                          </div>
+                          <div className="absolute -bottom-4 left-4 right-4 h-2.5 bg-slate-200 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                            <div className="h-full bg-pink-500 transition-all linear" style={{ width: `${Math.max(0, 100 - ((Date.now() - (item.createdAt || 0)) / ITEM_LIFETIME * 100))}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="h-44 w-full flex justify-center gap-12 md:gap-24 px-10 pb-8">
+                      {config.categories.map(cat => (
+                        <div
+                          key={cat.id}
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={(e) => {
+                            handleSortItem(e.dataTransfer.getData('itemId'), cat.id);
+                            setSelectedSortItemId(null);
+                          }}
+                          onClick={() => {
+                            if (selectedSortItemId) {
+                              handleSortItem(selectedSortItemId, cat.id);
+                              setSelectedSortItemId(null);
+                            }
+                          }}
+                          className={`flex flex-col items-center group cursor-pointer transition-all ${selectedSortItemId ? 'animate-bounce-gentle' : ''}`}
+                        >
+                          <div className={`w-28 h-16 md:w-40 md:h-28 bg-white rounded-[20px] md:rounded-[28px] border-4 border-dashed shadow-2xl flex items-center justify-center transition-all relative overflow-hidden ${selectedSortItemId ? 'border-indigo-400 bg-indigo-50/30' : 'border-slate-300 group-hover:border-blue-400'}`}>
+                            {cat.imageUrl ? (
+                              <img src={cat.imageUrl} className="w-full h-full object-cover" alt={cat.title} />
+                            ) : (
+                              <span className="text-5xl md:text-7xl drop-shadow-xl transition-transform duration-500 group-hover:scale-110">
+                                {cat.emoji || '📦'}
+                              </span>
+                            )}
+                          </div>
+                          <div className="mt-2 bg-white px-6 py-2 rounded-2xl shadow-xl border-b-4 border-slate-200 text-sm md:text-base font-black text-slate-800 uppercase tracking-tighter">
+                            {cat.title}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {config.mode === 'cooking' && (
+                  <div className="w-full h-full flex flex-col items-center justify-center p-4 md:p-10">
+                    <div className="absolute top-2 md:top-6 left-1/2 -translate-x-1/2 flex flex-col items-center z-20 w-fit">
+                      <span className="bg-amber-500 text-white px-4 md:px-6 py-1 md:py-2 rounded-full font-black text-xs md:text-xl mb-2 md:mb-4 shadow-lg border-2 border-amber-300 whitespace-nowrap">
+                        เมนู: {shuffledRecipes[dishIndex]?.name}
+                      </span>
+                      {!showCookingOrder && !isExtraPhase && phase === 'play' && (
+                        <button
+                          onClick={() => {
+                            setShowHint(true);
+                            setTimeout(() => setShowHint(false), 2000);
+                          }}
+                          disabled={showHint}
+                          className={`mb-2 md:mb-4 px-4 md:px-6 py-1 md:py-2 rounded-full text-[10px] md:text-sm font-black transition-all shadow-md active:scale-95 border-2 ${showHint ? 'bg-indigo-100 text-indigo-400 border-indigo-200' : 'bg-white text-indigo-600 border-indigo-300 hover:bg-indigo-50 animate-bounce-gentle'}`}
+                        >
+                          {showHint ? '📖 กำลังแสดงสรุปสูตร...' : '💡 ดูสูตรอีกครั้ง'}
+                        </button>
+                      )}
+
+                      {(showCookingOrder || showHint) && (
+                        <div className="flex flex-wrap justify-center gap-1.5 md:gap-2 p-2.5 md:p-4 bg-white rounded-2xl md:rounded-3xl shadow-2xl border-2 md:border-4 border-indigo-400 animate-in zoom-in max-w-[280px] md:max-w-lg">
+                          {currentOrder.map((ing, i) => (
+                            <div key={i} className="px-2.5 md:px-4 py-1 md:py-2 bg-indigo-50 rounded-xl md:rounded-2xl text-indigo-700 font-black text-xs md:text-xl border-2 border-indigo-100 shadow-sm animate-in fade-in slide-in-from-bottom-2">
+                              {ing}
                             </div>
                           ))}
-                          {collectedIngredients.length < currentOrder.length && !showCookingOrder && !isExtraPhase && (
-                            <div className="text-slate-400 font-black text-xl md:text-2xl animate-pulse">?</div>
-                          )}
                         </div>
+                      )}
+
+                      {thoughtBubble && (
+                        <div className="relative p-4 md:p-6 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border-2 md:border-4 border-rose-400 animate-in slide-in-from-top duration-500 max-w-[280px] md:max-w-md">
+                          <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-5 h-5 bg-white border-l-2 md:border-l-4 border-t-2 md:border-t-4 border-rose-400 rotate-45"></div>
+                          <p className="text-rose-600 font-black text-sm md:text-2xl text-center">
+                            💭 "{thoughtBubble}"
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 flex flex-col items-center justify-center mt-12 md:mt-32">
+                      <div className="relative mb-6 md:mb-16">
+                        <div className="w-64 h-24 md:w-[600px] md:h-48 bg-slate-200/50 rounded-full border-b-[8px] md:border-b-[12px] border-slate-300 flex items-center justify-center relative overflow-hidden shadow-inner">
+                          <div className="flex flex-wrap justify-center gap-2 md:gap-3 p-3 md:p-6">
+                            {collectedIngredients.map((ing, i) => (
+                              <div key={i} className="w-10 h-10 md:w-20 md:h-20 bg-white rounded-lg md:rounded-xl shadow-sm flex items-center justify-center p-1 animate-in bounce-in overflow-hidden relative group border-2 border-slate-100">
+                                <img src={getIngPath(ing, shuffledRecipes[dishIndex]?.round || 1)} className="w-full h-full object-contain" alt={ing} />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                  <span className="text-[8px] md:text-xs text-white font-bold">{ing}</span>
+                                </div>
+                              </div>
+                            ))}
+                            {collectedIngredients.length < currentOrder.length && !showCookingOrder && !isExtraPhase && (
+                              <div className="text-slate-400 font-black text-xl md:text-2xl animate-pulse">?</div>
+                            )}
+                          </div>
+                        </div>
+                        {/* Pan handle or decor */}
+                        <div className="absolute top-1/2 -right-12 md:-right-24 w-16 md:w-32 h-3 md:h-6 bg-slate-400 rounded-full -translate-y-1/2 shadow-md"></div>
                       </div>
-                      {/* Pan handle or decor */}
-                      <div className="absolute top-1/2 -right-12 md:-right-24 w-16 md:w-32 h-3 md:h-6 bg-slate-400 rounded-full -translate-y-1/2 shadow-md"></div>
-                    </div>
 
-                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 md:gap-3 max-w-3xl px-2 md:px-4">
-                      {cookingItems.map((item, i) => (
-                        <button
-                          key={i}
-                          onClick={() => handleCookIngredient(item.name)}
-                          className="group flex flex-col items-center gap-1.5 md:gap-3 p-1.5 md:p-3 bg-white rounded-2xl md:rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-2 active:translate-y-0 active:shadow-none transition-all border-b-[4px] md:border-b-[6px] border-slate-200"
-                        >
-                          <div className="w-16 h-16 sm:w-24 sm:h-24 md:w-40 md:h-40 bg-slate-50 rounded-xl md:rounded-2xl flex items-center justify-center p-2 md:p-3 border-2 border-slate-100">
-                            <img src={item.image} className="w-full h-full object-contain group-hover:scale-110 transition-transform" alt={item.name} />
-                          </div>
-                          <div className="px-3 md:px-6 py-1 md:py-2 bg-indigo-50 rounded-full border-2 border-indigo-100 text-indigo-800 font-black text-[10px] md:text-xl shadow-sm whitespace-nowrap">
-                            {item.name}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {config.mode === 'maze' && (
-                <div className={`w-full h-full flex flex-col items-center justify-center p-6 bg-white transition-all duration-1000 relative ${isMazeHidden ? 'bg-slate-900' : ''}`}>
-                  <div className="bg-white p-2 rounded-2xl shadow-xl border-2 border-slate-800 transition-opacity duration-500" style={{ opacity: isMazeHidden ? 0 : 1 }}>
-                    <div className="grid gap-0" style={{ gridTemplateColumns: `repeat(${maze[0]?.length || 1}, minmax(0, 1fr))` }}>
-                      {maze.map((row, r) => row.map((cell, c) => (
-                        <div
-                          key={`${r}-${c}`}
-                          className={`w-7 h-7 md:w-10 md:h-10 flex items-center justify-center transition-all duration-300 ${cell === 1 ? 'bg-slate-900' : 'bg-white'
-                            }`}
-                        >
-                          {playerPos.r === r && playerPos.c === c && (
-                            <img src="/assets_employer/logo.png" className="w-[85%] h-[85%] object-contain animate-bounce-gentle drop-shadow-md z-10" alt="brain" />
-                          )}
-                          {cell === 2 && (
-                            <div className={`relative w-full h-full flex items-center justify-center ${levelParam >= 7 && !hasKey ? 'grayscale opacity-30 brightness-50' : 'animate-bounce'}`}>
-                              <span className="text-2xl md:text-3xl drop-shadow-sm filter saturate-150 brightness-110">⛳</span>
+                      <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 md:gap-3 max-w-3xl px-2 md:px-4">
+                        {cookingItems.map((item, i) => (
+                          <button
+                            key={i}
+                            onClick={() => handleCookIngredient(item.name)}
+                            className="group flex flex-col items-center gap-1.5 md:gap-3 p-1.5 md:p-3 bg-white rounded-2xl md:rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-2 active:translate-y-0 active:shadow-none transition-all border-b-[4px] md:border-b-[6px] border-slate-200"
+                          >
+                            <div className="w-16 h-16 sm:w-24 sm:h-24 md:w-40 md:h-40 bg-slate-50 rounded-xl md:rounded-2xl flex items-center justify-center p-2 md:p-3 border-2 border-slate-100">
+                              <img src={item.image} className="w-full h-full object-contain group-hover:scale-110 transition-transform" alt={item.name} />
                             </div>
-                          )}
-                          {cell === 3 && (
-                            <span className="text-xl md:text-2xl animate-jiggle">🔑</span>
-                          )}
-                          {cell === 4 && showBombs && (
-                            <span className="text-xl md:text-2xl">💣</span>
-                          )}
-                        </div>
-                      )))}
+                            <div className="px-3 md:px-6 py-1 md:py-2 bg-indigo-50 rounded-full border-2 border-indigo-100 text-indigo-800 font-black text-[10px] md:text-xl shadow-sm whitespace-nowrap">
+                              {item.name}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 mt-6">
-                    <div /><button onClick={() => handleMazeMove(-1, 0)} className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">🔼</button><div />
-                    <button onClick={() => handleMazeMove(0, -1)} className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">◀️</button>
-                    <button onClick={() => handleMazeMove(1, 0)} className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">🔽</button>
-                    <button onClick={() => handleMazeMove(0, 1)} className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">▶️</button>
-                  </div>
-                </div>
-              )}
+                )}
 
-              {config.mode === 'matching' && (
-                <div className="w-full h-full flex flex-col items-center justify-center p-4 md:p-10">
-                  <div className="grid grid-cols-2 gap-x-4 md:gap-x-20 gap-y-3 md:gap-y-4 w-full max-w-3xl">
-                    <div className="flex flex-col gap-2 md:gap-3">
-                      <span className="text-center font-black text-slate-400 text-[10px] md:text-xs mb-1 md:mb-2 uppercase tracking-widest">วลี/คำพูด</span>
-                      {matchingPairs.map((pair) => (
-                        <button key={pair.id} onClick={() => handleMatchClick('left', pair.id)} disabled={pair.matched} className={`p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm md:shadow-md font-black text-[10px] sm:text-xs md:text-base min-h-[50px] transition-all ${pair.matched ? 'bg-green-50 text-green-300 opacity-40' : selectedLeft === pair.id ? 'bg-blue-600 text-white' : 'bg-white text-slate-700'}`}>
-                          {pair.left}
-                        </button>
-                      ))}
+                {config.mode === 'maze' && (
+                  <div className={`w-full h-full flex flex-col items-center justify-center p-6 bg-white transition-all duration-1000 relative ${isMazeHidden ? 'bg-slate-900' : ''}`}>
+                    <div className="bg-white p-2 rounded-2xl shadow-xl border-2 border-slate-800 transition-opacity duration-500" style={{ opacity: isMazeHidden ? 0 : 1 }}>
+                      <div className="grid gap-0" style={{ gridTemplateColumns: `repeat(${maze[0]?.length || 1}, minmax(0, 1fr))` }}>
+                        {maze.map((row, r) => row.map((cell, c) => (
+                          <div
+                            key={`${r}-${c}`}
+                            className={`w-7 h-7 md:w-10 md:h-10 flex items-center justify-center transition-all duration-300 ${cell === 1 ? 'bg-slate-900' : 'bg-white'
+                              }`}
+                          >
+                            {playerPos.r === r && playerPos.c === c && (
+                              <img src="/assets_employer/logo.png" className="w-[85%] h-[85%] object-contain animate-bounce-gentle drop-shadow-md z-10" alt="brain" />
+                            )}
+                            {cell === 2 && (
+                              <div className={`relative w-full h-full flex items-center justify-center ${levelParam >= 7 && !hasKey ? 'grayscale opacity-30 brightness-50' : 'animate-bounce-gentle'}`}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[85%] h-[85%] drop-shadow-sm filter saturate-150 brightness-110">
+                                  <rect x="5" y="2" width="2" height="20" fill="#616161" rx="0.5" />
+                                  <path d="M7 2L21 9L7 16V2Z" fill="#78B13F" />
+                                </svg>
+                              </div>
+                            )}
+                            {cell === 3 && (
+                              <div className="w-full h-full p-1 animate-jiggle">
+                                <img src={`${MG_BASE}/เกมเขาวงกต หมู่บ้านที่ 6-7-8-9/ICON อื่นๆ/กุญแจ.png`} className="w-full h-full object-contain" alt="key" />
+                              </div>
+                            )}
+                            {cell === 4 && showBombs && (
+                              <div className="w-full h-full p-1">
+                                <img src={`${MG_BASE}/เกมเขาวงกต หมู่บ้านที่ 6-7-8-9/ICON อื่นๆ/ลูกระเบิด.png`} className="w-full h-full object-contain" alt="bomb" />
+                              </div>
+                            )}
+                          </div>
+                        )))}
+                      </div>
                     </div>
-                    <div className="flex flex-col gap-2 md:gap-3">
-                      <span className="text-center font-black text-slate-400 text-[10px] md:text-xs mb-1 md:mb-2 uppercase tracking-widest">หมวดหมู่</span>
-                      {shuffledRight.map((item, idx) => {
-                        const isMatched = matchingPairs.find(p => p.id === item.id)?.matched
-                        return (<button key={idx} onClick={() => handleMatchClick('right', item.id)} disabled={isMatched} className={`p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm md:shadow-md font-black text-[10px] sm:text-xs md:text-base min-h-[50px] transition-all ${isMatched ? 'opacity-20' : 'bg-white text-slate-600 border-2 border-dashed'}`}>{item.text}</button>)
-                      })}
+                    <div className="grid grid-cols-3 gap-2 mt-6">
+                      <div /><button onClick={() => handleMazeMove(-1, 0)} className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">🔼</button><div />
+                      <button onClick={() => handleMazeMove(0, -1)} className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">◀️</button>
+                      <button onClick={() => handleMazeMove(1, 0)} className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">🔽</button>
+                      <button onClick={() => handleMazeMove(0, 1)} className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">▶️</button>
                     </div>
                   </div>
-                  <p className="mt-8 md:mt-12 text-blue-400 font-bold italic text-xs md:text-base animate-pulse text-center">💡 เลือกวลีทางซ้าย แล้วเลือกหมวดหมู่ที่ถูกต้องทางขวา</p>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+
+                {config.mode === 'matching' && (
+                  <div className="w-full h-full flex flex-col items-center justify-center p-4 md:p-10">
+                    <div className="grid grid-cols-2 gap-x-4 md:gap-x-20 gap-y-3 md:gap-y-4 w-full max-w-3xl">
+                      <div className="flex flex-col gap-2 md:gap-3">
+                        <span className="text-center font-black text-slate-400 text-[10px] md:text-xs mb-1 md:mb-2 uppercase tracking-widest">วลี/คำพูด</span>
+                        {matchingPairs.map((pair) => (
+                          <button key={pair.id} onClick={() => handleMatchClick('left', pair.id)} disabled={pair.matched} className={`p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm md:shadow-md font-black text-[10px] sm:text-xs md:text-base min-h-[50px] transition-all ${pair.matched ? 'bg-green-50 text-green-300 opacity-40' : selectedLeft === pair.id ? 'bg-blue-600 text-white' : 'bg-white text-slate-700'}`}>
+                            {pair.left}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex flex-col gap-2 md:gap-3">
+                        <span className="text-center font-black text-slate-400 text-[10px] md:text-xs mb-1 md:mb-2 uppercase tracking-widest">หมวดหมู่</span>
+                        {shuffledRight.map((item, idx) => {
+                          const isMatched = matchingPairs.find(p => p.id === item.id)?.matched
+                          return (<button key={idx} onClick={() => handleMatchClick('right', item.id)} disabled={isMatched} className={`p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm md:shadow-md font-black text-[10px] sm:text-xs md:text-base min-h-[50px] transition-all ${isMatched ? 'opacity-20' : 'bg-white text-slate-600 border-2 border-dashed'}`}>{item.text}</button>)
+                        })}
+                      </div>
+                    </div>
+                    <p className="mt-8 md:mt-12 text-blue-400 font-bold italic text-xs md:text-base animate-pulse text-center">💡 เลือกวลีทางซ้าย แล้วเลือกหมวดหมู่ที่ถูกต้องทางขวา</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-      <style jsx global>{`
+        <style jsx global>{`
         @keyframes bounce-gentle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
         .animate-bounce-gentle { animation: bounce-gentle 1.5s ease-in-out infinite; }
         @keyframes jiggle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
@@ -1192,7 +1315,8 @@ function ManagementGameInner() {
         .animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
       `}</style>
-    </div >
+      </div>
+    </>
   )
 }
 
