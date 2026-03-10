@@ -846,104 +846,145 @@ export default function Home() {
             </button>
           </div>
         )}
+      </div>
 
-        {/* Phase 7: Integrated Assessment */}
-        {phase === 'assessment' && (
-          <div className="animate-in fade-in duration-700 fixed inset-0 z-[5000] bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4">
-            <div className="w-full max-w-4xl">
-              {assessmentSubPhase === 'memorize' && (
-                <MemoryRecallChallenge
-                  phase="memorize"
-                  onWordsGenerated={setMemoryWords}
-                  onComplete={() => setAssessmentSubPhase('clock')}
-                />
-              )}
+      {/* Phase 7: Integrated Assessment */}
+      {phase === 'assessment' && (
+        <div className="animate-in fade-in duration-700 fixed inset-0 z-[5000] bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="w-full max-w-4xl">
+            {assessmentSubPhase === 'memorize' && (
+              <MemoryRecallChallenge
+                phase="memorize"
+                onWordsGenerated={setMemoryWords}
+                onComplete={() => setAssessmentSubPhase('clock')}
+              />
+            )}
 
-              {assessmentSubPhase === 'clock' && (
-                <ClockIntro
-                  targetHour={clockTarget.hour}
-                  targetMinute={clockTarget.minute}
-                  showResult={false}
-                  onEvaluation={(score, title, text) => setClockEval({ score, title, text })}
-                  onComplete={() => setAssessmentSubPhase('recall')}
-                />
-              )}
+            {assessmentSubPhase === 'clock' && (
+              <ClockIntro
+                targetHour={clockTarget.hour}
+                targetMinute={clockTarget.minute}
+                showResult={false}
+                onEvaluation={(score, title, text) => setClockEval({ score, title, text })}
+                onComplete={() => setAssessmentSubPhase('recall')}
+              />
+            )}
 
-              {assessmentSubPhase === 'recall' && (
-                <MemoryRecallChallenge
-                  phase="recall"
-                  selectedWords={memoryWords}
-                  showFeedback={false}
-                  onEvaluation={(tries, success) => setMemoryEval({ tries, success })}
-                  onComplete={() => setAssessmentSubPhase('result')}
-                />
-              )}
+            {assessmentSubPhase === 'recall' && (
+              <MemoryRecallChallenge
+                phase="recall"
+                selectedWords={memoryWords}
+                showFeedback={false}
+                onEvaluation={(tries, success) => setMemoryEval({ tries, success })}
+                onComplete={() => setAssessmentSubPhase('result')}
+              />
+            )}
 
-              {assessmentSubPhase === 'result' && (
-                <div className="fixed inset-0 z-[150] flex flex-col items-center justify-center bg-slate-900/95 backdrop-blur-xl p-6">
-                  <div className="max-w-xl w-full bg-white rounded-[3rem] p-8 md:p-12 border-4 border-black shadow-[20px_20px_0_#000] text-center animate-in zoom-in duration-500">
-                    <div className="w-32 h-32 mx-auto mb-8 bg-amber-50 rounded-full border-4 border-black overflow-hidden flex items-end justify-center">
-                      <img src="/assets_employer/characters/grandpa_front.png" alt="คุณตา" className="w-full h-full object-contain scale-125 translate-y-2" />
-                    </div>
+            {assessmentSubPhase === 'result' && (
+              <div className="fixed inset-0 z-[5050] bg-slate-900/80 backdrop-blur-xl p-4 md:p-6 overflow-y-auto flex flex-col pt-24 md:pt-32 pb-8">
+                <div className="max-w-xl w-full bg-white rounded-[2.5rem] p-6 md:p-8 shadow-2xl text-center animate-in zoom-in duration-500 relative mx-auto my-auto shrink-0">
+                  <div className="absolute -top-14 md:-top-16 left-1/2 -translate-x-1/2 w-28 h-28 md:w-32 md:h-32 bg-gradient-to-b from-amber-100 to-orange-50 rounded-full border-[6px] border-white shadow-[0_10px_20px_rgba(0,0,0,0.15)] overflow-hidden flex items-end justify-center z-10 transition-transform duration-500 hover:scale-105">
+                    <img src="/assets_employer/characters/grandpa_front.png" alt="คุณตา" className="w-full h-full object-contain scale-[1.3] translate-y-[10%]" />
+                  </div>
 
-                    <h2 className="text-3xl font-black text-slate-800 mb-2 uppercase">ผลการประเมินเบื้องต้น</h2>
-                    <p className="text-slate-500 font-bold mb-8 text-sm md:text-base">คุณตาได้สรุปผลระดับการรู้คิดของหลานไว้ตรงนี้แล้วนะ</p>
+                  <div className="pt-12 md:pt-16">
+                    <h2 className="text-2xl md:text-4xl font-black text-slate-800 mb-2 md:mb-3 uppercase tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">
+                      ผลการประเมินเบื้องต้น
+                    </h2>
+                    <p className="text-slate-500 font-bold mb-6 md:mb-8 text-xs md:text-sm">
+                      คุณตาได้สรุปผลระดับการรู้คิดของหลานไว้ตรงนี้แล้วนะ 📝
+                    </p>
 
-                    <div className="space-y-6 mb-12">
+                    <div className="space-y-4 md:space-y-6 mb-8 md:mb-10">
                       {/* Clock Result */}
-                      <div className="bg-indigo-50 p-6 rounded-3xl border-3 border-indigo-200 text-left">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="text-2xl">🕘</span>
-                          <h4 className="font-black text-indigo-700 uppercase">ทักษะการวางแผน (Clock Task)</h4>
+                      <div className="relative overflow-hidden group rounded-[1.5rem] md:rounded-[2rem]">
+                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-50/50 to-indigo-100/50 transform transition-transform duration-500 group-hover:scale-105"></div>
+                        <div className="relative bg-white/60 backdrop-blur-sm p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-indigo-100 shadow-sm text-left transition-all hover:bg-white hover:shadow-md hover:border-indigo-200">
+                          <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4 mb-2 md:mb-3">
+                            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-2xl md:text-3xl shadow-lg shadow-indigo-500/30 shrink-0 transform -rotate-6 group-hover:rotate-0 transition-transform">
+                              🕘
+                            </div>
+                            <div>
+                              <span className="text-[10px] md:text-xs font-black text-indigo-500 uppercase tracking-widest block mb-0.5">การประมวลผล & มิติสัมพันธ์</span>
+                              <h4 className="font-black text-lg md:text-xl text-indigo-950 uppercase">ทักษะการวางแผน (Clock Task)</h4>
+                            </div>
+                          </div>
+                          <div className="md:pl-[4.5rem]">
+                            <p className="font-bold text-slate-600 text-sm md:text-base leading-relaxed">
+                              {clockEval?.text || 'การตอบสนองปกติดีมาก แสดงให้เห็นถึงทักษะมิติสัมพันธ์ที่ดีเยี่ยม'}
+                            </p>
+                          </div>
                         </div>
-                        <p className="font-bold text-indigo-900/70 text-sm leading-relaxed">
-                          {clockEval?.text || 'การตอบสนองปกติดีมาก'}
-                        </p>
                       </div>
 
                       {/* Memory Result */}
-                      <div className="bg-amber-50 p-6 rounded-3xl border-3 border-amber-200 text-left">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="text-2xl">🧠</span>
-                          <h4 className="font-black text-amber-700 uppercase">ความจำระยะสั้น (Memory Task)</h4>
+                      <div className="relative overflow-hidden group rounded-[1.5rem] md:rounded-[2rem]">
+                        <div className="absolute inset-0 bg-gradient-to-r from-amber-50/50 to-orange-100/50 transform transition-transform duration-500 group-hover:scale-105"></div>
+                        <div className="relative bg-white/60 backdrop-blur-sm p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-amber-100 shadow-sm text-left transition-all hover:bg-white hover:shadow-md hover:border-amber-200">
+                          <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4 mb-2 md:mb-3">
+                            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-2xl md:text-3xl shadow-lg shadow-amber-500/30 shrink-0 transform rotate-6 group-hover:rotate-0 transition-transform">
+                              🧠
+                            </div>
+                            <div>
+                              <span className="text-[10px] md:text-xs font-black text-amber-500 uppercase tracking-widest block mb-0.5">ความจำขณะทำงาน</span>
+                              <h4 className="font-black text-lg md:text-xl text-amber-950 uppercase">ความจำระยะสั้น (Memory Task)</h4>
+                            </div>
+                          </div>
+                          <div className="md:pl-[4.5rem]">
+                            <p className="font-bold text-slate-600 text-sm md:text-base leading-relaxed">
+                              {memoryEval?.success
+                                ? `ยอดเยี่ยมมาก! หลานความจำดีมาก จำได้แม่นยำในเวลาไม่กี่อึดใจ 🌟`
+                                : `ไม่เป็นไรนะ ความจำคนเรามีขึ้นมีลง ฝึกฝนบ่อยๆ เดี๋ยวก็ดีขึ้นเอง! 💪`}
+                            </p>
+                          </div>
                         </div>
-                        <p className="font-bold text-amber-900/70 text-sm leading-relaxed">
-                          {memoryEval?.success
-                            ? `ยอดเยี่ยมมาก! หลานความจำดีมาก จำได้แม่นยำในเวลาไม่กี่อึดใจ`
-                            : `ไม่เป็นไรนะ ความจำคนเรามีขึ้นมีลง ฝึกฝนบ่อยๆ เดี๋ยวก็ดีขึ้นเอง!`
-                          }
-                        </p>
                       </div>
                     </div>
 
                     <button
                       onClick={nextPhase}
-                      className="w-full py-5 bg-black text-white rounded-2xl font-black text-2xl shadow-[0_8px_0_#4f46e5] active:translate-y-1 active:shadow-none transition-all"
+                      className="group relative w-full overflow-hidden rounded-[2rem] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-xl hover:shadow-2xl shadow-indigo-500/30"
                     >
-                      เริ่มออกเดินทางจริง! 🌍
+                      <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600" />
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-20 bg-white transition-opacity duration-300" />
+                      <div className="relative py-4 md:py-5 px-6 flex items-center justify-center gap-3">
+                        <span className="font-black text-white text-xl md:text-2xl tracking-wide uppercase">เริ่มออกเดินทางจริง!</span>
+                        <span className="text-2xl md:text-3xl group-hover:scale-110 group-hover:-rotate-12 transition-transform">🌍</span>
+                      </div>
                     </button>
 
-                    <div className="mt-8 pt-6 border-t border-slate-100">
-                      <p className="text-[10px] md:text-xs text-slate-400 font-bold leading-relaxed px-4">
-                        *ข้อมูลผลการทดสอบนี้จัดเก็บตามมาตรฐาน PDPA เพื่อใช้ในการประมวลผลทักษะการรู้คิดส่วนบุคคลเท่านั้น ผลลัพธ์ที่ได้เป็นเพียงการบันทึกระดับความพยายามในขณะนั้น ไม่ใช่การวินิจฉัยทางการแพทย์ และสามารถพัฒนาได้ผ่านการฝึกฝนอย่างสม่ำเสมอ เพื่อให้ทุกคนสามารถสนุกกับการพัฒนาตนเองได้โดยไม่ต้องกังวลเรื่องคะแนนจนเกินไป
-                      </p>
+                    <div className="mt-6 md:mt-8 pt-5 border-t border-slate-100">
+                      <details className="group cursor-pointer">
+                        <summary className="text-[10px] md:text-xs text-slate-400 font-bold flex items-center justify-center gap-2 list-none outline-none select-none hover:text-slate-600 transition-colors">
+                          <span className="w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-slate-200 flex items-center justify-center group-open:bg-slate-100 group-hover:border-slate-300 transition-colors bg-slate-50">
+                            <span className="text-[10px] md:text-[11px] font-black italic">i</span>
+                          </span>
+                          <span className="underline decoration-slate-200 underline-offset-4 group-hover:decoration-slate-300">คลิกเพื่ออ่านเงื่อนไขการเก็บข้อมูล (PDPA)</span>
+                        </summary>
+                        <div className="p-4 mt-4 bg-slate-50 border border-slate-100 rounded-2xl animate-in fade-in slide-in-from-top-2 duration-300">
+                          <p className="text-[10px] md:text-xs text-slate-500 font-bold leading-relaxed text-left">
+                            *ข้อมูลผลการทดสอบนี้จัดเก็บตามมาตรฐาน PDPA เพื่อใช้ในการประมวลผลทักษะการรู้คิดส่วนบุคคลเท่านั้น ผลลัพธ์ที่ได้เป็นเพียงการบันทึกระดับความพยายามในขณะนั้น ไม่ใช่การวินิจฉัยทางการแพทย์ และสามารถพัฒนาได้ผ่านการฝึกฝนอย่างสม่ำเสมอ เพื่อให้ทุกคนสามารถสนุกกับการพัฒนาตนเองได้โดยไม่ต้องกังวลเรื่องคะแนนจนเกินไป
+                          </p>
+                        </div>
+                      </details>
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Training Modal Overlay */}
-        {trainingMode && (
-          <TrainingModal
-            mode={trainingMode}
-            onClose={() => setTrainingMode(null)}
-          />
-        )}
+      {/* Training Modal Overlay */}
+      {trainingMode && (
+        <TrainingModal
+          mode={trainingMode}
+          onClose={() => setTrainingMode(null)}
+        />
+      )}
 
-      </div>
     </div >
   )
 }
+
