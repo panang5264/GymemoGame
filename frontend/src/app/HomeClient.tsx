@@ -49,20 +49,22 @@ export default function Home() {
   useEffect(() => {
     if (progressLoading || !progress) return
 
-    if (progress.userName) {
-      setName(progress.userName)
-      const isEditMode = searchParams.get('edit') === 'true'
+    const activeName = progress.userName || user?.name
 
-      // Redirect to world if intro already seen and not in edit mode
-      if (!isEditMode && progress.introSeen) {
-        router.replace('/world')
-        return
+    if (activeName) {
+      setName(activeName)
+      
+      if (!progress.userName && user?.name) {
+        saveProgress({ ...progress, userName: user.name })
       }
+
+      const isEditMode = searchParams.get('edit') === 'true'
+      const hasSeenIntro = progress.introSeen || (user as any)?.introSeen
 
       // Determine initial phase: edit -> intro(if not seen) -> profile
       if (isEditMode) {
         setPhase('edit_profile')
-      } else if (!progress.introSeen) {
+      } else if (!hasSeenIntro) {
         setPhase('intro')
       } else {
         setPhase('profile')
@@ -91,7 +93,7 @@ export default function Home() {
       setCognitiveData(null)
     }
     setIsReady(true)
-  }, [progressLoading, progress?.guestId, progress?.userName, progress?.introSeen, router, searchParams])
+  }, [progressLoading, progress?.guestId, progress?.userName, progress?.introSeen, router, searchParams, user?.name, (user as any)?.introSeen])
 
   if (progressLoading) {
     return (
@@ -131,11 +133,11 @@ export default function Home() {
             saveProgress({ ...progress, userName })
           }
 
-          // ถ้าเคยดูเนื้อเรื่องแล้ว ให้เข้าหน้าแผนที่เลย
+          // ถ้าเคยดูเนื้อเรื่องแล้ว ให้เข้าหน้าโปรไฟล์ แต่ถ้ายังให้ดูเนื้อเรื่อง
           if (progress.introSeen || (res.data as any).introSeen) {
-            router.push('/world')
-          } else {
             setPhase('profile')
+          } else {
+            setPhase('intro')
           }
         } else {
           setPhase('name')
