@@ -30,15 +30,15 @@ interface BoxQuestion {
 // Boxlv3 — sub-set id 1.1, 1.2
 const BOX_LV3: BoxQuestion[] = [
   {
-    block: `${BASE}/Boxlv3/โจทบล็อก 1.1 .png`,
+    block: `${BASE}/Boxlv3/โจทบล็อก 1.1.png`,
     correct: `${BASE}/Boxlv3/Correct1.1.png`,
-    wrongs: [`${BASE}/Boxlv3/Wrong1.1.png`, `${BASE}/Boxlv3/Wrong1.2.png`],
+    wrongs: [`${BASE}/Boxlv3/Wrong1.1.png`],
     direction: 'มองจากบนลงล่าง ⬇️',
   },
   {
     block: `${BASE}/Boxlv3/โจทบล็อก 1.2.png`,
     correct: `${BASE}/Boxlv3/Correct1.2.png`,
-    wrongs: [`${BASE}/Boxlv3/Wrong1.2.png`, `${BASE}/Boxlv3/Wrong1.1.png`],
+    wrongs: [`${BASE}/Boxlv3/Wrong1.2.png`],
     direction: 'มองจากด้านข้าง ↔️',
   },
 ]
@@ -48,19 +48,19 @@ const BOX_LV4: BoxQuestion[] = [
   {
     block: `${BASE}/Boxlv4/โจทบล็อก2.1.png`,
     correct: `${BASE}/Boxlv4/Correct 2.1.png`,
-    wrongs: [`${BASE}/Boxlv4/Wrong 2.1.png`, `${BASE}/Boxlv4/Wrong2.2.png`],
+    wrongs: [`${BASE}/Boxlv4/Wrong 2.1.png`],
     direction: 'มองจากบนลงล่าง ⬇️',
   },
   {
     block: `${BASE}/Boxlv4/โจทบล็อก2.2.png`,
     correct: `${BASE}/Boxlv4/Correct 2.2.png`,
-    wrongs: [`${BASE}/Boxlv4/Wrong2.2.png`, `${BASE}/Boxlv4/Wrong 2.3.png`],
+    wrongs: [`${BASE}/Boxlv4/Wrong2.2.png`],
     direction: 'มองจากด้านซ้าย ➡️',
   },
   {
     block: `${BASE}/Boxlv4/Block2.3.png`,
     correct: `${BASE}/Boxlv4/Correct 2.3.png`,
-    wrongs: [`${BASE}/Boxlv4/Wrong 2.3.png`, `${BASE}/Boxlv4/Wrong 2.1.png`],
+    wrongs: [`${BASE}/Boxlv4/Wrong 2.3.png`],
     direction: 'มองจากล่างขึ้นบน ⬆️',
   },
 ]
@@ -70,13 +70,13 @@ const BOX_LV5: BoxQuestion[] = [
   {
     block: `${BASE}/Boxlv5/Block 3.1.png`,
     correct: `${BASE}/Boxlv5/Correct 3.1.png`,
-    wrongs: [`${BASE}/Boxlv5/Wrong 3.1.png`, `${BASE}/Boxlv5/Wrong 3.2.png`],
+    wrongs: [`${BASE}/Boxlv5/Wrong 3.1.png`],
     direction: 'มองจากบนลงล่าง ⬇️',
   },
   {
     block: `${BASE}/Boxlv5/Block 3.2.png`,
     correct: `${BASE}/Boxlv5/Correct 3.2.png`,
-    wrongs: [`${BASE}/Boxlv5/Wrong 3.2.png`, `${BASE}/Boxlv5/Wrong 3.1.png`],
+    wrongs: [`${BASE}/Boxlv5/Wrong 3.2.png`],
     direction: 'มองจากด้านข้าง ↔️',
   },
 ]
@@ -96,19 +96,19 @@ const BOX_LV7: BoxQuestion[] = [
   {
     block: `${BASE}/Boxlv7/Block5.1.png`,
     correct: `${BASE}/Boxlv7/Correct5.1.png`,
-    wrongs: [`${BASE}/Boxlv7/Wrong5.1.png`, `${BASE}/Boxlv7/Wrong_1_5.1.png`, `${BASE}/Boxlv7/Wrong5.2.png`],
+    wrongs: [`${BASE}/Boxlv7/Wrong5.1.png`, `${BASE}/Boxlv7/Wrong_1_5.1.png`],
     direction: 'มองจากบนลงล่าง ⬇️',
   },
   {
     block: `${BASE}/Boxlv7/Block5.2.png`,
     correct: `${BASE}/Boxlv7/Correct5.2.png`,
-    wrongs: [`${BASE}/Boxlv7/Wrong5.2.png`, `${BASE}/Boxlv7/Wrong_1_5.2.png`, `${BASE}/Boxlv7/Wrong5.1.png`],
+    wrongs: [`${BASE}/Boxlv7/Wrong5.2.png`, `${BASE}/Boxlv7/Wrong_1_5.2.png`],
     direction: 'มองจากด้านข้าง ↔️',
   },
   {
     block: `${BASE}/Boxlv7/Block5.3.png`,
     correct: `${BASE}/Boxlv7/Correct5.3.png`,
-    wrongs: [`${BASE}/Boxlv7/Wrong5.3.png`, `${BASE}/Boxlv7/Wrong_1_5.2.png`, `${BASE}/Boxlv7/Wrong5.2.png`],
+    wrongs: [`${BASE}/Boxlv7/Wrong5.3.png`],
     direction: 'มองจากล่างขึ้นบน ⬆️',
   },
 ]
@@ -118,13 +118,13 @@ const BOX_LV8: BoxQuestion[] = [
   {
     block: `${BASE}/Boxlv8/Block 6.1.png`,
     correct: `${BASE}/Boxlv8/Correct 6.1.png`,
-    wrongs: [`${BASE}/Boxlv8/Wrong 6.1.png`, `${BASE}/Boxlv8/Wrong_1 6.1.png`, `${BASE}/Boxlv8/Wrong 6.2.png`],
+    wrongs: [`${BASE}/Boxlv8/Wrong 6.1.png`, `${BASE}/Boxlv8/Wrong_1 6.1.png`],
     direction: 'มองจากบนลงล่าง ⬇️',
   },
   {
     block: `${BASE}/Boxlv8/Block 6.2.png`,
     correct: `${BASE}/Boxlv8/Correct 6.2.png`,
-    wrongs: [`${BASE}/Boxlv8/Wrong 6.2.png`, `${BASE}/Boxlv8/Wrong_1 6.2.png`, `${BASE}/Boxlv8/Wrong 6.1.png`],
+    wrongs: [`${BASE}/Boxlv8/Wrong 6.2.png`, `${BASE}/Boxlv8/Wrong_1 6.2.png`],
     direction: 'มองจากด้านข้าง ↔️',
   },
   {
@@ -140,7 +140,7 @@ const BOX_LV9: BoxQuestion[] = [
   {
     block: `${BASE}/Boxlv9/Block7.1.png`,
     correct: `${BASE}/Boxlv9/Correct7.1.png`,
-    wrongs: [`${BASE}/Boxlv9/Wrong7.1.png`, `${BASE}/Boxlv9/Wrong_1_7.1.png`, `${BASE}/Boxlv9/Wrong 7.2.png`],
+    wrongs: [`${BASE}/Boxlv9/Wrong7.1.png`, `${BASE}/Boxlv9/Wrong_1_7.1.png`],
     direction: 'มองจากบนลงล่าง ⬇️',
   },
   {
