@@ -1,0 +1,50 @@
+services:
+  mongo:
+    image: mongo:6.0
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: gymemo
+    networks:
+      - gymemo_net
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      MONGODB_URI: mongodb://mongo:27017/gymemo
+      JWT_SECRET: 6c06c7c527490ad80653edeb673cfe8e
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongo
+    networks:
+      - gymemo_net
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - gymemo_net
+
+volumes:
+  mongo_data:
+
+networks:
+  gymemo_net:
+    driver: bridge
