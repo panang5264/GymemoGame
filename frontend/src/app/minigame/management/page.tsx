@@ -62,21 +62,21 @@ const COOKING_RECIPES: CookingRecipe[] = [
     name: 'กะเพราหมูสับ',
     ingredients: ['กระเทียม', 'พริกแดง', 'หมูสับ', 'กะเพรา', 'น้ำปลา', 'น้ำตาล'],
     extra: 'พริกแดง',
-    thought: 'อยากได้ความเผ็ดเพิ่มจัง... (ใส่พริกแดงเพิ่ม)',
+    thought: 'อยากได้ความเผ็ดเพิ่มจัง...',
     round: 1
   },
   {
     name: 'ผัดไทยกุ้ง',
     ingredients: ['เต้าหู้', 'กุ้ง', 'เส้นจันท์', 'ถั่วงอก', 'กุยช่าย', 'น้ำปลา', 'น้ำตาล'],
     extra: 'น้ำปลา',
-    thought: 'อยากได้ความเค็มเพิ่มจัง... (ใส่น้ำปลาเพิ่ม)',
+    thought: 'อยากได้ความเค็มเพิ่มจัง...',
     round: 1
   },
   {
     name: 'แตงกวาผัดไข่',
     ingredients: ['กระเทียม', 'แตงกวา', 'ไข่ไก่', 'น้ำปลา', 'น้ำตาล'],
     extra: 'น้ำตาล',
-    thought: 'อยากได้ความหวานเพิ่มจัง... (ใส่น้ำตาลเพิ่ม)',
+    thought: 'อยากได้ความหวานเพิ่มจัง...',
     round: 1
   },
   // Round 2
@@ -84,21 +84,21 @@ const COOKING_RECIPES: CookingRecipe[] = [
     name: 'หมูสับทอดกระเทียม',
     ingredients: ['หมูสับ', 'กระเทียม', 'น้ำปลา', 'น้ำตาล'],
     extra: 'กระเทียม',
-    thought: 'อยากได้ความหอมกระเทียมเพิ่มจัง... (ใส่กระเทียมเพิ่ม)',
+    thought: 'อยากได้ความหอมกระเทียมเพิ่มจัง...',
     round: 2
   },
   {
     name: 'ไข่เจียวหมูสับ',
     ingredients: ['ไข่ไก่', 'หมูสับ', 'น้ำปลา'],
     extra: 'น้ำปลา',
-    thought: 'อยากได้ความเค็มเพิ่มจัง... (ใส่น้ำปลาเพิ่ม)',
+    thought: 'อยากได้ความเค็มเพิ่มจัง...',
     round: 2
   },
   {
     name: 'ต้มยำกุ้ง',
     ingredients: ['กุ้ง', 'พริกแดง', 'น้ำปลา', 'น้ำตาล'],
     extra: 'พริกแดง',
-    thought: 'อยากได้ความเผ็ดร้อนเพิ่มจัง... (ใส่พริกแดงเพิ่ม)',
+    thought: 'อยากได้ความเผ็ดร้อนเพิ่มจัง...',
     round: 2
   },
   // Round 3
@@ -106,14 +106,14 @@ const COOKING_RECIPES: CookingRecipe[] = [
     name: 'ข้าวผัดกุ้ง',
     ingredients: ['ข้าวสวย', 'ไข่ไก่', 'กุ้ง', 'แตงกวา', 'น้ำปลา', 'น้ำตาล'],
     extra: 'น้ำตาล',
-    thought: 'อยากได้ความกลมกล่อมเพิ่มจัง... (ใส่น้ำตาลเพิ่ม)',
+    thought: 'อยากได้ความกลมกล่อมเพิ่มจัง...',
     round: 3
   },
   {
     name: 'ส้มตำ',
     ingredients: ['กระเทียม', 'พริกแดง', 'น้ำตาล', 'น้ำปลา'],
     extra: 'น้ำปลา',
-    thought: 'อยากได้ความนัวเพิ่มจัง... (ใส่น้ำปลาเพิ่ม)',
+    thought: 'อยากได้ความนัวเพิ่มจัง...',
     round: 3
   }
 ]
@@ -151,6 +151,21 @@ function generateMaze(rows: number, cols: number, hasKey: boolean, hasBombs: boo
   }
 
   walk(1, 1)
+
+  // --- Add Multiple Paths (Loops) ---
+  // Iterate through internal walls and randomly remove some to create loops/multiple paths
+  for (let r = 1; r < rows - 1; r++) {
+    for (let c = 1; c < cols - 1; c++) {
+      if (maze[r][c] === 1) {
+        // Don't remove walls that would create a direct shortcut to the exit too easily
+        // 15% chance to turn a wall into a path
+        if (Math.random() < 0.15) {
+          maze[r][c] = 0
+        }
+      }
+    }
+  }
+
   maze[rows - 2][cols - 2] = 2 // Exit (Flag)
 
   // Reachability check (BFS)
@@ -175,13 +190,18 @@ function generateMaze(rows: number, cols: number, hasKey: boolean, hasBombs: boo
   if (hasKey) {
     // Place key at a random path (not start/end)
     let placed = false
-    while (!placed) {
+    let attempts = 0
+    while (!placed && attempts < 100) {
       const kr = Math.floor(Math.random() * (rows - 2)) + 1
       const kc = Math.floor(Math.random() * (cols - 2)) + 1
       if (maze[kr][kc] === 0 && (kr !== 1 || kc !== 1) && (kr !== rows - 2 || kc !== cols - 2)) {
-        maze[kr][kc] = 3
-        placed = true
+        // Ensure starting point can reach the key
+        if (canReach(1, 1, kr, kc, maze)) {
+          maze[kr][kc] = 3
+          placed = true
+        }
       }
+      attempts++
     }
   }
 
@@ -374,6 +394,7 @@ function ManagementGameInner() {
   // Cooking State
   const [dishIndex, setDishIndex] = useState(0)
   const [showCookingOrder, setShowCookingOrder] = useState(false)
+  const [showHint, setShowHint] = useState(false)
   const [currentOrder, setCurrentOrder] = useState<string[]>([])
   const [collectedIngredients, setCollectedIngredients] = useState<string[]>([])
   const [cookingItems, setCookingItems] = useState<{ name: string, image: string }[]>([])
@@ -545,6 +566,7 @@ function ManagementGameInner() {
     setCurrentOrder(recipe.ingredients)
     setCollectedIngredients([])
     setShowCookingOrder(true)
+    setShowHint(false)
     setIsExtraPhase(false)
     setThoughtBubble(null)
     setFeedback(null)
@@ -559,7 +581,7 @@ function ManagementGameInner() {
     })).sort(() => Math.random() - 0.5)
 
     setCookingItems(items)
-    setTimeout(() => setShowCookingOrder(false), 4000)
+    setTimeout(() => setShowCookingOrder(false), 2500)
   }
 
   const handleCookIngredient = (ing: string) => {
@@ -1025,8 +1047,20 @@ function ManagementGameInner() {
                     <span className="bg-amber-500 text-white px-6 py-2 rounded-full font-black text-sm md:text-xl mb-4 shadow-lg border-2 border-amber-300">
                       เมนู: {shuffledRecipes[dishIndex]?.name}
                     </span>
+                    {!showCookingOrder && !isExtraPhase && phase === 'play' && (
+                      <button
+                        onClick={() => {
+                          setShowHint(true);
+                          setTimeout(() => setShowHint(false), 2000);
+                        }}
+                        disabled={showHint}
+                        className={`mb-4 px-6 py-2 rounded-full text-xs md:text-sm font-black transition-all shadow-md active:scale-95 border-2 ${showHint ? 'bg-indigo-100 text-indigo-400 border-indigo-200' : 'bg-white text-indigo-600 border-indigo-300 hover:bg-indigo-50 animate-bounce-gentle'}`}
+                      >
+                        {showHint ? '📖 กำลังแสดงสรุปสูตร...' : '💡 ดูสูตรอีกครั้ง'}
+                      </button>
+                    )}
 
-                    {showCookingOrder && (
+                    {(showCookingOrder || showHint) && (
                       <div className="flex flex-wrap justify-center gap-2 p-4 bg-white rounded-3xl shadow-2xl border-4 border-indigo-400 animate-in zoom-in max-w-lg">
                         {currentOrder.map((ing, i) => (
                           <div key={i} className="px-4 py-2 bg-indigo-50 rounded-2xl text-indigo-700 font-black text-sm md:text-xl border-2 border-indigo-100 shadow-sm animate-in fade-in slide-in-from-bottom-2">
@@ -1048,18 +1082,18 @@ function ManagementGameInner() {
 
                   <div className="flex-1 flex flex-col items-center justify-center mt-24 md:mt-32">
                     <div className="relative mb-12 md:mb-16">
-                      <div className="w-64 h-24 md:w-96 md:h-32 bg-slate-200/50 rounded-full border-b-[12px] border-slate-300 flex items-center justify-center relative overflow-hidden shadow-inner">
-                        <div className="flex flex-wrap justify-center gap-2 p-4">
+                      <div className="w-72 h-32 md:w-[600px] md:h-48 bg-slate-200/50 rounded-full border-b-[12px] border-slate-300 flex items-center justify-center relative overflow-hidden shadow-inner">
+                        <div className="flex flex-wrap justify-center gap-3 p-6">
                           {collectedIngredients.map((ing, i) => (
-                            <div key={i} className="w-8 h-8 md:w-12 md:h-12 bg-white rounded-lg shadow-sm flex items-center justify-center p-1 animate-in bounce-in overflow-hidden relative group">
+                            <div key={i} className="w-12 h-12 md:w-20 md:h-20 bg-white rounded-xl shadow-sm flex items-center justify-center p-1 animate-in bounce-in overflow-hidden relative group border-2 border-slate-100">
                               <img src={getIngPath(ing, shuffledRecipes[dishIndex]?.round || 1)} className="w-full h-full object-contain" alt={ing} />
                               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                <span className="text-[8px] text-white font-bold">{ing}</span>
+                                <span className="text-[10px] md:text-xs text-white font-bold">{ing}</span>
                               </div>
                             </div>
                           ))}
                           {collectedIngredients.length < currentOrder.length && !showCookingOrder && !isExtraPhase && (
-                            <div className="text-slate-400 font-black text-xl animate-pulse">?</div>
+                            <div className="text-slate-400 font-black text-2xl animate-pulse">?</div>
                           )}
                         </div>
                       </div>
@@ -1074,10 +1108,10 @@ function ManagementGameInner() {
                           onClick={() => handleCookIngredient(item.name)}
                           className="group flex flex-col items-center gap-2 md:gap-3 p-2 md:p-3 bg-white rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-2 active:translate-y-0 active:shadow-none transition-all border-b-[6px] border-slate-200"
                         >
-                          <div className="w-20 h-20 md:w-32 md:h-32 bg-slate-50 rounded-2xl flex items-center justify-center p-3 border-2 border-slate-100">
+                          <div className="w-24 h-24 md:w-40 md:h-40 bg-slate-50 rounded-2xl flex items-center justify-center p-3 border-2 border-slate-100">
                             <img src={item.image} className="w-full h-full object-contain group-hover:scale-110 transition-transform" alt={item.name} />
                           </div>
-                          <div className="px-5 py-1.5 bg-indigo-50 rounded-full border-2 border-indigo-100 text-indigo-800 font-black text-xs md:text-lg shadow-sm">
+                          <div className="px-6 py-2 bg-indigo-50 rounded-full border-2 border-indigo-100 text-indigo-800 font-black text-sm md:text-xl shadow-sm">
                             {item.name}
                           </div>
                         </button>
@@ -1102,7 +1136,7 @@ function ManagementGameInner() {
                           )}
                           {cell === 2 && (
                             <div className={`relative w-full h-full flex items-center justify-center ${levelParam >= 7 && !hasKey ? 'grayscale opacity-30 brightness-50' : 'animate-bounce'}`}>
-                              <span className="text-2xl md:text-3xl drop-shadow-sm filter saturate-150">🚩</span>
+                              <span className="text-2xl md:text-3xl drop-shadow-sm filter saturate-150 brightness-110">⛳</span>
                             </div>
                           )}
                           {cell === 3 && (
