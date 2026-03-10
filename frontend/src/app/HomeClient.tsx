@@ -53,6 +53,12 @@ export default function Home() {
       setName(progress.userName)
       const isEditMode = searchParams.get('edit') === 'true'
 
+      // Redirect to world if intro already seen and not in edit mode
+      if (!isEditMode && progress.introSeen) {
+        router.replace('/world')
+        return
+      }
+
       // Determine initial phase: edit -> intro(if not seen) -> profile
       if (isEditMode) {
         setPhase('edit_profile')
@@ -126,7 +132,7 @@ export default function Home() {
           }
 
           // ถ้าเคยดูเนื้อเรื่องแล้ว ให้เข้าหน้าแผนที่เลย
-          if (progress.introSeen) {
+          if (progress.introSeen || (res.data as any).introSeen) {
             router.push('/world')
           } else {
             setPhase('profile')
