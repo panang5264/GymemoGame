@@ -398,8 +398,8 @@ function getLevelConfig(
     case 1:
       instruction = 'แยกวัตถุสีแดง และ วัตถุรูปทรงกลม (15 ชิ้น)'
       categories = [
-        { id: 'red', title: 'วัตถุสีแดง 🔴', emoji: '📦', imageUrl: boxImg || undefined, accepts: i => i.tags.includes('red') },
-        { id: 'round', title: 'วัตถุทรงกลม ⚪', emoji: '📦', imageUrl: boxImg || undefined, accepts: i => i.tags.includes('round') },
+        { id: 'red', title: 'วัตถุสีแดง 🔴', emoji: '📦', accepts: i => i.tags.includes('red') },
+        { id: 'round', title: 'วัตถุทรงกลม ⚪', emoji: '📦', accepts: i => i.tags.includes('round') },
       ]
       items = [...V1_RED, ...V1_ROUND, ...DISTRACTORS.slice(0, 5)]
       break
@@ -407,8 +407,8 @@ function getLevelConfig(
     case 2:
       instruction = 'แยกสัตว์ 4 ขา และ อุปกรณ์สำหรับขัด/แปรง (15 ชิ้น)'
       categories = [
-        { id: 'animal4', title: 'สัตว์ 4 ขา 🐾', emoji: '🕳️', imageUrl: boxImg || undefined, accepts: i => i.tags.includes('animal4') },
-        { id: 'scrubber', title: 'อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', imageUrl: boxImg || undefined, accepts: i => i.tags.includes('scrubber') },
+        { id: 'animal4', title: 'สัตว์ 4 ขา 🐾', emoji: '🕳️', accepts: i => i.tags.includes('animal4') },
+        { id: 'scrubber', title: 'อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', accepts: i => i.tags.includes('scrubber') },
       ]
       items = [...V2_ANIMALS, ...V2_SCRUBBERS, ...DISTRACTORS.slice(0, 5)]
       break
@@ -416,8 +416,8 @@ function getLevelConfig(
     case 3:
       instruction = 'แยก 4 หมวดหมู่! ภาชนะจะสลับทุก 2 ครั้ง (30 ชิ้น)'
       categories = [
-        { id: 'animal4', title: 'หลุม 1: สัตว์ 4 ขา 🐾', emoji: '🕳️', imageUrl: boxImg || undefined, accepts: i => i.tags.includes('animal4') },
-        { id: 'scrubber', title: 'หลุม 2: อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', imageUrl: boxImg || undefined, accepts: i => i.tags.includes('scrubber') },
+        { id: 'animal4', title: 'หลุม 1: สัตว์ 4 ขา 🐾', emoji: '🕳️', accepts: i => i.tags.includes('animal4') },
+        { id: 'scrubber', title: 'หลุม 2: อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', accepts: i => i.tags.includes('scrubber') },
       ]
       items = [...V2_ANIMALS, ...V2_SCRUBBERS, ...V1_RED, ...V1_ROUND, ...DISTRACTORS.slice(0, 10)]
       break
@@ -641,7 +641,7 @@ function ManagementGameInner() {
       setCorrectCount(prev => {
         const newCount = prev + 1
         if (levelParam === 3 && newCount % 2 === 0) {
-          // Prompt: "Only two containers (either the two holes OR the two boxes) are visible at a time. The visible set swaps every two correct sorts."
+          // Level 3 swaps between "box set" (Lv1) and "hole set" (Lv2) every 2 correct sorts
           const isHoleSet = config.categories.some(c => c.emoji === '🕳️')
           const newCategories: Category[] = isHoleSet
             ? [
