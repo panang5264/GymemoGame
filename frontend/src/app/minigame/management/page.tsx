@@ -1043,8 +1043,8 @@ function ManagementGameInner() {
 
               {config.mode === 'cooking' && (
                 <div className="w-full h-full flex flex-col items-center justify-center p-4 md:p-10">
-                  <div className="absolute top-4 md:top-6 left-1/2 -translate-x-1/2 flex flex-col items-center z-20">
-                    <span className="bg-amber-500 text-white px-6 py-2 rounded-full font-black text-sm md:text-xl mb-4 shadow-lg border-2 border-amber-300">
+                  <div className="absolute top-2 md:top-6 left-1/2 -translate-x-1/2 flex flex-col items-center z-20 w-fit">
+                    <span className="bg-amber-500 text-white px-4 md:px-6 py-1 md:py-2 rounded-full font-black text-xs md:text-xl mb-2 md:mb-4 shadow-lg border-2 border-amber-300 whitespace-nowrap">
                       เมนู: {shuffledRecipes[dishIndex]?.name}
                     </span>
                     {!showCookingOrder && !isExtraPhase && phase === 'play' && (
@@ -1054,16 +1054,16 @@ function ManagementGameInner() {
                           setTimeout(() => setShowHint(false), 2000);
                         }}
                         disabled={showHint}
-                        className={`mb-4 px-6 py-2 rounded-full text-xs md:text-sm font-black transition-all shadow-md active:scale-95 border-2 ${showHint ? 'bg-indigo-100 text-indigo-400 border-indigo-200' : 'bg-white text-indigo-600 border-indigo-300 hover:bg-indigo-50 animate-bounce-gentle'}`}
+                        className={`mb-2 md:mb-4 px-4 md:px-6 py-1 md:py-2 rounded-full text-[10px] md:text-sm font-black transition-all shadow-md active:scale-95 border-2 ${showHint ? 'bg-indigo-100 text-indigo-400 border-indigo-200' : 'bg-white text-indigo-600 border-indigo-300 hover:bg-indigo-50 animate-bounce-gentle'}`}
                       >
                         {showHint ? '📖 กำลังแสดงสรุปสูตร...' : '💡 ดูสูตรอีกครั้ง'}
                       </button>
                     )}
 
                     {(showCookingOrder || showHint) && (
-                      <div className="flex flex-wrap justify-center gap-2 p-4 bg-white rounded-3xl shadow-2xl border-4 border-indigo-400 animate-in zoom-in max-w-lg">
+                      <div className="flex flex-wrap justify-center gap-1.5 md:gap-2 p-2.5 md:p-4 bg-white rounded-2xl md:rounded-3xl shadow-2xl border-2 md:border-4 border-indigo-400 animate-in zoom-in max-w-[280px] md:max-w-lg">
                         {currentOrder.map((ing, i) => (
-                          <div key={i} className="px-4 py-2 bg-indigo-50 rounded-2xl text-indigo-700 font-black text-sm md:text-xl border-2 border-indigo-100 shadow-sm animate-in fade-in slide-in-from-bottom-2">
+                          <div key={i} className="px-2.5 md:px-4 py-1 md:py-2 bg-indigo-50 rounded-xl md:rounded-2xl text-indigo-700 font-black text-xs md:text-xl border-2 border-indigo-100 shadow-sm animate-in fade-in slide-in-from-bottom-2">
                             {ing}
                           </div>
                         ))}
@@ -1071,47 +1071,47 @@ function ManagementGameInner() {
                     )}
 
                     {thoughtBubble && (
-                      <div className="relative p-6 bg-white rounded-[2rem] shadow-2xl border-4 border-rose-400 animate-in slide-in-from-top duration-500 max-w-md">
-                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-white border-l-4 border-t-4 border-rose-400 rotate-45"></div>
-                        <p className="text-rose-600 font-black text-lg md:text-2xl text-center">
+                      <div className="relative p-4 md:p-6 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border-2 md:border-4 border-rose-400 animate-in slide-in-from-top duration-500 max-w-[280px] md:max-w-md">
+                        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-5 h-5 bg-white border-l-2 md:border-l-4 border-t-2 md:border-t-4 border-rose-400 rotate-45"></div>
+                        <p className="text-rose-600 font-black text-sm md:text-2xl text-center">
                           💭 "{thoughtBubble}"
                         </p>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex-1 flex flex-col items-center justify-center mt-24 md:mt-32">
-                    <div className="relative mb-12 md:mb-16">
-                      <div className="w-72 h-32 md:w-[600px] md:h-48 bg-slate-200/50 rounded-full border-b-[12px] border-slate-300 flex items-center justify-center relative overflow-hidden shadow-inner">
-                        <div className="flex flex-wrap justify-center gap-3 p-6">
+                  <div className="flex-1 flex flex-col items-center justify-center mt-12 md:mt-32">
+                    <div className="relative mb-6 md:mb-16">
+                      <div className="w-64 h-24 md:w-[600px] md:h-48 bg-slate-200/50 rounded-full border-b-[8px] md:border-b-[12px] border-slate-300 flex items-center justify-center relative overflow-hidden shadow-inner">
+                        <div className="flex flex-wrap justify-center gap-2 md:gap-3 p-3 md:p-6">
                           {collectedIngredients.map((ing, i) => (
-                            <div key={i} className="w-12 h-12 md:w-20 md:h-20 bg-white rounded-xl shadow-sm flex items-center justify-center p-1 animate-in bounce-in overflow-hidden relative group border-2 border-slate-100">
+                            <div key={i} className="w-10 h-10 md:w-20 md:h-20 bg-white rounded-lg md:rounded-xl shadow-sm flex items-center justify-center p-1 animate-in bounce-in overflow-hidden relative group border-2 border-slate-100">
                               <img src={getIngPath(ing, shuffledRecipes[dishIndex]?.round || 1)} className="w-full h-full object-contain" alt={ing} />
                               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                <span className="text-[10px] md:text-xs text-white font-bold">{ing}</span>
+                                <span className="text-[8px] md:text-xs text-white font-bold">{ing}</span>
                               </div>
                             </div>
                           ))}
                           {collectedIngredients.length < currentOrder.length && !showCookingOrder && !isExtraPhase && (
-                            <div className="text-slate-400 font-black text-2xl animate-pulse">?</div>
+                            <div className="text-slate-400 font-black text-xl md:text-2xl animate-pulse">?</div>
                           )}
                         </div>
                       </div>
                       {/* Pan handle or decor */}
-                      <div className="absolute top-1/2 -right-16 md:-right-24 w-20 md:w-32 h-4 md:h-6 bg-slate-400 rounded-full -translate-y-1/2 shadow-md"></div>
+                      <div className="absolute top-1/2 -right-12 md:-right-24 w-16 md:w-32 h-3 md:h-6 bg-slate-400 rounded-full -translate-y-1/2 shadow-md"></div>
                     </div>
 
-                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 max-w-3xl px-4">
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 md:gap-3 max-w-3xl px-2 md:px-4">
                       {cookingItems.map((item, i) => (
                         <button
                           key={i}
                           onClick={() => handleCookIngredient(item.name)}
-                          className="group flex flex-col items-center gap-2 md:gap-3 p-2 md:p-3 bg-white rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-2 active:translate-y-0 active:shadow-none transition-all border-b-[6px] border-slate-200"
+                          className="group flex flex-col items-center gap-1.5 md:gap-3 p-1.5 md:p-3 bg-white rounded-2xl md:rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-2 active:translate-y-0 active:shadow-none transition-all border-b-[4px] md:border-b-[6px] border-slate-200"
                         >
-                          <div className="w-24 h-24 md:w-40 md:h-40 bg-slate-50 rounded-2xl flex items-center justify-center p-3 border-2 border-slate-100">
+                          <div className="w-16 h-16 sm:w-24 sm:h-24 md:w-40 md:h-40 bg-slate-50 rounded-xl md:rounded-2xl flex items-center justify-center p-2 md:p-3 border-2 border-slate-100">
                             <img src={item.image} className="w-full h-full object-contain group-hover:scale-110 transition-transform" alt={item.name} />
                           </div>
-                          <div className="px-6 py-2 bg-indigo-50 rounded-full border-2 border-indigo-100 text-indigo-800 font-black text-sm md:text-xl shadow-sm">
+                          <div className="px-3 md:px-6 py-1 md:py-2 bg-indigo-50 rounded-full border-2 border-indigo-100 text-indigo-800 font-black text-[10px] md:text-xl shadow-sm whitespace-nowrap">
                             {item.name}
                           </div>
                         </button>

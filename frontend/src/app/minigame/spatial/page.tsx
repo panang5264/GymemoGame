@@ -181,6 +181,23 @@ const BOX_LV10: BoxQuestion[] = [
   },
 ]
 
+// ── Match Asset Database (from /public/Asset ด้าน/มิติสัมพันธ์/match) ────────
+const MATCH_BASE = '/Asset ด้าน/มิติสัมพันธ์/match'
+
+const V1_MATCH_BANK = [
+  { folder: '1', items: ['1.1', '1.1(1)'] },
+  { folder: '2', items: ['1.2', '1.2(1)'] },
+  { folder: '3', items: ['ด่าน1-1', 'ด่าน1-2'] },
+  { folder: '4', items: ['ด่าน1-3', 'ด่าน1-3(1)'] },
+]
+
+const V2_MATCH_BANK = [
+  { folder: '1', items: ['2.1', '2.2'] },
+  { folder: '2', items: ['2.1', '2.2'] },
+  { folder: '3', items: ['ด่าน2-1', 'ด่าน2-2'] },
+  { folder: '4', items: ['ด่าน2-3', 'ด่าน2-3(1)'] },
+]
+
 function getBoxBank(level: number): BoxQuestion[] {
   if (level === 3) return BOX_LV3
   if (level === 4) return BOX_LV4
@@ -251,7 +268,7 @@ function SpatialGameInner() {
   const [errorCount, setErrorCount] = useState(0)
   const [startTime] = useState(Date.now())
   const [questionCount, setQuestionCount] = useState(0)
-  const MAX_QUESTIONS = levelParam <= 2 ? 1 : 3
+  const MAX_QUESTIONS = levelParam <= 2 ? 2 : 3
 
   const isComplete = isGameOver
 
@@ -272,23 +289,31 @@ function SpatialGameInner() {
     if (levelParam <= 2) {
       // Village 1-2: Interactive Image Matching Pair game
       const isLevel1 = levelParam === 1
-      const basePath = `/assets/level1andlevel2/relation1-${isLevel1 ? '1' : '2'}`
+      const bank = isLevel1 ? V1_MATCH_BANK : V2_MATCH_BANK
+      const villageFolderName = isLevel1 ? 'หมู่บ้าน 1' : 'หมู่บ้าน 2'
 
-      const pairs = isLevel1
-        ? [
-          { target: 'left1.PNG', correct: 'right4.PNG' },
-          { target: 'left2.PNG', correct: 'right3.PNG' },
-          { target: 'left3.PNG', correct: 'right1.PNG' },
-          { target: 'left4.PNG', correct: 'right5.PNG' },
-          { target: 'left5.PNG', correct: 'right2.PNG' },
-        ]
-        : [
-          { target: 'left1.PNG', correct: 'right3.PNG' },
-          { target: 'left2.PNG', correct: 'right5.PNG' },
-          { target: 'left3.PNG', correct: 'right4.PNG' },
-          { target: 'left4.PNG', correct: 'right2.PNG' },
-          { target: 'left5.PNG', correct: 'right1.PNG' },
-        ]
+      // Version strategy: Guarantee Folder 1 if it's the first question, then random folder 1-4
+      // Picking folder
+      let selectedVersionIdx = 0 // Default to folder 1 (Main)
+      if (questionCount > 0) {
+        selectedVersionIdx = Math.floor(Math.random() * bank.length)
+      } else {
+        // First question always folder 1 for consistency as requested
+        selectedVersionIdx = 0
+      }
+
+      const v = bank[selectedVersionIdx]
+      // Pick random image (subset) in that folder
+      const selectedImageName = v.items[Math.floor(Math.random() * v.items.length)]
+
+      // Generate pairs (5 rows for V1, 6 rows for V2)
+      const rows = isLevel1 ? 5 : 6
+      const pairs = Array.from({ length: rows }, (_, i) => ({
+        target: `${selectedImageName}_row${i + 1}_left.png`,
+        correct: `${selectedImageName}_row${i + 1}_right.png`,
+      }))
+
+      const basePath = `${MATCH_BASE}/${villageFolderName}/${v.folder}/cropped`
 
       setQuestionData({ isPairMatching: true, pairs, basePath })
       setQuestionText('จับคู่รูปทรงต้นแบบที่มีรอยแหว่งกับชิ้นส่วนที่หายไป 🧩')
@@ -470,7 +495,14 @@ function SpatialGameInner() {
                 basePath={questionData.basePath || ''}
                 onComplete={() => {
                   setFeedback({ type: 'correct', message: '✨ ถูกต้องทั้งหมด! เก่งมาก' })
-                  setTimeout(() => setIsGameOver(true), 1500)
+                  setTimeout(() => {
+                    if (questionCount + 1 >= MAX_QUESTIONS) {
+                      setIsGameOver(true)
+                    } else {
+                      setQuestionCount(prev => prev + 1)
+                      nextQuestion()
+                    }
+                  }, 1500)
                 }}
                 onError={() => setErrorCount(e => e + 1)}
               />

@@ -21,13 +21,13 @@ export default function Header() {
     ]
 
   return (
-    <header className="header bg-white/90 backdrop-blur-md sticky top-0 z-[100] border-b-2 border-slate-100 shadow-sm py-1.5">
-      <div className="container max-w-7xl px-4 flex flex-col md:flex-row justify-between items-center gap-2">
+    <header className="header bg-white/90 backdrop-blur-md sticky top-0 z-[100] border-b-2 border-slate-100 shadow-sm py-1 md:py-1.5">
+      <div className="container max-w-7xl px-2 md:px-4 flex flex-col md:flex-row justify-between items-center gap-1 md:gap-2">
 
         {/* Logo Section */}
-        <Link href="/" className="flex items-center gap-2 hover:scale-105 transition-all group">
-          <div className="flex items-center gap-3">
-            <div className="relative h-10 md:h-12 w-10 md:w-12 flex items-center justify-center">
+        <Link href="/" className="flex items-center gap-1.5 md:gap-2 hover:scale-105 transition-all group">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="relative h-7 md:h-12 w-7 md:w-12 flex items-center justify-center">
               {/* Floating Brain Icon - Isolated and Premium */}
               <img
                 src="/assets_employer/logo.png"
@@ -36,25 +36,25 @@ export default function Header() {
               />
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl md:text-3xl font-black text-slate-800 tracking-tighter leading-none">Gymemo</span>
-              <span className="text-[8px] md:text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em] leading-none mt-1 ml-0.5 opacity-80">ฝึกสมองรายวัน</span>
+              <span className="text-xl md:text-3xl font-black text-slate-800 tracking-tighter leading-none">Gymemo</span>
+              <span className="text-[6px] md:text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em] leading-none mt-0.5 ml-0.5 opacity-80">ฝึกสมองรายวัน</span>
             </div>
           </div>
         </Link>
 
         {/* Navigation Menu - Centered */}
-        <nav className="flex items-center gap-1 md:gap-2 flex-wrap justify-center bg-slate-100/40 p-1 rounded-full border-2 border-slate-50">
+        <nav className="flex items-center gap-0.5 md:gap-2 flex-wrap justify-center bg-slate-100/40 p-0.5 md:p-1 rounded-full border-2 border-slate-50">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-black transition-all text-sm md:text-base border-2 ${pathname === link.href
+              className={`flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-1 md:py-1.5 rounded-full font-black transition-all text-xs md:text-base border-2 ${pathname === link.href
                 ? 'bg-indigo-600 text-white border-indigo-700 shadow-[1px_1px_0_#312e81]'
                 : 'text-slate-600 border-transparent hover:bg-white hover:text-indigo-600 hover:border-indigo-100'
                 }`}
             >
-              <span className="text-lg">{link.icon}</span>
-              <span className="hidden md:inline">{link.name}</span>
+              <span className="text-base md:text-lg">{link.icon}</span>
+              <span className="hidden sm:inline">{link.name}</span>
             </Link>
           ))}
         </nav>
@@ -62,28 +62,28 @@ export default function Header() {
         {/* User Profile Section */}
         <div className="flex items-center gap-3 shrink-0">
           {user ? (
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 md:gap-3">
+              <div className="flex items-center gap-1.5 md:gap-2">
                 <Link
                   href={isAdmin ? '/admin' : '/'}
-                  className="flex items-center gap-2 bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-200 rounded-full pl-1.5 pr-4 py-1 transition-all group shadow-sm"
+                  className="flex items-center gap-1.5 md:gap-2 bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-200 rounded-full pl-1 md:pl-1.5 pr-2.5 md:pr-4 py-0.5 md:py-1 transition-all group shadow-sm scale-90 md:scale-100"
                   title={isAdmin ? 'หน้าจัดการระบบ' : 'ดูสถิติส่วนตัว'}
                 >
                   <img
                     src={getAvatarPath(user.avatar)}
                     alt="avatar"
-                    className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-slate-100 object-cover shadow-sm group-hover:scale-105 transition-transform"
+                    className="w-6 h-6 md:w-10 md:h-10 rounded-full border-2 border-slate-100 object-cover shadow-sm group-hover:scale-105 transition-transform"
                   />
                   <div className="flex flex-col text-left">
-                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">{isAdmin ? 'จัดการ' : 'สวัสดีคุณ'}</span>
-                    <span className="text-base md:text-lg font-black text-slate-700 leading-none group-hover:text-indigo-600 transition-colors uppercase">{user.name}</span>
+                    <span className="text-[6px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">{isAdmin ? 'จัดการ' : 'สวัสดีคุณ'}</span>
+                    <span className="text-sm md:text-lg font-black text-slate-700 leading-none group-hover:text-indigo-600 transition-colors uppercase">{user.name}</span>
                   </div>
                 </Link>
 
                 {!isAdmin && (
                   <Link
                     href="/?edit=true"
-                    className="w-8 h-8 md:w-10 md:h-10 bg-orange-100 text-orange-600 hover:bg-orange-500 hover:text-white rounded-full flex items-center justify-center text-lg transition-all border-2 border-orange-200 hover:border-orange-400 shadow-sm"
+                    className="w-7 h-7 md:w-10 md:h-10 bg-orange-100 text-orange-600 hover:bg-orange-500 hover:text-white rounded-full flex items-center justify-center text-sm md:text-lg transition-all border-2 border-orange-200 hover:border-orange-400 shadow-sm"
                     title="แก้ไขโปรไฟล์"
                   >
                     ✏️
@@ -91,14 +91,14 @@ export default function Header() {
                 )}
               </div>
 
-              <div className="w-[1px] h-6 bg-slate-200 hidden md:block mx-1" />
+              <div className="w-[1px] h-4 md:h-6 bg-slate-200 hidden md:block mx-0.5 md:mx-1" />
 
               <button
                 onClick={logout}
-                className="w-8 h-8 md:w-10 md:h-10 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white rounded-[0.8rem] md:rounded-[1rem] flex items-center justify-center transition-all border-2 border-rose-100 hover:border-rose-400 shadow-sm"
+                className="w-7 h-7 md:w-10 md:h-10 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white rounded-[0.6rem] md:rounded-[1rem] flex items-center justify-center transition-all border-2 border-rose-100 hover:border-rose-400 shadow-sm"
                 title="ออกจากระบบ"
               >
-                <span className="text-lg">👋</span>
+                <span className="text-sm md:text-lg">👋</span>
               </button>
             </div>
           ) : (
