@@ -392,55 +392,53 @@ export default function LeaderboardPage() {
                     ข้อมูลสรุปคะแนนและการผจญภัยของคุณ 🧠
                 </p>
 
-                {/* User Profile Modal */}
+                {/* User Profile Modal - Compact Card Version */}
                 {selectedUserEntry && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4 md:p-8 animate-in fade-in duration-300" onClick={() => setSelectedUserEntry(null)}>
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-300" onClick={() => setSelectedUserEntry(null)}>
                         <div
-                            className="bg-white rounded-[3rem] p-8 md:p-12 max-w-xl w-full border-[6px] border-[var(--border-dark)] shadow-[20px_20px_0_var(--border-dark)] relative flex flex-col items-center animate-in zoom-in-75 duration-300"
+                            className="bg-white rounded-[2.5rem] p-6 md:p-8 max-w-sm w-full border-[4px] border-[var(--border-dark)] shadow-[12px_12px_0_var(--border-dark)] relative flex flex-col items-center animate-in zoom-in-95 duration-200"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <button
                                 onClick={() => setSelectedUserEntry(null)}
-                                className="absolute top-6 right-6 w-12 h-12 md:w-14 md:h-14 bg-slate-100 hover:bg-rose-100 hover:text-rose-600 rounded-full flex items-center justify-center text-3xl transition-colors font-black z-10"
+                                className="absolute top-4 right-4 w-10 h-10 bg-slate-100 hover:bg-rose-100 hover:text-rose-600 rounded-full flex items-center justify-center text-xl transition-colors font-black z-10"
                             >
                                 ✕
                             </button>
 
-                            <div className="relative mb-8 md:mb-12 mt-4">
-                                <div className={`w-36 h-36 md:w-48 md:h-48 bg-slate-100 rounded-full border-[6px] border-[var(--border-dark)] overflow-hidden shadow-inner mx-auto`}>
+                            <div className="relative mb-6 mt-2">
+                                <div className={`w-28 h-28 bg-slate-100 rounded-full border-[4px] border-[var(--border-dark)] overflow-hidden shadow-inner mx-auto`}>
                                     <img src={getAvatarPath(selectedUserEntry.user?.avatar)} alt="avatar" className="w-full h-full object-cover" />
                                 </div>
-                                <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-[var(--border-dark)] text-white px-8 py-2 md:py-3 rounded-full font-black text-xl md:text-3xl border-4 border-white shadow-xl flex items-center gap-2 whitespace-nowrap">
+                                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-[var(--border-dark)] text-white px-4 py-1.5 rounded-full font-black text-sm border-2 border-white shadow-lg flex items-center gap-1 whitespace-nowrap">
                                     อันดับ {selectedUserEntry.displayRank} 🏆
                                 </div>
                             </div>
 
-                            <h3 className="text-4xl md:text-6xl font-black text-slate-800 mb-2 tracking-tighter text-center">{selectedUserEntry.user?.name || 'Unknown User'}</h3>
-                            <p className="text-slate-500 font-bold uppercase tracking-widest text-sm md:text-base mb-8 text-center bg-slate-100 px-6 py-2 rounded-full border-2 border-slate-200">✨ ผู้เล่นอันดับแนวหน้า</p>
+                            <h3 className="text-2xl md:text-3xl font-black text-slate-800 mb-1 tracking-tighter text-center">{selectedUserEntry.user?.name || 'Unknown User'}</h3>
+                            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mb-6 text-center bg-slate-50 px-4 py-1.5 rounded-full border border-slate-100">✨ ผู้เล่นอันดับแนวหน้า</p>
 
-                            <div className="w-full bg-indigo-50 border-4 border-indigo-100 rounded-[2.5rem] p-6 md:p-8 mb-8">
-                                <div className="grid grid-cols-2 gap-4 text-center">
-                                    <div className="bg-white p-4 md:p-6 rounded-3xl border-2 border-indigo-50 shadow-sm">
-                                        <p className="text-indigo-400 font-black text-xs md:text-sm uppercase tracking-widest mb-2">คะแนนรวมสุทธิ</p>
-                                        <p className="text-4xl md:text-6xl font-black text-indigo-600 tabular-nums leading-none">{selectedUserEntry.score.toLocaleString()}</p>
-                                    </div>
-                                    <div className="bg-white p-4 md:p-6 rounded-3xl border-2 border-indigo-50 shadow-sm">
-                                        <p className="text-orange-400 font-black text-xs md:text-sm uppercase tracking-widest mb-2">เวลาแข่งขัน</p>
-                                        <p className="text-4xl md:text-6xl font-black text-orange-500 tabular-nums leading-none">{selectedUserEntry.timeTaken}<span className="text-2xl md:text-4xl ml-2">s</span></p>
-                                    </div>
+                            <div className="w-full grid grid-cols-2 gap-3 mb-6">
+                                <div className="bg-indigo-50/50 p-3 rounded-2xl border border-indigo-100 text-center">
+                                    <p className="text-indigo-400 font-black text-[9px] uppercase tracking-widest mb-1">คะแนนรวม</p>
+                                    <p className="text-2xl font-black text-indigo-600 tabular-nums">{selectedUserEntry.score.toLocaleString()}</p>
+                                </div>
+                                <div className="bg-orange-50/50 p-3 rounded-2xl border border-orange-100 text-center">
+                                    <p className="text-orange-400 font-black text-[9px] uppercase tracking-widest mb-1">เวลาที่ใช้</p>
+                                    <p className="text-2xl font-black text-orange-500 tabular-nums">{selectedUserEntry.timeTaken}<span className="text-xs ml-1">s</span></p>
                                 </div>
                             </div>
 
-                            <div className="w-full bg-slate-50/50 rounded-[2.5rem] p-6 md:p-8 border-4 border-slate-100 relative">
-                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-xs md:text-sm font-black uppercase text-slate-500 tracking-widest bg-white px-6 py-2 rounded-full border-2 border-slate-200 shadow-sm whitespace-nowrap">🧠 กราฟความสามารถ (จำลอง)</div>
-                                <div className="w-full max-h-[250px] md:max-h-[350px] flex justify-center items-center mt-4">
+                            <div className="w-full bg-slate-50/30 rounded-3xl p-4 border border-slate-100/50 relative">
+                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[9px] font-black uppercase text-slate-400 tracking-widest bg-white px-4 py-1 rounded-full border border-slate-200 shadow-sm whitespace-nowrap">🧠 สถิติการเล่น</div>
+                                <div className="w-full flex justify-center items-center">
                                     <BrainRadarChart
                                         data={[
                                             { label: 'การจัดการ', value: Math.min(100, 40 + (selectedUserEntry.score % 60)), color: '#f97316' },
                                             { label: 'การคำนวณ', value: Math.min(100, 50 + ((selectedUserEntry.score * 7) % 50)), color: '#3b82f6' },
                                             { label: 'มิติสัมพันธ์', value: Math.min(100, 30 + ((selectedUserEntry.score * 13) % 70)), color: '#22c55e' }
                                         ]}
-                                        size={300}
+                                        size={180}
                                     />
                                 </div>
                             </div>
@@ -449,7 +447,7 @@ export default function LeaderboardPage() {
                     </div>
                 )}
 
-            </div >
-        </div >
+            </div>
+        </div>
     )
 }
