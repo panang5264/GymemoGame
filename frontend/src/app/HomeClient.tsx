@@ -863,8 +863,12 @@ export default function Home() {
             {assessmentSubPhase === 'memorize' && (
               <MemoryRecallChallenge
                 phase="memorize"
+                selectedWords={['หลานสาว', 'สวรรค์', 'ภูเขา']}
                 onWordsGenerated={setMemoryWords}
-                onComplete={() => setAssessmentSubPhase('clock')}
+                onComplete={() => {
+                  setMemoryWords(['หลานสาว', 'สวรรค์', 'ภูเขา']);
+                  setAssessmentSubPhase('clock');
+                }}
               />
             )}
 
