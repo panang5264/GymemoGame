@@ -11,8 +11,12 @@ const { errorHandler } = require('./middleware/errorMiddleware')
 
 const app = express()
 
+const createAdmin = require('./scripts/createAdmin')
+
 // เชื่อมต่อ Database
-connectDB()
+connectDB().then(() => {
+  createAdmin()
+})
 
 // Setup Cron Jobs
 const setupCronJobs = require('./services/cronService')
