@@ -1088,24 +1088,28 @@ function ManagementGameInner() {
               )}
 
               {config.mode === 'maze' && (
-                <div className={`w-full h-full flex flex-col items-center justify-center p-6 transition-all duration-1000 ${isMazeHidden ? 'bg-slate-900' : 'bg-white'}`}>
-                  <div className="bg-white p-2 rounded-[40px] shadow-2xl border-4 border-slate-800">
-                    <div className="grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${maze[0]?.length || 0}, minmax(0, 1fr))` }}>
+                <div className={`w-full h-full flex flex-col items-center justify-center p-6 bg-white transition-all duration-1000 relative ${isMazeHidden ? 'bg-slate-900' : ''}`}>
+                  <div className="bg-white p-2 rounded-2xl shadow-xl border-2 border-slate-800 transition-opacity duration-500" style={{ opacity: isMazeHidden ? 0 : 1 }}>
+                    <div className="grid gap-0" style={{ gridTemplateColumns: `repeat(${maze[0]?.length || 1}, minmax(0, 1fr))` }}>
                       {maze.map((row, r) => row.map((cell, c) => (
-                        <div key={`${r}-${c}`} className={`w-8 h-8 md:w-10 md:h-10 border border-slate-100 flex items-center justify-center text-xl md:text-2xl ${cell === 1 ? 'bg-slate-800' : 'bg-white'}`}>
+                        <div
+                          key={`${r}-${c}`}
+                          className={`w-7 h-7 md:w-10 md:h-10 flex items-center justify-center transition-all duration-300 ${cell === 1 ? 'bg-slate-900' : 'bg-white'
+                            }`}
+                        >
                           {playerPos.r === r && playerPos.c === c && (
-                            <img src="/assets_employer/logo.png" className="w-[80%] h-[80%] object-contain animate-bounce" alt="brain" />
+                            <img src="/assets_employer/logo.png" className="w-[85%] h-[85%] object-contain animate-bounce-gentle drop-shadow-md z-10" alt="brain" />
                           )}
                           {cell === 2 && (
-                            <div className={`relative w-full h-full flex items-center justify-center ${levelParam >= 7 && !hasKey ? 'grayscale opacity-30 brightness-50' : ''}`}>
-                              <span className="drop-shadow-lg">�</span>
+                            <div className={`relative w-full h-full flex items-center justify-center ${levelParam >= 7 && !hasKey ? 'grayscale opacity-30 brightness-50' : 'animate-bounce'}`}>
+                              <span className="text-2xl md:text-3xl drop-shadow-sm filter saturate-150">🚩</span>
                             </div>
                           )}
                           {cell === 3 && (
-                            <span className="scale-125">🔑</span>
+                            <span className="text-xl md:text-2xl animate-jiggle">🔑</span>
                           )}
                           {cell === 4 && showBombs && (
-                            <span className="scale-125">💣</span>
+                            <span className="text-xl md:text-2xl">💣</span>
                           )}
                         </div>
                       )))}
