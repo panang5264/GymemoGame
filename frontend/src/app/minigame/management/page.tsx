@@ -448,7 +448,7 @@ function ManagementGameInner() {
     if (c.mode === 'cooking') {
       let rounds = [1]
       if (villageId === 4) rounds = [1, 3]
-      else if (villageId === 5) rounds = [2, 4]
+      else if (villageId === 5) rounds = [2, 3] // Use Round 3 instead of Round 4 (empty)
       else rounds = [1, 2, 3]
 
       const recipes = COOKING_RECIPES.filter(r => rounds.includes(r.round)).sort(() => Math.random() - 0.5)
@@ -817,7 +817,7 @@ function ManagementGameInner() {
     if (c.mode === 'cooking') {
       let rounds = [1]
       if (villageId === 4) rounds = [1, 3]
-      else if (villageId === 5) rounds = [2, 4]
+      else if (villageId === 5) rounds = [2, 3] // Use Round 3 instead of Round 4 (empty)
       else rounds = [1, 2, 3]
 
       const recipes = COOKING_RECIPES.filter(r => rounds.includes(r.round)).sort(() => Math.random() - 0.5)

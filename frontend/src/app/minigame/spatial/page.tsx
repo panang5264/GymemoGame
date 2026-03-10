@@ -41,6 +41,18 @@ const BOX_LV3: BoxQuestion[] = [
     wrongs: [`${BASE}/Boxlv3/Wrong1.2.png`],
     direction: 'มองจากด้านข้าง ↔️',
   },
+  {
+    block: `${BASE}/Boxlv3/2/1.1/โจทย์.png`,
+    correct: `${BASE}/Boxlv3/2/1.1/✅.png`,
+    wrongs: [`${BASE}/Boxlv3/2/1.1/❌.png`, `${BASE}/Boxlv3/2/1.1/❌(1).png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+  {
+    block: `${BASE}/Boxlv3/2/1.2/โจทย์.png`,
+    correct: `${BASE}/Boxlv3/2/1.2/✅.png`,
+    wrongs: [`${BASE}/Boxlv3/2/1.2/❌.png`, `${BASE}/Boxlv3/2/1.2/❌(1).png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
 ]
 
 // Boxlv4 — sub-set id 2.1, 2.2, 2.3
@@ -83,11 +95,58 @@ const BOX_LV5: BoxQuestion[] = [
 
 // Boxlv6 — sub-set 4.2 (only 1 available)
 const BOX_LV6: BoxQuestion[] = [
+  // Folder roots for 4.2 (original)
   {
     block: `${BASE}/Boxlv6/Block4.2.png`,
     correct: `${BASE}/Boxlv6/Correct 4.2.png`,
     wrongs: [`${BASE}/Boxlv6/Wrong4.2.png`, `${BASE}/Boxlv6/Wrong_1_4.2.png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+  // Sub-folder 4.1 (Top)
+  {
+    block: `${BASE}/Boxlv6/4/4.1/โจทย์.png`,
+    correct: `${BASE}/Boxlv6/4/4.1/✅.png`,
+    wrongs: [`${BASE}/Boxlv6/4/4.1/❌.png`, `${BASE}/Boxlv6/4/4.1/❌(1).png`],
     direction: 'มองจากบนลงล่าง ⬇️',
+  },
+  // Sub-folder 4.3 (Bottom)
+  {
+    block: `${BASE}/Boxlv6/4/4.3/โจทย์.png`,
+    correct: `${BASE}/Boxlv6/4/4.3/✅.png`,
+    wrongs: [`${BASE}/Boxlv6/4/4.3/❌.png`, `${BASE}/Boxlv6/4/4.3/❌(1).png`],
+    direction: 'มองจากล่างขึ้นบน ⬆️',
+  },
+  // Subset 3.1 (Top), 3.2 (Side), 3.3 (Bottom)
+  {
+    block: `${BASE}/Boxlv6/3/3.1/โจทย์.png`,
+    correct: `${BASE}/Boxlv6/3/3.1/✅.png`,
+    wrongs: [`${BASE}/Boxlv6/3/3.1/❌.png`, `${BASE}/Boxlv6/3/3.1/❌(1).png`],
+    direction: 'มองจากบนลงล่าง ⬇️',
+  },
+  {
+    block: `${BASE}/Boxlv6/3/3.2/โจทย์.png`,
+    correct: `${BASE}/Boxlv6/3/3.2/✅.png`,
+    wrongs: [`${BASE}/Boxlv6/3/3.2/❌.png`, `${BASE}/Boxlv6/3/3.2/❌(1).png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+  {
+    block: `${BASE}/Boxlv6/3/3.3/โจทย์.png`,
+    correct: `${BASE}/Boxlv6/3/3.3/✅.png`,
+    wrongs: [`${BASE}/Boxlv6/3/3.3/❌.png`, `${BASE}/Boxlv6/3/3.3/❌(1).png`],
+    direction: 'มองจากล่างขึ้นบน ⬆️',
+  },
+  // Subset 2.2 (Side), 2.3 (Bottom)
+  {
+    block: `${BASE}/Boxlv6/2/2.2/โจทย์.png`,
+    correct: `${BASE}/Boxlv6/2/2.2/✅.png`,
+    wrongs: [`${BASE}/Boxlv6/2/2.2/❌.png`, `${BASE}/Boxlv6/2/2.2/❌(1).png`],
+    direction: 'มองจากด้านข้าง ↔️',
+  },
+  {
+    block: `${BASE}/Boxlv6/2/2.3/โจทย์.png`,
+    correct: `${BASE}/Boxlv6/2/2.3/✅.png`,
+    wrongs: [`${BASE}/Boxlv6/2/2.3/❌.png`, `${BASE}/Boxlv6/2/2.3/❌(1).png`],
+    direction: 'มองจากล่างขึ้นบน ⬆️',
   },
 ]
 
