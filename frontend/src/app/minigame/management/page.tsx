@@ -559,7 +559,7 @@ function ManagementGameInner() {
     })).sort(() => Math.random() - 0.5)
 
     setCookingItems(items)
-    setTimeout(() => setShowCookingOrder(false), 10000)
+    setTimeout(() => setShowCookingOrder(false), 4000)
   }
 
   const handleCookIngredient = (ing: string) => {

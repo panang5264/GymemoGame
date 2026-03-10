@@ -615,21 +615,22 @@ export default function Home() {
 
             <form onSubmit={handleSaveName} className="space-y-8">
               <div className="space-y-4">
-                <p className="text-center text-sm font-black text-slate-400 uppercase tracking-widest">เลือกอวตาร</p>
-                <div className="grid grid-cols-3 gap-4">
+                <p className="text-center text-sm font-black text-slate-400 uppercase tracking-widest">เลือกอวตาร ({AVATARS.length})</p>
+                <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 max-h-[400px] overflow-y-auto p-4 bg-slate-50/50 rounded-[2.5rem] border-2 border-slate-100 custom-scrollbar">
                   {AVATARS.map((av) => (
                     <button
                       key={av.id}
                       type="button"
                       onClick={() => setSelectedAvatar(av.id)}
-                      className={`relative aspect-square flex items-center justify-center text-4xl rounded-[2rem] border-4 transition-all ${selectedAvatar === av.id
-                        ? 'bg-orange-100 border-orange-500 scale-105 shadow-[4px_4px_0_#f97316]'
+                      className={`relative aspect-square flex items-center justify-center text-4xl rounded-2xl border-2 transition-all ${selectedAvatar === av.id
+                        ? 'bg-orange-100 border-orange-500 scale-105 ring-2 ring-orange-200'
                         : 'bg-white border-slate-100 hover:border-slate-300'
                         }`}
+                      title={av.label}
                     >
-                      <img src={av.imagePath} alt={av.label} className="w-full h-full object-cover p-2 rounded-[2rem]" />
+                      <img src={av.imagePath} alt={av.label} className="w-full h-full object-cover p-1 rounded-2xl" />
                       {selectedAvatar === av.id && (
-                        <div className="absolute -top-2 -right-2 bg-orange-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-white">
+                        <div className="absolute -top-1 -right-1 bg-orange-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-white z-10">
                           ✓
                         </div>
                       )}
