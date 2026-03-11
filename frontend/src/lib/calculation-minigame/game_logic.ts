@@ -11,12 +11,12 @@ export type Operator = {
 
 const path_to_dice = "/assets/calculation/dice/"
 const diceImages: Dice[] = [
-  { name: "dice1", path: path_to_dice + "dice1.png", value: 1 },
-  { name: "dice2", path: path_to_dice + "dice2.png", value: 2 },
-  { name: "dice3", path: path_to_dice + "dice3.png", value: 3 },
-  { name: "dice4", path: path_to_dice + "dice4.png", value: 4 },
-  { name: "dice5", path: path_to_dice + "dice5.png", value: 5 },
-  { name: "dice6", path: path_to_dice + "dice6.png", value: 6 },
+  { name: "dice1", path: path_to_dice + "dice1.PNG", value: 1 },
+  { name: "dice2", path: path_to_dice + "dice2.PNG", value: 2 },
+  { name: "dice3", path: path_to_dice + "dice3.PNG", value: 3 },
+  { name: "dice4", path: path_to_dice + "dice4.PNG", value: 4 },
+  { name: "dice5", path: path_to_dice + "dice5.PNG", value: 5 },
+  { name: "dice6", path: path_to_dice + "dice6.PNG", value: 6 },
 ]
 
 const path_to_dot = "/Asset ด้าน/คำนวณ/ภาพจุด/"
@@ -31,8 +31,8 @@ const dotImages: Dice[] = [
 ]
 
 const operatorImages: Operator[] = [
-  { name: "+", path: path_to_dice + "plus.png" },
-  { name: "-", path: path_to_dice + "minus.png" },
+  { name: "+", path: path_to_dice + "plus.PNG" },
+  { name: "-", path: path_to_dice + "minus.PNG" },
 ]
 
 export function GetOperator(name: string): Operator {
