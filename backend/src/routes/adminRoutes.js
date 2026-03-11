@@ -55,7 +55,7 @@ router.get('/stats', protect, admin, async (req, res) => {
         const [totalUsers, totalGuests, totalScores] = await Promise.all([
             User.countDocuments({}),
             PlayerProgress.countDocuments({}),
-            Score.countDocuments({})
+            GameAnalysis.countDocuments({})
         ])
 
         // Average scores per game type from GameAnalysis
@@ -88,7 +88,40 @@ router.get('/stats', protect, admin, async (req, res) => {
 // @access  Private/Admin
 router.get('/export/scores', protect, admin, async (req, res) => {
     try {
-        const scores = await Score.find().populate('user', 'name phone')
+        const scores = await GameAnalysis.aggregate([
+            {
+                $lookup: {
+                    from: 'userprogresses',
+                    localField: 'guestId',
+                    foreignField: 'progressData.guestId',
+                    as: 'userProgressInfo'
+                }
+            },
+            { $unwind: { path: '$userProgressInfo', preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'userProgressInfo.userId',
+                    foreignField: '_id',
+                    as: 'userInfo'
+                }
+            },
+            { $unwind: { path: '$userInfo', preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    _id: 1,
+                    score: 1,
+                    moves: 1,
+                    timeTaken: 1,
+                    createdAt: '$date',
+                    user: {
+                        name: '$userInfo.name',
+                        phone: '$userInfo.phone'
+                    }
+                }
+            },
+            { $sort: { createdAt: -1 } }
+        ])
         res.json({ success: true, data: scores })
     } catch (error) {
         res.status(500).json({ success: false, message: error.message })
@@ -127,21 +160,21 @@ router.get('/summary/analysis', protect, admin, async (req, res) => {
                     avgAccuracy: { $avg: '$accuracy' }
                 }
             },
-            // 1. Join with PlayerProgress to find User ID linked to this guestId
+            // Join with UserProgress to map guestId to userId
             {
                 $lookup: {
-                    from: 'playerprogresses',
+                    from: 'userprogresses',
                     localField: '_id.guestId',
-                    foreignField: 'guestId',
-                    as: 'progressInfo'
+                    foreignField: 'progressData.guestId',
+                    as: 'userProgressInfo'
                 }
             },
-            { $unwind: { path: '$progressInfo', preserveNullAndEmptyArrays: true } },
-            // 2. Join with Users using the userId found in PlayerProgress
+            { $unwind: { path: '$userProgressInfo', preserveNullAndEmptyArrays: true } },
+            // Join with Users using userId from UserProgress
             {
                 $lookup: {
                     from: 'users',
-                    localField: 'progressInfo.user',
+                    localField: 'userProgressInfo.userId',
                     foreignField: '_id',
                     as: 'userInfo'
                 }

@@ -301,12 +301,7 @@ export default function AdminDashboard() {
                                     >
                                         <span>🧠</span> Export Analysis (All)
                                     </button>
-                                    <button
-                                        onClick={() => handleExportScores()}
-                                        className="px-8 py-4 bg-indigo-600 text-white rounded-3xl font-black hover:bg-indigo-700 transition-all flex items-center gap-3 shadow-xl"
-                                    >
-                                        <span>📅</span> Weekly Report Backup
-                                    </button>
+
                                 </div>
                             </div>
                         </div>
@@ -433,13 +428,13 @@ export default function AdminDashboard() {
 
                             {/* View Switcher */}
                             <div className="flex gap-4 mb-8">
-                                <button 
+                                <button
                                     onClick={() => setAnalysisView('grouped')}
                                     className={`px-6 py-2 rounded-2xl font-black text-sm transition-all ${analysisView === 'grouped' ? 'bg-indigo-100 text-indigo-600 border-2 border-indigo-200' : 'bg-slate-50 text-slate-400 border-2 border-transparent hover:bg-slate-100'}`}
                                 >
                                     📑 สรุปรายด่านหลัก (ID Grouped)
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => setAnalysisView('individual')}
                                     className={`px-6 py-2 rounded-2xl font-black text-sm transition-all ${analysisView === 'individual' ? 'bg-indigo-100 text-indigo-600 border-2 border-indigo-200' : 'bg-slate-50 text-slate-400 border-2 border-transparent hover:bg-slate-100'}`}
                                 >
@@ -462,7 +457,7 @@ export default function AdminDashboard() {
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-50 font-bold text-sm">
-                                            {analysisSummary.filter(s => 
+                                            {analysisSummary.filter(s =>
                                                 s.identifier?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                                 s.gameType?.toLowerCase().includes(searchTerm.toLowerCase())
                                             ).map((s: any, idx: number) => (
@@ -475,12 +470,11 @@ export default function AdminDashboard() {
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4">
-                                                        <span className={`px-2 py-1 rounded-lg text-[10px] ${
-                                                            s.gameType === 'management' ? 'bg-rose-100 text-rose-600' :
-                                                            s.gameType === 'spatial' ? 'bg-indigo-100 text-indigo-600' :
-                                                            s.gameType === 'calculation' ? 'bg-amber-100 text-amber-600' :
-                                                            'bg-emerald-100 text-emerald-600'
-                                                        }`}>
+                                                        <span className={`px-2 py-1 rounded-lg text-[10px] ${s.gameType === 'management' ? 'bg-rose-100 text-rose-600' :
+                                                                s.gameType === 'spatial' ? 'bg-indigo-100 text-indigo-600' :
+                                                                    s.gameType === 'calculation' ? 'bg-amber-100 text-amber-600' :
+                                                                        'bg-emerald-100 text-emerald-600'
+                                                            }`}>
                                                             {s.gameType.toUpperCase()}
                                                         </span>
                                                     </td>
@@ -514,13 +508,13 @@ export default function AdminDashboard() {
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-50 font-bold text-sm">
-                                            {analysisData.filter(a => 
+                                            {analysisData.filter(a =>
                                                 a.guestId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                                 a.gameType?.toLowerCase().includes(searchTerm.toLowerCase())
                                             ).slice(0, 100).map((a: any) => (
                                                 <tr key={a._id} className="hover:bg-slate-50 transition-colors">
                                                     <td className="px-6 py-4 text-xs text-indigo-600">
-                                                        {new Date(a.date).toLocaleString('th-TH', { 
+                                                        {new Date(a.date).toLocaleString('th-TH', {
                                                             hour: '2-digit',
                                                             minute: '2-digit',
                                                             day: 'numeric',
@@ -529,12 +523,11 @@ export default function AdminDashboard() {
                                                     </td>
                                                     <td className="px-6 py-4 text-xs font-mono text-slate-500">{a.guestId}</td>
                                                     <td className="px-6 py-4">
-                                                        <span className={`px-2 py-1 rounded-lg text-[10px] ${
-                                                            a.gameType === 'management' ? 'bg-rose-100 text-rose-600' :
-                                                            a.gameType === 'spatial' ? 'bg-indigo-100 text-indigo-600' :
-                                                            a.gameType === 'calculation' ? 'bg-amber-100 text-amber-600' :
-                                                            'bg-emerald-100 text-emerald-600'
-                                                        }`}>
+                                                        <span className={`px-2 py-1 rounded-lg text-[10px] ${a.gameType === 'management' ? 'bg-rose-100 text-rose-600' :
+                                                                a.gameType === 'spatial' ? 'bg-indigo-100 text-indigo-600' :
+                                                                    a.gameType === 'calculation' ? 'bg-amber-100 text-amber-600' :
+                                                                        'bg-emerald-100 text-emerald-600'
+                                                            }`}>
                                                             {a.gameType.toUpperCase()}
                                                         </span>
                                                     </td>
@@ -580,14 +573,14 @@ export default function AdminDashboard() {
                                     <p className="text-slate-500 font-bold">Gymemo Administrative Guide</p>
                                 </div>
                             </div>
-                            <button 
+                            <button
                                 onClick={() => setIsGuideOpen(false)}
                                 className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-100 text-slate-500 hover:bg-rose-50 hover:text-rose-500 transition-all font-black text-2xl"
                             >
                                 ×
                             </button>
                         </div>
-                        
+
                         <div className="p-8 md:p-12 space-y-10">
                             {/* Section 1 */}
                             <section>
@@ -643,7 +636,7 @@ export default function AdminDashboard() {
                                         <div>
                                             <p className="font-black text-slate-800 mb-1">สลับมุมมอง (View Switcher)</p>
                                             <p className="text-xs text-slate-500 font-bold leading-relaxed">
-                                                คุณสามารถสลับระหว่าง <strong>สรุปรายวัน</strong> (เพื่อดูภาพรวมกิจกรรมต่อคน) 
+                                                คุณสามารถสลับระหว่าง <strong>สรุปรายวัน</strong> (เพื่อดูภาพรวมกิจกรรมต่อคน)
                                                 หรือ <strong>ประวัติรายครั้ง</strong> (เพื่อดูรายละเอียดการเล่นแต่ละด่านย่อย) ได้ทันที
                                             </p>
                                         </div>
@@ -653,7 +646,7 @@ export default function AdminDashboard() {
                                         <div>
                                             <p className="font-black text-slate-800 mb-1">การติดตามรายคน (ID Matching)</p>
                                             <p className="text-xs text-slate-500 font-bold leading-relaxed">
-                                                ระบบจะพยายามดึง <strong>ชื่อและเบอร์โทรศัพท์</strong> มาแสดงแทน Guest ID 
+                                                ระบบจะพยายามดึง <strong>ชื่อและเบอร์โทรศัพท์</strong> มาแสดงแทน Guest ID
                                                 หากผู้เล่นคนนั้นเป็นสมาชิก คุณสามารถค้นหาด้วย "เบอร์โทร" ในช่องค้นหาด้านบนได้เลย
                                             </p>
                                         </div>
@@ -714,9 +707,9 @@ export default function AdminDashboard() {
                                 </ul>
                             </section>
                         </div>
-                        
+
                         <div className="p-8 bg-slate-50 flex justify-end">
-                            <button 
+                            <button
                                 onClick={() => setIsGuideOpen(false)}
                                 className="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition-all shadow-lg"
                             >
