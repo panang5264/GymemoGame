@@ -569,7 +569,7 @@ export default function AdminDashboard() {
 
             {/* Admin Guide Modal */}
             {isGuideOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-6 md:p-10 lg:p-20">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10 pt-24 md:pt-32 lg:pt-40">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setIsGuideOpen(false)}></div>
                     <div className="relative bg-white rounded-[3.5rem] shadow-2xl w-full max-w-4xl max-h-[85vh] overflow-y-auto custom-scrollbar animate-in zoom-in-95 duration-200 border-[6px] border-white ring-1 ring-slate-200">
                         <div className="sticky top-0 bg-white border-b border-slate-100 p-8 flex items-center justify-between z-10">
@@ -598,27 +598,73 @@ export default function AdminDashboard() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="p-6 rounded-3xl bg-indigo-50 border border-indigo-100 flex flex-col gap-2">
                                         <h4 className="font-black text-indigo-900 mb-1 flex items-center gap-2">
-                                            <span>📊</span> Version A: Daily Summary
+                                            <span>📊</span> Daily Summary
                                         </h4>
-                                        <p className="text-sm text-slate-600 font-bold leading-relaxed">
-                                            ใช้ดู <strong>"ความคืบหน้ารายวัน"</strong> สรุปยอดรวมเวลาและด่านที่เล่นจบในแต่ละวัน (ID ใคร ID มัน) เหมาะสำหรับทำรายงานสรุปพฤติกรรมผู้เล่นรายบุคคล
+                                        <p className="text-xs text-slate-600 font-bold leading-relaxed">
+                                            สรุปยอดรวม <strong>"รายวัน"</strong> (ID/เบอร์โทร, ด่านหลัก, จำนวนด่านย่อย, เวลารวม) เมื่อขึ้นวันใหม่จะแยกแถวใหม่ให้อัตโนมัติ เหมาะสำหรับทำรายงานสรุปประจำวัน
+                                        </p>
+                                    </div>
+                                    <div className="p-6 rounded-3xl bg-slate-50 border border-slate-200 flex flex-col gap-2">
+                                        <h4 className="font-black text-slate-800 mb-1 flex items-center gap-2">
+                                            <span>📜</span> All Scores (.csv)
+                                        </h4>
+                                        <p className="text-xs text-slate-500 font-bold leading-relaxed">
+                                            ข้อมูลคะแนนดิบ <strong>"ทั้งหมด"</strong> ในฐานข้อมูล ใช้สำหรับตรวจสอบ Traffic การเล่นโดยรวม และดึงข้อมูลไปวิเคราะห์ต่อใน Excel
                                         </p>
                                     </div>
                                     <div className="p-6 rounded-3xl bg-amber-50 border border-amber-100 flex flex-col gap-2">
                                         <h4 className="font-black text-amber-900 mb-1 flex items-center gap-2">
-                                            <span>🧠</span> Version B: Analysis Data
+                                            <span>🧠</span> Analysis (Raw)
                                         </h4>
-                                        <p className="text-sm text-slate-600 font-bold leading-relaxed">
-                                            ใช้ดู <strong>"ประสิทธิภาพสมอง"</strong> เจาะลึกรายครั้ง (Accuracy, Time, Moves) เหมาะสำหรับนักวิจัยหรือผู้ที่ต้องการตรวจสอบคุณภาพการเล่นขั้นสูง
+                                        <p className="text-xs text-amber-700 font-bold leading-relaxed">
+                                            ข้อมูล <strong>"คุณภาพการเล่น"</strong> เจาะลึกรายครั้ง (ความแม่นยำ, เวลารายครั้ง, จำนวนการขยับ) สำหรับใช้วิเคราะห์ประสิทธิภาพสมองขั้นสูง
+                                        </p>
+                                    </div>
+                                    <div className="p-6 rounded-3xl bg-violet-50 border border-violet-100 flex flex-col gap-2">
+                                        <h4 className="font-black text-violet-900 mb-1 flex items-center gap-2">
+                                            <span>📅</span> Weekly Backup
+                                        </h4>
+                                        <p className="text-xs text-violet-700 font-bold leading-relaxed">
+                                            ปุ่มลัดสำหรับ <strong>"สำรองข้อมูลประจำสัปดาห์"</strong> แนะนำให้แอดมินหมั่นกดโหลดเก็บไว้ทุกอาทิตย์เพื่อป้องกันข้อมูลสูญหาย
                                         </p>
                                     </div>
                                 </div>
                             </section>
 
-                            {/* Section 2 */}
+                            {/* Section 2: Log Details */}
                             <section>
                                 <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-3">
                                     <span className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm">2</span>
+                                    การใช้งานระบบ Log ด่าน (Analysis Log)
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="flex gap-4 items-start p-5 rounded-3xl bg-slate-50 border border-slate-100">
+                                        <span className="text-2xl">📑</span>
+                                        <div>
+                                            <p className="font-black text-slate-800 mb-1">สลับมุมมอง (View Switcher)</p>
+                                            <p className="text-xs text-slate-500 font-bold leading-relaxed">
+                                                คุณสามารถสลับระหว่าง <strong>สรุปรายวัน</strong> (เพื่อดูภาพรวมกิจกรรมต่อคน) 
+                                                หรือ <strong>ประวัติรายครั้ง</strong> (เพื่อดูรายละเอียดการเล่นแต่ละด่านย่อย) ได้ทันที
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-4 items-start p-5 rounded-3xl bg-slate-50 border border-slate-100">
+                                        <span className="text-2xl">📞</span>
+                                        <div>
+                                            <p className="font-black text-slate-800 mb-1">การติดตามรายคน (ID Matching)</p>
+                                            <p className="text-xs text-slate-500 font-bold leading-relaxed">
+                                                ระบบจะพยายามดึง <strong>ชื่อและเบอร์โทรศัพท์</strong> มาแสดงแทน Guest ID 
+                                                หากผู้เล่นคนนั้นเป็นสมาชิก คุณสามารถค้นหาด้วย "เบอร์โทร" ในช่องค้นหาด้านบนได้เลย
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* Section 3 */}
+                            <section>
+                                <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm">3</span>
                                     คำแนะนำสำหรับแอดมิน (Best Practices)
                                 </h3>
                                 <div className="space-y-4">
