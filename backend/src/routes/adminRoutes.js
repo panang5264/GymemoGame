@@ -100,8 +100,70 @@ router.get('/export/scores', protect, admin, async (req, res) => {
 // @access  Private/Admin
 router.get('/export/analysis', protect, admin, async (req, res) => {
     try {
-        const analysis = await GameAnalysis.find()
+        const analysis = await GameAnalysis.find().sort({ date: -1 })
         res.json({ success: true, data: analysis })
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message })
+    }
+})
+
+// @desc    Get Grouped Analysis Summary
+// @route   GET /api/admin/summary/analysis
+// @access  Private/Admin
+router.get('/summary/analysis', protect, admin, async (req, res) => {
+    try {
+        const summary = await GameAnalysis.aggregate([
+            {
+                $group: {
+                    _id: {
+                        guestId: '$guestId',
+                        gameType: '$gameType',
+                        level: '$level',
+                        day: { $dateToString: { format: "%Y-%m-%d", date: "$date" } }
+                    },
+                    subLevelsPlayed: { $addToSet: '$subLevelId' },
+                    totalTime: { $sum: '$timeTaken' },
+                    lastActive: { $max: '$date' },
+                    avgAccuracy: { $avg: '$accuracy' }
+                }
+            },
+            // 1. Join with PlayerProgress to find User ID linked to this guestId
+            {
+                $lookup: {
+                    from: 'playerprogresses',
+                    localField: '_id.guestId',
+                    foreignField: 'guestId',
+                    as: 'progressInfo'
+                }
+            },
+            { $unwind: { path: '$progressInfo', preserveNullAndEmptyArrays: true } },
+            // 2. Join with Users using the userId found in PlayerProgress
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'progressInfo.user',
+                    foreignField: '_id',
+                    as: 'userInfo'
+                }
+            },
+            { $unwind: { path: '$userInfo', preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    identifier: { $ifNull: ['$userInfo.phone', '$_id.guestId'] },
+                    userName: { $ifNull: ['$userInfo.name', 'Guest'] },
+                    gameType: '$_id.gameType',
+                    level: '$_id.level',
+                    day: '$_id.day',
+                    subLevelCount: { $size: '$subLevelsPlayed' },
+                    totalTime: 1,
+                    lastActive: 1,
+                    avgAccuracy: 1,
+                    _id: 0
+                }
+            },
+            { $sort: { lastActive: -1 } }
+        ])
+        res.json({ success: true, data: summary })
     } catch (error) {
         res.status(500).json({ success: false, message: error.message })
     }
