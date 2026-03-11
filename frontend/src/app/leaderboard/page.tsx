@@ -56,7 +56,7 @@ export default function LeaderboardPage() {
 
         // Fetch cognitive data from backend (same as Home page)
         if (p.guestId) {
-            fetch(`${API_BASE_URL}/api/analysis/profile/${p.guestId}`)
+            fetch(`${API_BASE_URL}/analysis/profile/${p.guestId}`)
                 .then(res => res.json())
                 .then(res => {
                     if (res.success && res.data) {

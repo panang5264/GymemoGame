@@ -115,7 +115,7 @@ function CalculationGameInner() {
         const accuracy = total > 0 ? (score / total) * 100 : 100
         const duration = (Date.now() - startTime) / 1000
         const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
-        fetch(`${API_BASE_URL}/api/analysis/record`, {
+        fetch(`${API_BASE_URL}/analysis/record`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

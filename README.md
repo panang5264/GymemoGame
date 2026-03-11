@@ -79,7 +79,7 @@
       dockerfile: Dockerfile
       args:
         # เปลี่ยน localhost:3001 เป็น URL/IP/Domain Backend ของคุณ
-        - NEXT_PUBLIC_API_BASE_URL=https://api.yourdomain.com
+        - =https://api.yourdomain.com
 ```
 และทำการ Build ใหม่ด้วยคำสั่ง `docker-compose up -d --build`
 

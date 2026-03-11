@@ -2,7 +2,7 @@ export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3001'
 
 export async function getProgression(guestId: string) {
-  const res = await fetch(`${API_BASE_URL}/api/progression/${guestId}`)
+  const res = await fetch(`${API_BASE_URL}/progression/${guestId}`)
   if (!res.ok) throw new Error('Failed to fetch progression')
   return res.json()
 }
@@ -13,7 +13,7 @@ export async function completeSubLevel(
   subLevelId: number,
   score: number = 0
 ) {
-  const res = await fetch(`${API_BASE_URL}/api/progression/complete`, {
+  const res = await fetch(`${API_BASE_URL}/progression/complete`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ guestId, villageId, subLevelId, score }),
@@ -23,7 +23,7 @@ export async function completeSubLevel(
 }
 
 export async function unlockVillage(guestId: string, villageId: number) {
-  const res = await fetch(`${API_BASE_URL}/api/progression/unlock`, {
+  const res = await fetch(`${API_BASE_URL}/progression/unlock`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ guestId, villageId }),
@@ -35,7 +35,7 @@ export async function unlockVillage(guestId: string, villageId: number) {
 // --- Auth API ---
 
 export async function loginUser(phone: string, password: string) {
-  const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+  const res = await fetch(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ phone, password }),
@@ -46,7 +46,7 @@ export async function loginUser(phone: string, password: string) {
 }
 
 export async function registerUser(name: string, phone: string, password: string) {
-  const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
+  const res = await fetch(`${API_BASE_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, phone, password }),
@@ -57,7 +57,7 @@ export async function registerUser(name: string, phone: string, password: string
 }
 
 export async function getUserProfile(token: string) {
-  const res = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+  const res = await fetch(`${API_BASE_URL}/auth/profile`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ export async function getUserProfile(token: string) {
 }
 
 export async function updateProfile(token: string, profileData: { name?: string, avatar?: string }) {
-  const res = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+  const res = await fetch(`${API_BASE_URL}/auth/profile`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ export async function updateProfile(token: string, profileData: { name?: string,
 // --- Sync API ---
 
 export async function fetchSyncProgress(token: string) {
-  const res = await fetch(`${API_BASE_URL}/api/progression/sync`, {
+  const res = await fetch(`${API_BASE_URL}/progression/sync`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ export async function fetchSyncProgress(token: string) {
 }
 
 export async function updateSyncProgress(token: string, progressData: any) {
-  const res = await fetch(`${API_BASE_URL}/api/progression/sync`, {
+  const res = await fetch(`${API_BASE_URL}/progression/sync`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ export async function updateSyncProgress(token: string, progressData: any) {
 // --- Scores API ---
 
 export async function submitScore(token: string, score: number, moves: number, timeTaken: number) {
-  const res = await fetch(`${API_BASE_URL}/api/scores`, {
+  const res = await fetch(`${API_BASE_URL}/scores`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -130,7 +130,7 @@ export async function submitScore(token: string, score: number, moves: number, t
 }
 
 export async function getLeaderboard(limit: number = 10) {
-  const res = await fetch(`${API_BASE_URL}/api/scores/leaderboard?limit=${limit}`, {
+  const res = await fetch(`${API_BASE_URL}/scores/leaderboard?limit=${limit}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ export async function getLeaderboard(limit: number = 10) {
 // --- Admin API ---
 
 export async function adminGetUsers(token: string) {
-  const res = await fetch(`${API_BASE_URL}/api/admin/users`, {
+  const res = await fetch(`${API_BASE_URL}/admin/users`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -156,7 +156,7 @@ export async function adminGetUsers(token: string) {
 }
 
 export async function adminGetGuests(token: string) {
-  const res = await fetch(`${API_BASE_URL}/api/admin/guests`, {
+  const res = await fetch(`${API_BASE_URL}/admin/guests`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ export async function adminGetGuests(token: string) {
 }
 
 export async function adminGetStats(token: string) {
-  const res = await fetch(`${API_BASE_URL}/api/admin/stats`, {
+  const res = await fetch(`${API_BASE_URL}/admin/stats`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -182,7 +182,7 @@ export async function adminGetStats(token: string) {
 }
 
 export async function adminDeleteUser(token: string, userId: string) {
-  const res = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, {
+  const res = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -195,7 +195,7 @@ export async function adminDeleteUser(token: string, userId: string) {
 }
 
 export async function adminGetExportScores(token: string) {
-  const res = await fetch(`${API_BASE_URL}/api/admin/export/scores`, {
+  const res = await fetch(`${API_BASE_URL}/admin/export/scores`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -208,7 +208,7 @@ export async function adminGetExportScores(token: string) {
 }
 
 export async function adminGetExportAnalysis(token: string) {
-  const res = await fetch(`${API_BASE_URL}/api/admin/export/analysis`, {
+  const res = await fetch(`${API_BASE_URL}/admin/export/analysis`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

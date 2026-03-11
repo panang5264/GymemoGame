@@ -48,6 +48,7 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
+              prefetch={false}
               className={`flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-1 md:py-1.5 rounded-full font-black transition-all text-xs md:text-base border-2 ${pathname === link.href
                 ? 'bg-indigo-600 text-white border-indigo-700 shadow-[1px_1px_0_#312e81]'
                 : 'text-slate-600 border-transparent hover:bg-white hover:text-indigo-600 hover:border-indigo-100'

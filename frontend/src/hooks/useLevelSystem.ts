@@ -26,7 +26,7 @@ export function useLevelSystem() {
             try {
                 // Ensure we use a conservative normalized score if needed, or the backend handles it
                 // Based on analysisService.js, it expects raw score and normalizes it there.
-                await fetch(`${API_BASE_URL}/api/analysis/record`, {
+                await fetch(`${API_BASE_URL}/analysis/record`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

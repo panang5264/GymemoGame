@@ -778,7 +778,7 @@ function ManagementGameInner() {
 
       if (progress?.guestId) {
         const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
-        fetch(`${API_BASE_URL}/api/analysis/record`, {
+        fetch(`${API_BASE_URL}/analysis/record`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1087,11 +1087,11 @@ function ManagementGameInner() {
                         <div className="w-full h-1.5 sm:h-2 bg-indigo-100/50">
                           <div
                             className="h-full bg-indigo-500 rounded-r-full"
-                            style={{ 
-                              animationName: 'shrinkWidth', 
-                              animationDuration: showCookingOrder ? '6s' : '3s', 
-                              animationTimingFunction: 'linear', 
-                              animationFillMode: 'forwards' 
+                            style={{
+                              animationName: 'shrinkWidth',
+                              animationDuration: showCookingOrder ? '6s' : '3s',
+                              animationTimingFunction: 'linear',
+                              animationFillMode: 'forwards'
                             }}
                           />
                         </div>

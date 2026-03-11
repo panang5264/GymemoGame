@@ -63,7 +63,7 @@ export default function DailyChallengePage() {
       setHasSynced(true)
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
 
-      fetch(`${API_BASE_URL}/api/daily/status/${progress.guestId}?date=${dk}`)
+      fetch(`${API_BASE_URL}/daily/status/${progress.guestId}?date=${dk}`)
         .then(res => res.json())
         .then(res => {
           if (res.success && res.data) {
@@ -101,7 +101,7 @@ export default function DailyChallengePage() {
 
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
     if (progress.guestId) {
-      fetch(`${API_BASE_URL}/api/daily/claim-reward`, {
+      fetch(`${API_BASE_URL}/daily/claim-reward`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ guestId: progress.guestId, dateKey })
@@ -115,7 +115,14 @@ export default function DailyChallengePage() {
     router.push('/world')
   }
 
-  const { currentKeys } = getKeys()
+  useEffect(() => {
+    if (!isLoading && progress) {
+      getKeys()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, progress])
+
+  const currentKeys = progress?.keys?.currentKeys ?? 0
 
   return (
     <div className="min-h-[calc(100vh-140px)] flex flex-col items-center py-10 px-4 font-['Supermarket']">

@@ -53,7 +53,7 @@ export default function Home() {
 
     if (activeName) {
       setName(activeName)
-      
+
       if (!progress.userName && user?.name) {
         saveProgress({ ...progress, userName: user.name })
       }
@@ -72,7 +72,7 @@ export default function Home() {
 
       // Fetch Analysis Data whenever guestId changes
       if (progress.guestId) {
-        fetch(`${API_BASE_URL}/api/analysis/profile/${progress.guestId}`)
+        fetch(`${API_BASE_URL}/analysis/profile/${progress.guestId}`)
           .then(res => res.json())
           .then(res => {
             if (res.success && res.data) {
@@ -260,7 +260,7 @@ export default function Home() {
                   setLoading(true);
                   setError('');
                   try {
-                    const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+                    const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ username, newPassword: password }),

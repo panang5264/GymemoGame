@@ -20,7 +20,7 @@ export default function WeeklySummaryChart({ guestId }: Props) {
     useEffect(() => {
         if (!guestId) return
         const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
-        fetch(`${API_BASE_URL}/api/analysis/weekly/${guestId}`)
+        fetch(`${API_BASE_URL}/analysis/weekly/${guestId}`)
             .then(res => res.json())
             .then(res => {
                 if (res.success) {

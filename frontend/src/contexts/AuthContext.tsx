@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
 import { getUserProfile } from '@/lib/api'
 
@@ -36,6 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null)
     const [token, setToken] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
+    const router = useRouter()
 
     useEffect(() => {
         // Check for token on mount
@@ -72,6 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.removeItem('gymemo_progress_v2')
             localStorage.removeItem('gymemo_guest_id')
         }
+        router.refresh() // Clear client-side router cache to ensure protected routes fetch the new token
     }
 
     const logout = () => {
