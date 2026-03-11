@@ -219,3 +219,15 @@ export async function adminGetExportAnalysis(token: string) {
   if (!res.ok) throw new Error(data.message || 'Failed to fetch export analysis')
   return data
 }
+export async function adminGetAnalysisSummary(token: string) {
+  const res = await fetch(`${API_BASE_URL}/admin/summary/analysis`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Failed to fetch analysis summary')
+  return data
+}
