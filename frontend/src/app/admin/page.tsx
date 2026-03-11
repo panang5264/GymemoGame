@@ -168,7 +168,7 @@ export default function AdminDashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 p-6 md:p-12 lg:p-16 font-['Mali'] text-slate-800">
+        <div className="min-h-screen bg-slate-50 p-6 md:p-12 lg:p-16 pt-20 md:pt-24 lg:pt-32 font-['Mali'] text-slate-800">
             <style jsx global>{`
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 6px;
@@ -300,12 +300,6 @@ export default function AdminDashboard() {
                                         className="px-8 py-4 bg-white border-2 border-amber-200 text-amber-700 rounded-3xl font-black hover:bg-amber-50 transition-all flex items-center gap-3 shadow-md"
                                     >
                                         <span>🧠</span> Export Analysis (All)
-                                    </button>
-                                    <button
-                                        onClick={() => handleExportAnalysis('management')}
-                                        className="px-8 py-4 bg-white border-2 border-rose-200 text-rose-700 rounded-3xl font-black hover:bg-rose-50 transition-all flex items-center gap-3 shadow-md"
-                                    >
-                                        <span>📋</span> Management-only
                                     </button>
                                     <button
                                         onClick={() => handleExportScores()}
@@ -602,18 +596,20 @@ export default function AdminDashboard() {
                                     สรุปประเภทข้อมูลการส่งออก (Export)
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="p-6 rounded-3xl bg-indigo-50 border border-indigo-100">
-                                        <h4 className="font-black text-indigo-900 mb-2">Version A: Export All Scores</h4>
+                                    <div className="p-6 rounded-3xl bg-indigo-50 border border-indigo-100 flex flex-col gap-2">
+                                        <h4 className="font-black text-indigo-900 mb-1 flex items-center gap-2">
+                                            <span>📊</span> Version A: Daily Summary
+                                        </h4>
                                         <p className="text-sm text-slate-600 font-bold leading-relaxed">
-                                            ใช้ดู "Traffic" หรือความถี่ในการเล่น เหมาะสำหรับฝ่ายการตลาดเพื่อดู Engagement 
-                                            และระบุตัวผู้เล่นที่ Active ที่สุดในระบบ
+                                            ใช้ดู <strong>"ความคืบหน้ารายวัน"</strong> สรุปยอดรวมเวลาและด่านที่เล่นจบในแต่ละวัน (ID ใคร ID มัน) เหมาะสำหรับทำรายงานสรุปพฤติกรรมผู้เล่นรายบุคคล
                                         </p>
                                     </div>
-                                    <div className="p-6 rounded-3xl bg-amber-50 border border-amber-100">
-                                        <h4 className="font-black text-amber-900 mb-2">Version B: Export Analysis Data</h4>
+                                    <div className="p-6 rounded-3xl bg-amber-50 border border-amber-100 flex flex-col gap-2">
+                                        <h4 className="font-black text-amber-900 mb-1 flex items-center gap-2">
+                                            <span>🧠</span> Version B: Analysis Data
+                                        </h4>
                                         <p className="text-sm text-slate-600 font-bold leading-relaxed">
-                                            ใช้ดู "ประสิทธิภาพสมอง" เจาะลึกรายด้าน (Executive, Memory, Attention, Calculation) 
-                                            เหมาะสำหรับนักวิจัยเพื่อประเมินผลเชิงคุณภาพ
+                                            ใช้ดู <strong>"ประสิทธิภาพสมอง"</strong> เจาะลึกรายครั้ง (Accuracy, Time, Moves) เหมาะสำหรับนักวิจัยหรือผู้ที่ต้องการตรวจสอบคุณภาพการเล่นขั้นสูง
                                         </p>
                                     </div>
                                 </div>
