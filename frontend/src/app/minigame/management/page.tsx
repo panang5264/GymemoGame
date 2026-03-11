@@ -62,21 +62,21 @@ const COOKING_RECIPES: CookingRecipe[] = [
     name: 'กะเพราหมูสับ',
     ingredients: ['กระเทียม', 'พริกแดง', 'หมูสับ', 'กะเพรา', 'น้ำปลา', 'น้ำตาล'],
     extra: 'พริกแดง',
-    thought: 'อยากได้ความเผ็ดเพิ่มจัง... (ใส่พริกแดงเพิ่ม)',
+    thought: 'อยากได้ความเผ็ดเพิ่มจัง...',
     round: 1
   },
   {
     name: 'ผัดไทยกุ้ง',
     ingredients: ['เต้าหู้', 'กุ้ง', 'เส้นจันท์', 'ถั่วงอก', 'กุยช่าย', 'น้ำปลา', 'น้ำตาล'],
     extra: 'น้ำปลา',
-    thought: 'อยากได้ความเค็มเพิ่มจัง... (ใส่น้ำปลาเพิ่ม)',
+    thought: 'อยากได้ความเค็มเพิ่มจัง...',
     round: 1
   },
   {
     name: 'แตงกวาผัดไข่',
     ingredients: ['กระเทียม', 'แตงกวา', 'ไข่ไก่', 'น้ำปลา', 'น้ำตาล'],
     extra: 'น้ำตาล',
-    thought: 'อยากได้ความหวานเพิ่มจัง... (ใส่น้ำตาลเพิ่ม)',
+    thought: 'อยากได้ความหวานเพิ่มจัง...',
     round: 1
   },
   // Round 2
@@ -84,21 +84,21 @@ const COOKING_RECIPES: CookingRecipe[] = [
     name: 'หมูสับทอดกระเทียม',
     ingredients: ['หมูสับ', 'กระเทียม', 'น้ำปลา', 'น้ำตาล'],
     extra: 'กระเทียม',
-    thought: 'อยากได้ความหอมกระเทียมเพิ่มจัง... (ใส่กระเทียมเพิ่ม)',
+    thought: 'อยากได้ความหอมกระเทียมเพิ่มจัง...',
     round: 2
   },
   {
     name: 'ไข่เจียวหมูสับ',
     ingredients: ['ไข่ไก่', 'หมูสับ', 'น้ำปลา'],
     extra: 'น้ำปลา',
-    thought: 'อยากได้ความเค็มเพิ่มจัง... (ใส่น้ำปลาเพิ่ม)',
+    thought: 'อยากได้ความเค็มเพิ่มจัง...',
     round: 2
   },
   {
     name: 'ต้มยำกุ้ง',
     ingredients: ['กุ้ง', 'พริกแดง', 'น้ำปลา', 'น้ำตาล'],
     extra: 'พริกแดง',
-    thought: 'อยากได้ความเผ็ดร้อนเพิ่มจัง... (ใส่พริกแดงเพิ่ม)',
+    thought: 'อยากได้ความเผ็ดร้อนเพิ่มจัง...',
     round: 2
   },
   // Round 3
@@ -106,14 +106,14 @@ const COOKING_RECIPES: CookingRecipe[] = [
     name: 'ข้าวผัดกุ้ง',
     ingredients: ['ข้าวสวย', 'ไข่ไก่', 'กุ้ง', 'แตงกวา', 'น้ำปลา', 'น้ำตาล'],
     extra: 'น้ำตาล',
-    thought: 'อยากได้ความกลมกล่อมเพิ่มจัง... (ใส่น้ำตาลเพิ่ม)',
+    thought: 'อยากได้ความกลมกล่อมเพิ่มจัง...',
     round: 3
   },
   {
     name: 'ส้มตำ',
     ingredients: ['กระเทียม', 'พริกแดง', 'น้ำตาล', 'น้ำปลา'],
     extra: 'น้ำปลา',
-    thought: 'อยากได้ความนัวเพิ่มจัง... (ใส่น้ำปลาเพิ่ม)',
+    thought: 'อยากได้ความนัวเพิ่มจัง...',
     round: 3
   }
 ]
@@ -151,6 +151,21 @@ function generateMaze(rows: number, cols: number, hasKey: boolean, hasBombs: boo
   }
 
   walk(1, 1)
+
+  // --- Add Multiple Paths (Loops) ---
+  // Iterate through internal walls and randomly remove some to create loops/multiple paths
+  for (let r = 1; r < rows - 1; r++) {
+    for (let c = 1; c < cols - 1; c++) {
+      if (maze[r][c] === 1) {
+        // Don't remove walls that would create a direct shortcut to the exit too easily
+        // 15% chance to turn a wall into a path
+        if (Math.random() < 0.15) {
+          maze[r][c] = 0
+        }
+      }
+    }
+  }
+
   maze[rows - 2][cols - 2] = 2 // Exit (Flag)
 
   // Reachability check (BFS)
@@ -164,6 +179,10 @@ function generateMaze(rows: number, cols: number, hasKey: boolean, hasBombs: boo
       for (const [dr, dc] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
         const nr = r + dr, nc = c + dc
         if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && currentMaze[nr][nc] !== 1 && currentMaze[nr][nc] !== 4 && !v[nr][nc]) {
+          // Cannot pass through the exit (2) if it's not the final destination
+          if (currentMaze[nr][nc] === 2 && (nr !== endR || nc !== endC)) {
+            continue;
+          }
           v[nr][nc] = true
           q.push([nr, nc])
         }
@@ -175,13 +194,18 @@ function generateMaze(rows: number, cols: number, hasKey: boolean, hasBombs: boo
   if (hasKey) {
     // Place key at a random path (not start/end)
     let placed = false
-    while (!placed) {
+    let attempts = 0
+    while (!placed && attempts < 100) {
       const kr = Math.floor(Math.random() * (rows - 2)) + 1
       const kc = Math.floor(Math.random() * (cols - 2)) + 1
       if (maze[kr][kc] === 0 && (kr !== 1 || kc !== 1) && (kr !== rows - 2 || kc !== cols - 2)) {
-        maze[kr][kc] = 3
-        placed = true
+        // Ensure starting point can reach the key
+        if (canReach(1, 1, kr, kc, maze)) {
+          maze[kr][kc] = 3
+          placed = true
+        }
       }
+      attempts++
     }
   }
 
@@ -374,6 +398,7 @@ function ManagementGameInner() {
   // Cooking State
   const [dishIndex, setDishIndex] = useState(0)
   const [showCookingOrder, setShowCookingOrder] = useState(false)
+  const [showHint, setShowHint] = useState(false)
   const [currentOrder, setCurrentOrder] = useState<string[]>([])
   const [collectedIngredients, setCollectedIngredients] = useState<string[]>([])
   const [cookingItems, setCookingItems] = useState<{ name: string, image: string }[]>([])
@@ -403,6 +428,14 @@ function ManagementGameInner() {
   const spawnQueueRef = useRef(spawnQueue)
   useEffect(() => { spawnQueueRef.current = spawnQueue }, [spawnQueue])
 
+  useEffect(() => {
+    if (phase === 'play' && config.mode === 'cooking') {
+      setShowCookingOrder(true)
+      const timer = setTimeout(() => setShowCookingOrder(false), 6000)
+      return () => clearTimeout(timer)
+    }
+  }, [phase, config.mode, dishIndex])
+
   // Initialization
   useEffect(() => {
     hasSavedRef.current = false
@@ -427,7 +460,7 @@ function ManagementGameInner() {
     if (c.mode === 'cooking') {
       let rounds = [1]
       if (villageId === 4) rounds = [1, 3]
-      else if (villageId === 5) rounds = [2, 4]
+      else if (villageId === 5) rounds = [2, 3] // Use Round 3 instead of Round 4 (empty)
       else rounds = [1, 2, 3]
 
       const recipes = COOKING_RECIPES.filter(r => rounds.includes(r.round)).sort(() => Math.random() - 0.5)
@@ -545,6 +578,7 @@ function ManagementGameInner() {
     setCurrentOrder(recipe.ingredients)
     setCollectedIngredients([])
     setShowCookingOrder(true)
+    setShowHint(false)
     setIsExtraPhase(false)
     setThoughtBubble(null)
     setFeedback(null)
@@ -559,7 +593,8 @@ function ManagementGameInner() {
     })).sort(() => Math.random() - 0.5)
 
     setCookingItems(items)
-    setTimeout(() => setShowCookingOrder(false), 10000)
+
+    // Timer is now fully handled by the useEffect watching dishIndex and phase
   }
 
   const handleCookIngredient = (ing: string) => {
@@ -795,7 +830,7 @@ function ManagementGameInner() {
     if (c.mode === 'cooking') {
       let rounds = [1]
       if (villageId === 4) rounds = [1, 3]
-      else if (villageId === 5) rounds = [2, 4]
+      else if (villageId === 5) rounds = [2, 3] // Use Round 3 instead of Round 4 (empty)
       else rounds = [1, 2, 3]
 
       const recipes = COOKING_RECIPES.filter(r => rounds.includes(r.round)).sort(() => Math.random() - 0.5)
@@ -826,24 +861,26 @@ function ManagementGameInner() {
       <div className="w-full max-w-5xl bg-white rounded-[32px] md:rounded-[40px] shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-140px)] min-h-[550px] max-h-[850px] relative border border-slate-100">
 
         {/* Header Bar */}
-        <div className="h-16 md:h-20 bg-white border-b-2 border-slate-50 flex items-center justify-between px-4 md:px-10 shrink-0">
-          <div className="flex items-center gap-2 md:gap-4">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-50 rounded-lg md:rounded-2xl flex items-center justify-center text-xl md:text-3xl relative">
+        <div className="min-h-[4.5rem] md:min-h-[5.5rem] py-3 md:py-4 bg-white border-b border-slate-100 flex flex-row items-center justify-between px-3 md:px-8 shrink-0 z-20 rounded-t-[32px] md:rounded-t-[40px] shadow-sm relative">
+          <div className="flex items-center gap-3 md:gap-5 flex-1 pr-2">
+            <div className="w-10 h-10 md:w-14 md:h-14 bg-indigo-50/80 rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-3xl relative shrink-0 border border-indigo-100 shadow-inner">
               {levelParam <= 3 ? '📦' : levelParam <= 5 ? '🍳' : levelParam <= 9 ? '🧭' : '📝'}
               {isBonus && (
-                <div className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-[8px] md:text-[10px] font-black px-1.5 py-0.5 rounded-full border border-yellow-500 shadow-sm animate-pulse">
+                <div className="absolute -top-2 -right-3 bg-yellow-400 text-yellow-900 text-[9px] md:text-xs font-black px-2 py-0.5 rounded-full border border-yellow-500 shadow-sm animate-pulse">
                   x2
                 </div>
               )}
             </div>
-            <h1 className="text-sm md:text-2xl font-black text-slate-800 tracking-tight leading-tight max-w-[150px] md:max-w-none">
-              {config.instruction}
-            </h1>
+            <div className="flex flex-col flex-1 pb-1">
+              <h1 className="text-xs min-[360px]:text-[13px] sm:text-base md:text-xl lg:text-2xl font-black text-slate-800 tracking-tight leading-[1.35] break-words line-clamp-3 sm:line-clamp-none drop-shadow-sm">
+                {config.instruction}
+              </h1>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col items-end">
-              <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Score</span>
-              <span className="text-2xl md:text-4xl font-black text-indigo-600 tabular-nums">{score}</span>
+          <div className="flex items-center shrink-0 pl-3 md:pl-5 border-l-2 border-slate-100 h-10 md:h-12">
+            <div className="flex flex-col items-center justify-center">
+              <span className="text-[9px] md:text-xs font-black text-slate-400 uppercase tracking-widest leading-none">Score</span>
+              <span className="text-2xl md:text-4xl font-black text-indigo-600 tabular-nums leading-none mt-1">{score}</span>
             </div>
           </div>
         </div>
@@ -1020,64 +1057,91 @@ function ManagementGameInner() {
               )}
 
               {config.mode === 'cooking' && (
-                <div className="w-full h-full flex flex-col items-center justify-center p-4 md:p-10">
-                  <div className="absolute top-4 md:top-6 left-1/2 -translate-x-1/2 flex flex-col items-center z-20">
-                    <span className="bg-amber-500 text-white px-6 py-2 rounded-full font-black text-sm md:text-xl mb-4 shadow-lg border-2 border-amber-300">
+                <div className="w-full h-full flex flex-col items-center justify-center p-2 sm:p-4 md:p-10">
+                  <div className="absolute top-2 md:top-6 left-1/2 -translate-x-1/2 flex flex-col items-center z-20 w-fit">
+                    <span className="bg-amber-500 text-white px-4 md:px-6 py-1 md:py-2 rounded-full font-black text-xs md:text-xl mb-2 md:mb-4 shadow-lg border-2 border-amber-300 whitespace-nowrap">
                       เมนู: {shuffledRecipes[dishIndex]?.name}
                     </span>
+                    {!showCookingOrder && !isExtraPhase && phase === 'play' && (
+                      <button
+                        onClick={() => {
+                          setShowHint(true);
+                          setTimeout(() => setShowHint(false), 3000);
+                        }}
+                        disabled={showHint}
+                        className={`mb-2 md:mb-4 px-4 md:px-6 py-1 md:py-2 rounded-full text-[10px] md:text-sm font-black transition-all shadow-md active:scale-95 border-2 ${showHint ? 'bg-indigo-100 text-indigo-400 border-indigo-200' : 'bg-white text-indigo-600 border-indigo-300 hover:bg-indigo-50 animate-bounce-gentle'}`}
+                      >
+                        {showHint ? '📖 กำลังแสดงสรุปสูตร...' : '💡 ดูสูตรอีกครั้ง'}
+                      </button>
+                    )}
 
-                    {showCookingOrder && (
-                      <div className="flex flex-wrap justify-center gap-2 p-4 bg-white rounded-3xl shadow-2xl border-4 border-indigo-400 animate-in zoom-in max-w-lg">
-                        {currentOrder.map((ing, i) => (
-                          <div key={i} className="px-4 py-2 bg-indigo-50 rounded-2xl text-indigo-700 font-black text-sm md:text-xl border-2 border-indigo-100 shadow-sm animate-in fade-in slide-in-from-bottom-2">
-                            {ing}
-                          </div>
-                        ))}
+                    {(showCookingOrder || showHint) && (
+                      <div className="bg-white rounded-xl sm:rounded-3xl shadow-2xl border-2 sm:border-4 border-indigo-400 animate-in zoom-in max-w-[300px] sm:max-w-lg overflow-hidden flex flex-col">
+                        <div className="flex flex-wrap justify-center gap-1 sm:gap-2 p-2 sm:p-4 pb-3">
+                          {currentOrder.map((ing, i) => (
+                            <div key={i} className="px-2 sm:px-4 py-0.5 sm:py-2 bg-indigo-50 rounded-lg sm:rounded-2xl text-indigo-700 font-black text-[10px] sm:text-xl border-2 border-indigo-100 shadow-sm animate-in fade-in slide-in-from-bottom-2">
+                              {ing}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="w-full h-1.5 sm:h-2 bg-indigo-100/50">
+                          <div
+                            className="h-full bg-indigo-500 rounded-r-full"
+                            style={{ 
+                              animationName: 'shrinkWidth', 
+                              animationDuration: showCookingOrder ? '6s' : '3s', 
+                              animationTimingFunction: 'linear', 
+                              animationFillMode: 'forwards' 
+                            }}
+                          />
+                        </div>
                       </div>
                     )}
 
                     {thoughtBubble && (
-                      <div className="relative p-6 bg-white rounded-[2rem] shadow-2xl border-4 border-rose-400 animate-in slide-in-from-top duration-500 max-w-md">
-                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-white border-l-4 border-t-4 border-rose-400 rotate-45"></div>
-                        <p className="text-rose-600 font-black text-lg md:text-2xl text-center">
+                      <div className="relative p-4 md:p-6 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border-2 md:border-4 border-rose-400 animate-in slide-in-from-top duration-500 max-w-[280px] md:max-w-md">
+                        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-5 h-5 bg-white border-l-2 md:border-l-4 border-t-2 md:border-t-4 border-rose-400 rotate-45"></div>
+                        <p className="text-rose-600 font-black text-sm md:text-2xl text-center">
                           💭 "{thoughtBubble}"
                         </p>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex-1 flex flex-col items-center justify-center mt-24 md:mt-32">
-                    <div className="relative mb-12 md:mb-16">
-                      <div className="w-64 h-24 md:w-96 md:h-32 bg-slate-200/50 rounded-full border-b-[12px] border-slate-300 flex items-center justify-center relative overflow-hidden shadow-inner">
-                        <div className="flex flex-wrap justify-center gap-2 p-4">
-                          {collectedIngredients.map((ing, i) => (
-                            <div key={i} className="w-8 h-8 md:w-12 md:h-12 bg-white rounded-lg shadow-sm flex items-center justify-center p-1 animate-in bounce-in overflow-hidden relative group">
-                              <img src={getIngPath(ing, shuffledRecipes[dishIndex]?.round || 1)} className="w-full h-full object-contain" alt={ing} />
-                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                <span className="text-[8px] text-white font-bold">{ing}</span>
+                  <div className="flex-1 flex flex-col items-center justify-end pb-4 min-[400px]:pb-8 md:justify-center mt-2 md:mt-16 w-full max-h-[85%]">
+                    <div className="mb-2 min-[400px]:mb-6 sm:mb-10 w-full flex justify-center">
+                      <div className="relative">
+                        <div className="w-56 h-12 min-[400px]:h-14 sm:w-[480px] sm:h-36 lg:w-[600px] lg:h-48 bg-slate-200/50 rounded-full border-b-[4px] sm:border-b-[8px] lg:border-b-[12px] border-slate-300 flex items-center justify-center relative overflow-hidden shadow-inner z-10">
+                          <div className="flex flex-wrap justify-center gap-1.5 min-[400px]:gap-2 md:gap-3 p-2 min-[400px]:p-3 md:p-6">
+                            {collectedIngredients.map((ing, i) => (
+                              <div key={i} className="w-7 h-7 min-[400px]:w-8 min-[400px]:h-8 sm:w-14 sm:h-14 lg:w-20 lg:h-20 bg-white rounded-lg md:rounded-xl shadow-sm flex items-center justify-center p-1 animate-in bounce-in overflow-hidden relative group border-2 border-slate-100">
+                                <img src={getIngPath(ing, shuffledRecipes[dishIndex]?.round || 1)} className="w-full h-full object-contain" alt={ing} />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                  <span className="text-[6px] lg:text-xs text-white font-bold">{ing}</span>
+                                </div>
                               </div>
-                            </div>
-                          ))}
-                          {collectedIngredients.length < currentOrder.length && !showCookingOrder && !isExtraPhase && (
-                            <div className="text-slate-400 font-black text-xl animate-pulse">?</div>
-                          )}
+                            ))}
+                            {collectedIngredients.length < currentOrder.length && !showCookingOrder && !isExtraPhase && (
+                              <div className="text-slate-400 font-black text-sm min-[400px]:text-xl md:text-2xl animate-pulse">?</div>
+                            )}
+                          </div>
                         </div>
+                        {/* Pan handle or decor */}
+                        <div className="absolute top-1/2 -right-8 sm:-right-12 lg:-right-20 w-12 sm:w-20 lg:w-32 h-3 sm:h-4 lg:h-6 bg-slate-400 rounded-full -translate-y-1/2 shadow-md z-0"></div>
                       </div>
-                      {/* Pan handle or decor */}
-                      <div className="absolute top-1/2 -right-16 md:-right-24 w-20 md:w-32 h-4 md:h-6 bg-slate-400 rounded-full -translate-y-1/2 shadow-md"></div>
                     </div>
 
-                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 max-w-3xl px-4">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-1.5 min-[400px]:gap-2 lg:gap-3 w-full max-w-[90%] lg:max-w-3xl px-1 min-[400px]:px-2 shrink-0">
                       {cookingItems.map((item, i) => (
                         <button
                           key={i}
                           onClick={() => handleCookIngredient(item.name)}
-                          className="group flex flex-col items-center gap-2 md:gap-3 p-2 md:p-3 bg-white rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-2 active:translate-y-0 active:shadow-none transition-all border-b-[6px] border-slate-200"
+                          className="group flex flex-col items-center gap-1 min-[400px]:gap-1.5 lg:gap-3 p-1 min-[400px]:p-1.5 lg:p-3 bg-white rounded-xl lg:rounded-3xl shadow-md hover:shadow-xl hover:-translate-y-1 lg:hover:-translate-y-2 active:translate-y-0 active:shadow-none transition-all border-b-[3px] lg:border-b-[6px] border-slate-200"
                         >
-                          <div className="w-20 h-20 md:w-32 md:h-32 bg-slate-50 rounded-2xl flex items-center justify-center p-3 border-2 border-slate-100">
+                          <div className="w-12 h-12 min-[400px]:w-14 min-[400px]:h-14 sm:w-20 sm:h-20 lg:w-32 lg:h-32 bg-slate-50 rounded-lg min-[400px]:rounded-xl lg:rounded-2xl flex items-center justify-center p-1.5 min-[400px]:p-2 lg:p-3 border-2 border-slate-100">
                             <img src={item.image} className="w-full h-full object-contain group-hover:scale-110 transition-transform" alt={item.name} />
                           </div>
-                          <div className="px-5 py-1.5 bg-indigo-50 rounded-full border-2 border-indigo-100 text-indigo-800 font-black text-xs md:text-lg shadow-sm">
+                          <div className="px-2 lg:px-6 py-0.5 lg:py-2 bg-indigo-50 rounded-full border border-indigo-100 text-indigo-800 font-black text-[8px] min-[400px]:text-[9px] lg:text-lg shadow-sm whitespace-nowrap">
                             {item.name}
                           </div>
                         </button>
@@ -1102,7 +1166,7 @@ function ManagementGameInner() {
                           )}
                           {cell === 2 && (
                             <div className={`relative w-full h-full flex items-center justify-center ${levelParam >= 7 && !hasKey ? 'grayscale opacity-30 brightness-50' : 'animate-bounce'}`}>
-                              <span className="text-2xl md:text-3xl drop-shadow-sm filter saturate-150">🚩</span>
+                              <span className="text-2xl md:text-3xl drop-shadow-sm filter saturate-150 brightness-110">⛳</span>
                             </div>
                           )}
                           {cell === 3 && (
@@ -1157,6 +1221,7 @@ function ManagementGameInner() {
         .animate-jiggle { animation: jiggle 2s ease-in-out infinite; }
         .animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        @keyframes shrinkWidth { from { width: 100%; } to { width: 0%; } }
       `}</style>
     </div >
   )

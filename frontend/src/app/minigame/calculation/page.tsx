@@ -348,7 +348,7 @@ function CalculationGameInner() {
                       /* 2. Messing Index (The distractor / clown / symbol) */
                       <div className="relative group shrink-0">
                         {question.custom_messing?.[index] ? (
-                          <span className="text-2xl md:text-4xl font-black text-slate-300 transition-all group-hover:text-slate-400 group-hover:scale-105 whitespace-nowrap">
+                          <span className="text-2xl md:text-4xl font-black text-slate-500 transition-all group-hover:text-slate-700 group-hover:scale-105 whitespace-nowrap">
                             {question.custom_messing[index]}
                           </span>
                         ) : (
@@ -360,7 +360,9 @@ function CalculationGameInner() {
                       </div>
                     ) : typeof value === 'number' ? (
                       /* 3. Normal Number */
-                      <span className="text-3xl md:text-6xl lg:text-7xl font-black text-slate-800 tracking-tighter shrink-0">{value}</span>
+                      <span className={`text-3xl md:text-6xl lg:text-7xl font-black tracking-tighter shrink-0 ${value < 0 ? 'text-red-600' : 'text-slate-950'}`}>
+                        {value}
+                      </span>
                     ) : (
                       /* 4. Dice Image */
                       <div className="p-1 md:p-2 bg-white rounded-xl border-2 border-slate-100 shadow-sm flex items-center justify-center w-[65px] h-[55px] md:w-[120px] md:h-[110px] shrink-0 transform hover:scale-105 transition-transform">
@@ -370,17 +372,19 @@ function CalculationGameInner() {
 
                     {/* Operator between operands */}
                     {index < question.operators.length && (
-                      <span className={`${level.level === 10 ? 'text-2xl md:text-5xl text-indigo-400/50' : 'text-2xl md:text-5xl text-indigo-400'} font-black shrink-0 px-1 md:px-2`}>
+                      <span className="text-2xl md:text-5xl text-slate-900 font-black shrink-0 px-1 md:px-2">
                         {question.operators[index].name}
                       </span>
                     )}
 
-                    {/* Show equals sign at the end */}
+                    {/* Show equals sign at the end if not already present in operators */}
                     {index === question.operands.length - 1 && !question.operators.some(op => op.name === '=') && (
                       <div className="flex items-center gap-2 md:gap-4 ml-2 md:ml-4 shrink-0">
-                        <span className="text-2xl md:text-5xl font-black text-indigo-400">=</span>
+                        <span className="text-2xl md:text-5xl font-black text-slate-900">=</span>
                         {question.final_result !== undefined ? (
-                          <span className="text-3xl md:text-6xl lg:text-7xl font-black text-slate-800 tracking-tighter">{question.final_result}</span>
+                          <span className={`text-3xl md:text-6xl lg:text-7xl font-black tracking-tighter ${question.final_result < 0 ? 'text-red-600' : 'text-slate-950'}`}>
+                            {question.final_result}
+                          </span>
                         ) : (
                           <div className="w-10 h-10 md:w-20 md:h-20 flex items-center justify-center bg-blue-50 border-4 md:border-6 border-dashed border-blue-200 rounded-xl md:rounded-2xl text-2xl md:text-5xl text-blue-600 font-black">?</div>
                         )}

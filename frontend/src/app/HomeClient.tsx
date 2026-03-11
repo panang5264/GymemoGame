@@ -35,6 +35,7 @@ export default function Home() {
   const { login, logout, user, token, setUser: setAuthUser } = useAuth()
   const [trainingMode, setTrainingMode] = useState<'management' | 'calculation' | 'spatial' | null>(null)
   const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar || 'avatar-1')
+  const [activeAvatarCategory, setActiveAvatarCategory] = useState('ธรรมดา')
 
   const { progress, setProgress, saveProgress, isLoading: progressLoading, history } = useProgress()
   const [clockTarget, setClockTarget] = useState({ hour: 10, minute: 10 })
@@ -48,14 +49,22 @@ export default function Home() {
   useEffect(() => {
     if (progressLoading || !progress) return
 
-    if (progress.userName) {
-      setName(progress.userName)
+    const activeName = progress.userName || user?.name
+
+    if (activeName) {
+      setName(activeName)
+      
+      if (!progress.userName && user?.name) {
+        saveProgress({ ...progress, userName: user.name })
+      }
+
       const isEditMode = searchParams.get('edit') === 'true'
+      const hasSeenIntro = progress.introSeen || (user as any)?.introSeen
 
       // Determine initial phase: edit -> intro(if not seen) -> profile
       if (isEditMode) {
         setPhase('edit_profile')
-      } else if (!progress.introSeen) {
+      } else if (!hasSeenIntro) {
         setPhase('intro')
       } else {
         setPhase('profile')
@@ -84,7 +93,7 @@ export default function Home() {
       setCognitiveData(null)
     }
     setIsReady(true)
-  }, [progressLoading, progress?.guestId, progress?.userName, progress?.introSeen, router, searchParams])
+  }, [progressLoading, progress?.guestId, progress?.userName, progress?.introSeen, router, searchParams, user?.name, (user as any)?.introSeen])
 
   if (progressLoading) {
     return (
@@ -124,11 +133,11 @@ export default function Home() {
             saveProgress({ ...progress, userName })
           }
 
-          // ถ้าเคยดูเนื้อเรื่องแล้ว ให้เข้าหน้าแผนที่เลย
-          if (progress.introSeen) {
-            router.push('/world')
-          } else {
+          // ถ้าเคยดูเนื้อเรื่องแล้ว ให้เข้าหน้าโปรไฟล์ แต่ถ้ายังให้ดูเนื้อเรื่อง
+          if (progress.introSeen || (res.data as any).introSeen) {
             setPhase('profile')
+          } else {
+            setPhase('intro')
           }
         } else {
           setPhase('name')
@@ -615,21 +624,36 @@ export default function Home() {
 
             <form onSubmit={handleSaveName} className="space-y-8">
               <div className="space-y-4">
-                <p className="text-center text-sm font-black text-slate-400 uppercase tracking-widest">เลือกอวตาร</p>
-                <div className="grid grid-cols-3 gap-4">
-                  {AVATARS.map((av) => (
+                <div className="flex flex-wrap justify-center gap-2 mb-4">
+                  {['ธรรมดา', 'ใส่แว่น', 'ชุดพื้นเมือง', 'แว่น+พื้นเมือง'].map(cat => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setActiveAvatarCategory(cat)}
+                      className={`px-3 py-1.5 rounded-xl text-[10px] font-black transition-all border-2 ${activeAvatarCategory === cat
+                        ? 'bg-indigo-600 text-white border-indigo-700 shadow-[2px_2px_0_#312e81]'
+                        : 'bg-white text-slate-400 border-slate-100 hover:border-slate-200'
+                        }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-3 gap-4 max-h-[320px] overflow-y-auto p-2 scrollbar-hide">
+                  {AVATARS.filter(av => (av as any).category === activeAvatarCategory).map((av) => (
                     <button
                       key={av.id}
                       type="button"
                       onClick={() => setSelectedAvatar(av.id)}
-                      className={`relative aspect-square flex items-center justify-center text-4xl rounded-[2rem] border-4 transition-all ${selectedAvatar === av.id
+                      className={`relative aspect-square flex items-center justify-center text-4xl rounded-[1.5rem] border-4 transition-all ${selectedAvatar === av.id
                         ? 'bg-orange-100 border-orange-500 scale-105 shadow-[4px_4px_0_#f97316]'
                         : 'bg-white border-slate-100 hover:border-slate-300'
                         }`}
                     >
-                      <img src={av.imagePath} alt={av.label} className="w-full h-full object-cover p-2 rounded-[2rem]" />
+                      <img src={av.imagePath} alt={av.label} className="w-full h-full object-cover p-2 rounded-[1.5rem]" />
                       {selectedAvatar === av.id && (
-                        <div className="absolute -top-2 -right-2 bg-orange-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-white">
+                        <div className="absolute -top-1 -right-1 bg-orange-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-white">
                           ✓
                         </div>
                       )}
@@ -847,8 +871,12 @@ export default function Home() {
             {assessmentSubPhase === 'memorize' && (
               <MemoryRecallChallenge
                 phase="memorize"
+                selectedWords={['หลานสาว', 'สวรรค์', 'ภูเขา']}
                 onWordsGenerated={setMemoryWords}
-                onComplete={() => setAssessmentSubPhase('clock')}
+                onComplete={() => {
+                  setMemoryWords(['หลานสาว', 'สวรรค์', 'ภูเขา']);
+                  setAssessmentSubPhase('clock');
+                }}
               />
             )}
 

@@ -248,60 +248,81 @@ export const CALC_LEVELS: CalcLevel[] = [
     },
   },
 
-  // ── Level 8: สมการ 2 ฝั่ง (มีตัวแปรหายไป ใช้ภาพประกอบ) ────────────────────────────
+  // ── Level 8: N + N = ภาพจุด - ? ────────────────────────────
   {
     level: 8,
-    name: 'สมการ 2 ฝั่ง (หาค่าที่หายไป)',
-    description: 'สมดุลสมการสองฝั่ง ย้ายข้างสมการเพื่อหาคำตอบ (? + B = C + D)',
-    maxNumber: 9,
+    name: 'สมการ 2 ฝั่ง (N + N = ภาพจุด - ?)',
+    description: 'คำนวณสองฝั่งให้เท่ากัน โดยใช้ภาพจุดประกอบ (ผลรวมไม่เกิน 12)',
+    maxNumber: 6,
     generate_problem(): CalcQuestion {
-      const vA = calGame.RandomValue(9, 1)
-      const vB = calGame.RandomValue(9, 1)
-      const op1 = calGame.GetOperator("+")
-      const op2 = calGame.GetOperator("+")
-      const [targetSum] = calGame.Calculate({ operands: [vA, vB], operators: [op1] })
+      const rng = Math.random
+      // We need Num1 + Num2 = Dots - Missing
+      // To keep it simple and within dot image limits (max 12):
+      // Let sum = 4-9
+      const vA = Math.floor(rng() * 4) + 2 // 2-5
+      const vB = Math.floor(rng() * 4) + 2 // 2-5
+      const sum = vA + vB // 4-10
 
-      // targetSum = vC + missing
-      const vC = calGame.RandomValue(Math.min(targetSum - 1, 9), 1)
-      const missing = targetSum - vC
+      // Dots must be > sum. dotImages are 6-12.
+      let vDots = calGame.RandomDotImage()
+      while (vDots.value <= sum) {
+        vDots = calGame.RandomDotImage()
+      }
 
-      const terms = [vA, vB, vC, missing]
-      const hidden_index = Math.floor(Math.random() * 4) // randomize where "?" is
+      const missing = vDots.value - sum
+
+      const opAdd = calGame.GetOperator("+")
+      const opSub = calGame.GetOperator("-")
       const opEq = { name: "=", path: "" } as calGame.Operator
 
       return {
-        operands: terms,
-        operators: [op1, opEq, op2],
-        expect_result: terms[hidden_index] as number,
-        hidden_index: hidden_index
+        operands: [vA, vB, vDots, missing],
+        operators: [opAdd, opEq, opSub],
+        expect_result: missing,
+        hidden_index: 3 // The "?" at the very end
       }
     },
   },
 
-  // ── Level 9: สมการที่มีตัวแปรหายไป (ใช้ลูกเต๋าแทน) ──────────────────────────────────
+  // ── Level 9: สมการ 3 ตัว (หน้า 3 หลัง 3) ──────────────────────────────────
   {
     level: 9,
-    name: 'สมการตัวแปรหาย (ใช้ลูกเต๋า)',
-    description: 'หาตัวเลขที่หายไปในชุดสมการ โดยมีลูกเต๋าเป็นส่วนหนึ่ง (A op ? = C)',
-    maxNumber: 10,
+    name: 'สมการ 2 ฝั่ง (หน้า 3 ตัว / หลัง 3 ตัว)',
+    description: 'สมดุลสมการที่มี 3 จำนวนในแต่ละฝั่ง (A + B + ? = C + Dice + D)',
+    maxNumber: 20,
     generate_problem(): CalcQuestion {
-      const dice = calGame.RandomDice()
-      const op = calGame.RandomOperator()
-      let missingValue = calGame.RandomValue(9, 1)
+      const rng = Math.random
+      // Structure: Num1 + Num2 + ? = Num3 + Dice + Num4
+      // Use user's example values as a base: 3, B, ?, 2, Dice, 16
+      const v1 = Math.floor(rng() * 10) + 1 // "3"
+      const v2 = Math.floor(rng() * 15) + 5 // "B"
 
-      let operands: calGame.Operand[] = [dice, missingValue]
-      if (op.name === '-' && dice.value < missingValue) {
-        operands = [missingValue, dice]
+      const v3 = Math.floor(rng() * 10) + 1 // "2"
+      const vDice = calGame.RandomDice() // "Dice"
+      const v4 = Math.floor(rng() * 20) + 10 // "16"
+
+      const rightSum = v3 + vDice.value + v4
+      const leftKnown = v1 + v2
+
+      // We need leftKnown + missing = rightSum => missing = rightSum - leftKnown
+      // Ensure rightSum > leftKnown
+      let missing = rightSum - leftKnown
+
+      // If missing is negative or too small, adjust v4
+      let adjustedV4 = v4
+      if (missing <= 0) {
+        adjustedV4 = v4 + (Math.abs(missing) + 5)
+        missing = v3 + vDice.value + adjustedV4 - leftKnown
       }
 
-      const [result] = calGame.Calculate({ operands, operators: [op] })
+      const opAdd = calGame.GetOperator("+")
+      const opEq = { name: "=", path: "" } as calGame.Operator
 
       return {
-        operands: operands,
-        operators: [op],
-        expect_result: operands[1] instanceof Object ? (operands[1] as calGame.Dice).value : (operands[1] as number),
-        final_result: result,
-        hidden_index: 1
+        operands: [v1, v2, missing, v3, vDice, adjustedV4],
+        operators: [opAdd, opAdd, opEq, opAdd, opAdd],
+        expect_result: missing,
+        hidden_index: 2 // The third operand (index 2)
       }
     },
   },
@@ -309,15 +330,18 @@ export const CALC_LEVELS: CalcLevel[] = [
   // ── Level 10: สมการมีตัวกวน + หาตัวเลขที่หายไป ──────────────────────────────────
   {
     level: 10,
-    name: 'สมการตัวกวน (Interference)',
-    description: 'ดูให้ดี มีตัวกวน! คำนวณบวกหรือลบเฉพาะตัวเลขและลูกเต๋าเท่านั้น ห้ามสนใจสัญลักษณ์หลอก ○ ▲ ★ ♥︎ ◼︎ ◯ △',
+    name: 'สมการตัวกวน (Interference Level)',
+    description: 'คำนวณเฉพาะตัวเลขและลูกเต๋า! ห้ามสนใจสัญลักษณ์หลอก และเครื่องหมายที่ติดกับสัญลักษณ์หลอก',
     maxNumber: 50,
     generate_problem(): CalcQuestion {
       const rng = Math.random
       const numSlots = 4
       const slots: { val: number; isReal: boolean }[] = []
 
-      const distractorIdx = Math.floor(rng() * 4)
+      // To avoid "... ? - = " or confusing sequences, let's pick distractor index carefully
+      // User said: "ห้าม มีลบแบบ ลูกเต๋า + ? -= "
+      // We'll place distractor at index 1 or 2 (middle) to keep equation structure clear
+      const distractorIdx = Math.floor(rng() * 2) + 1 // index 1 or 2
       const realIndices = [0, 1, 2, 3].filter(i => i !== distractorIdx)
       const hiddenIdx = realIndices[Math.floor(rng() * 3)]
 
@@ -327,7 +351,7 @@ export const CALC_LEVELS: CalcLevel[] = [
         if (i === hiddenIdx) {
           val = Math.floor(rng() * 11) + 10 // 10-20
         } else if (isDist) {
-          val = Math.floor(rng() * 15) + 1
+          val = Math.floor(rng() * 15) + 5
         } else {
           val = Math.floor(rng() * 12) + 2
         }
@@ -336,6 +360,11 @@ export const CALC_LEVELS: CalcLevel[] = [
 
       // 3 operators for 4 slots
       const ops = [calGame.RandomOperator(), calGame.RandomOperator(), calGame.RandomOperator()]
+
+      // Rule: Operator before distractor should be '+' to avoid " - Dist =" looking like " -= "
+      if (!slots[distractorIdx].isReal) {
+        ops[distractorIdx - 1] = calGame.GetOperator("+")
+      }
 
       // Calculate Truth
       let runningTotal = 0
@@ -346,9 +375,23 @@ export const CALC_LEVELS: CalcLevel[] = [
             runningTotal = slots[i].val
             firstReal = false
           } else {
-            // Operator before this slot is ops[i-1]
+            // Find the last real index to use the correct operator chain
+            // Actually the current Calculate logic in game_logic.ts is linear.
+            // But we want to calculate ONLY real numbers.
+            // Let's find the previous real index.
+            let prevRealIdx = -1
+            for (let j = i - 1; j >= 0; j--) {
+              if (slots[j].isReal) {
+                prevRealIdx = j
+                break
+              }
+            }
+
+            // For simplicity in UI rendering, we use the operator immediately before the current slot
+            // but for LOGIC, we must use the one that connects real numbers.
+            // Actually, Level 10 is designed to be "A op1 Dist op2 B" where calculation is "A op2 B".
+            // Let's refine the ops to be consistent.
             let operator = ops[i - 1]
-            // Safety: avoid negative results by flipping - to + if needed
             if (operator.name === "-" && runningTotal < slots[i].val) {
               operator = calGame.GetOperator("+")
               ops[i - 1] = operator
@@ -374,6 +417,7 @@ export const CALC_LEVELS: CalcLevel[] = [
         } else {
           const mIdx = finalOperands.length
           messingIndices.push(mIdx)
+          // Add a symbol and a number, but make sure it's distinct
           customMessing[mIdx] = distractors[Math.floor(rng() * distractors.length)] + " " + slot.val
           finalOperands.push(0)
         }

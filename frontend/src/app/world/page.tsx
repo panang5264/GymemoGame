@@ -429,7 +429,7 @@ export default function WorldPage() {
                 className={styles.stageIcon}
                 style={{ backgroundImage: `url("${iconPath}")` }}
               />
-              <span className="bg-[var(--card-bg)] text-[var(--text-main)] px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-black shadow-[2px_2px_0_var(--border-dark)] uppercase tracking-widest whitespace-nowrap mt-1">
+              <span className="bg-[var(--card-bg)] text-[var(--text-main)] px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[8px] sm:text-xs font-black shadow-[2px_2px_0_var(--border-dark)] uppercase tracking-widest whitespace-nowrap mt-0.5">
                 ด่าน {stage}
               </span>
               {state !== 'locked' && (

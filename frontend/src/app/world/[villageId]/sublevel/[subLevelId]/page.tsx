@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import ConfirmUseKeyModal from '@/components/ConfirmUseKeyModal'
 import { getDateKey } from '@/lib/dailyChallenge'
 import { useProgress } from '@/contexts/ProgressContext'
-import { getKeys, recordPlay as rawRecordPlay } from '@/lib/levelSystem'
+import { getKeys, recordPlay as rawRecordPlay, consumeKey } from '@/lib/levelSystem'
 
 function getMinigameUrl(villageId: number, subId: number): string {
   const difficulty = Math.min(villageId, 10)
@@ -60,14 +60,14 @@ export default function SubLevelPage({
 
   const handleConfirm = () => {
     // ผู้เล่นเลือกใช้กุญแจข้ามด่าน
-    if (!progress) return
-    const { currentKeys } = getKeys(progress)
-    if (currentKeys <= 0) {
+    const consumedResult = consumeKey(progress)
+    if (!consumedResult) {
       setModalOpen(false)
       router.back()
       return
     }
-    let nextP = { ...progress, keys: { ...progress.keys, currentKeys: currentKeys - 1 } }
+    
+    let nextP = consumedResult
 
     // SKIP LOGIC: 50 points, Key count decreases
     // Note: recordPlay handles point calculation (50 pts for skips)
