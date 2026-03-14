@@ -153,6 +153,57 @@ function CalculationGameInner() {
     setPhase('done')
   }, [])
 
+  const getOperandNumericValue = useCallback((operand: CalcQuestion['operands'][number]) => {
+    if (typeof operand === 'number') return operand
+    if (operand && typeof operand === 'object' && 'value' in operand && typeof operand.value === 'number') {
+      return operand.value
+    }
+    return null
+  }, [])
+
+  const getExpectedAnswer = useCallback((q: CalcQuestion) => {
+    if (level.level === 10 && q.hidden_index !== undefined) {
+      const hiddenOperand = q.operands[q.hidden_index]
+      const hiddenValue = hiddenOperand !== undefined ? getOperandNumericValue(hiddenOperand) : null
+      if (typeof hiddenValue === 'number' && Number.isFinite(hiddenValue)) {
+        return hiddenValue
+      }
+    }
+    return q.expect_result
+  }, [level.level, getOperandNumericValue])
+
+  const getDistractorMeta = useCallback((q: CalcQuestion) => {
+    const indices = new Set<number>()
+
+    if (typeof q.messing_index === 'number' && q.messing_index >= 0 && q.messing_index < q.operands.length) {
+      indices.add(q.messing_index)
+    }
+
+    q.messing_indices?.forEach(i => {
+      if (i >= 0 && i < q.operands.length) indices.add(i)
+    })
+
+    const custom = q.custom_messing ?? {}
+    const customEntries = Object.entries(custom)
+    let fallbackText: string | number | undefined
+
+    for (const [rawKey, val] of customEntries) {
+      const idx = Number(rawKey)
+      if (Number.isInteger(idx) && idx >= 0 && idx < q.operands.length) {
+        indices.add(idx)
+      } else if (fallbackText === undefined) {
+        fallbackText = val
+      }
+    }
+
+    if (indices.size === 0 && level.level === 10) {
+      const zeroIdx = q.operands.findIndex(op => getOperandNumericValue(op) === 0)
+      if (zeroIdx >= 0) indices.add(zeroIdx)
+    }
+
+    return { indices, fallbackText }
+  }, [level.level, getOperandNumericValue])
+
   // ── Answer handler ────────────────────────────────────────────────────────
   const handleSubmit = useCallback(() => {
     if (!question || isTimeUp) return
@@ -160,7 +211,7 @@ function CalculationGameInner() {
     const parsed = Number(answer)
     if (Number.isNaN(parsed)) return
 
-    const correct = parsed === question.expect_result
+    const correct = parsed === getExpectedAnswer(question)
     setLastCorrect(correct)
     setScore(s => s + (correct ? 1 : 0))
     setTotal(t => t + 1)
@@ -175,7 +226,7 @@ function CalculationGameInner() {
         setQuestion(level.generate_problem())
       }
     }, 400)
-  }, [answer, question, isTimeUp, level])
+  }, [answer, question, isTimeUp, level, total, getExpectedAnswer])
 
   // ── Cheat Mode ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -263,6 +314,8 @@ function CalculationGameInner() {
 
   // ── Render: play ──────────────────────────────────────────────────────────
   if (phase === 'play' && question) {
+    const distractorMeta = getDistractorMeta(question)
+
     return (
       <div className="min-h-[calc(100vh-140px)] flex flex-col items-center p-4 font-['Supermarket']">
         {/* Responsive Header */}
@@ -341,34 +394,48 @@ function CalculationGameInner() {
               <div className="flex justify-center gap-2 md:gap-4 items-center flex-wrap max-w-full px-2">
                 {question.operands.map((value, index) => (
                   <div key={`op-${index}`} className="flex items-center gap-2 md:gap-3">
-                    {/* 1. Missing Index (The one to answer) */}
-                    {question.hidden_index === index ? (
-                      <div className="w-8 h-8 md:w-12 md:h-12 flex items-center justify-center bg-blue-50 border-2 md:border-4 border-dashed border-blue-200 rounded-xl text-xl md:text-3xl text-blue-600 font-black animate-pulse shrink-0">?</div>
-                    ) : (question.messing_index === index || question.messing_indices?.includes(index)) ? (
-                      /* 2. Messing Index (The distractor / clown / symbol) */
-                      <div className="relative group shrink-0">
-                        {question.custom_messing?.[index] ? (
-                          <span className="text-2xl md:text-4xl font-black text-slate-500 transition-all group-hover:text-slate-700 group-hover:scale-105 whitespace-nowrap">
-                            {question.custom_messing[index]}
+                    {(() => {
+                      const isDistractor =
+                        question.messing_index === index ||
+                        question.messing_indices?.includes(index) ||
+                        distractorMeta.indices.has(index)
+                      const customMessing = question.custom_messing?.[index] ?? (distractorMeta.indices.has(index) ? distractorMeta.fallbackText : undefined)
+
+                      if (question.hidden_index === index) {
+                        return <div className="w-8 h-8 md:w-12 md:h-12 flex items-center justify-center bg-blue-50 border-2 md:border-4 border-dashed border-blue-200 rounded-xl text-xl md:text-3xl text-blue-600 font-black animate-pulse shrink-0">?</div>
+                      }
+
+                      if (isDistractor) {
+                        return (
+                          <div className="relative group shrink-0">
+                            {customMessing !== undefined ? (
+                              <span className="text-2xl md:text-4xl font-black text-slate-500 transition-all group-hover:text-slate-700 group-hover:scale-105 whitespace-nowrap">
+                                {customMessing}
+                              </span>
+                            ) : (
+                              <>
+                                <span className="text-2xl md:text-4xl animate-bounce inline-block">🤡</span>
+                                <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">ตัวแปรส่วนเกิน!</div>
+                              </>
+                            )}
+                          </div>
+                        )
+                      }
+
+                      if (typeof value === 'number') {
+                        return (
+                          <span className={`text-3xl md:text-6xl lg:text-7xl font-black tracking-tighter shrink-0 ${value < 0 ? 'text-red-600' : 'text-slate-950'}`}>
+                            {value}
                           </span>
-                        ) : (
-                          <>
-                            <span className="text-2xl md:text-4xl animate-bounce inline-block">🤡</span>
-                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">ตัวแปรส่วนเกิน!</div>
-                          </>
-                        )}
-                      </div>
-                    ) : typeof value === 'number' ? (
-                      /* 3. Normal Number */
-                      <span className={`text-3xl md:text-6xl lg:text-7xl font-black tracking-tighter shrink-0 ${value < 0 ? 'text-red-600' : 'text-slate-950'}`}>
-                        {value}
-                      </span>
-                    ) : (
-                      /* 4. Dice Image */
-                      <div className="p-1 md:p-2 bg-white rounded-xl border-2 border-slate-100 shadow-sm flex items-center justify-center w-[65px] h-[55px] md:w-[120px] md:h-[110px] shrink-0 transform hover:scale-105 transition-transform">
-                        <Image src={(value as any).path} width={110} height={100} className="rounded-lg object-contain w-full h-full" alt={(value as any).name} />
-                      </div>
-                    )}
+                        )
+                      }
+
+                      return (
+                        <div className="p-1 md:p-2 bg-white rounded-xl border-2 border-slate-100 shadow-sm flex items-center justify-center w-[65px] h-[55px] md:w-[120px] md:h-[110px] shrink-0 transform hover:scale-105 transition-transform">
+                          <Image src={(value as any).path} width={110} height={100} className="rounded-lg object-contain w-full h-full" alt={(value as any).name} />
+                        </div>
+                      )
+                    })()}
 
                     {/* Operator between operands */}
                     {index < question.operators.length && (

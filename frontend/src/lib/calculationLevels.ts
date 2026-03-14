@@ -1,4 +1,5 @@
 import * as calGame from '@/lib/calculation-minigame/game_logic'
+import exp from 'constants'
 /**
  * Calculation Mode – level configurations and question generation.
  *
@@ -194,8 +195,8 @@ export const CALC_LEVELS: CalcLevel[] = [
       if (!this.minNumber) {
         this.minNumber = 10;
       }
-      const val1 = calGame.RandomValue(this.minNumber, this.maxNumber);
-      const val2 = calGame.RandomValue(0, this.minNumber); // Ensure carry: lastDigit + val2 >= 10
+      const val1 = calGame.RandomValue(this.maxNumber, this.minNumber);
+      const val2 = calGame.RandomValue(this.minNumber, 0); // Ensure carry: lastDigit + val2 >= 10
       const ope = calGame.GetOperator("+")
       const [result] = calGame.Calculate({ operands: [val1, val2], operators: [ope] })
       return {
@@ -217,8 +218,8 @@ export const CALC_LEVELS: CalcLevel[] = [
       if (!this.minNumber) {
         this.minNumber = 10;
       }
-      const val1 = calGame.RandomValue(this.minNumber, this.maxNumber);
-      const val2 = calGame.RandomValue(0, this.minNumber); // Ensure carry: lastDigit + val2 >= 10
+      const val1 = calGame.RandomValue(this.maxNumber, this.minNumber);
+      const val2 = calGame.RandomValue(this.minNumber, 0); // Ensure carry: lastDigit + val2 >= 10
       const ope = calGame.GetOperator("-")
       const [result] = calGame.Calculate({ operands: [val1, val2], operators: [ope] })
       return {
@@ -293,17 +294,17 @@ export const CALC_LEVELS: CalcLevel[] = [
     level: 9,
     name: 'สมการ 2 ฝั่ง (หน้า 3 ตัว / หลัง 3 ตัว)',
     description: 'สมดุลสมการที่มี 3 จำนวนในแต่ละฝั่ง (A + B + ? = C + Dice + D)',
-    maxNumber: 20,
+    maxNumber: 10,
     generate_problem(): CalcQuestion {
-      const rng = Math.random
       // Structure: Num1 + Num2 + ? = Num3 + Dice + Num4
       // Use user's example values as a base: 3, B, ?, 2, Dice, 16
-      const v1 = Math.floor(rng() * 10) + 1 // "3"
-      const v2 = Math.floor(rng() * 15) + 5 // "B"
+      const v1 = calGame.RandomValue(this.maxNumber);
+      const v2 = calGame.RandomValue(this.maxNumber);
 
-      const v3 = Math.floor(rng() * 10) + 1 // "2"
+      const v3 = calGame.RandomValue(this.maxNumber);
       const vDice = calGame.RandomDice() // "Dice"
-      const v4 = Math.floor(rng() * 20) + 10 // "16"
+      const v4 = calGame.RandomValue(this.maxNumber);
+
 
       const rightSum = v3 + vDice.value + v4
       const leftKnown = v1 + v2
@@ -336,101 +337,79 @@ export const CALC_LEVELS: CalcLevel[] = [
     level: 10,
     name: 'สมการตัวกวน (Interference Level)',
     description: 'คำนวณเฉพาะตัวเลขและลูกเต๋า! ห้ามสนใจสัญลักษณ์หลอก และเครื่องหมายที่ติดกับสัญลักษณ์หลอก',
-    maxNumber: 50,
+    maxNumber: 20,
     generate_problem(): CalcQuestion {
       const rng = Math.random
       const numSlots = 4
-      const slots: { val: number; isReal: boolean }[] = []
+      const slots: calGame.Operand[] = []
 
       // To avoid "... ? - = " or confusing sequences, let's pick distractor index carefully
       // User said: "ห้าม มีลบแบบ ลูกเต๋า + ? -= "
       // We'll place distractor at index 1 or 2 (middle) to keep equation structure clear
       const distractorIdx = Math.floor(rng() * 2) + 1 // index 1 or 2
       const realIndices = [0, 1, 2, 3].filter(i => i !== distractorIdx)
-      const hiddenIdx = realIndices[Math.floor(rng() * 3)]
+      const hiddenIdx = realIndices[Math.floor(rng() * (numSlots - 1))]
 
       for (let i = 0; i < numSlots; i++) {
-        const isDist = i === distractorIdx
-        let val = 0
-        if (i === hiddenIdx) {
-          val = Math.floor(rng() * 11) + 10 // 10-20
-        } else if (isDist) {
-          val = Math.floor(rng() * 15) + 5
-        } else {
-          val = Math.floor(rng() * 12) + 2
-        }
-        slots.push({ val, isReal: !isDist })
+        slots.push(calGame.Random(this.maxNumber))
       }
 
       // 3 operators for 4 slots
       const ops = [calGame.RandomOperator(), calGame.RandomOperator(), calGame.RandomOperator()]
 
       // Rule: Operator before distractor should be '+' to avoid " - Dist =" looking like " -= "
-      if (!slots[distractorIdx].isReal) {
-        ops[distractorIdx - 1] = calGame.GetOperator("+")
-      }
+      ops[distractorIdx - 1] = calGame.GetOperator("+");
 
       // Calculate Truth
-      let runningTotal = 0
-      let firstReal = true
-      for (let i = 0; i < numSlots; i++) {
-        if (slots[i].isReal) {
-          if (firstReal) {
-            runningTotal = slots[i].val
-            firstReal = false
-          } else {
-            // Find the last real index to use the correct operator chain
-            // Actually the current Calculate logic in game_logic.ts is linear.
-            // But we want to calculate ONLY real numbers.
-            // Let's find the previous real index.
-            let prevRealIdx = -1
-            for (let j = i - 1; j >= 0; j--) {
-              if (slots[j].isReal) {
-                prevRealIdx = j
-                break
-              }
-            }
+      const calOperands = slots.filter((value, index, arr) => index !== distractorIdx)
+      let calOperators = ops.filter((val, index, arr) => index !== distractorIdx - 1)
+      let [runningTotal] = calGame.Calculate({ operands: calOperands, operators: calOperators })
 
-            // For simplicity in UI rendering, we use the operator immediately before the current slot
-            // but for LOGIC, we must use the one that connects real numbers.
-            // Actually, Level 10 is designed to be "A op1 Dist op2 B" where calculation is "A op2 B".
-            // Let's refine the ops to be consistent.
-            let operator = ops[i - 1]
-            if (operator.name === "-" && runningTotal < slots[i].val) {
-              operator = calGame.GetOperator("+")
-              ops[i - 1] = operator
-            }
-            runningTotal = (operator.name === "+") ? runningTotal + slots[i].val : runningTotal - slots[i].val
-          }
+      // If result is negative, swap one +/- operator and convert total to positive
+      if (runningTotal < 0) {
+        for (let i = 0; i < ops.length; i++) {
+          const ope = ops[i]
+          const target = (ope.name === "-") ? "+" : "-"
+          ops[i] = calGame.GetOperator(target)
         }
+        calOperators = ops.filter((val, index, arr) => index !== distractorIdx - 1)
+        const [newTotal] = calGame.Calculate({ operands: calOperands, operators: calOperators })
+        runningTotal = newTotal
+        console.log(runningTotal)
       }
 
       const distractors = ['○', '▲', '★', '♥︎', '◼︎', '◯', '△']
-      const finalOperands: calGame.Operand[] = []
+      const finalOperands: calGame.Operand[] = slots
       const messingIndices: number[] = []
       const customMessing: Record<number, string | number> = {}
+      let expectedResult = 0;
 
       for (let i = 0; i < numSlots; i++) {
-        const slot = slots[i]
-        if (slot.isReal) {
-          if (slot.val <= 6 && rng() > 0.4) {
-            finalOperands.push({ ...calGame.RandomDice(), value: slot.val, name: `dice${slot.val}` } as calGame.Dice)
-          } else {
-            finalOperands.push(slot.val)
-          }
+        const slot = slots[i];
+        let val = 0;
+        if (typeof slot !== "number") {
+          val = slot.value
         } else {
+          val = slot
+        }
+        if (i === distractorIdx) {
           const mIdx = finalOperands.length
           messingIndices.push(mIdx)
           // Add a symbol and a number, but make sure it's distinct
-          customMessing[mIdx] = distractors[Math.floor(rng() * distractors.length)] + " " + slot.val
-          finalOperands.push(0)
+          customMessing[mIdx] = distractors[Math.floor(rng() * distractors.length)] + " " + val
+          finalOperands[i] = 0;
+        } else if (i === hiddenIdx) {
+          expectedResult = val;
         }
       }
+
+      console.log(expectedResult);
+
 
       return {
         operands: finalOperands,
         operators: ops,
-        expect_result: slots[hiddenIdx].val,
+        expect_result: expectedResult,
         final_result: runningTotal,
         messing_indices: messingIndices,
         custom_messing: customMessing,
