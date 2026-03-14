@@ -48,7 +48,7 @@ only ${operatorImages}`)
 
 export type Operand = Dice | number
 
-export function Random(maxNumber: number): Operand {
+export function Random(maxNumber: number, minNumber: number = 0): Operand {
   const types = ["d", "n"]
   const type = types[Math.floor(Math.random() * types.length)]
   let value: Operand = 0
