@@ -185,14 +185,17 @@ export const CALC_LEVELS: CalcLevel[] = [
     level: 5,
     name: 'บวกเลข 2 หลัก + 1 หลัก (มีตัวทด)',
     description: 'เลขสองหลักบวกเลขหนึ่งหลัก แบบมีการทดหลัก',
-    maxNumber: 99,
-    minNumber: 11,
+    maxNumber: 30,
+    minNumber: 10,
     generate_problem(): CalcQuestion {
       // Find val1 (2 digits) and val2 (1 digit) such that carry occurs in ones place
-      const lastDigit = calGame.RandomValue(9, 1);
-      const val1_tens = calGame.RandomValue(8, 1) * 10;
-      const val1 = val1_tens + lastDigit;
-      const val2 = calGame.RandomValue(9, 10 - lastDigit); // Ensure carry: lastDigit + val2 >= 10
+      // const lastDigit = calGame.RandomValue(9, 1);
+      // const val1_tens = calGame.RandomValue(8, 1);
+      if (!this.minNumber) {
+        this.minNumber = 10;
+      }
+      const val1 = calGame.RandomValue(this.minNumber, this.maxNumber);
+      const val2 = calGame.RandomValue(0, this.minNumber); // Ensure carry: lastDigit + val2 >= 10
       const ope = calGame.GetOperator("+")
       const [result] = calGame.Calculate({ operands: [val1, val2], operators: [ope] })
       return {
@@ -208,13 +211,14 @@ export const CALC_LEVELS: CalcLevel[] = [
     level: 6,
     name: 'ลบเลข 2 หลัก - 1 หลัก (มีการยืม)',
     description: 'เลขสองหลักลบเลขหนึ่งหลัก แบบมีการยืมหลัก',
-    maxNumber: 99,
-    minNumber: 11,
+    maxNumber: 30,
+    minNumber: 10,
     generate_problem(): CalcQuestion {
-      const lastDigit = calGame.RandomValue(8, 0); // 0-8
-      const val1_tens = calGame.RandomValue(9, 2) * 10; // 20-90
-      const val1 = val1_tens + lastDigit;
-      const val2 = calGame.RandomValue(9, lastDigit + 1); // Ensure borrow: lastDigit < val2
+      if (!this.minNumber) {
+        this.minNumber = 10;
+      }
+      const val1 = calGame.RandomValue(this.minNumber, this.maxNumber);
+      const val2 = calGame.RandomValue(0, this.minNumber); // Ensure carry: lastDigit + val2 >= 10
       const ope = calGame.GetOperator("-")
       const [result] = calGame.Calculate({ operands: [val1, val2], operators: [ope] })
       return {
