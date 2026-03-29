@@ -85,335 +85,247 @@ export const CALC_LEVELS: CalcLevel[] = [
   {
     level: 1,
     name: 'บวก/ลบแต้มลูกเต๋า 2 ลูก',
-    description: 'บวกหรือลบแต้มจากลูกเต๋า 2 ลูก (ผลบวก < 10)',
+    description: 'บวกแต้มสองลูกเต๋า (ผลรวม < 10) หรือ ลบลูกเต๋า (ผลลัพธ์เป็นบวก)',
     maxNumber: 10,
     generate_problem(): CalcQuestion {
       const ope = calGame.RandomOperator()
       let val1 = calGame.RandomDice()
       let val2 = calGame.RandomDice()
-
       if (ope.name === '+') {
-        // Ensure sum < 10
         while (val1.value + val2.value >= 10) {
           val1 = calGame.RandomDice()
           val2 = calGame.RandomDice()
         }
       } else {
-        // Ensure result >= 0
-        if (val1.value < val2.value) {
-          [val1, val2] = [val2, val1]
-        }
+        if (val1.value < val2.value) [val1, val2] = [val2, val1]
       }
-
       const [result] = calGame.Calculate({ operands: [val1, val2], operators: [ope] })
-      return {
-        operands: [val1, val2],
-        operators: [ope],
-        expect_result: result,
-      }
+      return { operands: [val1, val2], operators: [ope], expect_result: result }
     },
   },
-
-  // ── Level 2: บวก/ลบเลขหลักเดียว ─────────────────────────────
+  // ── Level 2: ตัวเลข 1 หลัก บวก/ลบ กัน ──────────────────────────────────────────
   {
     level: 2,
-    name: 'บวก/ลบเลขหลักเดียว',
-    description: 'บวกหรือลบเลขหลักเดียว',
+    name: 'บวก/ลบเลข 1 หลัก',
+    description: 'ตัวเลข 1 หลัก บวก ลบ กัน',
     maxNumber: 9,
     generate_problem(): CalcQuestion {
       let val1 = calGame.RandomValue(9, 1)
       let val2 = calGame.RandomValue(9, 1)
       const ope = calGame.RandomOperator()
-      if (ope.name === '-' && val1 < val2) {
-        [val1, val2] = [val2, val1]
-      }
+      if (ope.name === '-' && val1 < val2) [val1, val2] = [val2, val1]
       const [result] = calGame.Calculate({ operands: [val1, val2], operators: [ope] })
-      return {
-        operands: [val1, val2],
-        operators: [ope],
-        expect_result: result,
-      }
+      return { operands: [val1, val2], operators: [ope], expect_result: result }
     },
   },
-
   // ── Level 3: บวกเลขหลักเดียว 3 จำนวน ────────────────────────────────
   {
     level: 3,
-    name: 'บวกเลขหลักเดียว 3 จำนวน',
-    description: 'บวกเลขหลักเดียว 3 จำนวนเข้าด้วยกัน',
+    name: 'บวก/ลบเลขหลักเดียว 3 จำนวน',
+    description: 'บวกเลขหลักเดียว 3 จำนวน (วิธีบวกผสมลบ)',
     maxNumber: 9,
     generate_problem(): CalcQuestion {
-      const val1 = calGame.RandomValue(9, 1)
-      const val2 = calGame.RandomValue(9, 1)
-      const val3 = calGame.RandomValue(9, 1)
-      const ope1 = calGame.GetOperator("+")
-      const ope2 = calGame.GetOperator("+")
-      const [result] = calGame.Calculate({ operands: [val1, val2, val3], operators: [ope1, ope2] })
-      return {
-        operands: [val1, val2, val3],
-        operators: [ope1, ope2],
-        expect_result: result,
+      let val1 = calGame.RandomValue(9, 1)
+      let val2 = calGame.RandomValue(9, 1)
+      let val3 = calGame.RandomValue(9, 1)
+      let ope1 = calGame.GetOperator('+')
+      let ope2 = calGame.GetOperator('-')
+      if (Math.random() > 0.5) [ope1, ope2] = [ope2, ope1]
+      let [result] = calGame.Calculate({ operands: [val1, val2, val3], operators: [ope1, ope2] })
+      while (result < 0) {
+        val1 = calGame.RandomValue(9, 1)
+        val2 = calGame.RandomValue(9, 1)
+        val3 = calGame.RandomValue(9, 1)
+        result = calGame.Calculate({ operands: [val1, val2, val3], operators: [ope1, ope2] })[0]
       }
+      return { operands: [val1, val2, val3], operators: [ope1, ope2], expect_result: result }
     },
   },
-
   // ── Level 4: ลูกเต๋า + ตัวเลข ─────────────────────────────────────────────────
   {
     level: 4,
-    name: 'ลูกเต๋า + ตัวเลข',
-    description: 'บวกหรือลบแต้มลูกเต๋ากับตัวเลข',
-    maxNumber: 9,
+    name: 'ลูกเต๋า + เลข 1 หลัก 2 ตัว + เลข 2 หลัก 1 ตัว',
+    description: 'ลูกเต๋าบวกกับตัวเลข 2 ตัว (เลขหลักเดียว และ เลข 2 หลัก)',
+    maxNumber: 19,
     generate_problem(): CalcQuestion {
-      const val1 = calGame.RandomDice()
-      const val2 = calGame.RandomValue(9, 1)
-      const ope = calGame.RandomOperator()
-      let operands: calGame.Operand[] = [val1, val2]
-      // Ensure positive result
-      if (ope.name === '-' && val1.value < val2) {
-        operands = [val2, val1]
+      let val1 = calGame.RandomDice()
+      let val2 = calGame.RandomValue(9, 1)
+      let val3 = calGame.RandomValue(30, 10)
+      let ope1 = calGame.GetOperator('+')
+      let ope2 = calGame.GetOperator('-')
+      if (Math.random() > 0.5) [ope1, ope2] = [ope2, ope1]
+      let operands: calGame.Operand[] = [val1, val2, val3]
+      if (Math.random() > 0.5) operands = [val1, val3, val2]
+      let [result] = calGame.Calculate({ operands, operators: [ope1, ope2] })
+      while (result < 0) {
+        val1 = calGame.RandomDice()
+        val2 = calGame.RandomValue(9, 1)
+        val3 = calGame.RandomValue(30, 10)
+        operands = [val1, val2, val3]
+        if (Math.random() > 0.5) operands = [val1, val3, val2]
+        result = calGame.Calculate({ operands, operators: [ope1, ope2] })[0]
       }
-      const [result] = calGame.Calculate({ operands, operators: [ope] })
-      return {
-        operands,
-        operators: [ope],
-        expect_result: result
-      }
+      return { operands, operators: [ope1, ope2], expect_result: result }
     },
   },
-
-  // ── Level 5: บวกเลข 2 หลัก + 1 หลัก (มีตัวทด) ──────────────────────────────
+  // ── Level 5: บวกเลข 2 หลัก + เลข 2 หลัก ──────────────────────────────
   {
     level: 5,
-    name: 'บวกเลข 2 หลัก + 1 หลัก (มีตัวทด)',
-    description: 'เลขสองหลักบวกเลขหนึ่งหลัก แบบมีการทดหลัก',
-    maxNumber: 30,
-    minNumber: 10,
+    name: 'บวกเลข 2 หลัก',
+    description: 'บวกเลข 2 หลัก + เลข 2 หลัก',
+    maxNumber: 99,
     generate_problem(): CalcQuestion {
-      // Find val1 (2 digits) and val2 (1 digit) such that carry occurs in ones place
-      // const lastDigit = calGame.RandomValue(9, 1);
-      // const val1_tens = calGame.RandomValue(8, 1);
-      if (!this.minNumber) {
-        this.minNumber = 10;
-      }
-      const val1 = calGame.RandomValue(this.maxNumber, this.minNumber);
-      const val2 = calGame.RandomValue(this.minNumber, 0); // Ensure carry: lastDigit + val2 >= 10
-      const ope = calGame.GetOperator("+")
+      const val1 = calGame.RandomValue(99, 10)
+      const val2 = calGame.RandomValue(99, 10)
+      const ope = calGame.GetOperator('+')
       const [result] = calGame.Calculate({ operands: [val1, val2], operators: [ope] })
-      return {
-        operands: [val1, val2],
-        operators: [ope],
-        expect_result: result
-      }
+      return { operands: [val1, val2], operators: [ope], expect_result: result }
     },
   },
-
-  // ── Level 6: ลบเลข 2 หลัก - 1 หลัก (มีการยืม) ──────────────────────────
+  // ── Level 6: ลบเลข 2 หลัก - เลข 2 หลัก ──────────────────────────
   {
     level: 6,
-    name: 'ลบเลข 2 หลัก - 1 หลัก (มีการยืม)',
-    description: 'เลขสองหลักลบเลขหนึ่งหลัก แบบมีการยืมหลัก',
-    maxNumber: 30,
-    minNumber: 10,
+    name: 'ลบเลข 2 หลัก',
+    description: 'ลบเลข 2 หลัก - เลข 2 หลัก',
+    maxNumber: 99,
     generate_problem(): CalcQuestion {
-      if (!this.minNumber) {
-        this.minNumber = 10;
-      }
-      const val1 = calGame.RandomValue(this.maxNumber, this.minNumber);
-      const val2 = calGame.RandomValue(this.minNumber, 0); // Ensure carry: lastDigit + val2 >= 10
-      const ope = calGame.GetOperator("-")
+      let val1 = calGame.RandomValue(99, 10)
+      let val2 = calGame.RandomValue(99, 10)
+      if (val1 < val2) [val1, val2] = [val2, val1]
+      const ope = calGame.GetOperator('-')
       const [result] = calGame.Calculate({ operands: [val1, val2], operators: [ope] })
-      return {
-        operands: [val1, val2],
-        operators: [ope],
-        expect_result: result
-      }
+      return { operands: [val1, val2], operators: [ope], expect_result: result }
     },
   },
-
-  // ── Level 7: นับจุดในรูปภาพแล้วนำมาบวก/ลบ ────────────────────────────────────
+  // ── Level 7: สมการ 2 ฝั่ง (หา ? สมดุล) ────────────────────────────────────
   {
     level: 7,
-    name: 'นับจำนวนจุดแล้วบวก/ลบ',
-    description: 'นับแต้มจากภาพแล้วนำมาคำนวณบวกหรือลบ',
-    maxNumber: 10,
+    name: 'สมการ 2 ฝั่ง (หา ? กลางสมการ)',
+    description: 'เลข 2 หลัก 1 ค่า และเลข 1 หลัก 2 ค่า (ผสมบวก/ลบกัน)',
+    maxNumber: 30,
     generate_problem(): CalcQuestion {
-      const val1 = calGame.RandomDotImage()
-      const val2 = calGame.RandomDotImage()
-      const ope = calGame.RandomOperator()
-      let operands: calGame.Operand[] = [val1, val2]
-      if (ope.name === '-' && val1.value < val2.value) {
-        operands = [val2, val1]
+      let A = 0, B = 0, C = 0, missing = 0, ope1: any, ope2: any
+      let valid = false
+      while (!valid) {
+        A = calGame.RandomValue(30, 10)
+        B = calGame.RandomValue(9, 1)
+        C = calGame.RandomValue(9, 1)
+        ope1 = calGame.RandomOperator()
+        ope2 = calGame.RandomOperator()
+        let leftSum = calGame.Calculate({operands: [A, B], operators: [ope1]})[0]
+        if (leftSum < 0) continue
+        missing = ope2.name === '+' ? leftSum - C : leftSum + C
+        if (missing >= 0 && missing <= 50) valid = true
       }
-      const [result] = calGame.Calculate({ operands, operators: [ope] })
+      const opEq = { name: '=', path: '' } as calGame.Operator
       return {
-        operands,
-        operators: [ope],
-        expect_result: result,
+         operands: [A, B, missing, C],
+         operators: [ope1, opEq, ope2],
+         expect_result: missing,
+         hidden_index: 2
       }
     },
   },
-
-  // ── Level 8: N + N = ภาพจุด - ? ────────────────────────────
+  // ── Level 8: N + ? = สมการมีลูกเต๋า ────────────────────────────
   {
     level: 8,
-    name: 'สมการ 2 ฝั่ง (N + N = ภาพจุด - ?)',
-    description: 'คำนวณสองฝั่งให้เท่ากัน โดยใช้ภาพจุดประกอบ (ผลรวมไม่เกิน 12)',
-    maxNumber: 6,
+    name: 'สมการ 2 ฝั่ง (มีลูกเต๋า, หา ? หน้าสมการ)',
+    description: 'สมการหน้ามีเลข 2 หลัก 1 ค่า + ?, กลางมีเลข 2 ค่า + ลูกเต๋า (บวกเท่านั้น)',
+    maxNumber: 30,
     generate_problem(): CalcQuestion {
-      const rng = Math.random
-      // We need Num1 + Num2 = Dots - Missing
-      // To keep it simple and within dot image limits (max 12):
-      // Let sum = 4-9
-      const vA = Math.floor(rng() * 4) + 2 // 2-5
-      const vB = Math.floor(rng() * 4) + 2 // 2-5
-      const sum = vA + vB // 4-10
-
-      // Dots must be > sum. dotImages are 6-12.
-      let vDots = calGame.RandomDotImage()
-      while (vDots.value <= sum) {
-        vDots = calGame.RandomDotImage()
+      let A = 0, B = 0, C = 0, missing = 0, Dice = calGame.RandomDice()
+      let valid = false
+      while (!valid) {
+        B = calGame.RandomValue(9, 1)
+        C = calGame.RandomValue(9, 1)
+        Dice = calGame.RandomDice()
+        let rightSum = B + C + Dice.value
+        A = calGame.RandomValue(Math.min(24, Math.max(10, rightSum - 1)), 10)
+        missing = rightSum - A
+        if (missing >= 0) valid = true
       }
-
-      const missing = vDots.value - sum
-
       const opAdd = calGame.GetOperator("+")
-      const opSub = calGame.GetOperator("-")
       const opEq = { name: "=", path: "" } as calGame.Operator
-
       return {
-        operands: [vA, vB, vDots, missing],
-        operators: [opAdd, opEq, opSub],
+        operands: [A, missing, B, C, Dice],
+        operators: [opAdd, opEq, opAdd, opAdd],
         expect_result: missing,
-        hidden_index: 3 // The "?" at the very end
+        hidden_index: 1
       }
     },
   },
-
   // ── Level 9: สมการ 3 ตัว (หน้า 3 หลัง 3) ──────────────────────────────────
   {
     level: 9,
-    name: 'สมการ 2 ฝั่ง (หน้า 3 ตัว / หลัง 3 ตัว)',
-    description: 'สมดุลสมการที่มี 3 จำนวนในแต่ละฝั่ง (A + B + ? = C + Dice + D)',
-    maxNumber: 10,
+    name: 'สมการ 2 ฝั่ง (หน้า 3 ค่า, หลัง 3 ค่า)',
+    description: 'สมการหน้ามี 3 ค่า เลข 2 หลัก 1 ค่า, สมการหลังลูกเต๋าผสมตัวเลข',
+    maxNumber: 30,
     generate_problem(): CalcQuestion {
-      // Structure: Num1 + Num2 + ? = Num3 + Dice + Num4
-      // Use user's example values as a base: 3, B, ?, 2, Dice, 16
-      const v1 = calGame.RandomValue(this.maxNumber);
-      const v2 = calGame.RandomValue(this.maxNumber);
-
-      const v3 = calGame.RandomValue(this.maxNumber);
-      const vDice = calGame.RandomDice() // "Dice"
-      const v4 = calGame.RandomValue(this.maxNumber);
-
-
-      const rightSum = v3 + vDice.value + v4
-      const leftKnown = v1 + v2
-
-      // We need leftKnown + missing = rightSum => missing = rightSum - leftKnown
-      // Ensure rightSum > leftKnown
-      let missing = rightSum - leftKnown
-
-      // If missing is negative or too small, adjust v4
-      let adjustedV4 = v4
-      if (missing <= 0) {
-        adjustedV4 = v4 + (Math.abs(missing) + 5)
-        missing = v3 + vDice.value + adjustedV4 - leftKnown
+      let A = 0, B = 0, C = 0, D = 0, missing = 0, Dice = calGame.RandomDice()
+      let opL2: any, opR1: any, opR2: any
+      let valid = false
+      while (!valid) {
+        A = calGame.RandomValue(30, 10)
+        B = calGame.RandomValue(9, 1)
+        C = calGame.RandomValue(9, 1)
+        D = calGame.RandomValue(9, 1)
+        Dice = calGame.RandomDice()
+        opL2 = calGame.RandomOperator()
+        opR1 = calGame.RandomOperator()
+        opR2 = calGame.RandomOperator()
+        let rightSum = calGame.Calculate({operands: [Dice.value, C, D], operators: [opR1, opR2]})[0]
+        if (rightSum < 0) continue
+        let adjustedB = opL2.name === '+' ? -B : B
+        missing = rightSum - A + adjustedB
+        if (missing >= 0 && missing <= 50) valid = true
       }
-
       const opAdd = calGame.GetOperator("+")
       const opEq = { name: "=", path: "" } as calGame.Operator
-
       return {
-        operands: [v1, v2, missing, v3, vDice, adjustedV4],
-        operators: [opAdd, opAdd, opEq, opAdd, opAdd],
+        operands: [A, missing, B, Dice, C, D],
+        operators: [opAdd, opL2, opEq, opR1, opR2],
         expect_result: missing,
-        hidden_index: 2 // The third operand (index 2)
+        hidden_index: 1
       }
     },
   },
-
   // ── Level 10: สมการมีตัวกวน + หาตัวเลขที่หายไป ──────────────────────────────────
   {
     level: 10,
-    name: 'สมการตัวกวน (Interference Level)',
-    description: 'คำนวณเฉพาะตัวเลขและลูกเต๋า! ห้ามสนใจสัญลักษณ์หลอก และเครื่องหมายที่ติดกับสัญลักษณ์หลอก',
-    maxNumber: 20,
+    name: 'สมการตัวกวน (มีตัวหลอก)',
+    description: 'ด่าน 10: ดูให้ดี มีตัวกวน! บวกหรือลบตัวเลขหรือรูปลูกเต๋าที่มีจุดเท่านั้น',
+    maxNumber: 40,
     generate_problem(): CalcQuestion {
-      const rng = Math.random
-      const numSlots = 4
-      const slots: calGame.Operand[] = []
-
-      // To avoid "... ? - = " or confusing sequences, let's pick distractor index carefully
-      // User said: "ห้าม มีลบแบบ ลูกเต๋า + ? -= "
-      // We'll place distractor at index 1 or 2 (middle) to keep equation structure clear
-      const distractorIdx = Math.floor(rng() * 2) + 1 // index 1 or 2
-      const realIndices = [0, 1, 2, 3].filter(i => i !== distractorIdx)
-      const hiddenIdx = realIndices[Math.floor(rng() * (numSlots - 1))]
-
-      for (let i = 0; i < numSlots; i++) {
-        slots.push(calGame.Random(this.maxNumber))
+      let missing = 0, A = 0, B = 0, C = 0, D = 0, E = 0, Dice = calGame.RandomDice()
+      let opR1: any, opR2: any, opR3: any
+      let valid = false
+      while (!valid) {
+        A = calGame.RandomValue(9, 1)
+        B = calGame.RandomValue(30, 10)
+        C = calGame.RandomValue(9, 1)
+        D = calGame.RandomValue(9, 1)
+        E = calGame.RandomValue(9, 1)
+        Dice = calGame.RandomDice()
+        opR1 = calGame.RandomOperator()
+        opR2 = calGame.RandomOperator()
+        opR3 = calGame.RandomOperator()
+        let rightSum = calGame.Calculate({operands: [C, D, E, Dice.value], operators: [opR1, opR2, opR3]})[0]
+        if (rightSum < 0) continue
+        missing = rightSum - A + B
+        if (missing >= 0 && missing <= 50) valid = true
       }
-
-      // 3 operators for 4 slots
-      const ops = [calGame.RandomOperator(), calGame.RandomOperator(), calGame.RandomOperator()]
-
-      // Rule: Operator before distractor should be '+' to avoid " - Dist =" looking like " -= "
-      ops[distractorIdx - 1] = calGame.GetOperator("+");
-
-      // Calculate Truth
-      const calOperands = slots.filter((value, index, arr) => index !== distractorIdx)
-      let calOperators = ops.filter((val, index, arr) => index !== distractorIdx - 1)
-      let [runningTotal] = calGame.Calculate({ operands: calOperands, operators: calOperators })
-
-      // If result is negative, swap one +/- operator and convert total to positive
-      if (runningTotal < 0) {
-        for (let i = 0; i < ops.length; i++) {
-          const ope = ops[i]
-          const target = (ope.name === "-") ? "+" : "-"
-          ops[i] = calGame.GetOperator(target)
-        }
-        calOperators = ops.filter((val, index, arr) => index !== distractorIdx - 1)
-        const [newTotal] = calGame.Calculate({ operands: calOperands, operators: calOperators })
-        runningTotal = newTotal
-        console.log(runningTotal)
-      }
-
-      const distractors = ['○', '▲', '★', '♥︎', '◼︎', '◯', '△']
-      const finalOperands: calGame.Operand[] = slots
-      const messingIndices: number[] = []
-      const customMessing: Record<number, string | number> = {}
-      let expectedResult = 0;
-
-      for (let i = 0; i < numSlots; i++) {
-        const slot = slots[i];
-        let val = 0;
-        if (typeof slot !== "number") {
-          val = slot.value
-        } else {
-          val = slot
-        }
-        if (i === distractorIdx) {
-          const mIdx = finalOperands.length
-          messingIndices.push(mIdx)
-          // Add a symbol and a number, but make sure it's distinct
-          customMessing[mIdx] = distractors[Math.floor(rng() * distractors.length)] + " " + val
-          finalOperands[i] = 0;
-        } else if (i === hiddenIdx) {
-          expectedResult = val;
-        }
-      }
-
-      console.log(expectedResult);
-
-
+      const opAdd = calGame.GetOperator("+")
+      const opSub = calGame.GetOperator("-")
+      const opEq = { name: "=", path: "" } as calGame.Operator
+      const distractors = ['❌', '✖', '○', '▲', '★', '♥︎', '◼︎', '◯', '△']
+      const distSym = distractors[Math.floor(Math.random() * distractors.length)]
       return {
-        operands: finalOperands,
-        operators: ops,
-        expect_result: expectedResult,
-        final_result: runningTotal,
-        messing_indices: messingIndices,
-        custom_messing: customMessing,
-        hidden_index: hiddenIdx
+        operands: [missing, A, B, 0, C, D, E, Dice],
+        operators: [opAdd, opSub, opAdd, opEq, opR1, opR2, opR3],
+        expect_result: missing,
+        hidden_index: 0,
+        messing_indices: [3],
+        custom_messing: { 3: distSym }
       }
     },
   },
