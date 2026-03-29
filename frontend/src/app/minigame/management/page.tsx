@@ -280,6 +280,30 @@ const V1_ROUND = [
   { id: 'ro5', label: 'ดาวอังคาร', emoji: '�', tags: ['round'], imageUrl: `${MG_BASE}/หมู่บ้านที่ 1/รอบที่ 1/หมวดหมู่ที่2/ทรงกลม/ดาวอังคาร.jpg` },
 ]
 
+// ── MOCKUP: ด่าน 4 (สีฟ้า & ทรงกระบอก) ──
+const V4_BLUE = [
+  ...Array(5).fill(0).map((_, i) => ({ id: `b${i}`, label: `สีฟ้า ${i + 1}`, emoji: '🟦', tags: ['blue'] }))
+]
+const V4_CYLINDER = [
+  ...Array(5).fill(0).map((_, i) => ({ id: `c${i}`, label: `ทรงกระบอก ${i + 1}`, emoji: '🛢️', tags: ['cylinder'] }))
+]
+
+// ── MOCKUP: ด่าน 7 (สีเหลือง & สามเหลี่ยม) ──
+const V7_YELLOW = [
+  ...Array(5).fill(0).map((_, i) => ({ id: `y${i}`, label: `สีเหลือง ${i + 1}`, emoji: '🟨', tags: ['yellow'] }))
+]
+const V7_TRIANGLE = [
+  ...Array(5).fill(0).map((_, i) => ({ id: `t${i}`, label: `สามเหลี่ยม ${i + 1}`, emoji: '🔺', tags: ['triangle'] }))
+]
+
+// ── MOCKUP: ด่าน 10 (สีเขียว & สี่เหลี่ยม) ──
+const V10_GREEN = [
+  ...Array(5).fill(0).map((_, i) => ({ id: `g${i}`, label: `สีเขียว ${i + 1}`, emoji: '🟩', tags: ['green'] }))
+]
+const V10_SQUARE = [
+  ...Array(5).fill(0).map((_, i) => ({ id: `sq${i}`, label: `สี่เหลี่ยม ${i + 1}`, emoji: '⏹️', tags: ['square'] }))
+]
+
 // Village 2 images – 4-legged animals & Scrubbers
 const V2_ANIMALS = [
   { id: 'a1', label: 'จระเข้', emoji: '🐊', tags: ['animal4'], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 3/จรเข้.png` },
@@ -320,6 +344,7 @@ function getLevelConfig(level: number, assetVersion: string = 'v1') {
 
   switch (level) {
     case 1:
+      mode = 'sorting'
       instruction = 'แยกวัตถุสีแดง และ วัตถุรูปทรงกลม (15 ชิ้น)'
       categories = [
         { id: 'red', title: 'วัตถุสีแดง 🔴', emoji: '📦', accepts: i => i.tags.includes('red') },
@@ -328,7 +353,38 @@ function getLevelConfig(level: number, assetVersion: string = 'v1') {
       items = [...V1_RED, ...V1_ROUND, ...DISTRACTORS.slice(0, 5)]
       break
 
+    case 4:
+      mode = 'sorting'
+      instruction = 'แยกวัตถุสีฟ้า และ วัตถุรูปทรงกระบอก (15 ชิ้น)'
+      categories = [
+        { id: 'blue', title: 'วัตถุสีฟ้า 🟦', emoji: '📦', accepts: i => i.tags.includes('blue') },
+        { id: 'cylinder', title: 'ทรงกระบอก 🛢️', emoji: '📦', accepts: i => i.tags.includes('cylinder') },
+      ]
+      items = [...V4_BLUE, ...V4_CYLINDER, ...DISTRACTORS.slice(5, 10)]
+      break
+
+    case 7:
+      mode = 'sorting'
+      instruction = 'แยกวัตถุสีเหลือง และ สามเหลี่ยม (15 ชิ้น)'
+      categories = [
+        { id: 'yellow', title: 'วัตถุสีเหลือง 🟨', emoji: '📦', accepts: i => i.tags.includes('yellow') },
+        { id: 'triangle', title: 'สามเหลี่ยม 🔺', emoji: '📦', accepts: i => i.tags.includes('triangle') },
+      ]
+      items = [...V7_YELLOW, ...V7_TRIANGLE, ...DISTRACTORS.slice(0, 5)]
+      break
+
+    case 10:
+      mode = 'sorting'
+      instruction = 'แยกวัตถุสีเขียว และ สี่เหลี่ยม (15 ชิ้น)'
+      categories = [
+        { id: 'green', title: 'วัตถุสีเขียว 🟩', emoji: '📦', accepts: i => i.tags.includes('green') },
+        { id: 'square', title: 'สี่เหลี่ยม ⏹️', emoji: '📦', accepts: i => i.tags.includes('square') },
+      ]
+      items = [...V10_GREEN, ...V10_SQUARE, ...DISTRACTORS.slice(5, 10)]
+      break
+
     case 2:
+      mode = 'sorting'
       instruction = 'แยกสัตว์ 4 ขา และ อุปกรณ์สำหรับขัด/แปรง (15 ชิ้น)'
       categories = [
         { id: 'animal4', title: 'สัตว์ 4 ขา 🐾', emoji: '🕳️', accepts: i => i.tags.includes('animal4') },
@@ -338,9 +394,8 @@ function getLevelConfig(level: number, assetVersion: string = 'v1') {
       break
 
     case 3:
+      mode = 'sorting'
       instruction = 'แยก 4 หมวดหมู่! ภาชนะจะสลับทุก 2 ครั้ง (30 ชิ้น)'
-      // Prompt Requirement: Hole 1: 4-legged animals, Hole 2: Cleaning tools, Box 1: Red... Box 2: Round...
-      // Start with the "Holes" set
       categories = [
         { id: 'animal4', title: 'หลุม 1: สัตว์ 4 ขา 🐾', emoji: '🕳️', accepts: i => i.tags.includes('animal4') },
         { id: 'scrubber', title: 'หลุม 2: อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', accepts: i => i.tags.includes('scrubber') },
@@ -348,19 +403,14 @@ function getLevelConfig(level: number, assetVersion: string = 'v1') {
       items = [...V2_ANIMALS, ...V2_SCRUBBERS, ...V1_RED, ...V1_ROUND, ...DISTRACTORS.slice(0, 10)]
       break
 
-    case 4:
     case 5:
       mode = 'cooking'
-      instruction = level === 4 ? 'ปรุงอาหารตามลำดับที่ปรากฏ (จำลำดับให้ดี!)' : 'ปรุงอาหารและปรับรสชาติพิเศษตามความคิดของตัวละคร'
+      instruction = 'ปรุงอาหารและปรับรสชาติพิเศษตามความคิดของตัวละคร'
       break
 
     case 6:
       mode = 'maze'
       instruction = 'เดินหาทางออกจากจุดเริ่มต้นไปยังธงสีเขียว (หากไม่เดินจะจางหาย)'
-      break
-    case 7:
-      mode = 'maze'
-      instruction = 'ต้องหากุญแจเพื่อไขทองออกจากเขาวงกต'
       break
     case 8:
       mode = 'maze'
@@ -370,7 +420,8 @@ function getLevelConfig(level: number, assetVersion: string = 'v1') {
       mode = 'maze'
       instruction = 'ระวัง! การควบคุมจะตรงกันข้าม และระเบิดจะถูกซ่อนไว้ (ต้องหากุญแจด้วย)'
       break
-    case 10:
+    case 11:
+    case 12:
       mode = 'matching'
       instruction = 'จับคู่คำพูด/วลีให้ตรงหมวดหมู่'
       break
