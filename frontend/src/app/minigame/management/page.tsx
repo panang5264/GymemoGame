@@ -341,89 +341,55 @@ function getLevelConfig(level: number, assetVersion: string = 'v1') {
   // MOCKUP: ตัวอย่างการนำ assetVersion ไปผูกสร้างฐาน Path ให้โฟลเดอร์รูปภาพ
   // ตัวอย่าง path: /Asset_New/Asset_New/management_raw/หมู่บ้านที่ 1/v1/
   const DYNAMIC_BASE_PATH = `/Asset_New/Asset_New/management_raw/หมู่บ้านที่ ${level}/${assetVersion}`
-
   switch (level) {
     case 1:
+    case 2:
+    case 3:
       mode = 'sorting'
-      instruction = 'แยกวัตถุสีแดง และ วัตถุรูปทรงกลม (15 ชิ้น)'
-      categories = [
-        { id: 'red', title: 'วัตถุสีแดง 🔴', emoji: '📦', accepts: i => i.tags.includes('red') },
-        { id: 'round', title: 'วัตถุทรงกลม ⚪', emoji: '📦', accepts: i => i.tags.includes('round') },
-      ]
-      items = [...V1_RED, ...V1_ROUND, ...DISTRACTORS.slice(0, 5)]
+      if (level === 1) {
+        instruction = 'แยกวัตถุสีแดง และ วัตถุรูปทรงกลม (15 ชิ้น)'
+        categories = [
+          { id: 'red', title: 'วัตถุสีแดง 🔴', emoji: '📦', accepts: i => i.tags.includes('red') },
+          { id: 'round', title: 'วัตถุทรงกลม ⚪', emoji: '📦', accepts: i => i.tags.includes('round') },
+        ]
+        items = [...V1_RED, ...V1_ROUND, ...DISTRACTORS.slice(0, 5)]
+      } else if (level === 2) {
+        instruction = 'แยกสัตว์ 4 ขา และ อุปกรณ์สำหรับขัด/แปรง (15 ชิ้น)'
+        categories = [
+          { id: 'animal4', title: 'สัตว์ 4 ขา 🐾', emoji: '🕳️', accepts: i => i.tags.includes('animal4') },
+          { id: 'scrubber', title: 'อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', accepts: i => i.tags.includes('scrubber') },
+        ]
+        items = [...V2_ANIMALS, ...V2_SCRUBBERS, ...DISTRACTORS.slice(0, 5)]
+      } else {
+        instruction = 'แยก 4 หมวดหมู่! ภาชนะจะสลับทุก 2 ครั้ง (30 ชิ้น)'
+        categories = [
+          { id: 'animal4', title: 'หลุม 1: สัตว์ 4 ขา 🐾', emoji: '🕳️', accepts: i => i.tags.includes('animal4') },
+          { id: 'scrubber', title: 'หลุม 2: อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', accepts: i => i.tags.includes('scrubber') },
+        ]
+        items = [...V2_ANIMALS, ...V2_SCRUBBERS, ...V1_RED, ...V1_ROUND, ...DISTRACTORS.slice(0, 10)]
+      }
       break
 
     case 4:
-      mode = 'sorting'
-      instruction = 'แยกวัตถุสีฟ้า และ วัตถุรูปทรงกระบอก (15 ชิ้น)'
-      categories = [
-        { id: 'blue', title: 'วัตถุสีฟ้า 🟦', emoji: '📦', accepts: i => i.tags.includes('blue') },
-        { id: 'cylinder', title: 'ทรงกระบอก 🛢️', emoji: '📦', accepts: i => i.tags.includes('cylinder') },
-      ]
-      items = [...V4_BLUE, ...V4_CYLINDER, ...DISTRACTORS.slice(5, 10)]
-      break
-
-    case 7:
-      mode = 'sorting'
-      instruction = 'แยกวัตถุสีเหลือง และ สามเหลี่ยม (15 ชิ้น)'
-      categories = [
-        { id: 'yellow', title: 'วัตถุสีเหลือง 🟨', emoji: '📦', accepts: i => i.tags.includes('yellow') },
-        { id: 'triangle', title: 'สามเหลี่ยม 🔺', emoji: '📦', accepts: i => i.tags.includes('triangle') },
-      ]
-      items = [...V7_YELLOW, ...V7_TRIANGLE, ...DISTRACTORS.slice(0, 5)]
-      break
-
-    case 10:
-      mode = 'sorting'
-      instruction = 'แยกวัตถุสีเขียว และ สี่เหลี่ยม (15 ชิ้น)'
-      categories = [
-        { id: 'green', title: 'วัตถุสีเขียว 🟩', emoji: '📦', accepts: i => i.tags.includes('green') },
-        { id: 'square', title: 'สี่เหลี่ยม ⏹️', emoji: '📦', accepts: i => i.tags.includes('square') },
-      ]
-      items = [...V10_GREEN, ...V10_SQUARE, ...DISTRACTORS.slice(5, 10)]
-      break
-
-    case 2:
-      mode = 'sorting'
-      instruction = 'แยกสัตว์ 4 ขา และ อุปกรณ์สำหรับขัด/แปรง (15 ชิ้น)'
-      categories = [
-        { id: 'animal4', title: 'สัตว์ 4 ขา 🐾', emoji: '🕳️', accepts: i => i.tags.includes('animal4') },
-        { id: 'scrubber', title: 'อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', accepts: i => i.tags.includes('scrubber') },
-      ]
-      items = [...V2_ANIMALS, ...V2_SCRUBBERS, ...DISTRACTORS.slice(0, 5)]
-      break
-
-    case 3:
-      mode = 'sorting'
-      instruction = 'แยก 4 หมวดหมู่! ภาชนะจะสลับทุก 2 ครั้ง (30 ชิ้น)'
-      categories = [
-        { id: 'animal4', title: 'หลุม 1: สัตว์ 4 ขา 🐾', emoji: '🕳️', accepts: i => i.tags.includes('animal4') },
-        { id: 'scrubber', title: 'หลุม 2: อุปกรณ์ขัด/แปรง 🧽', emoji: '🕳️', accepts: i => i.tags.includes('scrubber') },
-      ]
-      items = [...V2_ANIMALS, ...V2_SCRUBBERS, ...V1_RED, ...V1_ROUND, ...DISTRACTORS.slice(0, 10)]
-      break
-
     case 5:
       mode = 'cooking'
       instruction = 'ปรุงอาหารและปรับรสชาติพิเศษตามความคิดของตัวละคร'
       break
 
     case 6:
-      mode = 'maze'
-      instruction = 'เดินหาทางออกจากจุดเริ่มต้นไปยังธงสีเขียว (หากไม่เดินจะจางหาย)'
-      break
+    case 7:
     case 8:
-      mode = 'maze'
-      instruction = 'จำตำแหน่งระเบิดให้ดี! ระเบิดจะซ่อนเมื่อเริ่มเดิน (ต้องหากุญแจด้วย)'
-      break
     case 9:
       mode = 'maze'
-      instruction = 'ระวัง! การควบคุมจะตรงกันข้าม และระเบิดจะถูกซ่อนไว้ (ต้องหากุญแจด้วย)'
+      if (level === 6) instruction = 'เดินหาทางออกจากจุดเริ่มต้นไปยังธงสีเขียว (หากไม่เดินจะจางหาย)'
+      else if (level === 7) instruction = 'เขาวงกตขนาด 15x15! หากุญแจและทางออก'
+      else if (level === 8) instruction = 'จำตำแหน่งระเบิดให้ดี! ระเบิดจะซ่อนเมื่อเริ่มเดิน (ต้องหากุญแจด้วย)'
+      else instruction = 'ระวัง! การควบคุมจะตรงกันข้าม และระเบิดจะถูกซ่อนไว้ (ต้องหากุญแจด้วย)'
       break
-    case 11:
-    case 12:
+
+    case 10:
       mode = 'matching'
-      instruction = 'จับคู่คำพูด/วลีให้ตรงหมวดหมู่'
+      instruction = 'จับคู่คำพูด/วลีให้ตรงหมวดหมู่ (รอบที่ 1-4 ตามลำดับ)'
       break
   }
 
@@ -561,20 +527,57 @@ function ManagementGameInner() {
     }
 
     if (c.mode === 'matching') {
-      const phrases = [
-        { left: 'สวัสดีครับ', right: 'การทักทาย' },
-        { left: 'ขอบคุณมากนะครับ', right: 'การขอบคุณ' },
-        { left: 'ผมขอโทษจริงๆ ครับ', right: 'การขออภัย' },
-        { left: 'ยินดีที่ได้รู้จักครับ', right: 'การทำความรู้จัก' },
-        { left: 'ขอให้โชคดีนะ', right: 'การอวยพร' },
-      ]
+      let phrases: { left: string; right: string }[] = []
+      // Select round based on subId cycle or other logic if needed, 
+      // but let's map subId 1, 4, 7, 10 to Rounds 1, 2, 3, 4 for Level 10
+      let roundNum = 1
+      if (subId === 1) roundNum = 1
+      else if (subId === 4) roundNum = 2
+      else if (subId === 7) roundNum = 3
+      else if (subId === 10) roundNum = 4
+      else roundNum = (subId % 4) || 4
+
+      if (roundNum === 1) {
+        phrases = [
+          { left: 'พยาบาล/หมอ', right: 'โรงพยาบาล' },
+          { left: 'พ่อครัว', right: 'ห้องครัว' },
+          { left: 'ชาวนา', right: 'ทุ่งนา' },
+          { left: 'นักบิน', right: 'เครื่องบิน' },
+          { left: 'บรรณารักษ์', right: 'ห้องสมุด' },
+        ]
+      } else if (roundNum === 2) {
+        phrases = [
+          { left: 'ทะเลทราย', right: 'ภูเขาหิมะ' },
+          { left: 'ได้เหรียญทอง', right: 'อันดับสุดท้าย' },
+          { left: 'จุดเริ่มต้น', right: 'เส้นชัย' },
+          { left: 'บัณฑิต', right: 'คนโง่' },
+          { left: 'เศรษฐี', right: 'ยาจก' },
+        ]
+      } else if (roundNum === 3) {
+        phrases = [
+          { left: 'แป้งสาลี', right: 'ขนมปัง' },
+          { left: 'ทราย', right: 'กระจก' },
+          { left: 'เมล็ดโกโก้', right: 'ช็อกโกแลต' },
+          { left: 'ข้าว', right: 'สาโท' },
+          { left: 'ดินเหนียว', right: 'เครื่องปั้นดินเผา' },
+        ]
+      } else {
+        phrases = [
+          { left: 'ค้อน', right: 'ทุบตี,ตอก' },
+          { left: 'กรรไกร', right: 'การตัด' },
+          { left: 'มีด', right: 'การหั่น,การเฉือน' },
+          { left: 'ไม้ขีดไฟ', right: 'การเผา' },
+          { left: 'รถเข็น', right: 'การเคลื่อนย้ายของ' },
+        ]
+      }
+
       const pairs = phrases.map((p, idx) => ({ ...p, id: idx, matched: false }))
       setMatchingPairs(pairs)
 
       const shuffled = pairs.map(p => ({ text: p.right, id: p.id })).sort(() => Math.random() - 0.5)
       setShuffledRight(shuffled)
     }
-  }, [levelParam])
+  }, [levelParam, subId])
 
   // Spawning Logic (Sorting Only)
   useEffect(() => {

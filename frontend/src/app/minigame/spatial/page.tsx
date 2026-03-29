@@ -280,18 +280,23 @@ function getBoxBank(level: number): BoxQuestion[] {
 
 function pickBoxQuestion(level: number): { q: BoxQuestion; numOptions: number } {
   const bank = getBoxBank(level)
-  let q = bank[Math.floor(Math.random() * bank.length)]
+  const storageKey = `spatial_played_box_lv${level}`
+  let playedList = []
+  if (typeof window !== 'undefined') {
+    playedList = JSON.parse(sessionStorage.getItem(storageKey) || '[]')
+  }
+
+  // If played all, reset
+  if (playedList.length >= bank.length) playedList = []
+
+  const available = bank.filter(b => !playedList.includes(b.block))
+  const q = available.length > 0 
+    ? available[Math.floor(Math.random() * available.length)] 
+    : bank[Math.floor(Math.random() * bank.length)]
 
   if (typeof window !== 'undefined') {
-    const lastSeen = sessionStorage.getItem(`lastSeenBox_lv${level}`)
-    if (lastSeen && bank.length > 1) {
-      let tries = 0;
-      while (q.block === lastSeen && tries < 10) {
-        q = bank[Math.floor(Math.random() * bank.length)]
-        tries++
-      }
-    }
-    sessionStorage.setItem(`lastSeenBox_lv${level}`, q.block)
+    playedList.push(q.block)
+    sessionStorage.setItem(storageKey, JSON.stringify(playedList))
   }
 
   // Number of answer choices scales with level
@@ -363,19 +368,27 @@ function SpatialGameInner() {
       // Village 1-2: Interactive Image Matching Pair game
       const isLevel1 = levelParam === 1
       const bank = isLevel1 ? V1_MATCH_BANK : V2_MATCH_BANK
-      const villageFolderName = isLevel1 ? 'หมู่บ้าน 1' : 'หมู่บ้าน 2'
+      
+      const storageKey = `spatial_played_match_lv${levelParam}`
+      let playedList = JSON.parse(sessionStorage.getItem(storageKey) || '[]')
+      if (playedList.length >= bank.length) playedList = []
 
-      // Version strategy: Guarantee Folder 1 if it's the first question, then random folder 1-4
-      // Picking folder
-      let selectedVersionIdx = 0 // Default to folder 1 (Main)
-      if (questionCount > 0) {
-        selectedVersionIdx = Math.floor(Math.random() * bank.length)
+      const availableIndices = bank.map((_, i) => i).filter(i => !playedList.includes(i))
+      
+      // Select index based on consistency for first question or shuffle
+      let selectedIdx = 0
+      if (questionCount > 0 || playedList.length > 0) {
+        selectedIdx = availableIndices.length > 0 
+          ? availableIndices[Math.floor(Math.random() * availableIndices.length)]
+          : Math.floor(Math.random() * bank.length)
       } else {
-        // First question always folder 1 for consistency as requested
-        selectedVersionIdx = 0
+        selectedIdx = 0 // First ever play: start with folder 1
       }
 
-      const v = bank[selectedVersionIdx]
+      playedList.push(selectedIdx)
+      sessionStorage.setItem(storageKey, JSON.stringify(playedList))
+
+      const v = bank[selectedIdx]
       // Pick random image (subset) in that folder
       const selectedImageName = v.items[Math.floor(Math.random() * v.items.length)]
 
@@ -386,14 +399,12 @@ function SpatialGameInner() {
         correct: `${selectedImageName}/${i + 1}(M).png`,
       }))
 
-      // MOCKUP: แทนที่ MATCH_BASE ด้วยโฟลเดอร์ Asset_New ตาม Version
-      // เช่น /Asset_New/Asset_New/spatial/village_1/v1
       const basePath = `/Asset_New/Asset_New/spatial/village_${villageId}/${assetVersion}`
 
       setQuestionData({ isPairMatching: true, pairs, basePath })
       setQuestionText('จับคู่รูปทรงต้นแบบที่มีรอยแหว่งกับชิ้นส่วนที่หายไป 🧩')
     } else {
-      // Village 3+: Use Box asset images, randomized
+      // Village 3+: Use Box asset images, randomized via Shuffle Bag inside pickBoxQuestion
       const { q, numOptions } = pickBoxQuestion(levelParam)
       const availableWrongs = [...q.wrongs].sort(() => Math.random() - 0.5)
       const wrongsToUse = availableWrongs.slice(0, Math.min(numOptions - 1, availableWrongs.length))
@@ -403,7 +414,7 @@ function SpatialGameInner() {
       setQuestionData({ targetImage: q.block, options, correctIndex })
       setQuestionText(`ถ้า${q.direction} คุณจะเห็นหน้าตาบล็อกเป็นแบบใด? 📦`)
     }
-  }, [levelParam, subId])
+  }, [levelParam, villageId, assetVersion, questionCount])
 
   useEffect(() => {
     // ── กำหนด Version ตามเลขด่านย่อย (3, 6, 9, 12 = v1, v2, v3, v4) ──
