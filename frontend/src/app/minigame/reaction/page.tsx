@@ -8,6 +8,22 @@ import { useLevelSystem } from '@/hooks/useLevelSystem'
 import ClockIntro from '@/components/ClockIntro'
 import MemoryRecallChallenge from '@/components/MemoryRecallChallenge'
 
+// ── Algorithm การสุ่ม Asset Version ไม่ซ้ำ (Shuffle Bag) ───────────────────
+function getUniqueRandomVersion(gameKey: string, versions: string[]) {
+  if (typeof window === 'undefined') return versions[0]
+  const storageKey = `gymemo_history_${gameKey}`
+  let playedList = JSON.parse(sessionStorage.getItem(storageKey) || '[]')
+  
+  if (playedList.length >= versions.length) playedList = []
+  
+  const available = versions.filter(v => !playedList.includes(v))
+  const selected = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : versions[0]
+  
+  playedList.push(selected)
+  sessionStorage.setItem(storageKey, JSON.stringify(playedList))
+  return selected
+}
+
 // ─── Maze Generation Logic (Recursive Backtracker) ──────────────────────────
 
 type Cell = { r: number; c: number }
@@ -50,6 +66,9 @@ function MazeGameInner() {
     const mode = searchParams.get('mode') || 'practice'
     const levelParam = parseInt(searchParams.get('level') || (mode === 'village' ? villageIdParam : '1'), 10)
 
+    // ── Asset Version Mockup ──
+    const [assetVersion, setAssetVersion] = useState<string>('v1')
+
     const [phase, setPhase] = useState<'intro' | 'memorize' | 'clock' | 'recall' | 'play' | 'done'>('intro')
     const [memoryWords, setMemoryWords] = useState<string[]>([])
     const [clockTarget] = useState(() => ({
@@ -74,10 +93,20 @@ function MazeGameInner() {
     }, [])
 
     const startRealGame = useCallback(() => {
+        // ── กำหนด Asset Version ประจำหมู่บ้านและด่านนี้แบบไม่ซ้ำ (Shuffle Bag) ──
+        const ALL_VERSIONS = ['v1', 'v2', 'v3', 'v4']
+        const uniqueKey = `reaction_village_${villageIdParam}`
+        const versionForThisRound = getUniqueRandomVersion(uniqueKey, ALL_VERSIONS)
+        setAssetVersion(versionForThisRound)
+
+        // MOCKUP: ตัวอย่างการนำไปใช้สร้าง Path ดึงรูป
+        const MOCK_BASE_PATH = `/Asset_New/Asset_New/reaction/village_${villageIdParam}/${versionForThisRound}`
+
         const newMaze = generateMaze(rows, cols)
         setMaze(newMaze)
         setPlayerPos({ r: 1, c: 1 })
         setMoves(0)
+        
         setStartTime(Date.now())
         setPhase('play')
     }, [rows, cols])
@@ -145,7 +174,7 @@ function MazeGameInner() {
                 <div className="h-20 bg-white border-b-2 border-slate-50 flex items-center justify-between px-10 shrink-0">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-3xl">🧭</div>
-                        <h1 className="text-2xl font-black text-slate-800 tracking-tight">Maze Runner — ด่าน {levelParam}</h1>
+                        <h1 className="text-2xl font-black text-slate-800 tracking-tight">Maze Runner (ด่าน {levelParam})</h1>
                     </div>
                     <div className="flex items-center gap-6">
                         <div className="flex flex-col items-end">
@@ -155,7 +184,7 @@ function MazeGameInner() {
                     </div>
                 </div>
 
-                <div className="flex-1 relative flex items-center justify-center bg-slate-50/50 p-6">
+                <div className="flex-1 relative flex items-center justify-center bg-slate-50 p-6">
                     {phase === 'intro' && (
                         <div className="text-center animate-in zoom-in">
                             <div className="text-9xl mb-8 animate-jiggle">🧭</div>
@@ -185,14 +214,13 @@ function MazeGameInner() {
                                 {maze.map((row, r) => row.map((cell, c) => (
                                     <div
                                         key={`${r}-${c}`}
-                                        className={`w-6 h-6 md:w-8 md:h-8 border border-slate-50 flex items-center justify-center text-lg ${cell === 1 ? 'bg-slate-800' : 'bg-white'
-                                            }`}
+                                        className={`w-6 h-6 md:w-8 md:h-8 border border-white/10 flex items-center justify-center text-lg ${cell === 1 ? 'bg-slate-800' : 'bg-white'}`}
                                     >
                                         {playerPos.r === r && playerPos.c === c && (
                                             <img src="/assets_employer/logo.png" className="w-[85%] h-[85%] object-contain animate-bounce" alt="brain" />
                                         )}
                                         {cell === 2 && (
-                                            <span className="drop-shadow-xl animate-pulse">🚩</span>
+                                            <span className="drop-shadow-xl animate-pulse">⛳</span>
                                         )}
                                     </div>
                                 )))}

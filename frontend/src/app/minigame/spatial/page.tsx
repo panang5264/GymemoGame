@@ -15,6 +15,22 @@ const DIP_STYLE: React.CSSProperties = {
   imageRendering: 'crisp-edges' as any,
 }
 
+// ── Algorithm การสุ่ม Asset Version ไม่ซ้ำ (Shuffle Bag) ───────────────────
+function getUniqueRandomVersion(gameKey: string, versions: string[]) {
+  if (typeof window === 'undefined') return versions[0]
+  const storageKey = `gymemo_history_${gameKey}`
+  let playedList = JSON.parse(sessionStorage.getItem(storageKey) || '[]')
+  
+  if (playedList.length >= versions.length) playedList = []
+  
+  const available = versions.filter(v => !playedList.includes(v))
+  const selected = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : versions[0]
+  
+  playedList.push(selected)
+  sessionStorage.setItem(storageKey, JSON.stringify(playedList))
+  return selected
+}
+
 // ── Box Asset Database (from /public/Asset ด้าน/มิติสัมพันธ์/Box) ──────────
 //  Each entry: { block: path to main image, correct: correct choice, wrongs: wrong choices }
 
@@ -294,6 +310,10 @@ function SpatialGameInner() {
   const mode = searchParams.get('mode')
   const isBonus = searchParams.get('isBonus') === '1'
 
+  // ── Asset Version Mockup ──
+  // สุ่มว่าจะใช้ Version 1, 2, 3 หรือ 4 (ดึงภาพจาก Asset_New/Asset_New/spatial/...)
+  const [assetVersion, setAssetVersion] = useState<string>('v1')
+
   const [phase, setPhase] = useState<'intro' | 'memorize' | 'clock' | 'recall' | 'play'>('intro')
   const [memoryWords, setMemoryWords] = useState<string[]>([])
   const [clockTarget] = useState(() => ({
@@ -366,7 +386,9 @@ function SpatialGameInner() {
         correct: `${selectedImageName}/${i + 1}(M).png`,
       }))
 
-      const basePath = `${MATCH_BASE}/${villageFolderName}/${v.folder}/cropped`
+      // MOCKUP: แทนที่ MATCH_BASE ด้วยโฟลเดอร์ Asset_New ตาม Version
+      // เช่น /Asset_New/Asset_New/spatial/village_1/v1
+      const basePath = `/Asset_New/Asset_New/spatial/village_${villageId}/${assetVersion}`
 
       setQuestionData({ isPairMatching: true, pairs, basePath })
       setQuestionText('จับคู่รูปทรงต้นแบบที่มีรอยแหว่งกับชิ้นส่วนที่หายไป 🧩')
@@ -384,11 +406,17 @@ function SpatialGameInner() {
   }, [levelParam, subId])
 
   useEffect(() => {
+    // ── กำหนด Version ประจำหมู่บ้านและด่านนี้แบบไม่ซ้ำ (Shuffle Bag) ──
+    const ALL_VERSIONS = ['v1', 'v2', 'v3', 'v4']
+    const uniqueKey = `spatial_village_${villageId}`
+    const versionForThisRound = getUniqueRandomVersion(uniqueKey, ALL_VERSIONS)
+    setAssetVersion(versionForThisRound)
+
     hasSavedRef.current = false
     setIsGameOver(false)
     setQuestionCount(0)
     nextQuestion()
-  }, [levelParam, subId, nextQuestion])
+  }, [levelParam, subId, villageId, nextQuestion])
 
   const { progress, saveProgress } = useProgress()
   const { recordPlay } = useLevelSystem()

@@ -46,6 +46,22 @@ function getRandomPos() {
   }
 }
 
+// ── Algorithm การสุ่ม Asset Version ไม่ซ้ำ (Shuffle Bag) ───────────────────
+function getUniqueRandomVersion(gameKey: string, versions: string[]) {
+  if (typeof window === 'undefined') return versions[0]
+  const storageKey = `gymemo_history_${gameKey}`
+  let playedList = JSON.parse(sessionStorage.getItem(storageKey) || '[]')
+  
+  if (playedList.length >= versions.length) playedList = []
+  
+  const available = versions.filter(v => !playedList.includes(v))
+  const selected = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : versions[0]
+  
+  playedList.push(selected)
+  sessionStorage.setItem(storageKey, JSON.stringify(playedList))
+  return selected
+}
+
 // ─── Level Definitions ───────────────────────────────────────────────────────
 
 interface CookingRecipe {
@@ -292,11 +308,15 @@ const DISTRACTORS = [
   { id: 'd10', label: 'แว่นตา', emoji: '👓', tags: [], imageUrl: `${MG_BASE}/หมวดหมู่ที่ 5/แว่นตา.png` },
 ]
 
-function getLevelConfig(level: number) {
+function getLevelConfig(level: number, assetVersion: string = 'v1') {
   let mode: GameMode = 'sorting'
   let items: Item[] = []
   let categories: Category[] = []
   let instruction = 'ทำภารกิจให้สำเร็จตามที่กำหนด'
+
+  // MOCKUP: ตัวอย่างการนำ assetVersion ไปผูกสร้างฐาน Path ให้โฟลเดอร์รูปภาพ
+  // ตัวอย่าง path: /Asset_New/Asset_New/management_raw/หมู่บ้านที่ 1/v1/
+  const DYNAMIC_BASE_PATH = `/Asset_New/Asset_New/management_raw/หมู่บ้านที่ ${level}/${assetVersion}`
 
   switch (level) {
     case 1:
@@ -370,6 +390,9 @@ function ManagementGameInner() {
   const modeParam = searchParams.get('mode')
   const isBonus = searchParams.get('isBonus') === '1'
 
+  // Asset Version State
+  const [assetVersion, setAssetVersion] = useState<string>('v1')
+
   // Phase State
   const [phase, setPhase] = useState<'intro' | 'memorize' | 'clock' | 'recall' | 'play' | 'done'>('intro')
   const [memoryWords, setMemoryWords] = useState<string[]>([])
@@ -385,7 +408,7 @@ function ManagementGameInner() {
   const { recordPlay } = useLevelSystem()
 
   // Sorting State
-  const [config, setConfig] = useState(() => getLevelConfig(levelParam))
+  const [config, setConfig] = useState(() => getLevelConfig(levelParam, 'v1'))
   const [spawnQueue, setSpawnQueue] = useState<Item[]>([])
   const [activePool, setActivePool] = useState<Item[]>([])
   const [correctCount, setCorrectCount] = useState(0)
@@ -438,8 +461,14 @@ function ManagementGameInner() {
 
   // Initialization
   useEffect(() => {
+    // ── กำหนด Version ประจำหมู่บ้านและด่านนี้แบบไม่ซ้ำ (Shuffle Bag) ──
+    const ALL_VERSIONS = ['v1', 'v2', 'v3', 'v4']
+    const uniqueKey = `management_village_${villageId}`
+    const versionForThisRound = getUniqueRandomVersion(uniqueKey, ALL_VERSIONS)
+    setAssetVersion(versionForThisRound)
+
     hasSavedRef.current = false
-    const c = getLevelConfig(levelParam)
+    const c = getLevelConfig(levelParam, versionForThisRound)
     setConfig(c)
     setSpawnQueue(c.items)
 
