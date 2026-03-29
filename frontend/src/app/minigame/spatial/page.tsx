@@ -406,10 +406,18 @@ function SpatialGameInner() {
   }, [levelParam, subId])
 
   useEffect(() => {
-    // ── กำหนด Version ประจำหมู่บ้านและด่านนี้แบบไม่ซ้ำ (Shuffle Bag) ──
-    const ALL_VERSIONS = ['v1', 'v2', 'v3', 'v4']
-    const uniqueKey = `spatial_village_${villageId}`
-    const versionForThisRound = getUniqueRandomVersion(uniqueKey, ALL_VERSIONS)
+    // ── กำหนด Version ตามเลขด่านย่อย (3, 6, 9, 12 = v1, v2, v3, v4) ──
+    let versionForThisRound = 'v1'
+    if (subId === 3) versionForThisRound = 'v1'
+    else if (subId === 6) versionForThisRound = 'v2'
+    else if (subId === 9) versionForThisRound = 'v3'
+    else if (subId === 12) versionForThisRound = 'v4'
+    else {
+      // โบนัสหรือกรณีอื่นๆ ค่อยใช้ Shuffle Bag
+      const ALL_VERSIONS = ['v1', 'v2', 'v3', 'v4']
+      const uniqueKey = `spatial_village_${villageId}`
+      versionForThisRound = getUniqueRandomVersion(uniqueKey, ALL_VERSIONS)
+    }
     setAssetVersion(versionForThisRound)
 
     hasSavedRef.current = false

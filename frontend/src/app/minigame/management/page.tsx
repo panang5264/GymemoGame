@@ -512,10 +512,18 @@ function ManagementGameInner() {
 
   // Initialization
   useEffect(() => {
-    // ── กำหนด Version ประจำหมู่บ้านและด่านนี้แบบไม่ซ้ำ (Shuffle Bag) ──
-    const ALL_VERSIONS = ['v1', 'v2', 'v3', 'v4']
-    const uniqueKey = `management_village_${villageId}`
-    const versionForThisRound = getUniqueRandomVersion(uniqueKey, ALL_VERSIONS)
+    // ── กำหนด Version ตามเลขด่านย่อย (1, 4, 7, 10 = v1, v2, v3, v4) ──
+    let versionForThisRound = 'v1'
+    if (subId === 1) versionForThisRound = 'v1'
+    else if (subId === 4) versionForThisRound = 'v2'
+    else if (subId === 7) versionForThisRound = 'v3'
+    else if (subId === 10) versionForThisRound = 'v4'
+    else {
+      // โบนัสหรือกรณีอื่นๆ ค่อยใช้ Shuffle Bag
+      const ALL_VERSIONS = ['v1', 'v2', 'v3', 'v4']
+      const uniqueKey = `management_village_${villageId}`
+      versionForThisRound = getUniqueRandomVersion(uniqueKey, ALL_VERSIONS)
+    }
     setAssetVersion(versionForThisRound)
 
     hasSavedRef.current = false
@@ -524,17 +532,20 @@ function ManagementGameInner() {
     setSpawnQueue(c.items)
 
     if (c.mode === 'maze') {
-      const rows = 9 + (levelParam > 7 ? 2 : 0)
-      const cols = 9 + (levelParam > 7 ? 2 : 0)
-      const needsKey = levelParam >= 7
-      const needsBombs = levelParam >= 8
+      const rows = 15
+      const cols = 15
+      const needsKey = true
+      const needsBombs = true
 
       const mazeLayout = generateMaze(rows, cols, needsKey, needsBombs)
       setMaze(mazeLayout)
       setPlayerPos({ r: 1, c: 1 })
       setHasKey(false)
-      setShowBombs(needsBombs) // Visible initially for level 8, 9
+      setShowBombs(true)
       setLastMoveTime(Date.now())
+
+      const timer = setTimeout(() => setShowBombs(false), 3000)
+      return () => clearTimeout(timer)
     }
 
     if (c.mode === 'cooking') {
@@ -729,11 +740,6 @@ function ManagementGameInner() {
 
     const currentPos = playerPosRef.current
 
-    // Hide bombs after first move for level 8 & 9
-    if ((levelParam === 8 || levelParam === 9) && showBombs) {
-      setShowBombs(false)
-    }
-
     const moveR = levelParam === 9 ? -dr : dr
     const moveC = levelParam === 9 ? -dc : dc
     const nr = currentPos.r + moveR
@@ -895,16 +901,17 @@ function ManagementGameInner() {
     setActivePool([])
 
     if (c.mode === 'maze') {
-      const rows = 9 + (levelParam > 7 ? 2 : 0)
-      const cols = 9 + (levelParam > 7 ? 2 : 0)
-      const needsKey = levelParam >= 7
-      const needsBombs = levelParam >= 8
+      const rows = 15
+      const cols = 15
+      const needsKey = true
+      const needsBombs = true
       const mazeLayout = generateMaze(rows, cols, needsKey, needsBombs)
       setMaze(mazeLayout)
       setPlayerPos({ r: 1, c: 1 })
       setHasKey(false)
-      setShowBombs(needsBombs)
+      setShowBombs(true)
       setLastMoveTime(Date.now())
+      setTimeout(() => setShowBombs(false), 3000)
     }
 
     if (c.mode === 'cooking') {
@@ -1245,8 +1252,11 @@ function ManagementGameInner() {
                             <img src="/assets_employer/logo.png" className="w-[85%] h-[85%] object-contain animate-bounce-gentle drop-shadow-md z-10" alt="brain" />
                           )}
                           {cell === 2 && (
-                            <div className={`relative w-full h-full flex items-center justify-center ${levelParam >= 7 && !hasKey ? 'grayscale opacity-30 brightness-50' : 'animate-bounce'}`}>
+                            <div className={`relative w-full h-full flex items-center justify-center ${!hasKey ? 'grayscale opacity-30 brightness-50' : 'animate-bounce'}`}>
                               <span className="text-2xl md:text-3xl drop-shadow-sm filter saturate-150 brightness-110">⛳</span>
+                              {!hasKey && (
+                                <span className="absolute text-3xl z-20 drop-shadow-md">🔒</span>
+                              )}
                             </div>
                           )}
                           {cell === 3 && (
