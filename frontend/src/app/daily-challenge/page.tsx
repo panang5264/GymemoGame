@@ -62,7 +62,6 @@ export default function DailyChallengePage() {
     if (progress.guestId && !hasSynced) {
       setHasSynced(true)
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
-
       fetch(`${API_BASE_URL}/daily/status/${progress.guestId}?date=${dk}`)
         .then(res => res.json())
         .then(res => {
@@ -98,7 +97,6 @@ export default function DailyChallengePage() {
     if (rewardClaimed) return
     addKeys(3)
     setRewardClaimed(true)
-
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
     if (progress.guestId) {
       fetch(`${API_BASE_URL}/daily/claim-reward`, {
