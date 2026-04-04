@@ -20,12 +20,12 @@ function getUniqueRandomVersion(gameKey: string, versions: string[]) {
   if (typeof window === 'undefined') return versions[0]
   const storageKey = `gymemo_history_${gameKey}`
   let playedList = JSON.parse(sessionStorage.getItem(storageKey) || '[]')
-  
+
   if (playedList.length >= versions.length) playedList = []
-  
+
   const available = versions.filter(v => !playedList.includes(v))
   const selected = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : versions[0]
-  
+
   playedList.push(selected)
   sessionStorage.setItem(storageKey, JSON.stringify(playedList))
   return selected
@@ -281,7 +281,7 @@ function getBoxBank(level: number): BoxQuestion[] {
 function pickBoxQuestion(level: number): { q: BoxQuestion; numOptions: number } {
   const bank = getBoxBank(level)
   const storageKey = `spatial_played_box_lv${level}`
-  let playedList = []
+  let playedList: any[] = []
   if (typeof window !== 'undefined') {
     playedList = JSON.parse(sessionStorage.getItem(storageKey) || '[]')
   }
@@ -290,8 +290,8 @@ function pickBoxQuestion(level: number): { q: BoxQuestion; numOptions: number } 
   if (playedList.length >= bank.length) playedList = []
 
   const available = bank.filter(b => !playedList.includes(b.block))
-  const q = available.length > 0 
-    ? available[Math.floor(Math.random() * available.length)] 
+  const q = available.length > 0
+    ? available[Math.floor(Math.random() * available.length)]
     : bank[Math.floor(Math.random() * bank.length)]
 
   if (typeof window !== 'undefined') {
@@ -368,17 +368,17 @@ function SpatialGameInner() {
       // Village 1-2: Interactive Image Matching Pair game
       const isLevel1 = levelParam === 1
       const bank = isLevel1 ? V1_MATCH_BANK : V2_MATCH_BANK
-      
+
       const storageKey = `spatial_played_match_lv${levelParam}`
       let playedList = JSON.parse(sessionStorage.getItem(storageKey) || '[]')
       if (playedList.length >= bank.length) playedList = []
 
       const availableIndices = bank.map((_, i) => i).filter(i => !playedList.includes(i))
-      
+
       // Select index based on consistency for first question or shuffle
       let selectedIdx = 0
       if (questionCount > 0 || playedList.length > 0) {
-        selectedIdx = availableIndices.length > 0 
+        selectedIdx = availableIndices.length > 0
           ? availableIndices[Math.floor(Math.random() * availableIndices.length)]
           : Math.floor(Math.random() * bank.length)
       } else {
