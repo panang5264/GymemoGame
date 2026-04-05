@@ -9,7 +9,7 @@ export type Operator = {
   path: string
 }
 
-const path_to_dice = "/Asset_New/Asset_New/calculation/add_subtract/"
+const path_to_dice = "/Asset_New/calculation/add_subtract/"
 const diceImages: Dice[] = [
   { name: "dice1", path: path_to_dice + "1.png", value: 1 },
   { name: "dice2", path: path_to_dice + "2.png", value: 2 },
@@ -19,7 +19,7 @@ const diceImages: Dice[] = [
   { name: "dice6", path: path_to_dice + "6.png", value: 6 },
 ]
 
-const path_to_dot = "/Asset_New/Asset_New/calculation/dot_images/"
+const path_to_dot = "/Asset_New/calculation/dot_images/"
 const dotImages: Dice[] = [
   { name: "dot6", path: path_to_dot + "6.PNG", value: 6 },
   { name: "dot7", path: path_to_dot + "7.PNG", value: 7 },

@@ -206,7 +206,7 @@ function CalculationGameInner() {
 
   // ── Answer handler ────────────────────────────────────────────────────────
   const handleSubmit = useCallback(() => {
-    if (!question || isTimeUp) return
+    if (!question || isTimeUp || lastCorrect !== null) return
     if (answer.trim() === '') return
     const parsed = Number(answer)
     if (Number.isNaN(parsed)) return
@@ -336,7 +336,7 @@ function CalculationGameInner() {
           </div>
           <div className="bg-white/90 backdrop-blur-md px-4 md:px-8 py-2 rounded-2xl border border-white/20 flex flex-col items-center shadow-xl">
             <span className="text-slate-400 text-[10px] md:text-xs font-black uppercase tracking-widest">Question</span>
-            <span className="text-xl md:text-3xl font-black text-blue-600">{total + 1} / {MAX_QUESTIONS}</span>
+            <span className="text-xl md:text-3xl font-black text-blue-600">{Math.min(total + 1, MAX_QUESTIONS)} / {MAX_QUESTIONS}</span>
           </div>
         </div>
 
@@ -472,13 +472,13 @@ function CalculationGameInner() {
                 className={`w-full bg-slate-50 border-[4px] md:border-[8px] rounded-[1.25rem] md:rounded-[2rem] py-4 md:py-6 px-5 md:px-10 text-3xl md:text-5xl font-black text-center outline-none transition-all shadow-inner ${lastCorrect === true ? 'border-green-500 text-green-600 bg-green-50/50' : lastCorrect === false ? 'border-red-500 text-red-600 animate-shake bg-red-50/50' : 'border-slate-100 focus:border-blue-400 text-blue-700 focus:shadow-[0_0_0_8px_rgba(59,130,246,0.1)]'}`}
                 placeholder="?"
                 value={answer}
-                disabled={isTimeUp}
+                disabled={isTimeUp || lastCorrect !== null}
                 onKeyDown={(event) => { if (event.key === 'Enter') handleSubmit() }}
                 onChange={(e) => setAnswer(e.target.value)}
               />
               <button
-                className={`w-full py-4 md:py-6 rounded-[1.25rem] md:rounded-[2rem] font-black text-xl md:text-3xl transition-all ${isTimeUp ? 'bg-slate-100 text-slate-300' : 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-[0_8px_0_#2563eb] md:shadow-[0_12px_0_#2563eb] hover:translate-y-[2px] hover:shadow-[0_6px_0_#2563eb] active:translate-y-[6px] md:active:translate-y-[8px] active:shadow-none'}`}
-                disabled={isTimeUp}
+                className={`w-full py-4 md:py-6 rounded-[1.25rem] md:rounded-[2rem] font-black text-xl md:text-3xl transition-all ${isTimeUp || lastCorrect !== null ? 'bg-slate-100 text-slate-300' : 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-[0_8px_0_#2563eb] md:shadow-[0_12px_0_#2563eb] hover:translate-y-[2px] hover:shadow-[0_6px_0_#2563eb] active:translate-y-[6px] md:active:translate-y-[8px] active:shadow-none'}`}
+                disabled={isTimeUp || lastCorrect !== null}
                 onClick={handleSubmit}
               >
                 SUBMIT
