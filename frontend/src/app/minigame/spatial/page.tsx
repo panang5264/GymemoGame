@@ -161,7 +161,7 @@ const CUSTOM_BOX_DIRECTIONS: Record<string, Record<string, string>> = {
   // คุณสามารถเพิ่มหมู่บ้าน 5, 6, 7... และเลขรอบที่คุณต้องการกำหนดเองได้ที่นี่ครับ
 }
 
-function pickBoxQuestion(level: number, villageId: number, version: string, questionIndex: number): { q: BoxQuestion; numOptions: number, index: number } {
+function pickBoxQuestion(level: number, villageId: number, version: string, questionIndex: number[]): { q: BoxQuestion; numOptions: number, index: number } {
   const roundNum = version.replace('v', '')
   const storageKey = `spatial_played_box_v${villageId}_r${roundNum}`
   let playedList: number[] = []
@@ -172,11 +172,8 @@ function pickBoxQuestion(level: number, villageId: number, version: string, ques
   if (playedList.length >= 3) {
     playedList = []
   }
-  const available = [1, 2, 3]
+  const available = questionIndex
   let subId = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : 1
-  while (subId == questionIndex) {
-    subId = available[Math.floor(Math.random() * available.length)]
-  }
 
   if (typeof window !== 'undefined') {
     playedList.push(subId)
@@ -257,8 +254,8 @@ function SpatialGameInner() {
 
   const isComplete = isGameOver
 
-  const [questionIndex, setQuestionIndex] = useState(-1)
-  const lastQuestionIndexRef = useRef<number>(-1)
+  // const [questionIndex, setQuestionIndex] = useState<number[]>([1, 2, 3])
+  const lastQuestionIndexRef = useRef<number[]>([1, 2, 3])
   const [questionData, setQuestionData] = useState<{
     // For pair matching (levels 1-2)
     isPairMatching?: boolean
@@ -303,8 +300,9 @@ function SpatialGameInner() {
       if (correctIndex === -1) {
         finalOptions[0] = q.correct
       }
-      lastQuestionIndexRef.current = index
-      setQuestionIndex(index)
+      lastQuestionIndexRef.current = lastQuestionIndexRef.current.filter((value) => value != index)
+      console.log(lastQuestionIndexRef.current)
+      // setQuestionIndex(lastQuestionIndexRef.current)
       setQuestionData({ targetImage: q.block, options: finalOptions, correctIndex: finalOptions.indexOf(q.correct) })
       setQuestionText(`ถ้า${q.direction} คุณจะเห็นหน้าตาบล็อกเป็นแบบใด? 📦`)
     }
@@ -326,9 +324,9 @@ function SpatialGameInner() {
     setAssetVersion(versionForThisRound)
 
     hasSavedRef.current = false
-    lastQuestionIndexRef.current = -1
+    lastQuestionIndexRef.current = [1, 2, 3]
     setIsGameOver(false)
-    setQuestionIndex(-1)
+    // setQuestionIndex([1, 2, 3])
     setQuestionCount(0)
     nextQuestion()
   }, [levelParam, subId, villageId, nextQuestion])
@@ -496,6 +494,7 @@ function SpatialGameInner() {
                       setIsGameOver(true)
                     } else {
                       setQuestionCount(prev => prev + 1)
+                      console.log(questionCount)
                       nextQuestion()
                     }
                   }, 1500)
