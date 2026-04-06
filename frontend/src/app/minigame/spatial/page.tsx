@@ -185,16 +185,20 @@ function pickBoxQuestion(level: number, villageId: number, version: string): { q
   const villageKey = villageId.toString()
   const customDir = CUSTOM_BOX_DIRECTIONS[villageKey]?.[folderName]
   const defaultDir = subId === 1 ? 'มองจากด้านบน ⬇️' : subId === 2 ? 'มองจากด้านข้าง ↔️' : subId === 3 ? 'มองจากด้านล่าง ⬆️' : subId === 4 ? 'มองจากด้านซ้าย ➡️' : 'มองจากด้านขวา ⬅️'
+  let wrongs: string[] = []
+  if (villageId <= 5) {
+    wrongs = [`${path}/Wrong.png`]
+  } else if (villageId <= 8) {
+    wrongs = [`${path}/Wrong.png`, `${path}/Wrong1.png`]
+  } else {
+    wrongs = [`${path}/Wrong.png`, `${path}/Wrong1.png`, `${path}/Wrong2.png`]
+  }
 
   // ระบบรองรับทั้ง ตัวเล็ก/ตัวใหญ่ และชื่อไทย/อังกฤษ ครับ
   const q: BoxQuestion = {
     block: `${path}/Block.png`, // เดี๋ยวในฝั่ง Component จะมี onerror ช่วยเช็ค block.png ให้ครับ
     correct: `${path}/Correct.png`,
-    wrongs: [
-      `${path}/Wrong.png`, `${path}/Wrong1.png`, `${path}/Wrong2.png`,
-      `${path}/wrong.png`, `${path}/wrong1.png`, `${path}/wrong2.png`,
-      `${path}/ผิด.png`, `${path}/ผิด1.png`, `${path}/ผิด2.png`
-    ],
+    wrongs: wrongs,
     direction: customDir || defaultDir
   }
 
@@ -526,7 +530,8 @@ function SpatialGameInner() {
                             if (questionCount + 1 >= MAX_QUESTIONS) {
                               setIsGameOver(true)
                             } else {
-                              setQuestionCount(prev => prev + 1)
+                              let count = questionCount
+                              setQuestionCount(count + 1)
                               nextQuestion()
                             }
                           }, 1200)
@@ -546,9 +551,15 @@ function SpatialGameInner() {
                         onError={(e) => {
                           const img = e.currentTarget;
                           // ลองเปลี่ยนเป็นชื่ออื่นๆ ที่เป็นไปได้
-                          if (img.src.includes('Correct.png')) img.src = img.src.replace('Correct.png', 'correct.png');
-                          else if (img.src.includes('Wrong')) img.src = img.src.toLowerCase();
-                          else if (img.src.includes('ถูก.png')) img.src = img.src.replace('ถูก.png', '✅.png');
+                          if (img.src.includes('Correct.png')) {
+                            img.src = img.src.toLowerCase();
+                          }
+                          else if (img.src.includes('Wrong')) {
+                            img.src = img.src;
+                          }
+                          else if (img.src.includes('ถูก.png')) {
+                            img.src = img.src.replace('ถูก.png', '✅.png');
+                          }
                         }}
                       />
                       <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-7 sm:h-7 bg-slate-100 rounded-full border sm:border-2 border-white text-slate-500 font-black flex items-center justify-center text-[8px] sm:text-xs group-hover:bg-indigo-500 group-hover:text-white transition-colors shadow">
