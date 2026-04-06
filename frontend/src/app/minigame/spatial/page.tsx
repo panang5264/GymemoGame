@@ -43,260 +43,47 @@ interface BoxQuestion {
   direction: string
 }
 
-// village_3 — sub-set id 1.1, 1.2
-const BOX_LV3: BoxQuestion[] = [
-  {
-    block: `${BASE}/village_3/โจทบล็อก 1.1.png`,
-    correct: `${BASE}/village_3/Correct1.1.png`,
-    wrongs: [`${BASE}/village_3/Wrong1.1.png`],
-    direction: 'มองจากบนลงล่าง ⬇️',
-  },
-  {
-    block: `${BASE}/village_3/โจทบล็อก 1.2.png`,
-    correct: `${BASE}/village_3/Correct1.2.png`,
-    wrongs: [`${BASE}/village_3/Wrong1.2.png`],
-    direction: 'มองจากด้านข้าง ↔️',
-  },
-  {
-    block: `${BASE}/village_3/2/2.1/1.png`,
-    correct: `${BASE}/village_3/2/2.1/✅.png`,
-    wrongs: [`${BASE}/village_3/2/2.1/3.png`],
-    direction: 'มองจากด้านข้าง ↔️',
-  },
-]
-
-// village_4 — sub-set id 2.1, 2.2, 2.3
-const BOX_LV4: BoxQuestion[] = [
-  {
-    block: `${BASE}/village_4/โจทบล็อก2.1.png`,
-    correct: `${BASE}/village_4/Correct 2.1.png`,
-    wrongs: [`${BASE}/village_4/Wrong 2.1.png`],
-    direction: 'มองจากบนลงล่าง ⬇️',
-  },
-  {
-    block: `${BASE}/village_4/โจทบล็อก2.2.png`,
-    correct: `${BASE}/village_4/Correct 2.2.png`,
-    wrongs: [`${BASE}/village_4/Wrong2.2.png`],
-    direction: 'มองจากด้านซ้าย ➡️',
-  },
-  {
-    block: `${BASE}/village_4/Block2.3.png`,
-    correct: `${BASE}/village_4/Correct 2.3.png`,
-    wrongs: [`${BASE}/village_4/Wrong 2.3.png`],
-    direction: 'มองจากล่างขึ้นบน ⬆️',
-  },
-]
-
-// village_5 — sub-set 3.1, 3.2
-const BOX_LV5: BoxQuestion[] = [
-  {
-    block: `${BASE}/village_5/Block 3.1.png`,
-    correct: `${BASE}/village_5/Correct 3.1.png`,
-    wrongs: [`${BASE}/village_5/Wrong 3.1.png`],
-    direction: 'มองจากบนลงล่าง ⬇️',
-  },
-  {
-    block: `${BASE}/village_5/Block 3.2.png`,
-    correct: `${BASE}/village_5/Correct 3.2.png`,
-    wrongs: [`${BASE}/village_5/Wrong 3.2.png`],
-    direction: 'มองจากด้านข้าง ↔️',
-  },
-]
-
-// village_6 — sub-set 4.2 (only 1 available)
-const BOX_LV6: BoxQuestion[] = [
-  // Folder roots for 4.2 (original)
-  {
-    block: `${BASE}/village_6/Block4.2.png`,
-    correct: `${BASE}/village_6/Correct 4.2.png`,
-    wrongs: [`${BASE}/village_6/Wrong4.2.png`, `${BASE}/village_6/Wrong_1_4.2.png`],
-    direction: 'มองจากด้านข้าง ↔️',
-  },
-  // Sub-folder 4.1 (Top)
-  {
-    block: `${BASE}/village_6/4/4.1/โจทย์.png`,
-    correct: `${BASE}/village_6/4/4.1/✅.png`,
-    wrongs: [`${BASE}/village_6/4/4.1/❌.png`, `${BASE}/village_6/4/4.1/❌(1).png`],
-    direction: 'มองจากบนลงล่าง ⬇️',
-  },
-  // Sub-folder 4.3 (Bottom)
-  {
-    block: `${BASE}/village_6/4/4.3/โจทย์.png`,
-    correct: `${BASE}/village_6/4/4.3/✅.png`,
-    wrongs: [`${BASE}/village_6/4/4.3/❌.png`, `${BASE}/village_6/4/4.3/❌(1).png`],
-    direction: 'มองจากล่างขึ้นบน ⬆️',
-  },
-  // Subset 3.1 (Top), 3.2 (Side), 3.3 (Bottom)
-  {
-    block: `${BASE}/village_6/3/3.1/โจทย์.png`,
-    correct: `${BASE}/village_6/3/3.1/✅.png`,
-    wrongs: [`${BASE}/village_6/3/3.1/❌.png`, `${BASE}/village_6/3/3.1/❌(1).png`],
-    direction: 'มองจากบนลงล่าง ⬇️',
-  },
-  {
-    block: `${BASE}/village_6/3/3.2/โจทย์.png`,
-    correct: `${BASE}/village_6/3/3.2/✅.png`,
-    wrongs: [`${BASE}/village_6/3/3.2/❌.png`, `${BASE}/village_6/3/3.2/❌(1).png`],
-    direction: 'มองจากด้านข้าง ↔️',
-  },
-  {
-    block: `${BASE}/village_6/3/3.3/โจทย์.png`,
-    correct: `${BASE}/village_6/3/3.3/✅.png`,
-    wrongs: [`${BASE}/village_6/3/3.3/❌.png`, `${BASE}/village_6/3/3.3/❌(1).png`],
-    direction: 'มองจากล่างขึ้นบน ⬆️',
-  },
-  // Subset 2.2 (Side), 2.3 (Bottom)
-  {
-    block: `${BASE}/village_6/2/2.2/โจทย์.png`,
-    correct: `${BASE}/village_6/2/2.2/✅.png`,
-    wrongs: [`${BASE}/village_6/2/2.2/❌.png`, `${BASE}/village_6/2/2.2/❌(1).png`],
-    direction: 'มองจากด้านข้าง ↔️',
-  },
-  {
-    block: `${BASE}/village_6/2/2.3/โจทย์.png`,
-    correct: `${BASE}/village_6/2/2.3/✅.png`,
-    wrongs: [`${BASE}/village_6/2/2.3/❌.png`, `${BASE}/village_6/2/2.3/❌(1).png`],
-    direction: 'มองจากล่างขึ้นบน ⬆️',
-  },
-]
-
-// village_7 — sub-set 5.1, 5.2, 5.3
-const BOX_LV7: BoxQuestion[] = [
-  {
-    block: `${BASE}/village_7/Block5.1.png`,
-    correct: `${BASE}/village_7/Correct5.1.png`,
-    wrongs: [`${BASE}/village_7/Wrong5.1.png`, `${BASE}/village_7/Wrong_1_5.1.png`],
-    direction: 'มองจากบนลงล่าง ⬇️',
-  },
-  {
-    block: `${BASE}/village_7/Block5.2.png`,
-    correct: `${BASE}/village_7/Correct5.2.png`,
-    wrongs: [`${BASE}/village_7/Wrong5.2.png`, `${BASE}/village_7/Wrong_1_5.2.png`],
-    direction: 'มองจากด้านข้าง ↔️',
-  },
-  {
-    block: `${BASE}/village_7/Block5.3.png`,
-    correct: `${BASE}/village_7/Correct5.3.png`,
-    wrongs: [`${BASE}/village_7/Wrong5.3.png`],
-    direction: 'มองจากล่างขึ้นบน ⬆️',
-  },
-]
-
-// village_8 — sub-set 6.1, 6.2, 6.3
-const BOX_LV8: BoxQuestion[] = [
-  {
-    block: `${BASE}/village_8/Block 6.1.png`,
-    correct: `${BASE}/village_8/Correct 6.1.png`,
-    wrongs: [`${BASE}/village_8/Wrong 6.1.png`, `${BASE}/village_8/Wrong_1 6.1.png`],
-    direction: 'มองจากบนลงล่าง ⬇️',
-  },
-  {
-    block: `${BASE}/village_8/Block 6.2.png`,
-    correct: `${BASE}/village_8/Correct 6.2.png`,
-    wrongs: [`${BASE}/village_8/Wrong 6.2.png`, `${BASE}/village_8/Wrong_1 6.2.png`],
-    direction: 'มองจากด้านข้าง ↔️',
-  },
-  {
-    block: `${BASE}/village_8/Block6.3.jpeg`,
-    correct: `${BASE}/village_8/Correct6.3.jpeg`,
-    wrongs: [`${BASE}/village_8/Wrong6.3.jpeg`, `${BASE}/village_8/Wrong_1_6.3.jpeg`, `${BASE}/village_8/Wrong_2_6.3.jpeg`],
-    direction: 'มองจากล่างขึ้นบน ⬆️',
-  },
-]
-
-// village_9 — sub-set 7.1, 7.2, 7.3
-const BOX_LV9: BoxQuestion[] = [
-  {
-    block: `${BASE}/village_9/Block7.1.png`,
-    correct: `${BASE}/village_9/Correct7.1.png`,
-    wrongs: [`${BASE}/village_9/Wrong7.1.png`, `${BASE}/village_9/Wrong_1_7.1.png`],
-    direction: 'มองจากบนลงล่าง ⬇️',
-  },
-  {
-    block: `${BASE}/village_9/Block 7.2.png`,
-    correct: `${BASE}/village_9/Corrrect 7.2.png`,
-    wrongs: [`${BASE}/village_9/Wrong 7.2.png`, `${BASE}/village_9/Wrong_1 7.2.png`, `${BASE}/village_9/Wrong_2 7.2.png`],
-    direction: 'มองจากด้านข้าง ↔️',
-  },
-  {
-    block: `${BASE}/village_9/Block 7.3.png`,
-    correct: `${BASE}/village_9/Correct 7.3.png`,
-    wrongs: [`${BASE}/village_9/Wrong 7.3.png`, `${BASE}/village_9/Wrong_1 7.3.png`, `${BASE}/village_9/Wrong_2 7.3.png`],
-    direction: 'มองจากล่างขึ้นบน ⬆️',
-  },
-]
-
-// village_10 — sub-set 8.1, 8.2
-const BOX_LV10: BoxQuestion[] = [
-  {
-    block: `${BASE}/village_10/Block 8.1.png`,
-    correct: `${BASE}/village_10/Correct 8.1.png`,
-    wrongs: [
-      `${BASE}/village_10/Wrong 8.1.png`,
-      `${BASE}/village_10/Wrong_1 8.1.png`,
-      `${BASE}/village_10/Wrong_2 8.1.png`,
-    ],
-    direction: 'มองจากบนลงล่าง ⬇️',
-  },
-  {
-    block: `${BASE}/village_10/Block 8.2.png`,
-    correct: `${BASE}/village_10/Correct 8.2.png`,
-    wrongs: [
-      `${BASE}/village_10/Wrong 8.2.png`,
-      `${BASE}/village_10/Wrong_1 8.2.png`,
-      `${BASE}/village_10/Wrong_2 8.2.png`,
-    ],
-    direction: 'มองจากด้านข้าง ↔️',
-  },
-]
-
-// (ตัวแปร V1, V2_MATCH_BANK ถูกลบทิ้งไปแล้วเพราะเราโหลดภาพ 10 คู่ตรงๆ จากโฟลเดอร์เลยครับ)
-
-function getBoxBank(level: number): BoxQuestion[] {
-  if (level === 3) return BOX_LV3
-  if (level === 4) return BOX_LV4
-  if (level === 5) return BOX_LV5
-  if (level === 6) return BOX_LV6
-  if (level === 7) return BOX_LV7
-  if (level === 8) return BOX_LV8
-  if (level === 9) return BOX_LV9
-  return BOX_LV10
+// ── ข้อมูลกำหนดคำใบ้ทิศทางเอง ( Village 3-10 ) ───────────────────────────────
+// สามารถระบุทิศทางแยกตามหมู่บ้านและรอบได้ที่นี่เลยครับ
+const CUSTOM_BOX_DIRECTIONS: Record<string, Record<string, string>> = {
+  "3": { "1.1": "มองจากบนลงล่าง ⬇️", "1.2": "มองจากด้านข้าง ↔️", "1.3": "มองจากล่างขึ้นบน ⬆️" },
+  "4": { "2.1": "มองจากบนลงล่าง ⬇️", "2.2": "มองจากด้านซ้าย ➡️", "2.3": "มองจากล่างขึ้นบน ⬆️" },
+  // คุณสามารถเพิ่มหมู่บ้าน 5, 6, 7... และเลขรอบที่คุณต้องการกำหนดเองได้ที่นี่ครับ
 }
 
-function pickBoxQuestion(level: number, version: string): { q: BoxQuestion; numOptions: number } {
-  const allBank = getBoxBank(level)
-  
-  // -- MOCK การดึงโจทย์ตามรอบตายตัว (v1-> ชุด 1, v2-> ชุด 2, ...) --
-  const roundNum = version === 'v1' ? '1' : version === 'v2' ? '2' : version === 'v3' ? '3' : '4';
-  let bank = allBank.filter(b => 
-    b.block.includes(` ${roundNum}.`) || 
-    b.block.includes(`${roundNum}.`) || 
-    b.block.includes(`/${roundNum}/`) ||
-    b.block.includes(`Block${roundNum}`)
-  )
-  if (bank.length === 0) bank = allBank; // fallback กรณีหาโจทย์ของชุดนั้นไม่เจอ
-
-  const storageKey = `spatial_played_box_lv${level}_${version}`
-  let playedList: any[] = []
+function pickBoxQuestion(level: number, villageId: number, version: string): { q: BoxQuestion; numOptions: number } {
+  const roundNum = version.replace('v', '')
+  const storageKey = `spatial_played_box_v${villageId}_r${roundNum}`
+  let playedList: number[] = []
   if (typeof window !== 'undefined') {
     playedList = JSON.parse(sessionStorage.getItem(storageKey) || '[]')
   }
 
-  // If played all, reset
-  if (playedList.length >= bank.length) playedList = []
-
-  const available = bank.filter(b => !playedList.includes(b.block))
-  const q = available.length > 0
-    ? available[Math.floor(Math.random() * available.length)]
-    : bank[Math.floor(Math.random() * bank.length)]
+  if (playedList.length >= 3) playedList = []
+  const available = [1, 2, 3].filter(n => !playedList.includes(n))
+  const subId = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : 1
 
   if (typeof window !== 'undefined') {
-    playedList.push(q.block)
+    playedList.push(subId)
     sessionStorage.setItem(storageKey, JSON.stringify(playedList))
   }
 
-  // Number of answer choices scales with level
+  const folderName = `${roundNum}.${subId}`
+  const path = `${BASE}/village_${villageId}/${roundNum}/${folderName}`
   const numOptions = level <= 5 ? 2 : level <= 7 ? 3 : 4
+
+  // ค้นหาทิศทางจากตาราง CUSTOM ด้านบน ถ้าไม่มีให้ใช้ Default
+  const villageKey = villageId.toString()
+  const customDir = CUSTOM_BOX_DIRECTIONS[villageKey]?.[folderName]
+  const defaultDir = subId === 1 ? 'มองจากด้านบน ⬇️' : subId === 2 ? 'มองจากด้านข้าง ↔️' : 'มองจากด้านล่าง ⬆️'
+
+  const q: BoxQuestion = {
+    block: `${path}/โจทย์.png`,
+    correct: `${path}/ถูก.png`,
+    wrongs: [`${path}/ผิด1.png`, `${path}/ผิด2.png`, `${path}/ผิด3.png`],
+    direction: customDir || defaultDir
+  }
+
   return { q, numOptions }
 }
 
@@ -312,7 +99,7 @@ function SpatialGameInner() {
   const isBonus = searchParams.get('isBonus') === '1'
 
   // ── Asset Version Mockup ──
-  // สุ่มว่าจะใช้ Version 1, 2, 3 หรือ 4 (ดึงภาพจาก Asset_New/Asset_New/spatial/...)
+  // สุ่มว่าจะใช้ Version 1, 2, 3 หรือ 4 (ดึงภาพจาก Asset_New/spatial/...)
   const [assetVersion, setAssetVersion] = useState<string>('v1')
 
   const [phase, setPhase] = useState<'intro' | 'memorize' | 'clock' | 'recall' | 'play'>('intro')
@@ -362,9 +149,6 @@ function SpatialGameInner() {
     setFeedback(null)
     if (levelParam <= 2) {
       // Village 1-2: Interactive Image Matching Pair game
-      const isLevel1 = levelParam === 1
-      // ── MOCK แก้เป็น 10 คู่ ตามโฟลเดอร์ 1, 2, 3, 4 โดยไม่ผ่าน Array เก่าแล้ว ──
-      // แปลง v1 เป็น 1, v2 เป็น 2 ตามที่ผู้ใช้จัดโฟลเดอร์
       const folderName = assetVersion.replace('v', '')
       const basePath = `/Asset_New/spatial/village_${villageId}/${folderName}`
 
@@ -379,7 +163,7 @@ function SpatialGameInner() {
       setQuestionText('จับคู่รูปทรงต้นแบบที่มีรอยแหว่งกับชิ้นส่วนที่หายไป 🧩')
     } else {
       // Village 3+: Use Box asset images, fixed by version wrapper logic
-      const { q, numOptions } = pickBoxQuestion(levelParam, assetVersion)
+      const { q, numOptions } = pickBoxQuestion(levelParam, villageId, assetVersion)
       const availableWrongs = [...q.wrongs].sort(() => Math.random() - 0.5)
       const wrongsToUse = availableWrongs.slice(0, Math.min(numOptions - 1, availableWrongs.length))
       const options = [q.correct, ...wrongsToUse].sort(() => Math.random() - 0.5)
@@ -440,7 +224,7 @@ function SpatialGameInner() {
           const accuracy = errorCount === 0 ? 100 : Math.max(0, 100 - errorCount * 25)
           const duration = (Date.now() - startTime) / 1000
           const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
-          fetch(`${API_BASE_URL}/analysis/record`, {
+          fetch(`${API_BASE_URL}/api/analysis/record`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
