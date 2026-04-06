@@ -72,22 +72,19 @@ function pickBoxQuestion(level: number, villageId: number, version: string): { q
   const path = `${BASE}/village_${villageId}/${roundNum}/${folderName}`
   const numOptions = level <= 5 ? 2 : level <= 7 ? 3 : 4
 
-  // ค้นหาทิศทางจากตาราง CUSTOM ด้านบน ถ้าไม่มีให้ใช้ Default
   const villageKey = villageId.toString()
   const customDir = CUSTOM_BOX_DIRECTIONS[villageKey]?.[folderName]
+  const defaultDir = subId === 1 ? 'มองจากด้านบน ⬇️' : subId === 2 ? 'มองจากด้านข้าง ↔️' : subId === 3 ? 'มองจากด้านล่าง ⬆️' : subId === 4 ? 'มองจากด้านซ้าย ➡️' : 'มองจากด้านขวา ⬅️'
 
-  // Default Directions: ปรับให้ครอบคลุมรอบด้าน
-  const defaultDir =
-    subId === 1 ? 'มองจากด้านบน ⬇️' :
-      subId === 2 ? 'มองจากด้านข้าง ↔️' :
-        subId === 3 ? 'มองจากด้านล่าง ⬆️' :
-          subId === 4 ? 'มองจากด้านซ้าย ➡️' :
-            'มองจากด้านขวา ⬅️'
-
+  // ระบบรองรับทั้ง ตัวเล็ก/ตัวใหญ่ และชื่อไทย/อังกฤษ ครับ
   const q: BoxQuestion = {
-    block: `${path}/Block.png`,
+    block: `${path}/Block.png`, // เดี๋ยวในฝั่ง Component จะมี onerror ช่วยเช็ค block.png ให้ครับ
     correct: `${path}/Correct.png`,
-    wrongs: [`${path}/Wrong.png`, `${path}/Wrong1.png`, `${path}/Wrong2.png`],
+    wrongs: [
+      `${path}/Wrong.png`, `${path}/Wrong1.png`, `${path}/Wrong2.png`, 
+      `${path}/wrong.png`, `${path}/wrong1.png`, `${path}/wrong2.png`,
+      `${path}/ผิด.png`, `${path}/ผิด1.png`, `${path}/ผิด2.png`
+    ],
     direction: customDir || defaultDir
   }
 
@@ -171,12 +168,21 @@ function SpatialGameInner() {
     } else {
       // Village 3+: Use Box asset images, fixed by version wrapper logic
       const { q, numOptions } = pickBoxQuestion(levelParam, villageId, assetVersion)
-      const availableWrongs = [...q.wrongs].sort(() => Math.random() - 0.5)
-      const wrongsToUse = availableWrongs.slice(0, Math.min(numOptions - 1, availableWrongs.length))
-      const options = [q.correct, ...wrongsToUse].sort(() => Math.random() - 0.5)
-      const correctIndex = options.indexOf(q.correct)
+      
+      // ฟังก์ชันช่วยสุ่มโดยกรองเอาเฉพาะ WRONG ที่มีอยู่จริง (ผ่านการสุ่มลำดับ)
+      const options = [q.correct, ...q.wrongs].sort(() => Math.random() - 0.5)
+      
+      // เราจะส่ง options ทั้งหมดไป แล้วเดี๋ยวฝั่งแสดงผลจะจัดการ onerror เองหากหาภาพไม่เจอ
+      // แต่ในที่นี้เราจะพยายามหยิบมาให้ได้จำนวนตาม numOptions
+      const finalOptions = options.slice(0, numOptions) 
+      const correctIndex = finalOptions.indexOf(q.correct)
 
-      setQuestionData({ targetImage: q.block, options, correctIndex })
+      // กรณีที่บังเอิญ Correct ไม่อยู่ในชุดที่ slice มา (น้อยมาก) ให้ยัด Correct กลับเข้าไป
+      if (correctIndex === -1) {
+        finalOptions[0] = q.correct
+      }
+
+      setQuestionData({ targetImage: q.block, options: finalOptions, correctIndex: finalOptions.indexOf(q.correct) })
       setQuestionText(`ถ้า${q.direction} คุณจะเห็นหน้าตาบล็อกเป็นแบบใด? 📦`)
     }
   }, [levelParam, villageId, assetVersion, questionCount])
@@ -384,9 +390,15 @@ function SpatialGameInner() {
                     style={DIP_STYLE}
                     className="w-full h-[100px] sm:h-[200px] object-contain mt-2 sm:mt-3"
                     alt="target block"
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      if (img.src.includes('Block.png')) {
+                        img.src = img.src.replace('Block.png', 'block.png');
+                      }
+                    }}
                   />
                 </div>
-
+                
                 {/* Answer choices */}
                 <div className={`grid gap-3 sm:gap-4 md:gap-5 w-full max-w-2xl px-2 sm:px-4 pb-8 ${questionData.options.length === 2
                   ? 'grid-cols-2'
@@ -396,7 +408,7 @@ function SpatialGameInner() {
                   }`}>
                   {questionData.options.map((opt: string, idx: number) => (
                     <button
-                      key={idx}
+                      key={`${idx}-${opt}`}
                       onClick={() => {
                         if (idx === questionData.correctIndex) {
                           setFeedback({ type: 'correct', message: '✨ ถูกต้องแล้ว! เก่งมาก' })
@@ -421,6 +433,13 @@ function SpatialGameInner() {
                         style={DIP_STYLE}
                         className="max-w-[40px] max-h-[40px] sm:max-w-[100px] sm:max-h-[100px] object-contain group-hover:scale-105 transition-transform"
                         alt={`option ${idx}`}
+                        onError={(e) => {
+                          const img = e.currentTarget;
+                          // ลองเปลี่ยนเป็นชื่ออื่นๆ ที่เป็นไปได้
+                          if (img.src.includes('Correct.png')) img.src = img.src.replace('Correct.png', 'correct.png');
+                          else if (img.src.includes('Wrong')) img.src = img.src.toLowerCase();
+                          else if (img.src.includes('ถูก.png')) img.src = img.src.replace('ถูก.png', '✅.png');
+                        }}
                       />
                       <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-7 sm:h-7 bg-slate-100 rounded-full border sm:border-2 border-white text-slate-500 font-black flex items-center justify-center text-[8px] sm:text-xs group-hover:bg-indigo-500 group-hover:text-white transition-colors shadow">
                         {String.fromCharCode(65 + idx)}
