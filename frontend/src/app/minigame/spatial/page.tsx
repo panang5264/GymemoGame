@@ -75,12 +75,19 @@ function pickBoxQuestion(level: number, villageId: number, version: string): { q
   // ค้นหาทิศทางจากตาราง CUSTOM ด้านบน ถ้าไม่มีให้ใช้ Default
   const villageKey = villageId.toString()
   const customDir = CUSTOM_BOX_DIRECTIONS[villageKey]?.[folderName]
-  const defaultDir = subId === 1 ? 'มองจากด้านบน ⬇️' : subId === 2 ? 'มองจากด้านข้าง ↔️' : 'มองจากด้านล่าง ⬆️'
+
+  // Default Directions: ปรับให้ครอบคลุมรอบด้าน
+  const defaultDir =
+    subId === 1 ? 'มองจากด้านบน ⬇️' :
+      subId === 2 ? 'มองจากด้านข้าง ↔️' :
+        subId === 3 ? 'มองจากด้านล่าง ⬆️' :
+          subId === 4 ? 'มองจากด้านซ้าย ➡️' :
+            'มองจากด้านขวา ⬅️'
 
   const q: BoxQuestion = {
-    block: `${path}/โจทย์.png`,
-    correct: `${path}/ถูก.png`,
-    wrongs: [`${path}/ผิด1.png`, `${path}/ผิด2.png`, `${path}/ผิด3.png`],
+    block: `${path}/Block.png`,
+    correct: `${path}/Correct.png`,
+    wrongs: [`${path}/Wrong.png`, `${path}/Wrong1.png`, `${path}/Wrong2.png`],
     direction: customDir || defaultDir
   }
 
