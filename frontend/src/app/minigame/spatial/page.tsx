@@ -161,7 +161,7 @@ const CUSTOM_BOX_DIRECTIONS: Record<string, Record<string, string>> = {
   // คุณสามารถเพิ่มหมู่บ้าน 5, 6, 7... และเลขรอบที่คุณต้องการกำหนดเองได้ที่นี่ครับ
 }
 
-function pickBoxQuestion(level: number, villageId: number, version: string): { q: BoxQuestion; numOptions: number } {
+function pickBoxQuestion(level: number, villageId: number, version: string, questionIndex: number): { q: BoxQuestion; numOptions: number, index: number } {
   const roundNum = version.replace('v', '')
   const storageKey = `spatial_played_box_v${villageId}_r${roundNum}`
   let playedList: number[] = []
@@ -169,9 +169,14 @@ function pickBoxQuestion(level: number, villageId: number, version: string): { q
     playedList = JSON.parse(sessionStorage.getItem(storageKey) || '[]')
   }
 
-  if (playedList.length >= 3) playedList = []
-  const available = [1, 2, 3].filter(n => !playedList.includes(n))
-  const subId = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : 1
+  if (playedList.length >= 3) {
+    playedList = []
+  }
+  const available = [1, 2, 3]
+  let subId = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : 1
+  while (subId == questionIndex) {
+    subId = available[Math.floor(Math.random() * available.length)]
+  }
 
   if (typeof window !== 'undefined') {
     playedList.push(subId)
@@ -201,8 +206,9 @@ function pickBoxQuestion(level: number, villageId: number, version: string): { q
     wrongs: wrongs,
     direction: customDir || defaultDir
   }
+  const index = subId
 
-  return { q, numOptions }
+  return { q, numOptions, index }
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -251,6 +257,8 @@ function SpatialGameInner() {
 
   const isComplete = isGameOver
 
+  const [questionIndex, setQuestionIndex] = useState(-1)
+  const lastQuestionIndexRef = useRef<number>(-1)
   const [questionData, setQuestionData] = useState<{
     // For pair matching (levels 1-2)
     isPairMatching?: boolean
@@ -281,7 +289,7 @@ function SpatialGameInner() {
       setQuestionText('จับคู่รูปทรงต้นแบบที่มีรอยแหว่งกับชิ้นส่วนที่หายไป 🧩')
     } else {
       // Village 3+: Use Box asset images, fixed by version wrapper logic
-      const { q, numOptions } = pickBoxQuestion(levelParam, villageId, assetVersion)
+      const { q, numOptions, index } = pickBoxQuestion(levelParam, villageId, assetVersion, lastQuestionIndexRef.current)
 
       // ฟังก์ชันช่วยสุ่มโดยกรองเอาเฉพาะ WRONG ที่มีอยู่จริง (ผ่านการสุ่มลำดับ)
       const options = [q.correct, ...q.wrongs].sort(() => Math.random() - 0.5)
@@ -295,11 +303,12 @@ function SpatialGameInner() {
       if (correctIndex === -1) {
         finalOptions[0] = q.correct
       }
-
+      lastQuestionIndexRef.current = index
+      setQuestionIndex(index)
       setQuestionData({ targetImage: q.block, options: finalOptions, correctIndex: finalOptions.indexOf(q.correct) })
       setQuestionText(`ถ้า${q.direction} คุณจะเห็นหน้าตาบล็อกเป็นแบบใด? 📦`)
     }
-  }, [levelParam, villageId, assetVersion, questionCount])
+  }, [levelParam, villageId, assetVersion])
 
   useEffect(() => {
     // ── กำหนด Version ตามเลขด่านย่อย (3, 6, 9, 12 = v1, v2, v3, v4) ──
@@ -317,7 +326,9 @@ function SpatialGameInner() {
     setAssetVersion(versionForThisRound)
 
     hasSavedRef.current = false
+    lastQuestionIndexRef.current = -1
     setIsGameOver(false)
+    setQuestionIndex(-1)
     setQuestionCount(0)
     nextQuestion()
   }, [levelParam, subId, villageId, nextQuestion])
