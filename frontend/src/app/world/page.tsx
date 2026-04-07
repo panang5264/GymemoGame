@@ -377,50 +377,45 @@ export default function WorldPage() {
       </div>
 
       {/* Main Action Hub - Mobile Optimized & Compact (Based on Sketch) */}
-      <div className="w-full max-w-4xl mx-auto px-4 mt-1 md:mt-4 space-y-2 relative z-10 animate-in slide-in-from-bottom duration-700">
+      <div className="w-full max-w-4xl mx-auto px-4 mt-0.5 md:mt-4 space-y-1.5 relative z-10 animate-in slide-in-from-bottom duration-700">
         
         {/* Row 1: Daily Mission (Pill Shape) */}
-        <Link href="/daily-challenge" className="w-full h-12 md:h-16 bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl border-4 border-black shadow-[2px_2px_0_#000] flex items-center justify-between px-6 group active:translate-y-1 active:shadow-none transition-all">
-          <div className="flex items-center gap-3">
-            <span className="text-xl md:text-2xl">🎯</span>
-            <div className="text-left font-black text-slate-900 text-sm md:text-lg uppercase">ภารกิจรายวัน</div>
+        <Link href="/daily-challenge" className="w-full h-10 md:h-16 bg-gradient-to-r from-orange-400 to-orange-500 rounded-xl border-[3px] border-black shadow-[2px_2px_0_#000] flex items-center justify-between px-4 group active:translate-y-1 active:shadow-none transition-all">
+          <div className="flex items-center gap-2">
+            <span className="text-lg md:text-2xl">🎯</span>
+            <div className="text-left font-black text-slate-900 text-xs md:text-lg uppercase">ภารกิจรายวัน</div>
           </div>
-          <div className="flex gap-2">
-            <div className={`w-3 h-3 rounded-full border-2 border-white/30 ${dailyStatus.management ? 'bg-white shadow-[0_0_8px_white]' : 'bg-white/20'}`} />
-            <div className={`w-3 h-3 rounded-full border-2 border-white/30 ${dailyStatus.calculation ? 'bg-white shadow-[0_0_8px_white]' : 'bg-white/20'}`} />
-            <div className={`w-3 h-3 rounded-full border-2 border-white/30 ${dailyStatus.spatial ? 'bg-white shadow-[0_0_8px_white]' : 'bg-white/20'}`} />
+          <div className="flex gap-1.5">
+            <div className={`w-2.5 h-2.5 rounded-full border-2 border-white/30 ${dailyStatus.management ? 'bg-white shadow-[0_0_8px_white]' : 'bg-white/20'}`} />
+            <div className={`w-2.5 h-2.5 rounded-full border-2 border-white/30 ${dailyStatus.calculation ? 'bg-white shadow-[0_0_8px_white]' : 'bg-white/20'}`} />
+            <div className={`w-2.5 h-2.5 rounded-full border-2 border-white/30 ${dailyStatus.spatial ? 'bg-white shadow-[0_0_8px_white]' : 'bg-white/20'}`} />
           </div>
         </Link>
 
-        {/* Row 2: Profile (Stats) & Leaderboard (2 Columns) */}
-        <div className="grid grid-cols-2 gap-2">
-          <button onClick={() => router.push('/')} className="bg-white py-2 md:py-3 rounded-xl border-2 border-black shadow-[2px_2px_0_#000] font-black text-[11px] md:text-sm flex items-center justify-center gap-2 hover:bg-slate-50 active:translate-y-0.5 transition-all">
-            <span className="text-sm md:text-lg">👤</span> สถิติโปรไฟล์
+        {/* Row 2: Profile & Leaderboard (Compact) */}
+        <div className="grid grid-cols-2 gap-1.5">
+          <button onClick={() => router.push('/')} className="bg-white py-1.5 md:py-3 rounded-lg border-2 border-black shadow-[2px_2px_0_#000] font-black text-[10px] md:text-sm flex items-center justify-center gap-1.5 hover:bg-slate-50 active:translate-y-0.5 transition-all">
+            <span className="text-xs md:text-lg">👤</span> โปรไฟล์
           </button>
-          <button onClick={() => router.push('/leaderboard')} className="bg-white py-2 md:py-3 rounded-xl border-2 border-black shadow-[2px_2px_0_#000] font-black text-[11px] md:text-sm flex items-center justify-center gap-2 hover:bg-slate-50 active:translate-y-0.5 transition-all">
-            <span className="text-sm md:text-lg">🏆</span> อันดับโลก
-          </button>
-        </div>
-
-        {/* Row 3: Development & Introduction (2 Columns) */}
-        <div className="grid grid-cols-2 gap-2">
-          <button className="bg-white py-2 md:py-3 rounded-xl border-2 border-black shadow-[2px_2px_0_#000] font-black text-[11px] md:text-sm flex items-center justify-center gap-2 hover:bg-slate-50 active:translate-y-0.5 transition-all opacity-50 cursor-not-allowed">
-            <span className="text-sm md:text-lg">📈</span> พัฒนาการ
-          </button>
-          <button onClick={() => { setSlideIndex(0); setShowIntro(true); }} className="bg-white py-2 md:py-3 rounded-xl border-2 border-black shadow-[2px_2px_0_#000] font-black text-[11px] md:text-sm flex items-center justify-center gap-2 hover:bg-slate-50 active:translate-y-0.5 transition-all">
-            <span className="text-sm md:text-lg">📖</span> บทนำ
+          <button onClick={() => router.push('/leaderboard')} className="bg-white py-1.5 md:py-3 rounded-lg border-2 border-black shadow-[2px_2px_0_#000] font-black text-[10px] md:text-sm flex items-center justify-center gap-1.5 hover:bg-slate-50 active:translate-y-0.5 transition-all">
+            <span className="text-xs md:text-lg">🏆</span> อันดับ
           </button>
         </div>
 
-        {/* Row 4: Teaching/Tutorial (Full width) */}
-        <button
-          onClick={() => setShowTutorial(true)}
-          className="w-full py-2 bg-white border-2 border-black rounded-xl shadow-[2px_2px_0_#000] font-black text-[11px] md:text-sm flex items-center justify-center gap-2 hover:bg-slate-50 active:translate-y-0.5 transition-all"
-        >
-          <span className="text-lg">🎓</span> สอนเล่น / ฝึกฝน
-        </button>
+        {/* Combined Row 3 & 4 for better compactness */}
+        <div className="grid grid-cols-2 gap-1.5">
+          <button onClick={() => { setSlideIndex(0); setShowIntro(true); }} className="bg-white py-1.5 md:py-3 rounded-lg border-2 border-black shadow-[2px_2px_0_#000] font-black text-[10px] md:text-sm flex items-center justify-center gap-1.5 hover:bg-slate-50 active:translate-y-0.5 transition-all">
+            <span className="text-xs md:text-lg">📖</span> บทนำ
+          </button>
+          <button
+            onClick={() => setShowTutorial(true)}
+            className="bg-white py-1.5 md:py-3 rounded-lg border-2 border-black shadow-[2px_2px_0_#000] font-black text-[10px] md:text-sm flex items-center justify-center gap-1.5 hover:bg-slate-50 active:translate-y-0.5 transition-all"
+          >
+            <span className="text-xs md:text-lg">🎓</span> สอนเล่น
+          </button>
+        </div>
 
-        {/* Row 5: BIG GREEN START BUTTON */}
+        {/* BIG GREEN START BUTTON - More Compact */}
         {(() => {
           const unlocked_villages_safe = unlockedVillages.length ? unlockedVillages : [1];
           const currentVillageId = Math.max(...unlocked_villages_safe);
@@ -431,19 +426,18 @@ export default function WorldPage() {
           return (
             <button
               onClick={() => router.push(`/world/${currentVillageId}/sublevel/${currentSubId}`)}
-              className="w-full py-3 md:py-6 bg-green-500 hover:bg-green-600 text-white rounded-2xl md:rounded-[2rem] border-4 border-black shadow-[0_6px_0_#166534] flex flex-col items-center justify-center group active:translate-y-1 active:shadow-none transition-all overflow-hidden relative"
+              className="w-full py-2.5 md:py-6 bg-green-500 hover:bg-green-600 text-white rounded-xl md:rounded-[2rem] border-[3px] border-black shadow-[0_4px_0_#166534] flex items-center justify-center gap-3 group active:translate-y-1 active:shadow-none transition-all overflow-hidden relative"
             >
-              <div className="absolute inset-0 bg-white/10 group-hover:bg-transparent transition-colors"></div>
-              <span className="text-xl md:text-4xl font-black uppercase tracking-tighter leading-none relative z-10">เริ่มเกม ➔</span>
-              <span className="text-[10px] md:text-sm font-bold text-black/50 mt-0.5 relative z-10">ด่านปัจจุบัน {currentVillageId}-{currentSubId}</span>
+              <span className="text-lg md:text-4xl font-black uppercase tracking-tighter leading-none relative z-10">เริ่มผจญภัย ➔</span>
+              <span className="text-[9px] md:text-sm font-bold text-black/50 relative z-10">{currentVillageId}-{currentSubId}</span>
             </button>
           )
         })()}
 
         {/* Bottom Options (Cheat/Reset) */}
-        <div className="flex justify-center gap-8 pt-1">
-          <button onClick={resetProgress} className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-red-500">ล้างข้อมูล</button>
-          <button onClick={unlockAllCheat} className="text-[9px] font-black text-slate-300 uppercase tracking-widest hover:text-indigo-500">ปลดล็อกโกง</button>
+        <div className="flex justify-center gap-8 py-0.5">
+          <button onClick={resetProgress} className="text-[8px] font-black text-slate-400 opacity-50 hover:opacity-100 hover:text-red-500 transition-opacity">ล้างข้อมูล</button>
+          <button onClick={unlockAllCheat} className="text-[8px] font-black text-slate-300 opacity-50 hover:opacity-100 hover:text-indigo-500 transition-opacity">ปลดล็อก</button>
         </div>
       </div>
 

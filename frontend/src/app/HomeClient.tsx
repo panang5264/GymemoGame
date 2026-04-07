@@ -185,7 +185,7 @@ export default function Home() {
       }
     }
     else if (phase === 'intro') setPhase('grandmother')
-    else if (phase === 'grandmother') setPhase('tutorial_summary')
+    else if (phase === 'grandmother') { setStoryStep(0); setPhase('tutorial_summary') }
     else if (phase === 'tutorial_summary') {
       // Randomize clock target
       const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -215,7 +215,7 @@ export default function Home() {
 
 
   return (
-    <div className="h-[100dvh] w-full flex flex-col items-center justify-center p-3 md:p-6 bg-[var(--bg-warm)] selection:bg-orange-100 selection:text-orange-900 font-['Supermarket'] overflow-hidden relative">
+    <div className="h-[100dvh] w-full flex flex-col items-center justify-center p-1.5 md:p-6 bg-[var(--bg-warm)] selection:bg-orange-100 selection:text-orange-900 font-['Supermarket'] overflow-hidden relative">
       {/* Background Decor */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-5%] right-[-5%] w-[30%] h-[30%] bg-orange-100/50 blur-[100px] rounded-full" />
@@ -226,7 +226,7 @@ export default function Home() {
 
         {/* Phase 1: Login / Forgot Password */}
         {phase === 'login' && (
-          <div className="friendly-card animate-in fade-in zoom-in duration-500 relative min-h-[400px] flex flex-col justify-center py-6 md:py-10">
+          <div className="friendly-card animate-in fade-in zoom-in duration-500 relative min-h-0 flex flex-col justify-center py-4 md:py-10">
             {/* Guide Button */}
             {!showForgot && (
               <button
@@ -238,19 +238,19 @@ export default function Home() {
               </button>
             )}
 
-            <div className="flex flex-col items-center mb-4 md:mb-10 text-center">
-              <div className="w-20 h-20 md:w-28 md:h-28 bg-white border-4 border-[#1a1a1a] rounded-full flex items-center justify-center mb-4 md:mb-6 overflow-hidden">
+            <div className="flex flex-col items-center mb-2 md:mb-10 text-center">
+              <div className="w-14 h-14 min-[400px]:w-20 min-[400px]:h-20 md:w-28 md:h-28 bg-white border-2 min-[400px]:border-4 border-[#1a1a1a] rounded-full flex items-center justify-center mb-1 md:mb-6 overflow-hidden">
                 {showForgot ? (
-                  <span className="text-5xl">🔑</span>
+                  <span className="text-3xl md:text-5xl">🔑</span>
                 ) : (
                   <img src="/assets_employer/logo.png" className="w-full h-full object-cover scale-[1.25]" alt="Gymemo Game Logo" />
                 )}
               </div>
-              {!showForgot && <p className="text-indigo-600 font-black uppercase tracking-[0.3em] text-xs mb-2">เข้าสู่การผจญภัย</p>}
-              <h1 className="text-4xl md:text-5xl font-black text-[#1a1a1a] tracking-tight uppercase">
+              {!showForgot && <p className="text-indigo-600 font-black uppercase tracking-[0.3em] text-[8px] md:text-xs mb-0.5">เข้าสู่การผจญภัย</p>}
+              <h1 className="text-2xl md:text-5xl font-black text-[#1a1a1a] tracking-tight uppercase leading-none">
                 {showForgot ? 'ลืมรหัสผ่าน' : 'Gymemo Game'}
               </h1>
-              {!showForgot && <p className="text-slate-700 font-black mt-3 text-lg drop-shadow-sm">ยินดีต้อนรับนักสำรวจความจำ!</p>}
+              {!showForgot && <p className="text-slate-700 font-black mt-1 md:mt-3 text-[13px] md:text-lg drop-shadow-sm">ยินดีต้อนรับนักสำรวจความจำ!</p>}
             </div>
 
             {showForgot ? (
@@ -366,14 +366,14 @@ export default function Home() {
                       required
                     />
                   </div>
-                  <div className="flex flex-col gap-4">
-                    <button disabled={loading} className="pill-button w-full py-4 md:py-5 text-xl md:text-2xl mt-3 md:mt-4 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_5px_0_#000] md:shadow-[0_7px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70">
+                  <div className="flex flex-col gap-2">
+                    <button disabled={loading} className="pill-button w-full py-3 md:py-5 text-base md:text-2xl mt-0 md:mt-4 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_4px_0_#000] md:shadow-[0_7px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70">
                       {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowForgot(true)}
-                      className="text-base font-bold text-slate-400 hover:text-indigo-600 transition-colors"
+                      className="text-xs md:text-base font-bold text-slate-400 hover:text-indigo-600 transition-colors"
                     >
                       ลืมรหัสผ่าน? รีเซ็ตได้ที่นี่ 🔑
                     </button>
@@ -382,18 +382,18 @@ export default function Home() {
               </div>
             )}
 
-            <div className="mt-8 text-center text-base font-bold text-[#717171]">
+            <div className="mt-4 md:mt-8 text-center text-sm md:text-base font-bold text-[#717171]">
               ยังไม่มีบัญชี? <Link href="/register" className="text-blue-600 underline hover:text-blue-800 ml-1">สมัครสมาชิก</Link>
             </div>
 
             {/* Other Options Row: Leaderboard with Game Feel */}
-            <div className="mt-6 md:mt-10 pt-6 md:pt-10 border-t-2 border-[#1a1a1a]/10">
-              <p className="text-center text-xs md:text-sm font-bold text-[#717171] mb-6 md:mb-8 uppercase tracking-widest">ทางเลือกอื่นสำหรับนักเดินทาง</p>
+            <div className="mt-4 md:mt-10 pt-4 md:pt-10 border-t-2 border-[#1a1a1a]/10">
+              <p className="text-center text-[10px] md:text-sm font-bold text-[#717171] mb-4 md:mb-8 uppercase tracking-widest leading-none">ทางเลือกอื่นสำหรับนักเดินทาง</p>
               <button
                 onClick={() => router.push('/leaderboard')}
-                className="w-full py-4 md:py-6 bg-slate-800 border-4 border-[#1a1a1a] rounded-full font-black text-white uppercase tracking-widest hover:bg-black transition-all shadow-[6px_6px_0_#4f46e5] text-lg md:text-xl flex items-center justify-center gap-3"
+                className="w-full py-2.5 md:py-6 bg-slate-800 border-2 md:border-4 border-[#1a1a1a] rounded-full font-black text-white uppercase tracking-widest hover:bg-black transition-all shadow-[3px_3px_0_#4f46e5] md:shadow-[6px_6px_0_#4f46e5] text-sm md:text-xl flex items-center justify-center gap-2 md:gap-3"
               >
-                <span>🏆</span> กระดานผู้นำระดับโลก
+                <span>🏆</span> กระดานผู้นำ
               </button>
             </div>
           </div>
@@ -473,24 +473,24 @@ export default function Home() {
 
               {/* ── Left Column: Avatar + Stats + Buttons ── */}
               <div className="flex flex-col items-center text-center">
-                <div className="relative mx-auto w-32 h-32 mb-8 group cursor-pointer" onClick={() => setPhase('edit_profile')}>
-                  <div className="absolute inset-0 bg-orange-200 border-4 border-[#1a1a1a] rounded-full translate-x-1 translate-y-1 group-hover:translate-x-0 group-hover:translate-y-0 transition-all" />
-                  <div className="relative w-full h-full bg-white border-4 border-[#1a1a1a] rounded-full flex items-center justify-center text-6xl shadow-inner overflow-hidden">
+                <div className="relative mx-auto w-24 h-24 mb-4 group cursor-pointer" onClick={() => setPhase('edit_profile')}>
+                  <div className="absolute inset-0 bg-orange-200 border-2 border-[#1a1a1a] rounded-full translate-x-1 translate-y-1 group-hover:translate-x-0 group-hover:translate-y-0 transition-all" />
+                  <div className="relative w-full h-full bg-white border-2 border-[#1a1a1a] rounded-full flex items-center justify-center text-4xl shadow-inner overflow-hidden">
                     <img src={getAvatarPath(user?.avatar || 'avatar-1')} className="w-full h-full object-cover p-1 rounded-full" alt="avatar" />
-                    <div className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[10px] py-1 opacity-0 group-hover:opacity-100 transition-opacity">EDIT</div>
+                    <div className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[8px] py-1 opacity-0 group-hover:opacity-100 transition-opacity">EDIT</div>
                   </div>
                 </div>
-                <h2 className="text-4xl font-black text-[#1a1a1a] mb-2">{name}</h2>
-                <p className="text-[#717171] font-black uppercase tracking-[0.2em] text-[10px] mb-8">นักสำรวจความจำ | ปลดล็อก {progress?.unlockedVillages?.length || 1}/10 หมู่บ้าน</p>
+                <h2 className="text-3xl font-black text-[#1a1a1a] mb-1">{name}</h2>
+                <p className="text-[#717171] font-black uppercase tracking-[0.2em] text-[10px] mb-4">นักสำรวจความจำ | {progress?.unlockedVillages?.length || 1}/10 หมู่บ้าน</p>
 
-                <div className="w-full grid grid-cols-2 gap-3 md:gap-5 mb-10 md:mb-12">
-                  <div className="bg-white border-4 border-slate-800 rounded-[2.5rem] p-5 md:p-6 shadow-[6px_6px_0_#1a1a1a] transition-transform hover:scale-105">
-                    <div className="text-slate-400 text-xs md:text-sm font-black uppercase tracking-[0.2em] mb-2">หมู่บ้าน</div>
-                    <div className="text-4xl md:text-6xl font-black text-slate-800 tracking-tighter">{progress?.unlockedVillages?.length || 1}</div>
+                <div className="w-full grid grid-cols-2 gap-2 mb-6 md:mb-12">
+                  <div className="bg-white border-2 border-slate-800 rounded-3xl p-3 md:p-6 shadow-[3px_3px_0_#1a1a1a] transition-transform hover:scale-105">
+                    <div className="text-slate-400 text-[10px] md:text-sm font-black uppercase tracking-[0.1em] mb-1">หมู่บ้าน</div>
+                    <div className="text-3xl md:text-6xl font-black text-slate-800 tracking-tighter">{progress?.unlockedVillages?.length || 1}</div>
                   </div>
-                  <div className="bg-white border-4 border-slate-800 rounded-[2.5rem] p-5 md:p-6 shadow-[6px_6px_0_#1a1a1a] transition-transform hover:scale-105">
-                    <div className="text-slate-400 text-xs md:text-sm font-black uppercase tracking-[0.2em] mb-2">คะแนนรวม</div>
-                    <div className="text-4xl md:text-6xl font-black text-indigo-600 tracking-tighter">{progress?.totalScore || 0}</div>
+                  <div className="bg-white border-2 border-slate-800 rounded-3xl p-3 md:p-6 shadow-[3px_3px_0_#1a1a1a] transition-transform hover:scale-105">
+                    <div className="text-slate-400 text-[10px] md:text-sm font-black uppercase tracking-[0.1em] mb-1">คะแนนร่วม</div>
+                    <div className="text-3xl md:text-6xl font-black text-indigo-600 tracking-tighter">{progress?.totalScore || 0}</div>
                   </div>
                 </div>
 
@@ -498,10 +498,10 @@ export default function Home() {
                   {/* Primary Action */}
                   <button
                     onClick={nextPhase}
-                    className="w-full py-5 bg-indigo-600 text-white rounded-[2rem] font-black text-2xl shadow-[0_8px_0_#312e81] hover:translate-y-[-4px] hover:shadow-[0_12px_0_#312e81] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-3"
+                    className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-xl shadow-[0_4px_0_#312e81] hover:translate-y-[-2px] hover:shadow-[0_6px_0_#312e81] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-3"
                   >
                     <span>เข้าสู่บทเรียน</span>
-                    <span className="text-3xl">✨</span>
+                    <span className="text-2xl">✨</span>
                   </button>
 
                   <div className="h-[2px] bg-slate-100 my-2" />
@@ -567,37 +567,34 @@ export default function Home() {
                 />
 
                 <div className="mt-10 grid grid-cols-1 gap-4">
-                  <div className="p-5 bg-indigo-50 rounded-3xl border-2 border-indigo-200 flex items-center justify-between">
+                  <div className="p-3 bg-indigo-50 rounded-2xl border border-indigo-200 flex items-center justify-between">
                     <div className="text-left">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[11px] font-black text-indigo-400 uppercase tracking-widest">การบริหารจัดการ</span>
-                        <div className="w-5 h-5 rounded-full border-2 border-indigo-200 flex items-center justify-center text-[11px] font-black text-indigo-400 cursor-help bg-white shadow-sm" title="ทักษะการตัดสินใจ การวางแผน และจัดลำดับความสำคัญ">i</div>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">การบริหารจัดการ</span>
                       </div>
-                      <div className="text-xl font-black text-indigo-900 leading-tight">โหมดจัดการ</div>
+                      <div className="text-sm font-black text-indigo-900 leading-tight">โหมดจัดการ</div>
                     </div>
-                    <div className="text-3xl font-black text-indigo-700 tabular-nums">{Math.round(cognitiveData?.averages?.executiveFunction || 0)}%</div>
+                    <div className="text-lg font-black text-indigo-700 tabular-nums">{Math.round(cognitiveData?.averages?.executiveFunction || 0)}%</div>
                   </div>
 
-                  <div className="p-5 bg-emerald-50 rounded-3xl border-2 border-emerald-200 flex items-center justify-between">
+                  <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-center justify-between">
                     <div className="text-left">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest">ความจำขณะทำงาน</span>
-                        <div className="w-5 h-5 rounded-full border-2 border-emerald-200 flex items-center justify-center text-[11px] font-black text-emerald-400 cursor-help bg-white shadow-sm" title="ความสามารถในการประมวลผลข้อมูลควบคู่กับการมองภาพมิติในใจ">i</div>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">ความจำขณะทำงาน</span>
                       </div>
-                      <div className="text-2xl font-black text-emerald-900 leading-tight">โหมดมิติสัมพันธ์</div>
+                      <div className="text-sm font-black text-emerald-900 leading-tight">โหมดมิติสัมพันธ์</div>
                     </div>
-                    <div className="text-4xl font-black text-emerald-700 tabular-nums">{Math.round(cognitiveData?.averages?.workingMemory || 0)}%</div>
+                    <div className="text-lg font-black text-emerald-700 tabular-nums">{Math.round(cognitiveData?.averages?.workingMemory || 0)}%</div>
                   </div>
 
-                  <div className="p-5 bg-blue-50 rounded-3xl border-2 border-blue-200 flex items-center justify-between">
+                  <div className="p-3 bg-blue-50 rounded-2xl border border-blue-200 flex items-center justify-between">
                     <div className="text-left">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[11px] font-black text-blue-400 uppercase tracking-widest">ความรวดเร็วในการคิด</span>
-                        <div className="w-5 h-5 rounded-full border-2 border-blue-200 flex items-center justify-center text-[11px] font-black text-blue-400 cursor-help bg-white shadow-sm" title="ความไวในการตีความโจทย์และหาคำตอบอย่างแม่นยำ">i</div>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest">ความรวดเร็วในการคิด</span>
                       </div>
-                      <div className="text-xl font-black text-blue-900 leading-tight">โหมดคำนวณ</div>
+                      <div className="text-sm font-black text-blue-900 leading-tight">โหมดคำนวณ</div>
                     </div>
-                    <div className="text-3xl font-black text-blue-700 tabular-nums">{Math.round(cognitiveData?.averages?.processingSpeed || 0)}%</div>
+                    <div className="text-lg font-black text-blue-700 tabular-nums">{Math.round(cognitiveData?.averages?.processingSpeed || 0)}%</div>
                   </div>
                 </div>
 
@@ -725,98 +722,88 @@ export default function Home() {
 
         {/* Phase 4: Game Intro Narrative (Story Panels) */}
         {phase === 'intro' && (
-          <div className="w-full max-w-4xl mx-auto h-full flex flex-col items-center justify-center py-2 px-4">
-            <div className="bg-white border-6 border-black rounded-[3rem] shadow-[15px_15px_0_#000] overflow-hidden w-full flex flex-col h-full animate-in zoom-in duration-500">
-              {/* Panel Area */}
-              <div className="flex-1 relative overflow-hidden bg-slate-100">
-                {/* 
-                  Using FINAL enhanced images (DIP processed for sharpness and contrast):
-                  Scene1_Final.png, Scene2_Final.png, Scene3_Final.png
-                */}
-                <img
-                  key={storyStep}
-                  src={`/assets_employer/background/Scene${storyStep + 1}_Final.png`}
-                  alt="Story Panel"
-                  className="w-full h-full object-cover scale-[1.1] md:scale-[1.05] animate-in fade-in duration-500"
-                  onError={(e) => {
-                    // Fallback to HQ if Final missing
-                    (e.target as any).src = `/assets_employer/background/Scene${storyStep + 1}_HQ.png`;
-                  }}
-                />
+          <div className="fixed inset-0 z-[300] flex flex-col bg-black">
+            {/* Panel Area — fills all remaining space */}
+            <div className="flex-1 relative overflow-hidden bg-slate-100 min-h-0">
+              <img
+                key={storyStep}
+                src={`/assets_employer/background/Scene${storyStep + 1}_Final.png`}
+                alt="Story Panel"
+                className="w-full h-full object-cover animate-in fade-in duration-500"
+                onError={(e) => {
+                  (e.target as any).src = `/assets_employer/background/Scene${storyStep + 1}_HQ.png`;
+                }}
+              />
 
-                {/* Overlay Text Box */}
-                <div className="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-20">
-                  <div className="max-w-2xl mx-auto space-y-4">
-                    <p className="text-white text-xl md:text-2xl font-black leading-relaxed text-center drop-shadow-lg scale-in-95 animate-in fade-in duration-700">
-                      {storyStep === 0 && "หมู่บ้านแห่งหนึ่งเคยเป็นสถานที่ที่เต็มไปด้วยชีวิตชีวาและความกระตือรือร้น แต่วันหนึ่งได้ถูกตัวร้ายลึกลับเข้ารุกราน"}
-                      {storyStep === 1 && "ตัวร้ายเหล่านี้เป็นสัญลักษณ์ของปัจจัยต่าง ๆ ที่ส่งผลให้สมองเสื่อมถอย ทำให้ชาวบ้านค่อย ๆ สูญเสียความสดใส ความกระฉับกระเฉง และพลังในการใช้ชีวิต"}
-                      {storyStep === 2 && "เจ้าสมองจึงตัดสินใจออกเดินทางเพื่อค้นหา “ยาป้องกันสมองเสื่อม” ที่เชื่อกันว่าสามารถปกป้องและฟื้นฟูสมองให้กลับมาแข็งแรงได้อีกครั้ง ระหว่างการเดินทาง ผู้เล่นจะต้องเผชิญกับอุปสรรคและตัวร้ายหลากหลายรูปแบบ!"}
-                    </p>
-                  </div>
-                </div>
+              {/* Overlay Text Box */}
+              <div className="absolute inset-x-0 bottom-0 px-4 pb-4 pt-16 bg-gradient-to-t from-black/90 via-black/70 to-transparent">
+                <p className="text-white text-sm min-[400px]:text-base md:text-xl font-black leading-relaxed text-center drop-shadow-lg animate-in fade-in duration-700 max-w-lg mx-auto">
+                  {storyStep === 0 && "หมู่บ้านแห่งหนึ่งเคยเป็นสถานที่ที่เต็มไปด้วยชีวิตชีวาและความกระตือรือร้น แต่วันหนึ่งได้ถูกตัวร้ายลึกลับเข้ารุกราน"}
+                  {storyStep === 1 && "ตัวร้ายเหล่านี้เป็นสัญลักษณ์ของปัจจัยต่าง ๆ ที่ส่งผลให้สมองเสื่อมถอย ทำให้ชาวบ้านค่อย ๆ สูญเสียความสดใสและพลังในการใช้ชีวิต"}
+                  {storyStep === 2 && "เจ้าสมองจึงตัดสินใจออกเดินทางเพื่อค้นหา “ยาป้องกันสมองเสื่อม” ที่สามารถปกป้องและฟื้นฟูสมองให้กลับมาแข็งแรงได้อีกครั้ง!"}
+                </p>
+              </div>
+            </div>
+
+            {/* Progress Bar & Button — pinned at bottom, never scrolls away */}
+            <div className="bg-white px-4 py-3 min-[400px]:py-4 border-t-4 border-black flex items-center justify-between gap-3 shrink-0">
+              <div className="flex gap-2 min-[400px]:gap-3 shrink-0">
+                {[0, 1, 2].map(i => (
+                  <div key={i} className={`h-3 min-[400px]:h-4 rounded-full transition-all duration-500 border-2 border-black ${storyStep === i ? 'w-10 min-[400px]:w-12 bg-indigo-600' : 'w-3 min-[400px]:w-4 bg-slate-200'}`} />
+                ))}
               </div>
 
-              {/* Progress Bar & Button Area */}
-              <div className="bg-white p-6 border-t-4 border-black flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="flex gap-4">
-                  {[0, 1, 2].map(i => (
-                    <div key={i} className={`h-4 rounded-full transition-all duration-500 border-2 border-black ${storyStep === i ? 'w-12 bg-indigo-600' : 'w-4 bg-slate-200'}`} />
-                  ))}
-                </div>
-
-                <button
-                  onClick={() => {
-                    if (storyStep < 2) setStoryStep(storyStep + 1);
-                    else nextPhase();
-                  }}
-                  className="pill-button px-12 py-4 text-xl md:text-2xl group shadow-[4px_4px_0_#000]"
-                >
-                  {storyStep < 2 ? 'เรื่องราวต่อไป →' : 'เลือกรับแผนที่และลุย! 🗝️'}
-                </button>
-              </div>
+              <button
+                onClick={() => {
+                  if (storyStep < 2) setStoryStep(storyStep + 1);
+                  else nextPhase();
+                }}
+                className="pill-button px-6 min-[400px]:px-10 py-3 text-base min-[400px]:text-lg md:text-2xl shadow-[3px_3px_0_#000] min-[400px]:shadow-[4px_4px_0_#000]"
+              >
+                {storyStep < 2 ? 'เรื่องราวต่อไป →' : 'เลือกรับแผนที่และลุย! 🗝️'}
+              </button>
             </div>
           </div>
         )}
 
         {/* Phase 5: Grandmother Story */}
         {phase === 'grandmother' && (
-          <div className="max-w-md mx-auto animate-in fade-in zoom-in duration-700">
+          <div className="max-w-md mx-auto animate-in fade-in zoom-in duration-700 w-full">
             <div className="flex flex-col items-center">
-              <div className="relative w-full aspect-square max-w-[280px] mb-10 group">
-                <div className="absolute inset-0 bg-white border-4 border-black rounded-[3rem] rotate-3 group-hover:rotate-0 transition-all duration-500"></div>
-                <div className="absolute inset-0 bg-[#fefae0] border-4 border-black rounded-[3rem] -rotate-3 group-hover:rotate-0 transition-all duration-500 flex items-center justify-center shadow-[10px_10px_0_rgba(0,0,0,0.1)] overflow-hidden">
+              <div className="relative w-full aspect-square max-w-[180px] min-[400px]:max-w-[220px] mb-4 min-[400px]:mb-6 group">
+                <div className="absolute inset-0 bg-white border-4 border-black rounded-[2.5rem] rotate-3 group-hover:rotate-0 transition-all duration-500"></div>
+                <div className="absolute inset-0 bg-[#fefae0] border-4 border-black rounded-[2.5rem] -rotate-3 group-hover:rotate-0 transition-all duration-500 flex items-center justify-center shadow-[8px_8px_0_rgba(0,0,0,0.1)] overflow-hidden">
                   <img src="/assets_employer/characters/grandpa_front.png" alt="คุณตา" className="w-full h-full object-contain object-bottom scale-125 translate-y-2 group-hover:scale-110 transition-transform duration-700" />
                 </div>
-                <div className="absolute -bottom-4 -right-4 bg-red-500 text-white w-20 h-20 rounded-full border-4 border-black flex items-center justify-center text-3xl shadow-[4px_4px_0_#000] rotate-12 z-10 animate-bounce">❤️</div>
+                <div className="absolute -bottom-3 -right-3 bg-red-500 text-white w-14 h-14 min-[400px]:w-16 min-[400px]:h-16 rounded-full border-4 border-black flex items-center justify-center text-2xl shadow-[3px_3px_0_#000] rotate-12 z-10 animate-bounce">❤️</div>
               </div>
 
-              <div className="bg-white border-4 border-black rounded-[2.5rem] p-8 relative shadow-[10px_10px_0_#000] w-full">
+              <div className="bg-white border-4 border-black rounded-[2rem] p-5 min-[400px]:p-6 relative shadow-[8px_8px_0_#000] w-full">
                 {/* Speech bubble arrow */}
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-white border-l-4 border-t-4 border-black rotate-45"></div>
 
-                <h3 className="text-xl font-black text-black mb-4 uppercase tracking-widest text-center opacity-40">คุณตาผู้ดูแลหมู่บ้าน</h3>
-                <p className="text-3xl font-black leading-tight text-[#1a1a1a] text-center">
+                <h3 className="text-sm min-[400px]:text-base font-black text-black mb-2 uppercase tracking-widest text-center opacity-40">คุณตาผู้ดูแลหมู่บ้าน</h3>
+                <p className="text-2xl min-[400px]:text-3xl font-black leading-tight text-[#1a1a1a] text-center">
                   "พร้อมบริหารสมอง<br />กันหรือยัง?" ✨
                 </p>
-                <div className="mt-4 text-center">
-                  <p className="text-sm font-bold text-slate-400">มาฝึกฝนเพื่อปกป้องหมู่บ้านกันเถอะ!</p>
+                <div className="mt-2 text-center">
+                  <p className="text-xs min-[400px]:text-sm font-bold text-slate-400">มาฝึกฝนเพื่อปกป้องหมู่บ้านกันเถอะ!</p>
                 </div>
               </div>
 
-              <div className="mt-12 w-full relative">
+              <div className="mt-5 min-[400px]:mt-6 w-full relative">
                 <button
                   onClick={nextPhase}
-                  className="pill-button w-full py-5 text-2xl !bg-green-500 !text-white !border-black shadow-[0_8px_0_#166534] hover:translate-y-1 hover:shadow-[0_4px_0_#166534] active:translate-y-2 active:shadow-none transition-all relative"
+                  className="pill-button w-full py-4 text-xl !bg-green-500 !text-white !border-black shadow-[0_6px_0_#166534] hover:translate-y-1 hover:shadow-[0_3px_0_#166534] active:translate-y-2 active:shadow-none transition-all relative"
                 >
                   พร้อมแล้ว! ✨
 
-                  {/* Red pulsing indicator moved INSIDE the button for perfect alignment */}
                   <div className="absolute right-3 top-1 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-                    <div className="w-6 h-6 bg-red-500 rounded-full animate-ping absolute border-2 border-white"></div>
-                    <div className="w-6 h-6 bg-red-500 rounded-full relative border-2 border-white"></div>
+                    <div className="w-5 h-5 bg-red-500 rounded-full animate-ping absolute border-2 border-white"></div>
+                    <div className="w-5 h-5 bg-red-500 rounded-full relative border-2 border-white"></div>
                   </div>
                 </button>
-                <p className="mt-4 text-[11px] font-black text-indigo-600 uppercase tracking-[0.3em] text-center animate-pulse">ก้าวแรกสู่การเป็นปรมาจารย์</p>
+                <p className="mt-3 text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em] text-center animate-pulse">ก้าวแรกสู่การเป็นปรมาจารย์</p>
               </div>
             </div>
           </div>
@@ -824,13 +811,13 @@ export default function Home() {
 
         {/* Phase 6: Tutorial Summary - Sequential Learning */}
         {phase === 'tutorial_summary' && (
-          <div className="friendly-card !p-6 md:!p-12 animate-in slide-in-from-bottom duration-700 max-w-4xl mx-auto border-[4px] md:border-[6px] min-h-[650px] flex flex-col items-center">
+          <div className="friendly-card !p-4 min-[400px]:!p-6 md:!p-12 animate-in slide-in-from-bottom duration-700 max-w-4xl mx-auto border-[3px] min-[400px]:border-[4px] md:border-[6px] flex flex-col items-center max-h-full overflow-y-auto custom-scrollbar">
 
             {/* Consistent Top Header */}
-            <div className="text-center mb-10">
-              <h2 className="text-3xl md:text-5xl font-black text-black mb-3 tracking-tight">งั้นมาสอนเล่นกันก่อนนะ</h2>
+            <div className="text-center mb-4 min-[400px]:mb-6 md:mb-10 shrink-0">
+              <h2 className="text-2xl min-[400px]:text-3xl md:text-5xl font-black text-black mb-2 tracking-tight">งั้นมาสอนเล่นกันก่อนนะ</h2>
               {storyStep > 0 && (
-                <div className="inline-block px-4 py-1.5 bg-indigo-50 border-2 border-indigo-100 text-indigo-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-full">
+                <div className="inline-block px-3 py-1 bg-indigo-50 border-2 border-indigo-100 text-indigo-600 text-[9px] font-black uppercase tracking-[0.2em] rounded-full">
                   ขั้นตอนที่ {storyStep} จาก 3
                 </div>
               )}
@@ -838,16 +825,16 @@ export default function Home() {
 
             {/* Step 0: Let's learn or Skip */}
             {storyStep === 0 && (
-              <div className="text-center animate-in zoom-in duration-500 py-10">
-                <div className="text-7xl md:text-9xl mb-10 drop-shadow-lg">💡</div>
-                <p className="text-[#717171] font-bold text-lg mb-12 max-w-sm">เพื่อการผจญภัยที่ราบรื่น มาลองฝึกทักษะพื้นฐานกันครับ</p>
+              <div className="text-center animate-in zoom-in duration-500 py-4 min-[400px]:py-8">
+                <div className="text-6xl min-[400px]:text-7xl md:text-9xl mb-6 min-[400px]:mb-8 drop-shadow-lg">💡</div>
+                <p className="text-[#717171] font-bold text-sm min-[400px]:text-base mb-8 max-w-sm">เพื่อการผจญภัยที่ราบรื่น มาลองฝึกทักษะพื้นฐานกันครับ</p>
 
-                <div className="flex flex-col gap-6 w-full max-w-xs mx-auto">
+                <div className="flex flex-col gap-4 w-full max-w-xs mx-auto">
                   <div className="relative">
                     <div className="absolute -top-3 -right-3 w-8 h-8 bg-red-500 rounded-full animate-ping z-10"></div>
                     <button
                       onClick={() => setStoryStep(1)}
-                      className="pill-button w-full py-5 text-2xl !bg-indigo-600 !text-white shadow-[0_8px_0_#312e81]"
+                      className="pill-button w-full py-4 text-xl !bg-indigo-600 !text-white shadow-[0_6px_0_#312e81]"
                     >
                       ลองฝึกฝนกัน ✨
                     </button>
@@ -868,85 +855,79 @@ export default function Home() {
 
             {/* Step 1: Management Tutorial */}
             {storyStep === 1 && (
-              <div className="w-full animate-in slide-in-from-right duration-500 text-center flex flex-col items-center">
+              <div className="w-full animate-in slide-in-from-right duration-500 text-center flex flex-col items-center gap-4">
                 <div
                   onClick={() => setTrainingMode('management')}
-                  className="group cursor-pointer relative bg-[#fffcf0] p-12 md:p-16 rounded-[4rem] border-4 border-black inline-block shadow-[20px_20px_0_#000] hover:scale-105 transition-all mb-12"
+                  className="group cursor-pointer relative bg-[#fffcf0] p-6 min-[400px]:p-8 md:p-16 rounded-[2rem] min-[400px]:rounded-[3rem] md:rounded-[4rem] border-4 border-black w-full shadow-[8px_8px_0_#000] min-[400px]:shadow-[12px_12px_0_#000] hover:scale-[1.02] transition-all"
                 >
-                  <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-10 h-10 bg-red-500 rounded-full animate-ping"></div>
-                  <div className="w-28 h-28 bg-orange-100 border-4 border-black rounded-[2rem] flex items-center justify-center text-6xl mx-auto mb-8 shadow-[8px_8px_0_#000] group-hover:rotate-12 transition-transform">📦</div>
-                  <h4 className="font-black text-4xl text-black mb-6 uppercase">โหมดจัดการ</h4>
-                  <p className="text-xl font-bold text-black/60 max-w-sm mx-auto leading-relaxed italic">
+                  <div className="absolute top-0 right-0 -translate-y-3 translate-x-3 w-8 h-8 bg-red-500 rounded-full animate-ping"></div>
+                  <div className="w-16 h-16 min-[400px]:w-20 min-[400px]:h-20 md:w-28 md:h-28 bg-orange-100 border-4 border-black rounded-[1.5rem] flex items-center justify-center text-4xl md:text-6xl mx-auto mb-3 min-[400px]:mb-4 shadow-[4px_4px_0_#000] group-hover:rotate-12 transition-transform">📦</div>
+                  <h4 className="font-black text-2xl min-[400px]:text-3xl md:text-4xl text-black mb-1.5 uppercase">โหมดจัดการ</h4>
+                  <p className="text-sm min-[400px]:text-base font-bold text-black/60 leading-relaxed italic">
                     "ฝึกทักษะการแยกแยะและจัดหมวดหมู่สิ่งของ"
                   </p>
                 </div>
-                <div className="mt-auto">
-                  <button
-                    onClick={() => setStoryStep(2)}
-                    className="pill-button px-20 py-5 text-2xl shadow-[0_8px_0_#1a1a1a]"
-                  >
-                    ขั้นตอนต่อไป →
-                  </button>
-                </div>
+                <button
+                  onClick={() => setStoryStep(2)}
+                  className="pill-button w-full py-4 text-xl shadow-[0_6px_0_#1a1a1a]"
+                >
+                  ขั้นตอนต่อไป →
+                </button>
               </div>
             )}
 
             {/* Step 2: Calculation Tutorial */}
             {storyStep === 2 && (
-              <div className="w-full animate-in slide-in-from-right duration-500 text-center flex flex-col items-center">
+              <div className="w-full animate-in slide-in-from-right duration-500 text-center flex flex-col items-center gap-4">
                 <div
                   onClick={() => setTrainingMode('calculation')}
-                  className="group cursor-pointer relative bg-[#f0f7ff] p-12 md:p-16 rounded-[4rem] border-4 border-black inline-block shadow-[20px_20px_0_#000] hover:scale-105 transition-all mb-12"
+                  className="group cursor-pointer relative bg-[#f0f7ff] p-6 min-[400px]:p-8 md:p-16 rounded-[2rem] min-[400px]:rounded-[3rem] md:rounded-[4rem] border-4 border-black w-full shadow-[8px_8px_0_#000] min-[400px]:shadow-[12px_12px_0_#000] hover:scale-[1.02] transition-all"
                 >
-                  <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-10 h-10 bg-red-500 rounded-full animate-ping"></div>
-                  <div className="w-28 h-28 bg-blue-100 border-4 border-black rounded-[2rem] flex items-center justify-center text-6xl mx-auto mb-8 shadow-[8px_8px_0_#000] group-hover:rotate-12 transition-transform">🔢</div>
-                  <h4 className="font-black text-4xl text-black mb-6 uppercase">โหมดคำนวณ</h4>
-                  <p className="text-xl font-bold text-black/60 max-w-sm mx-auto leading-relaxed italic">
+                  <div className="absolute top-0 right-0 -translate-y-3 translate-x-3 w-8 h-8 bg-red-500 rounded-full animate-ping"></div>
+                  <div className="w-16 h-16 min-[400px]:w-20 min-[400px]:h-20 md:w-28 md:h-28 bg-blue-100 border-4 border-black rounded-[1.5rem] flex items-center justify-center text-4xl md:text-6xl mx-auto mb-3 min-[400px]:mb-4 shadow-[4px_4px_0_#000] group-hover:rotate-12 transition-transform">🔢</div>
+                  <h4 className="font-black text-2xl min-[400px]:text-3xl md:text-4xl text-black mb-1.5 uppercase">โหมดคำนวณ</h4>
+                  <p className="text-sm min-[400px]:text-base font-bold text-black/60 leading-relaxed italic">
                     "ท้าทายความไวในการคิดเลข เพื่อสมองที่เฉียบแหลม"
                   </p>
                 </div>
-                <div className="mt-auto">
-                  <button
-                    onClick={() => setStoryStep(3)}
-                    className="pill-button px-20 py-5 text-2xl shadow-[0_8px_0_#1a1a1a]"
-                  >
-                    ขั้นตอนต่อไป →
-                  </button>
-                </div>
+                <button
+                  onClick={() => setStoryStep(3)}
+                  className="pill-button w-full py-4 text-xl shadow-[0_6px_0_#1a1a1a]"
+                >
+                  ขั้นตอนต่อไป →
+                </button>
               </div>
             )}
 
             {/* Step 3: Spatial Tutorial */}
             {storyStep === 3 && (
-              <div className="w-full animate-in slide-in-from-right duration-500 text-center flex flex-col items-center">
+              <div className="w-full animate-in slide-in-from-right duration-500 text-center flex flex-col items-center gap-4">
                 <div
                   onClick={() => setTrainingMode('spatial')}
-                  className="group cursor-pointer relative bg-[#f0fff4] p-12 md:p-16 rounded-[4rem] border-4 border-black inline-block shadow-[20px_20px_0_#000] hover:scale-105 transition-all mb-12"
+                  className="group cursor-pointer relative bg-[#f0fff4] p-6 min-[400px]:p-8 md:p-16 rounded-[2rem] min-[400px]:rounded-[3rem] md:rounded-[4rem] border-4 border-black w-full shadow-[8px_8px_0_#000] min-[400px]:shadow-[12px_12px_0_#000] hover:scale-[1.02] transition-all"
                 >
-                  <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-10 h-10 bg-red-500 rounded-full animate-ping"></div>
-                  <div className="w-28 h-28 bg-green-100 border-4 border-black rounded-[2rem] flex items-center justify-center text-6xl mx-auto mb-8 shadow-[8px_8px_0_#000] group-hover:rotate-12 transition-transform">🗺️</div>
-                  <h4 className="font-black text-4xl text-black mb-6 uppercase">โหมดมิติสัมพันธ์</h4>
-                  <p className="text-xl font-bold text-black/60 max-w-sm mx-auto leading-relaxed italic">
+                  <div className="absolute top-0 right-0 -translate-y-3 translate-x-3 w-8 h-8 bg-red-500 rounded-full animate-ping"></div>
+                  <div className="w-16 h-16 min-[400px]:w-20 min-[400px]:h-20 md:w-28 md:h-28 bg-green-100 border-4 border-black rounded-[1.5rem] flex items-center justify-center text-4xl md:text-6xl mx-auto mb-3 min-[400px]:mb-4 shadow-[4px_4px_0_#000] group-hover:rotate-12 transition-transform">🗺️</div>
+                  <h4 className="font-black text-2xl min-[400px]:text-3xl md:text-4xl text-black mb-1.5 uppercase">โหมดมิติสัมพันธ์</h4>
+                  <p className="text-sm min-[400px]:text-base font-bold text-black/60 leading-relaxed italic">
                     "ฝึกการมองภาพในใจ และการเชื่อมโยงมิติที่ซับซ้อน"
                   </p>
                 </div>
-                <div className="mt-auto">
-                  <button
-                    onClick={() => {
-                      const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-                      const minutes = [10, 15, 20, 30, 40, 45, 50];
-                      setClockTarget({
-                        hour: hours[Math.floor(Math.random() * hours.length)],
-                        minute: minutes[Math.floor(Math.random() * minutes.length)]
-                      });
-                      setAssessmentSubPhase('memorize')
-                      setPhase('assessment')
-                    }}
-                    className="pill-button px-14 py-5 text-2xl !bg-[#4ade80] !text-white !border-black shadow-[0_8px_0_#166534] hover:translate-y-1 hover:shadow-[0_4px_0_#166534] active:translate-y-2 active:shadow-none transition-all"
-                  >
-                    พร้อมผจญภัยจริง! ✨
-                  </button>
-                </div>
+                <button
+                  onClick={() => {
+                    const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+                    const minutes = [10, 15, 20, 30, 40, 45, 50];
+                    setClockTarget({
+                      hour: hours[Math.floor(Math.random() * hours.length)],
+                      minute: minutes[Math.floor(Math.random() * minutes.length)]
+                    });
+                    setAssessmentSubPhase('memorize')
+                    setPhase('assessment')
+                  }}
+                  className="pill-button w-full py-4 text-xl !bg-[#4ade80] !text-white !border-black shadow-[0_6px_0_#166534] hover:translate-y-0.5 hover:shadow-[0_3px_0_#166534] active:translate-y-1 active:shadow-none transition-all"
+                >
+                  พร้อมผจญภัยจริง! ✨
+                </button>
               </div>
             )}
           </div>

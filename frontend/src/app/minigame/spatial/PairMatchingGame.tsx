@@ -109,7 +109,7 @@ export default function PairMatchingGame({ pairs, basePath, onComplete, onError 
     }
 
     return (
-        <div className="w-full relative py-8" ref={containerRef}>
+        <div className="w-full relative py-2 sm:py-8" ref={containerRef}>
             <svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-10">
                 {lines.map((line, i) => (
                     <line
@@ -133,7 +133,7 @@ export default function PairMatchingGame({ pairs, basePath, onComplete, onError 
                                 ref={el => leftRefs.current[item.id] = el}
                                 onClick={() => handleLeftClick(item.id)}
                                 disabled={isMatched}
-                                className={`flex items-center justify-center p-2 md:p-4 rounded-xl md:rounded-2xl border-2 md:border-4 transition-all w-full h-24 sm:h-32 md:h-40 bg-white
+                                className={`flex items-center justify-center p-1 md:p-4 rounded-lg md:rounded-2xl border-2 md:border-4 transition-all w-full h-14 sm:h-32 md:h-40 bg-white
                   ${isMatched ? 'border-blue-500 opacity-50 scale-95' :
                                         isSelected ? 'border-indigo-500 shadow-lg scale-105' :
                                             'border-slate-200 hover:border-slate-300 hover:shadow-md'}`}
@@ -155,7 +155,7 @@ export default function PairMatchingGame({ pairs, basePath, onComplete, onError 
                                 ref={el => rightRefs.current[item.id] = el}
                                 onClick={() => handleRightClick(item.id)}
                                 disabled={isMatched}
-                                className={`flex items-center justify-center p-2 md:p-4 rounded-xl md:rounded-2xl border-2 md:border-4 transition-all w-full h-24 sm:h-32 md:h-40 bg-white
+                                className={`flex items-center justify-center p-1 md:p-4 rounded-lg md:rounded-2xl border-2 md:border-4 transition-all w-full h-14 sm:h-32 md:h-40 bg-white
                   ${isMatched ? 'border-blue-500 opacity-50 scale-95' :
                                         isSelected ? 'border-indigo-500 shadow-lg scale-105' :
                                             'border-slate-200 hover:border-slate-300 hover:shadow-md'}`}

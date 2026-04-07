@@ -10,18 +10,18 @@ import MemoryRecallChallenge from '@/components/MemoryRecallChallenge'
 
 // ── Algorithm การสุ่ม Asset Version ไม่ซ้ำ (Shuffle Bag) ───────────────────
 function getUniqueRandomVersion(gameKey: string, versions: string[]) {
-  if (typeof window === 'undefined') return versions[0]
-  const storageKey = `gymemo_history_${gameKey}`
-  let playedList = JSON.parse(sessionStorage.getItem(storageKey) || '[]')
-  
-  if (playedList.length >= versions.length) playedList = []
-  
-  const available = versions.filter(v => !playedList.includes(v))
-  const selected = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : versions[0]
-  
-  playedList.push(selected)
-  sessionStorage.setItem(storageKey, JSON.stringify(playedList))
-  return selected
+    if (typeof window === 'undefined') return versions[0]
+    const storageKey = `gymemo_history_${gameKey}`
+    let playedList = JSON.parse(sessionStorage.getItem(storageKey) || '[]')
+
+    if (playedList.length >= versions.length) playedList = []
+
+    const available = versions.filter(v => !playedList.includes(v))
+    const selected = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : versions[0]
+
+    playedList.push(selected)
+    sessionStorage.setItem(storageKey, JSON.stringify(playedList))
+    return selected
 }
 
 // ─── Maze Generation Logic (Recursive Backtracker) ──────────────────────────
@@ -106,7 +106,7 @@ function MazeGameInner() {
         setMaze(newMaze)
         setPlayerPos({ r: 1, c: 1 })
         setMoves(0)
-        
+
         setStartTime(Date.now())
         setPhase('play')
     }, [rows, cols])
@@ -167,32 +167,31 @@ function MazeGameInner() {
     }, [])
 
     return (
-        <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4 font-['Supermarket']">
-            <div className="w-full max-w-4xl bg-white rounded-[40px] shadow-2xl overflow-hidden flex flex-col min-h-[600px] relative border border-slate-100">
-
+        <div className="h-screen flex flex-col items-center justify-center p-1 md:p-4 font-['Supermarket'] overflow-hidden">
+            <div className="w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl bg-white rounded-[24px] md:rounded-[40px] shadow-2xl overflow-hidden flex flex-col h-full md:h-[calc(100vh-140px)] 2xl:h-[calc(100vh-100px)] relative border border-slate-100">
                 {/* Header Bar */}
-                <div className="h-20 bg-white border-b-2 border-slate-50 flex items-center justify-between px-10 shrink-0">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-3xl">🧭</div>
-                        <h1 className="text-2xl font-black text-slate-800 tracking-tight">Maze Runner (ด่าน {levelParam})</h1>
+                <div className="h-12 md:h-20 bg-white border-b-2 border-slate-50 flex items-center justify-between px-3 md:px-10 shrink-0">
+                    <div className="flex items-center gap-2 md:gap-4">
+                        <div className="w-7 h-7 md:w-12 md:h-12 bg-indigo-50 rounded-lg md:rounded-2xl flex items-center justify-center text-base md:text-3xl">🧭</div>
+                        <h1 className="text-xs md:text-2xl font-black text-slate-800 tracking-tight">Maze Runner (ด่าน {levelParam})</h1>
                     </div>
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center">
                         <div className="flex flex-col items-end">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Moves</span>
-                            <span className="text-3xl font-black text-indigo-600 tabular-nums">{moves}</span>
+                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">Moves</span>
+                            <span className="text-xl md:text-3xl font-black text-indigo-600 tabular-nums leading-none">{moves}</span>
                         </div>
                     </div>
                 </div>
 
                 <div className="flex-1 relative flex items-center justify-center bg-slate-50 p-6">
                     {phase === 'intro' && (
-                        <div className="text-center animate-in zoom-in">
-                            <div className="text-9xl mb-8 animate-jiggle">🧭</div>
-                            <h2 className="text-3xl font-black text-slate-800 mb-6 uppercase tracking-tighter">เขาวงกตพรีเมียม</h2>
-                            <p className="text-slate-500 font-bold mb-12 text-lg max-w-sm">ใช้ปุ่มลูกศรหรือ WASD เพื่อหาทางออกให้เร็วที่สุด!</p>
+                        <div className="text-center animate-in zoom-in p-4">
+                            <div className="text-7xl md:text-9xl mb-4 md:mb-8 animate-jiggle">🧭</div>
+                            <h2 className="text-2xl md:text-3xl font-black text-slate-800 mb-2 md:mb-6 uppercase tracking-tighter">เขาวงกตพรีเมียม</h2>
+                            <p className="text-slate-500 font-bold mb-6 md:mb-12 text-sm md:text-lg max-w-sm mx-auto">ใช้ปุ่มลูกศรหรือ WASD เพื่อหาทางออกให้เร็วที่สุด!</p>
                             <button
                                 onClick={startRealGame}
-                                className="px-16 py-5 bg-indigo-600 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95"
+                                className="w-full max-w-[240px] py-4 md:py-5 bg-indigo-600 text-white rounded-[20px] md:rounded-[24px] font-black text-xl md:text-2xl shadow-xl hover:scale-105 transition-all active:scale-95"
                             >
                                 เริ่มเดินทาง ✨
                             </button>
@@ -203,18 +202,22 @@ function MazeGameInner() {
                     {phase === 'play' && (
                         <div className="flex flex-col items-center">
                             <div
-                                className="bg-white p-2 rounded-[40px] shadow-2xl border-4 border-slate-800"
+                                className="bg-white p-1.5 rounded-[24px] md:rounded-[40px] shadow-2xl border-2 md:border-4 border-slate-800"
                                 style={{
                                     display: 'grid',
                                     gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-                                    gap: '2px',
-                                    width: 'fit-content'
-                                }}
+                                    gap: '1px',
+                                    width: 'fit-content',
+                                    maxWidth: '92vw',
+                                    margin: '0 auto',
+                                    '--cols': cols,
+                                    '--rows': rows,
+                                } as React.CSSProperties}
                             >
                                 {maze.map((row, r) => row.map((cell, c) => (
                                     <div
                                         key={`${r}-${c}`}
-                                        className={`w-6 h-6 md:w-8 md:h-8 border border-white/10 flex items-center justify-center text-lg ${cell === 1 ? 'bg-slate-800' : 'bg-white'}`}
+                                        className={`w-3.5 h-3.5 min-[390px]:w-4.5 min-[390px]:h-4.5 min-[420px]:w-5.5 min-[420px]:h-5.5 md:w-[calc(min(70vw/var(--cols),50vh/var(--rows)))] md:h-[calc(min(70vw/var(--cols),50vh/var(--rows)))] lg:w-[calc(min(60vw/var(--cols),60vh/var(--rows)))] lg:h-[calc(min(60vw/var(--cols),60vh/var(--rows)))] md:max-w-[45px] md:max-h-[45px] lg:max-w-[60px] lg:max-h-[60px] border border-white/10 flex items-center justify-center text-[10px] md:text-lg shrink-0 ${cell === 1 ? 'bg-slate-800' : 'bg-white'}`}
                                     >
                                         {playerPos.r === r && playerPos.c === c && (
                                             <img src="/assets_employer/logo.png" className="w-[85%] h-[85%] object-contain animate-bounce" alt="brain" />
@@ -226,55 +229,55 @@ function MazeGameInner() {
                                 )))}
                             </div>
 
-                            <div className="grid grid-cols-3 gap-2 mt-6 md:hidden">
-                                <div /><button onClick={() => movePlayer(-1, 0)} className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">🔼</button><div />
-                                <button onClick={() => movePlayer(0, -1)} className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">◀️</button>
-                                <button onClick={() => movePlayer(1, 0)} className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">🔽</button>
-                                <button onClick={() => movePlayer(0, 1)} className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center text-2xl border-b-4 border-slate-200 active:scale-95 transition-transform">▶️</button>
+                            <div className="grid grid-cols-3 gap-1.5 mt-4 md:hidden">
+                                <div /><button onClick={() => movePlayer(-1, 0)} className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center text-xl border-b-2 border-slate-200 active:scale-95 transition-transform">🔼</button><div />
+                                <button onClick={() => movePlayer(0, -1)} className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center text-xl border-b-2 border-slate-200 active:scale-95 transition-transform">◀️</button>
+                                <button onClick={() => movePlayer(1, 0)} className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center text-xl border-b-2 border-slate-200 active:scale-95 transition-transform">🔽</button>
+                                <button onClick={() => movePlayer(0, 1)} className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center text-xl border-b-2 border-slate-200 active:scale-95 transition-transform">▶️</button>
                             </div>
                         </div>
                     )}
 
                     {phase === 'done' && (
-                        <div className="max-w-md w-full bg-white rounded-[40px] p-12 shadow-2xl border border-slate-100 text-center animate-in zoom-in">
-                            <div className="text-8xl mb-8">🎯</div>
-                            <h3 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">ทางออกพบแล้ว!</h3>
-                            <p className="text-slate-400 font-bold mb-8 uppercase tracking-widest text-xs">คุณจัดการเวลาและเส้นทางได้ดีเยี่ยม</p>
+                        <div className="max-w-sm w-full bg-white rounded-[2rem] p-6 md:p-12 shadow-2xl border border-slate-100 text-center animate-in zoom-in my-auto">
+                            <div className="text-5xl md:text-8xl mb-4 md:mb-8">🎯</div>
+                            <h3 className="text-2xl md:text-4xl font-black text-slate-800 mb-1 tracking-tight">ทางออกพบแล้ว!</h3>
+                            <p className="text-slate-400 font-bold mb-4 uppercase tracking-widest text-[9px]">คุณจัดการเวลาและเส้นทางได้ดีเยี่ยม</p>
 
-                            <div className="grid grid-cols-2 gap-4 mb-10">
-                                <div className="bg-indigo-50/50 rounded-3xl p-6 border border-indigo-100">
-                                    <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest block mb-1">Time</span>
-                                    <div className="text-3xl font-black text-indigo-600 tabular-nums">
+                            <div className="grid grid-cols-2 gap-3 mb-6">
+                                <div className="bg-indigo-50/50 rounded-2xl p-4 border border-indigo-100">
+                                    <span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest block mb-1">Time</span>
+                                    <div className="text-xl font-black text-indigo-600 tabular-nums">
                                         {((endTime - startTime) / 1000).toFixed(1)}s
                                     </div>
                                 </div>
-                                <div className="bg-indigo-50/50 rounded-3xl p-6 border border-indigo-100">
-                                    <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest block mb-1">Moves</span>
-                                    <div className="text-3xl font-black text-indigo-600 tabular-nums">{moves}</div>
+                                <div className="bg-indigo-50/50 rounded-2xl p-4 border border-indigo-100">
+                                    <span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest block mb-1">Moves</span>
+                                    <div className="text-xl font-black text-indigo-600 tabular-nums">{moves}</div>
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-2">
                                 {mode === 'village' ? (
                                     <>
                                         {subId < 12 ? (
                                             <button
                                                 onClick={() => router.push(`/world/${villageIdParam}/sublevel/${subId + 1}`)}
-                                                className="w-full py-5 bg-green-500 hover:bg-green-600 text-white rounded-[24px] font-black text-xl shadow-xl transition-all active:scale-95"
+                                                className="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl font-black text-lg shadow-[0_4px_0_#166534] transition-all active:scale-95"
                                             >
                                                 ด่านต่อไป ✨
                                             </button>
                                         ) : parseInt(villageIdParam) < 10 ? (
                                             <button
                                                 onClick={() => router.push(`/world/${parseInt(villageIdParam) + 1}`)}
-                                                className="w-full py-5 bg-orange-500 hover:bg-orange-600 text-white rounded-[24px] font-black text-xl shadow-xl transition-all active:scale-95"
+                                                className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-black text-lg shadow-[0_4px_0_#c2410c] transition-all active:scale-95"
                                             >
                                                 หมู่บ้านต่อไป 🏘️
                                             </button>
                                         ) : null}
                                         <button
                                             onClick={() => router.push(`/world/${villageIdParam}`)}
-                                            className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-[24px] font-black text-lg transition-all"
+                                            className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-xl font-black text-base transition-all"
                                         >
                                             กลับสู่แผนที่ 🗺️
                                         </button>
@@ -282,7 +285,7 @@ function MazeGameInner() {
                                 ) : (
                                     <button
                                         onClick={() => router.push('/world')}
-                                        className="w-full py-5 bg-indigo-600 text-white rounded-[24px] font-black text-xl shadow-xl transition-all active:scale-95"
+                                        className="w-full py-4 bg-indigo-600 text-white rounded-xl font-black text-lg shadow-[0_4px_0_#1e40af] transition-all active:scale-95"
                                     >
                                         ตกลง ✨
                                     </button>

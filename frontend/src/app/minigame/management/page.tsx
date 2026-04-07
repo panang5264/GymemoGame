@@ -99,36 +99,29 @@ interface CookingRecipe {
 }
 
 const COOKING_RECIPES: CookingRecipe[] = [
-  // Round 1
+  // Round 1 (Sub-level 1)
   {
-    name: 'กะเพราหมูสับ',
-    ingredients: ['กระเทียม', 'พริกแดง', 'หมูสับ', 'กะเพรา', 'น้ำปลา', 'น้ำตาล'],
-    extra: 'พริกแดง',
-    thought: 'อยากได้ความเผ็ดเพิ่มจัง...',
+    name: 'แตงกวาผัดไข่',
+    ingredients: ['แตงกวา', 'ไข่ไก่', 'กระเทียม', 'น้ำตาล', 'น้ำปลา', 'พริกไทย'],
+    extra: 'น้ำตาล',
+    thought: 'ต้องการหวานเพิ่มจัง...',
     round: 1
   },
   {
     name: 'ผัดไทยกุ้ง',
-    ingredients: ['เต้าหู้', 'กุ้ง', 'เส้นจันท์', 'ถั่วงอก', 'กุยช่าย', 'น้ำปลา', 'น้ำตาล'],
+    ingredients: ['เส้นจันท์', 'กุ้ง', 'น้ำตาล', 'น้ำปลา', 'กุยช่าย', 'เต้าหู้', 'ถั่วงอก'],
     extra: 'น้ำปลา',
-    thought: 'อยากได้ความเค็มเพิ่มจัง...',
+    thought: 'ต้องการเค็มเพิ่มจัง...',
     round: 1
   },
   {
-    name: 'แตงกวาผัดไข่',
-    ingredients: ['กระเทียม', 'แตงกวา', 'ไข่ไก่', 'น้ำปลา', 'น้ำตาล'],
-    extra: 'น้ำตาล',
-    thought: 'อยากได้ความหวานเพิ่มจัง...',
+    name: 'กะเพราหมูสับ',
+    ingredients: ['ข้าว', 'หมูสับ', 'กะเพรา', 'น้ำปลา', 'น้ำตาล', 'พริกแดง'],
+    extra: 'พริกแดง',
+    thought: 'ต้องการความเผ็ดเพิ่มจัง...',
     round: 1
   },
-  // Round 2
-  {
-    name: 'หมูสับทอดกระเทียม',
-    ingredients: ['หมูสับ', 'กระเทียม', 'น้ำปลา', 'น้ำตาล'],
-    extra: 'กระเทียม',
-    thought: 'อยากได้ความหอมกระเทียมเพิ่มจัง...',
-    round: 2
-  },
+  // Round 2 (Sub-level 4)
   {
     name: 'ไข่เจียวหมูสับ',
     ingredients: ['ไข่ไก่', 'หมูสับ', 'น้ำปลา'],
@@ -167,9 +160,11 @@ const ROUND_INGREDIENTS_LIST: Record<number, string[]> = {
   4: ['กระเทียม', 'กุ้ง', 'น้ำตาล', 'น้ำปลา', 'พริกแดง', 'หมูสับ', 'ไข่ไก่'] // Fallback for Round 4
 }
 
-function getIngPath(name: string, round: number) {
-  const ext = name === 'ข้าวสวย' ? 'jpg' : 'png'
-  return `/Asset ด้าน/บริหารจัดการ/หมู่บ้านที่ 4/รอบที่ ${round}/วัตถุดิบ/${name}.${ext}`
+function getIngPath(name: string, round: number, level: number = 4) {
+  // Mapping level to asset village folder: Level 4 maps to village_4, Level 5 to village_5
+  const villageFolder = `village_${level === 5 ? 5 : 4}`
+  const ext = (level === 5) ? 'png' : 'PNG' // Check: village_5 uses .png, village_4 uses .PNG
+  return `${MG_BASE}/${villageFolder}/round_${round}/ingredients/${name}.${ext}`
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -751,12 +746,14 @@ function ManagementGameInner() {
     }
 
     if (c.mode === 'cooking') {
-      let rounds = [1]
-      if (villageId === 4) rounds = [1, 3]
-      else if (villageId === 5) rounds = [2, 3] // Use Round 3 instead of Round 4 (empty)
-      else rounds = [1, 2, 3]
+      let roundNum = 1
+      if (subId === 1) roundNum = 1
+      else if (subId === 4) roundNum = 2
+      else if (subId === 7) roundNum = 3
+      else if (subId === 10) roundNum = 4
+      else roundNum = ((subId - 1) % 4) + 1
 
-      const recipes = COOKING_RECIPES.filter(r => rounds.includes(r.round)).sort(() => Math.random() - 0.5)
+      const recipes = COOKING_RECIPES.filter(r => r.round === roundNum)
       setShuffledRecipes(recipes)
       setDishIndex(0)
       startNewCookingDish(0, recipes)
@@ -914,13 +911,11 @@ function ManagementGameInner() {
     setThoughtBubble(null)
     setFeedback(null)
 
-    // Pool of ingredients for THIS round, filtered to be easier (dish ingredients + 3 distractors)
+    // Use all ingredients from the round pool as per requirements
     const roundIngs = ROUND_INGREDIENTS_LIST[recipe.round] || ROUND_INGREDIENTS_LIST[1]
-    const distractors = roundIngs.filter(ing => !recipe.ingredients.includes(ing)).sort(() => Math.random() - 0.5).slice(0, 3)
-
-    const items = [...recipe.ingredients, ...distractors].map(name => ({
+    const items = roundIngs.map(name => ({
       name,
-      image: getIngPath(name, recipe.round)
+      image: getIngPath(name, recipe.round, levelParam)
     })).sort(() => Math.random() - 0.5)
 
     setCookingItems(items)
@@ -1155,12 +1150,14 @@ function ManagementGameInner() {
     }
 
     if (c.mode === 'cooking') {
-      let rounds = [1]
-      if (villageId === 4) rounds = [1, 3]
-      else if (villageId === 5) rounds = [2, 3] // Use Round 3 instead of Round 4 (empty)
-      else rounds = [1, 2, 3]
+      let roundNum = 1
+      if (subId === 1) roundNum = 1
+      else if (subId === 4) roundNum = 2
+      else if (subId === 7) roundNum = 3
+      else if (subId === 10) roundNum = 4
+      else roundNum = ((subId - 1) % 4) + 1
 
-      const recipes = COOKING_RECIPES.filter(r => rounds.includes(r.round)).sort(() => Math.random() - 0.5)
+      const recipes = COOKING_RECIPES.filter(r => r.round === roundNum)
       setShuffledRecipes(recipes)
       setDishIndex(0)
       startNewCookingDish(0, recipes)
@@ -1184,30 +1181,30 @@ function ManagementGameInner() {
   // ─── Render Components ──────────────────────────────────────────────────────
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 selection:bg-indigo-100 h-full w-full font-['Supermarket']">
-      <div className="w-full max-w-5xl bg-white rounded-[32px] md:rounded-[40px] shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-120px)] md:h-[calc(100vh-84px)] min-h-[560px] md:min-h-[640px] max-h-[980px] relative border border-slate-100">
+    <div className="flex flex-col items-center justify-center p-1.5 md:p-4 selection:bg-indigo-100 h-[100dvh] w-full font-['Supermarket'] overflow-hidden">
+      <div className="w-full max-w-5xl bg-white rounded-[24px] md:rounded-[40px] shadow-2xl overflow-hidden flex flex-col h-full md:h-[calc(100vh-84px)] max-h-screen md:max-h-[980px] relative border border-slate-100">
 
         {/* Header Bar */}
-        <div className="min-h-[4.5rem] md:min-h-[5.5rem] py-3 md:py-4 bg-white border-b border-slate-100 flex flex-row items-center justify-between px-3 md:px-8 shrink-0 z-20 rounded-t-[32px] md:rounded-t-[40px] shadow-sm relative">
-          <div className="flex items-center gap-3 md:gap-5 flex-1 pr-2">
-            <div className="w-10 h-10 md:w-14 md:h-14 bg-indigo-50/80 rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-3xl relative shrink-0 border border-indigo-100 shadow-inner">
+        <div className="min-h-[3rem] md:min-h-[5.5rem] py-1.5 md:py-4 bg-white border-b border-slate-100 flex flex-row items-center justify-between px-2.5 md:px-8 shrink-0 z-20 rounded-t-[24px] md:rounded-t-[40px] shadow-sm relative">
+          <div className="flex items-center gap-2 md:gap-5 flex-1 pr-1.5">
+            <div className="w-9 h-9 md:w-14 md:h-14 bg-indigo-50/80 rounded-xl md:rounded-2xl flex items-center justify-center text-lg md:text-3xl relative shrink-0 border border-indigo-100 shadow-inner">
               {levelParam <= 3 ? '📦' : levelParam <= 5 ? '🍳' : levelParam <= 9 ? '🧭' : '📝'}
               {isBonus && (
-                <div className="absolute -top-2 -right-3 bg-yellow-400 text-yellow-900 text-[9px] md:text-xs font-black px-2 py-0.5 rounded-full border border-yellow-500 shadow-sm animate-pulse">
+                <div className="absolute -top-1.5 -right-2 bg-yellow-400 text-yellow-900 text-[8px] md:text-xs font-black px-1.5 py-0.5 rounded-full border border-yellow-500 shadow-sm">
                   x2
                 </div>
               )}
             </div>
-            <div className="flex flex-col flex-1 pb-1">
-              <h1 className="text-xs min-[360px]:text-[13px] sm:text-base md:text-xl lg:text-2xl font-black text-slate-800 tracking-tight leading-[1.35] break-words line-clamp-3 sm:line-clamp-none drop-shadow-sm">
+            <div className="flex flex-col flex-1">
+              <h1 className="text-[11px] min-[360px]:text-[12px] sm:text-base md:text-xl lg:text-2xl font-black text-slate-800 tracking-tight leading-tight line-clamp-2 md:line-clamp-none">
                 {config.instruction}
               </h1>
             </div>
           </div>
-          <div className="flex items-center shrink-0 pl-3 md:pl-5 border-l-2 border-slate-100 h-10 md:h-12">
+          <div className="flex items-center shrink-0 pl-2.5 md:pl-5 border-l-2 border-slate-100 h-8 md:h-12">
             <div className="flex flex-col items-center justify-center">
-              <span className="text-[9px] md:text-xs font-black text-slate-400 uppercase tracking-widest leading-none">Score</span>
-              <span className="text-2xl md:text-4xl font-black text-indigo-600 tabular-nums leading-none mt-1">{score}</span>
+              <span className="text-[8px] md:text-xs font-black text-slate-400 uppercase tracking-widest leading-none">Score</span>
+              <span className="text-xl md:text-4xl font-black text-indigo-600 tabular-nums leading-none mt-0.5">{score}</span>
             </div>
           </div>
         </div>
@@ -1250,26 +1247,26 @@ function ManagementGameInner() {
           )}
 
           {phase === 'done' && (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-md p-4 md:p-6">
-              <div className="max-w-[400px] w-full bg-white rounded-3xl md:rounded-[48px] p-8 md:p-12 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] border border-white text-center animate-in zoom-in">
-                <div className="relative mb-4 flex justify-center">
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-md p-3">
+              <div className="max-w-[340px] w-full bg-white rounded-[2rem] p-6 md:p-12 shadow-2xl border-4 border-slate-900/5 text-center animate-in zoom-in">
+                <div className="relative mb-3 flex justify-center shrink-0">
                   <div className="absolute inset-0 bg-yellow-400 blur-3xl opacity-20 animate-pulse" />
-                  <div className="text-6xl md:text-8xl relative drop-shadow-2xl">🎯</div>
+                  <div className="text-5xl md:text-8xl relative drop-shadow-xl">🎯</div>
                 </div>
-                <h3 className="text-2xl md:text-4xl font-black text-slate-800 tracking-tight">
+                <h3 className="text-xl md:text-4xl font-black text-slate-800 tracking-tight leading-none">
                   คะแนนรอบนี้: {score}
                 </h3>
                 {playedRounds > 1 && (
-                  <p className="text-xl md:text-3xl font-black text-indigo-600 mb-2 mt-4">
-                    คะแนนเฉลี่ย ({playedRounds} รอบ): {Math.round((accumulatedScore + score) / playedRounds)}
+                  <p className="text-base md:text-3xl font-black text-indigo-600 mb-1 mt-2">
+                    เฉลี่ย ({playedRounds} รอบ): {Math.round((accumulatedScore + score) / playedRounds)}
                   </p>
                 )}
-                <p className="text-slate-400 font-bold mt-4 mb-8 uppercase tracking-[0.2em] text-[10px]">เลเวล {levelParam}</p>
-                <div className="flex flex-col gap-3">
+                <p className="text-slate-400 font-bold mt-2 mb-6 uppercase tracking-widest text-[8px]">เลเวล {levelParam}</p>
+                <div className="flex flex-col gap-2">
                   {playedRounds < 3 && (
                     <button
                       onClick={handleReplay}
-                      className="w-full py-4 bg-sky-100 hover:bg-sky-200 text-sky-700 rounded-[24px] font-black text-xl shadow-md transition-all active:scale-95 border-2 border-sky-300"
+                      className="w-full py-3 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded-xl font-black text-base shadow-sm transition-all active:scale-95 border border-sky-200"
                     >
                       เล่นซ้ำ (รอบที่ {playedRounds}/3) 🔄
                     </button>
@@ -1279,21 +1276,21 @@ function ManagementGameInner() {
                       {subId < 12 ? (
                         <button
                           onClick={() => handleNext(`/world/${villageId}/sublevel/${subId + 1}`)}
-                          className="w-full py-5 bg-green-500 hover:bg-green-600 text-white rounded-[24px] font-black text-2xl shadow-xl transition-all active:scale-95"
+                          className="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-black text-lg shadow-[0_4px_0_#166534] transition-all active:scale-95"
                         >
                           ด่านต่อไป ✨
                         </button>
                       ) : villageId < 10 ? (
                         <button
                           onClick={() => handleNext(`/world/${villageId + 1}`)}
-                          className="w-full py-5 bg-orange-500 hover:bg-orange-600 text-white rounded-[24px] font-black text-2xl shadow-xl transition-all active:scale-95"
+                          className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-black text-lg shadow-[0_4px_0_#c2410c] transition-all active:scale-95"
                         >
                           หมู่บ้านต่อไป 🏘️
                         </button>
                       ) : null}
                       <button
                         onClick={() => handleNext(`/world/${villageId}?showSummary=1`)}
-                        className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-[24px] font-black text-lg transition-all"
+                        className="w-full py-3 bg-slate-50 hover:bg-slate-100 text-slate-400 rounded-xl font-black text-base transition-all"
                       >
                         กลับสู่แผนที่ 🗺️
                       </button>
@@ -1301,7 +1298,7 @@ function ManagementGameInner() {
                   ) : (
                     <button
                       onClick={() => handleNext(modeParam === 'daily' ? '/daily-challenge' : '/world')}
-                      className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[24px] font-black text-2xl shadow-[0_12px_24px_-6px_rgba(79,70,229,0.4)] transition-all hover:-translate-y-1 active:scale-95 active:translate-y-0"
+                      className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black text-lg shadow-[0_6px_20px_-6px_rgba(79,70,229,0.4)] transition-all active:scale-95"
                     >
                       ตกลง ✨
                     </button>
@@ -1312,10 +1309,10 @@ function ManagementGameInner() {
           )}
 
           {phase === 'play' && (
-            <div className="w-full h-full">
+            <div className="absolute inset-0 flex flex-col">
               {config.mode === 'sorting' && (
-                <div className="w-full h-full flex flex-col items-center">
-                  <div className="flex-1 w-full relative">
+                <div className="flex-1 flex flex-col items-center w-full min-h-0">
+                  <div className="flex-1 w-full relative min-h-0">
                     {activePool.map(item => (
                       <div
                         key={item.id}
@@ -1354,7 +1351,7 @@ function ManagementGameInner() {
                       </div>
                     ))}
                   </div>
-                  <div className="shrink-0 w-full flex justify-center gap-4 sm:gap-8 md:gap-16 px-3 sm:px-6 md:px-10 pb-4 pt-2">
+                  <div className="shrink-0 w-full flex justify-center gap-3 min-[400px]:gap-4 sm:gap-8 md:gap-16 px-1 min-[400px]:px-3 sm:px-6 md:px-10 pb-2 min-[400px]:pb-4 pt-2 bg-slate-50/80 backdrop-blur-sm border-t border-slate-100 z-20">
                     {config.categories.map(cat => (
                       <div
                         key={cat.id}
@@ -1380,7 +1377,7 @@ function ManagementGameInner() {
                             </span>
                           )}
                         </div>
-                        <div className="mt-1 sm:mt-2 bg-white px-2 sm:px-4 py-1 sm:py-2 rounded-2xl shadow-xl border-b-4 border-slate-200 text-[9px] sm:text-sm md:text-base font-black text-slate-800 uppercase tracking-tighter text-center leading-tight">
+                        <div className="mt-1 min-[400px]:mt-2 bg-white px-2 sm:px-4 py-1 sm:py-2 rounded-xl min-[400px]:rounded-2xl shadow-xl border-b-[2px] min-[400px]:border-b-4 border-slate-200 text-[9px] min-[400px]:text-[11px] sm:text-sm md:text-base font-black text-slate-800 uppercase tracking-tighter text-center leading-tight">
                           {cat.title}
                         </div>
                       </div>
@@ -1432,46 +1429,40 @@ function ManagementGameInner() {
                     )}
 
                     {thoughtBubble && (
-                      <div className="relative p-4 md:p-6 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border-2 md:border-4 border-rose-400 animate-in slide-in-from-top duration-500 max-w-[280px] md:max-w-md">
-                        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-5 h-5 bg-white border-l-2 md:border-l-4 border-t-2 md:border-t-4 border-rose-400 rotate-45"></div>
-                        <p className="text-rose-600 font-black text-sm md:text-2xl text-center">
+                      <div className="relative p-3 md:p-6 bg-white rounded-2xl md:rounded-[2rem] shadow-2xl border-2 md:border-4 border-rose-400 animate-in slide-in-from-top duration-500 max-w-[240px] md:max-w-md">
+                        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-l-2 md:border-l-4 border-t-2 md:border-t-4 border-rose-400 rotate-45"></div>
+                        <p className="text-rose-600 font-black text-xs md:text-2xl text-center">
                           💭 "{thoughtBubble}"
                         </p>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex-1 flex flex-col items-center justify-start pt-28 min-[400px]:pt-32 md:pt-44 pb-4 min-[400px]:pb-8 w-full h-full">
-                    <div className="mb-2 min-[400px]:mb-6 sm:mb-10 w-full flex justify-center">
+                  <div className="flex-1 flex flex-col items-center justify-start pt-14 min-[400px]:pt-28 md:pt-44 pb-3 min-[400px]:pb-8 w-full h-full">
+                    <div className="mb-1.5 min-[400px]:mb-5 sm:mb-10 w-full flex justify-center">
                       <div className="relative">
-                        <div className="w-56 h-12 min-[400px]:h-14 sm:w-[480px] sm:h-36 lg:w-[600px] lg:h-48 bg-slate-200/50 rounded-full border-b-[4px] sm:border-b-[8px] lg:border-b-[12px] border-slate-300 flex items-center justify-center relative overflow-hidden shadow-inner z-10">
-                          <div className="flex flex-wrap justify-center gap-1.5 min-[400px]:gap-2 md:gap-3 p-2 min-[400px]:p-3 md:p-6">
+                        <div className="w-36 h-9 min-[400px]:h-12 sm:w-[480px] sm:h-36 lg:w-[600px] lg:h-48 bg-slate-200/50 rounded-full border-b-[3px] sm:border-b-[8px] lg:border-b-[12px] border-slate-300 flex items-center justify-center relative overflow-hidden shadow-inner z-10 transition-all">
+                          <div className="flex flex-wrap justify-center gap-1 min-[400px]:gap-2 md:gap-3 p-1 min-[400px]:p-3 md:p-6">
                             {collectedIngredients.map((ing, i) => (
-                              <div key={i} className="w-7 h-7 min-[400px]:w-8 min-[400px]:h-8 sm:w-14 sm:h-14 lg:w-20 lg:h-20 bg-white rounded-lg md:rounded-xl shadow-sm flex items-center justify-center p-1 animate-in bounce-in overflow-hidden relative group border-2 border-slate-100">
-                                <img src={getIngPath(ing, shuffledRecipes[dishIndex]?.round || 1)} className="w-full h-full object-contain" alt={ing} />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                  <span className="text-[6px] lg:text-xs text-white font-bold">{ing}</span>
-                                </div>
+                              <div key={i} className="w-6 h-6 min-[400px]:w-8 min-[400px]:h-8 sm:w-14 sm:h-14 lg:w-20 lg:h-20 bg-white rounded-md md:rounded-xl shadow-sm flex items-center justify-center p-0.5 animate-in bounce-in overflow-hidden relative group border-2 border-slate-100 transition-all">
+                                <img src={getIngPath(ing, shuffledRecipes[dishIndex]?.round || 1, levelParam)} className="w-full h-full object-contain" alt={ing} />
                               </div>
                             ))}
-                            {collectedIngredients.length < currentOrder.length && !showCookingOrder && !isExtraPhase && (
-                              <div className="text-slate-400 font-black text-sm min-[400px]:text-xl md:text-2xl animate-pulse">?</div>
-                            )}
                           </div>
                         </div>
                         {/* Pan handle or decor */}
-                        <div className="absolute top-1/2 -right-8 sm:-right-12 lg:-right-20 w-12 sm:w-20 lg:w-32 h-3 sm:h-4 lg:h-6 bg-slate-400 rounded-full -translate-y-1/2 shadow-md z-0"></div>
+                        <div className="absolute top-1/2 -right-6 sm:-right-12 lg:-right-20 w-10 sm:w-20 lg:w-32 h-2 sm:h-4 lg:h-6 bg-slate-400 rounded-full -translate-y-1/2 shadow-md z-0"></div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-1.5 min-[400px]:gap-2 lg:gap-3 w-full max-w-[90%] lg:max-w-3xl px-1 min-[400px]:px-2 shrink-0">
+                    <div className="grid grid-cols-4 min-[400px]:grid-cols-4 lg:grid-cols-5 gap-1 min-[400px]:gap-2 lg:gap-3 w-full max-w-[95%] lg:max-w-3xl px-1 min-[400px]:px-2 shrink-0 pb-1">
                       {cookingItems.map((item, i) => (
                         <button
                           key={i}
                           onClick={() => handleCookIngredient(item.name)}
-                          className="group flex flex-col items-center gap-1 min-[400px]:gap-1.5 lg:gap-3 p-1 min-[400px]:p-1.5 lg:p-3 bg-white rounded-xl lg:rounded-3xl shadow-md hover:shadow-xl hover:-translate-y-1 lg:hover:-translate-y-2 active:translate-y-0 active:shadow-none transition-all border-b-[3px] lg:border-b-[6px] border-slate-200"
+                          className="group flex flex-col items-center gap-1 p-1 bg-white rounded-xl lg:rounded-3xl shadow-md hover:shadow-xl hover:-translate-y-1 active:translate-y-0 active:shadow-none transition-all border-b-[2px] lg:border-b-[6px] border-slate-200"
                         >
-                          <div className="w-12 h-12 min-[400px]:w-14 min-[400px]:h-14 sm:w-20 sm:h-20 lg:w-32 lg:h-32 bg-slate-50 rounded-lg min-[400px]:rounded-xl lg:rounded-2xl flex items-center justify-center p-1.5 min-[400px]:p-2 lg:p-3 border-2 border-slate-100">
+                          <div className="w-10 h-10 min-[400px]:w-14 min-[400px]:h-14 sm:w-20 sm:h-20 lg:w-32 lg:h-32 bg-slate-50 rounded-lg min-[400px]:rounded-xl lg:rounded-2xl flex items-center justify-center p-1 md:p-3 border-2 border-slate-100">
                             <img src={item.image} className="w-full h-full object-contain group-hover:scale-110 transition-transform" alt={item.name} />
                           </div>
                           <div className="px-2 lg:px-6 py-0.5 lg:py-2 bg-indigo-50 rounded-full border border-indigo-100 text-indigo-800 font-black text-[8px] min-[400px]:text-[9px] lg:text-lg shadow-sm whitespace-nowrap">
