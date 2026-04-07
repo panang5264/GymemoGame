@@ -432,7 +432,11 @@ function SpatialGameInner() {
           )}
           <button
             onClick={() => {
-              setPhase('play')
+              if (levelParam >= 3) {
+                setPhase('memorize')
+              } else {
+                setPhase('play')
+              }
             }}
             className={`w-full py-4 text-white rounded-[20px] font-black text-lg md:text-xl shadow-xl hover:scale-105 transition-all active:scale-95 ${mode === 'daily' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}
           >
@@ -545,28 +549,6 @@ function SpatialGameInner() {
                       ออกเลย
                     </button>
                   </div>
-                </div>
-              </div>
-            )}
-
-            {phase === 'intro' && (
-              <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-sm p-4 md:p-10">
-                <div className="max-w-md w-full bg-white rounded-3xl md:rounded-[40px] p-8 md:p-10 shadow-2xl border border-slate-100 text-center animate-in zoom-in">
-                  <div className="text-5xl md:text-7xl mb-4 md:mb-6 animate-bounce">🧩</div>
-                  <h2 className="text-2xl md:text-3xl font-black text-slate-800 mb-2 md:mb-4">ด่าน {levelParam}</h2>
-                  <p className="text-slate-600 font-bold mb-6 md:mb-8 text-base md:text-lg">{diffDesc}</p>
-                  <button
-                    className="w-full py-4 md:py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-xl md:text-2xl shadow-[0_6px_0_#4338ca] hover:shadow-[0_4px_0_#4338ca] hover:translate-y-[2px] active:shadow-none active:translate-y-[6px] transition-all"
-                    onClick={() => {
-                      if (levelParam >= 3) {
-                        setPhase('memorize')
-                      } else {
-                        setPhase('play')
-                      }
-                    }}
-                  >
-                    เริ่มเลย! ✨
-                  </button>
                 </div>
               </div>
             )}

@@ -176,9 +176,9 @@ export default function ClockIntro({
                         {/* Value Badge inside the Clock (at the bottom or top) */}
                         {activeHand && (
                             <g className="animate-in fade-in slide-in-from-top-4 duration-300">
-                                <rect x="60" y="145" width="80" height="30" rx="15" fill="white" stroke={activeHand === 'hour' ? '#4f46e5' : '#3b82f6'} strokeWidth="3" className="shadow-lg" />
+                                <rect x="60" y="115" width="80" height="30" rx="15" fill="white" stroke={activeHand === 'hour' ? '#4f46e5' : '#3b82f6'} strokeWidth="3" className="shadow-lg" />
                                 <text
-                                    x="100" y="165"
+                                    x="100" y="135"
                                     textAnchor="middle"
                                     alignmentBaseline="middle"
                                     className={`text-[12px] font-black pointer-events-none ${activeHand === 'hour' ? 'fill-indigo-600' : 'fill-blue-600'}`}
