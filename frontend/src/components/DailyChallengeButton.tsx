@@ -79,7 +79,7 @@ export default function DailyChallengeButton() {
             <p className="dc-home-subtitle dc-available-badge">✅ พร้อมเล่นวันนี้!</p>
             <p className="dc-home-note">3 ด่าน × 60 วินาที &nbsp;|&nbsp; ไม่ใช้กุญแจ</p>
             <Link href="/daily-challenge" className="cta-button dc-home-btn">
-              🚀 เริ่มภารกิจรายวัน
+              เริ่มภารกิจรายวัน ✨
             </Link>
           </>
         )}

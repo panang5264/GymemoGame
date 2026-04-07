@@ -104,19 +104,35 @@ export default function ClockIntro({
                     เลือกเข็มและหมุนไปที่ <span className="text-white text-xl underline decoration-amber-400">{targetHour}:{targetMinute < 10 ? `0${targetMinute}` : targetMinute}</span>
                 </p>
 
-                <div className="flex gap-4 justify-center mb-10">
-                    <button
-                        onClick={() => setActiveHand('hour')}
-                        className={`group relative px-6 py-3 rounded-2xl font-black transition-all shadow-lg text-sm md:text-base ${activeHand === 'hour' ? 'bg-indigo-600 text-white scale-110' : 'bg-white/10 text-white hover:bg-white/20'}`}
-                    >
-                        🕘 เข็มชั่วโมง {hasMovedHour && '✅'}
-                    </button>
-                    <button
-                        onClick={() => setActiveHand('minute')}
-                        className={`group relative px-6 py-3 rounded-2xl font-black transition-all shadow-lg text-sm md:text-base ${activeHand === 'minute' ? 'bg-blue-600 text-white scale-110' : 'bg-white/10 text-white hover:bg-white/20'}`}
-                    >
-                        🕒 เข็มนาที {hasMovedMinute && '✅'}
-                    </button>
+                <div className="flex gap-4 justify-center mb-10 relative">
+                    <div className="relative">
+                        <button
+                            onClick={() => setActiveHand('hour')}
+                            className={`group relative px-6 py-3 rounded-2xl font-black transition-all shadow-lg text-sm md:text-base ${activeHand === 'hour' ? 'bg-indigo-600 text-white scale-110' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                        >
+                            🕘 เข็มชั่วโมง {hasMovedHour && '✅'}
+                        </button>
+                        {!hasMovedHour && !activeHand && (
+                            <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full animate-ping z-10 border-2 border-white pointer-events-none" />
+                        )}
+                        {!hasMovedHour && !activeHand && (
+                            <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full z-10 border-2 border-white pointer-events-none" />
+                        )}
+                    </div>
+                    <div className="relative">
+                        <button
+                            onClick={() => setActiveHand('minute')}
+                            className={`group relative px-6 py-3 rounded-2xl font-black transition-all shadow-lg text-sm md:text-base ${activeHand === 'minute' ? 'bg-blue-600 text-white scale-110' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                        >
+                            🕒 เข็มนาที {hasMovedMinute && '✅'}
+                        </button>
+                        {hasMovedHour && !hasMovedMinute && !activeHand && (
+                            <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full animate-ping z-10 border-2 border-white pointer-events-none" />
+                        )}
+                        {hasMovedHour && !hasMovedMinute && !activeHand && (
+                            <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full z-10 border-2 border-white pointer-events-none" />
+                        )}
+                    </div>
                 </div>
 
                 <div className="relative group mx-auto w-fit">
@@ -157,32 +173,52 @@ export default function ClockIntro({
                             )
                         })}
 
+                        {/* Value Badge inside the Clock (at the bottom or top) */}
+                        {activeHand && (
+                            <g className="animate-in fade-in slide-in-from-top-4 duration-300">
+                                <rect x="60" y="115" width="80" height="30" rx="15" fill="white" stroke={activeHand === 'hour' ? '#4f46e5' : '#3b82f6'} strokeWidth="3" className="shadow-lg" />
+                                <text
+                                    x="100" y="135"
+                                    textAnchor="middle"
+                                    alignmentBaseline="middle"
+                                    className={`text-[12px] font-black pointer-events-none ${activeHand === 'hour' ? 'fill-indigo-600' : 'fill-blue-600'}`}
+                                >
+                                    {activeHand === 'hour'
+                                        ? `${(Math.round(hourAngle / 30) % 12) || 12} ชม.`
+                                        : `${Math.round(minuteAngle / 6) % 60} น.`
+                                    }
+                                </text>
+                            </g>
+                        )}
+
                         {/* Center point */}
-                        <circle cx="100" cy="100" r="5" fill="#1e293b" />
+                        <circle cx="100" cy="100" r="6" fill="#1e293b" />
 
                         {/* Hour Hand */}
-                        <line
-                            x1="100" y1="100"
-                            x2="100" y2="55"
-                            stroke="#312e81"
-                            strokeWidth="10"
-                            strokeLinecap="round"
-                            transform={`rotate(${hourAngle}, 100, 100)`}
-                            className={`transition-transform duration-200 cursor-pointer ${activeHand === 'hour' ? 'stroke-indigo-600 filter drop-shadow-md' : 'opacity-40'}`}
-                            onClick={() => setActiveHand('hour')}
-                        />
+                        <g transform={`rotate(${hourAngle}, 100, 100)`} className={`transition-transform duration-200 cursor-pointer ${activeHand === 'hour' ? 'opacity-100' : 'opacity-50'}`} onClick={() => setActiveHand('hour')}>
+                            <line
+                                x1="100" y1="100"
+                                x2="100" y2="55"
+                                stroke="#312e81"
+                                strokeWidth="12"
+                                strokeLinecap="round"
+                            />
+                            {/* Hour Knob */}
+                            <circle cx="100" cy="55" r="9" fill="#312e81" stroke="white" strokeWidth="2" />
+                        </g>
 
                         {/* Minute Hand */}
-                        <line
-                            x1="100" y1="100"
-                            x2="100" y2="25"
-                            stroke="#6366f1"
-                            strokeWidth="6"
-                            strokeLinecap="round"
-                            transform={`rotate(${minuteAngle}, 100, 100)`}
-                            className={`transition-transform duration-200 cursor-pointer ${activeHand === 'minute' ? 'stroke-blue-600 filter drop-shadow-md' : 'opacity-40'}`}
-                            onClick={() => setActiveHand('minute')}
-                        />
+                        <g transform={`rotate(${minuteAngle}, 100, 100)`} className={`transition-transform duration-200 cursor-pointer ${activeHand === 'minute' ? 'opacity-100' : 'opacity-50'}`} onClick={() => setActiveHand('minute')}>
+                            <line
+                                x1="100" y1="100"
+                                x2="100" y2="25"
+                                stroke="#6366f1"
+                                strokeWidth="8"
+                                strokeLinecap="round"
+                            />
+                            {/* Minute Knob */}
+                            <circle cx="100" cy="25" r="7" fill="#6366f1" stroke="white" strokeWidth="2" />
+                        </g>
                     </svg>
 
                     {isDone && (
@@ -230,30 +266,42 @@ export default function ClockIntro({
                     )}
                 </div>
 
-                <button
-                    onClick={() => {
-                        if (isDone) onComplete();
-                        else if (activeHand) setActiveHand(null);
-                        else checkResult();
-                    }}
-                    disabled={(!hasMovedHour && !hasMovedMinute && !isDone)}
-                    className={`mt-4 w-full py-4 rounded-[1.5rem] font-black text-xl transition-all shadow-2xl ${isDone
-                        ? 'bg-green-500 text-white scale-105 hover:bg-green-400'
-                        : activeHand
-                            ? 'bg-amber-500 text-white hover:scale-105 shadow-amber-500/50 border-b-4 border-amber-700 active:border-b-0'
-                            : (!hasMovedHour || !hasMovedMinute)
-                                ? 'bg-slate-700 text-slate-500 cursor-not-allowed border-2 border-slate-600'
-                                : 'bg-gradient-to-r from-indigo-600 to-blue-700 text-white hover:shadow-indigo-500/50 animate-pulse-gentle shadow-[0_0_20px_rgba(79,70,229,0.4)] border-b-4 border-indigo-900 active:border-b-0'
-                        }`}
-                >
-                    {isDone
-                        ? 'เริ่มการทดสอบถัดไป 🚀'
-                        : activeHand
-                            ? '📍 เลือกวางเข็มตรงนี้'
-                            : (!hasMovedHour || !hasMovedMinute)
-                                ? 'กรุณาขยับเข็มให้ครบ'
-                                : '✨ ส่งคำตอบ (เลือกตรงนี้)'}
-                </button>
+                <div className="relative w-full">
+                    <button
+                        onClick={() => {
+                            if (isDone) onComplete();
+                            else if (activeHand) setActiveHand(null);
+                            else checkResult();
+                        }}
+                        disabled={(!hasMovedHour && !hasMovedMinute && !isDone)}
+                        className={`mt-4 w-full py-4 rounded-[1.5rem] font-black text-xl transition-all shadow-2xl relative ${isDone
+                            ? 'bg-green-500 text-white scale-105 hover:bg-green-400'
+                            : activeHand
+                                ? 'bg-amber-500 text-white hover:scale-105 shadow-amber-500/50 border-b-4 border-amber-700 active:border-b-0'
+                                : (!hasMovedHour || !hasMovedMinute)
+                                    ? 'bg-slate-700 text-slate-500 cursor-not-allowed border-2 border-slate-600'
+                                    : 'bg-gradient-to-r from-indigo-600 to-blue-700 text-white hover:shadow-indigo-500/50 animate-pulse-gentle shadow-[0_0_20px_rgba(79,70,229,0.4)] border-b-4 border-indigo-900 active:border-b-0'
+                            }`}
+                    >
+                        {isDone
+                            ? 'เริ่มการทดสอบถัดไป ✨'
+                            : activeHand
+                                ? '📍 เลือกวางเข็มตรงนี้'
+                                : (!hasMovedHour || !hasMovedMinute)
+                                    ? 'กรุณาขยับเข็มให้ครบ'
+                                    : '✨ ส่งคำตอบ (เลือกตรงนี้)'}
+
+                        {hasMovedHour && hasMovedMinute && !isDone && !activeHand && (
+                            <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full animate-ping z-10 border-2 border-white pointer-events-none" />
+                        )}
+                        {hasMovedHour && hasMovedMinute && !isDone && !activeHand && (
+                            <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full z-10 border-2 border-white pointer-events-none" />
+                        )}
+                    </button>
+                    {activeHand && (
+                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-4 h-4 bg-red-500 rounded-full animate-ping z-20 border-2 border-white pointer-events-none" />
+                    )}
+                </div>
             </div>
             <style jsx>{`
                 @keyframes pulse-gentle {

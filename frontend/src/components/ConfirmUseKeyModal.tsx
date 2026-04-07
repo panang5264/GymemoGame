@@ -9,19 +9,19 @@ type Props = {
   title?: string
   villageId?: number
   onCancel: () => void
-  onConfirm: () => void
-  onPlay?: () => void
+  onConfirm: () => void // This is now 'Play with Key'
+  onSkip?: () => void   // Option to skip still exists if needed
 }
 
 export default function ConfirmUseKeyModal({
   open,
   keysLeft,
   cost = 1,
-  title = 'เล่นฟรี หรือ ใช้กุญแจข้ามด่าน?',
+  title = 'ใช้กุญแจเพื่อเริ่มเล่น',
   villageId = 1,
   onCancel,
   onConfirm,
-  onPlay,
+  onSkip,
 }: Props) {
   useEffect(() => {
     if (!open) return
@@ -88,35 +88,38 @@ export default function ConfirmUseKeyModal({
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-          {onPlay && (
-            <button
-              onClick={onPlay}
-              className="py-4 md:py-5 px-4 bg-[#4ade80] border-3 border-[#000000] rounded-2xl md:rounded-[1.5rem] font-black text-[#000000] text-sm md:text-base uppercase shadow-[4px_4px_0_#000] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_#000] transition-all flex items-center justify-center gap-2"
-            >
-              <span className="text-lg md:text-xl">▶</span> เล่นด่านนี้ (ฟรี)
-            </button>
-          )}
-
+        <div className="flex flex-col gap-3">
           <button
             onClick={() => {
               if (!canPay) return
               onConfirm()
             }}
             disabled={!canPay}
-            className={`py-4 md:py-5 px-4 border-3 border-[#000000] rounded-2xl md:rounded-[1.5rem] font-black text-sm md:text-base uppercase transition-all flex items-center justify-center gap-2
+            className={`py-5 px-4 border-3 border-[#000000] rounded-2xl md:rounded-[1.5rem] font-black text-lg uppercase transition-all flex items-center justify-center gap-2
               ${canPay
-                ? 'bg-yellow-400 text-[#000000] shadow-[4px_4px_0_#000] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_#000]'
+                ? 'bg-[#4ade80] text-[#000000] shadow-[0_6px_0_#166534] hover:translate-y-[2px] hover:shadow-[0_4px_0_#166534]'
                 : 'bg-slate-200 text-slate-400 cursor-not-allowed opacity-50'
               }
             `}
           >
-            <span className="text-lg md:text-xl">⏭</span> ใช้ข้ามด่าน ({cost})
+            <span className="text-xl">🔑</span> เริ่มเล่น ({cost} ดอก)
           </button>
+
+          {onSkip && (
+            <button
+              onClick={onSkip}
+              disabled={!canPay}
+              className={`py-3 px-4 border-2 border-[#000000] rounded-xl font-black text-xs uppercase transition-all
+                ${canPay ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'opacity-30 cursor-not-allowed'}
+              `}
+            >
+              ใช้ข้ามด่าน ({cost} ดอก)
+            </button>
+          )}
 
           <button
             onClick={onCancel}
-            className="sm:col-span-2 py-3 md:py-4 text-[#555555] font-black text-xs md:text-sm uppercase tracking-widest hover:text-red-600 transition-all mt-2 md:mt-3"
+            className="py-3 md:py-4 text-[#555555] font-black text-xs md:text-sm uppercase tracking-widest hover:text-red-600 transition-all"
           >
             ยกเลิกและปิดหน้าต่าง
           </button>

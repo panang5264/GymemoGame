@@ -186,9 +186,9 @@ export default function VillageSummary({ villageId, onContinue, scores: propScor
 
                     <button
                         onClick={onContinue}
-                        className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[2rem] font-black text-xl transition-all active:scale-95 shadow-lg shadow-indigo-200 mt-4"
+                        className="w-full py-5 bg-green-500 hover:bg-green-600 text-white rounded-[2rem] font-black text-xl transition-all active:scale-95 shadow-lg shadow-green-100 mt-4"
                     >
-                        ไปต่อ 🚀
+                        ไปต่อ ✨
                     </button>
                 </div>
             </div>

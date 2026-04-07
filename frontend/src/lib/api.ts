@@ -1,10 +1,24 @@
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3001/api'
 
+
+async function safeJson(res: Response) {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch (e: any) {
+    console.error('[API Error] Failed to parse JSON from ' + res.url);
+    console.error('[API Error] Status: ' + res.status + ' ' + res.statusText);
+    console.error('[API Error] Response: ' + text.substring(0, 500));
+    throw new Error('Failed to parse JSON from ' + res.url + ': ' + (e?.message || 'Unknown error'));
+  }
+}
+
+
 export async function getProgression(guestId: string) {
   const res = await fetch(`${API_BASE_URL}/progression/${guestId}`)
   if (!res.ok) throw new Error('Failed to fetch progression')
-  return res.json()
+  return safeJson(res)
 }
 
 export async function completeSubLevel(
@@ -19,7 +33,7 @@ export async function completeSubLevel(
     body: JSON.stringify({ guestId, villageId, subLevelId, score }),
   })
   if (!res.ok) throw new Error('Failed to complete sublevel')
-  return res.json()
+  return safeJson(res)
 }
 
 export async function unlockVillage(guestId: string, villageId: number) {
@@ -29,7 +43,7 @@ export async function unlockVillage(guestId: string, villageId: number) {
     body: JSON.stringify({ guestId, villageId }),
   })
   if (!res.ok) throw new Error('Failed to unlock village')
-  return res.json()
+  return safeJson(res)
 }
 
 // --- Auth API ---
@@ -40,7 +54,7 @@ export async function loginUser(phone: string, password: string) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ phone, password }),
   })
-  const data = await res.json()
+  const data = await safeJson(res)
   if (!res.ok) throw new Error(data.message || 'Failed to login')
   return data
 }
@@ -51,7 +65,7 @@ export async function registerUser(name: string, phone: string, password: string
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, phone, password }),
   })
-  const data = await res.json()
+  const data = await safeJson(res)
   if (!res.ok) throw new Error(data.message || 'Failed to register')
   return data
 }
@@ -64,7 +78,7 @@ export async function getUserProfile(token: string) {
       Authorization: `Bearer ${token}`,
     },
   })
-  const data = await res.json()
+  const data = await safeJson(res)
   if (!res.ok) throw new Error(data.message || 'Failed to fetch profile')
   return data
 }
@@ -78,7 +92,7 @@ export async function updateProfile(token: string, profileData: { name?: string,
     },
     body: JSON.stringify(profileData),
   })
-  const data = await res.json()
+  const data = await safeJson(res)
   if (!res.ok) throw new Error(data.message || 'Failed to update profile')
   return data
 }
@@ -94,7 +108,7 @@ export async function fetchSyncProgress(token: string) {
     },
     cache: 'no-store',
   })
-  const data = await res.json()
+  const data = await safeJson(res)
   if (!res.ok) throw new Error(data.message || 'Failed to fetch sync progress')
   return data
 }
@@ -108,7 +122,7 @@ export async function updateSyncProgress(token: string, progressData: any) {
     },
     body: JSON.stringify({ progressData }),
   })
-  const data = await res.json()
+  const data = await safeJson(res)
   if (!res.ok) throw new Error(data.message || 'Failed to update sync progress')
   return data
 }
@@ -124,7 +138,7 @@ export async function submitScore(token: string, score: number, moves: number, t
     },
     body: JSON.stringify({ score, moves, timeTaken }),
   })
-  const data = await res.json()
+  const data = await safeJson(res)
   if (!res.ok) throw new Error(data.message || 'Failed to submit score')
   return data
 }
@@ -136,7 +150,7 @@ export async function getLeaderboard(limit: number = 10) {
       'Content-Type': 'application/json',
     },
   })
-  const data = await res.json()
+  const data = await safeJson(res)
   if (!res.ok) throw new Error(data.message || 'Failed to fetch leaderboard')
   return data
 }
@@ -150,7 +164,7 @@ export async function adminGetUsers(token: string) {
       Authorization: `Bearer ${token}`,
     },
   })
-  const data = await res.json()
+  const data = await safeJson(res)
   if (!res.ok) throw new Error(data.message || 'Failed to fetch users')
   return data
 }
@@ -163,7 +177,7 @@ export async function adminGetGuests(token: string) {
       Authorization: `Bearer ${token}`,
     },
   })
-  const data = await res.json()
+  const data = await safeJson(res)
   if (!res.ok) throw new Error(data.message || 'Failed to fetch guests')
   return data
 }
@@ -176,7 +190,7 @@ export async function adminGetStats(token: string) {
       Authorization: `Bearer ${token}`,
     },
   })
-  const data = await res.json()
+  const data = await safeJson(res)
   if (!res.ok) throw new Error(data.message || 'Failed to fetch stats')
   return data
 }
@@ -189,7 +203,7 @@ export async function adminDeleteUser(token: string, userId: string) {
       Authorization: `Bearer ${token}`,
     },
   })
-  const data = await res.json()
+  const data = await safeJson(res)
   if (!res.ok) throw new Error(data.message || 'Failed to delete user')
   return data
 }
@@ -202,7 +216,7 @@ export async function adminGetExportScores(token: string) {
       Authorization: `Bearer ${token}`,
     },
   })
-  const data = await res.json()
+  const data = await safeJson(res)
   if (!res.ok) throw new Error(data.message || 'Failed to fetch export scores')
   return data
 }
@@ -215,7 +229,7 @@ export async function adminGetExportAnalysis(token: string) {
       Authorization: `Bearer ${token}`,
     },
   })
-  const data = await res.json()
+  const data = await safeJson(res)
   if (!res.ok) throw new Error(data.message || 'Failed to fetch export analysis')
   return data
 }
@@ -227,7 +241,7 @@ export async function adminGetAnalysisSummary(token: string) {
       Authorization: `Bearer ${token}`,
     },
   })
-  const data = await res.json()
+  const data = await safeJson(res)
   if (!res.ok) throw new Error(data.message || 'Failed to fetch analysis summary')
   return data
 }

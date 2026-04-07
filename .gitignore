@@ -49,3 +49,11 @@ temp/
 # Lock files (optional - uncomment if you want to ignore)
 # package-lock.json
 # yarn.lock
+
+# Rename / utility scripts (one-time use)
+rename_assets_v2.mjs
+rename_assets_v2.ps1
+rename_assets.ps1
+rename_files.mjs
+copy_assets.mjs
+frontend/public/Asset_New/Asset_New/_structure.txt

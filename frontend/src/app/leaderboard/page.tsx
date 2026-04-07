@@ -104,42 +104,44 @@ export default function LeaderboardPage() {
     )
 
     return (
-        <div className="min-h-screen bg-[var(--bg-warm)] p-4 md:p-12 font-['Supermarket'] selection:bg-indigo-100">
-            <div className="max-w-4xl mx-auto">
+        <div className="h-screen bg-[var(--bg-warm)] p-2 md:p-12 font-['Supermarket'] selection:bg-indigo-100 overflow-hidden flex flex-col">
+            <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col min-h-0">
 
                 {/* Header */}
-                <div className="flex flex-col md:flex-row items-center justify-between mb-8 md:mb-10 gap-4">
+                <div className="flex flex-row items-center justify-between mb-4 md:mb-10 gap-2 shrink-0 px-2">
                     <button
                         onClick={() => router.back()}
-                        className="w-12 h-12 md:w-14 md:h-14 bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-xl md:rounded-2xl flex items-center justify-center shadow-[4px_4px_0_var(--border-dark)] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_var(--border-dark)] transition-all font-black text-xl md:text-2xl self-start md:self-auto"
+                        className="w-10 h-10 md:w-14 md:h-14 bg-[var(--card-bg)] border-2 md:border-3 border-[var(--border-dark)] rounded-xl md:rounded-2xl flex items-center justify-center shadow-[3px_3px_0_var(--border-dark)] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_var(--border-dark)] transition-all font-black text-lg md:text-2xl"
                     >
                         ←
                     </button>
-                    <h1 className="text-3xl md:text-4xl font-black text-[var(--text-main)] uppercase tracking-tight text-center">กระดานผู้นำ</h1>
-                    <div className="w-12 h-12 md:w-14 md:h-14 hidden md:block invisible" />
+                    <h1 className="text-xl md:text-4xl font-black text-[var(--text-main)] uppercase tracking-tight text-center">กระดานผู้นำ</h1>
+                    <div className="w-10 h-10 md:w-14 md:h-14 invisible" />
                 </div>
+
+                <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar px-2 pb-6">
 
                 {/* Global Leaderboard Table */}
                 <div className="friendly-card mb-8 md:mb-12 shadow-[10px_10px_0_rgba(79,70,229,0.05)] md:shadow-[15px_15px_0_rgba(79,70,229,0.05)] border-4 p-4 md:p-8">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6 md:mb-8 text-center md:text-left">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-100 rounded-xl md:rounded-2xl flex items-center justify-center text-2xl md:text-3xl shadow-sm">🏆</div>
-                            <h2 className="text-2xl md:text-3xl font-black text-slate-800">อันดับทั้งหมด</h2>
+                    <div className="flex flex-col items-center justify-between gap-3 mb-4 md:mb-8 text-center md:text-left">
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 md:w-12 md:h-12 bg-amber-100 rounded-lg md:rounded-2xl flex items-center justify-center text-xl md:text-3xl shadow-sm">🏆</div>
+                            <h2 className="text-xl md:text-3xl font-black text-slate-800">อันดับทั้งหมด</h2>
                         </div>
-
+  
                         {/* Search Bar */}
-                        <div className="relative w-full md:w-72 group">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-sm opacity-40">🔍</div>
+                        <div className="relative w-full group">
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] opacity-40">🔍</div>
                             <input
                                 type="text"
                                 placeholder="ค้นหาชื่อผู้เล่น..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 bg-slate-50 border-2 border-slate-100 rounded-full text-sm font-bold focus:border-indigo-300 focus:bg-white outline-none transition-all"
+                                className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border-2 border-slate-100 rounded-full text-[10px] font-bold focus:border-indigo-300 focus:bg-white outline-none transition-all"
                             />
                             {searchTerm && filteredEntries.length > 0 && searchTerm !== filteredEntries[0].user?.name && (
-                                <div className="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-slate-100 rounded-2xl shadow-xl z-20 p-2 animate-in slide-in-from-top-2 duration-200">
-                                    <p className="text-[9px] font-black text-slate-400 px-3 py-1 uppercase tracking-widest">แนะนำสำหรับคุณ</p>
+                                <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-slate-100 rounded-xl shadow-xl z-20 p-1.5">
+                                    <p className="text-[8px] font-black text-slate-400 px-2 py-0.5 uppercase tracking-widest">แนะนำ</p>
                                     <button
                                         onClick={() => setSearchTerm(filteredEntries[0].user?.name || '')}
                                         className="w-full text-left px-3 py-2 hover:bg-indigo-50 rounded-xl transition-colors flex items-center gap-2"
@@ -155,11 +157,11 @@ export default function LeaderboardPage() {
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-separate border-spacing-y-3">
                             <thead>
-                                <tr className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                                    <th className="px-6 py-2">อันดับ</th>
-                                    <th className="px-6 py-2">ชื่อผู้เล่น</th>
-                                    <th className="px-6 py-2 text-right">คะแนน</th>
-                                    <th className="px-6 py-2 text-right">เวลา/ความไว</th>
+                                <tr className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                    <th className="px-3 md:px-6 py-1">อันดับ</th>
+                                    <th className="px-3 md:px-6 py-1">ชื่อ</th>
+                                    <th className="px-3 md:px-6 py-1 text-right">คะแนน</th>
+                                    <th className="px-3 md:px-6 py-1 text-right">เวลา</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -174,21 +176,21 @@ export default function LeaderboardPage() {
                                             className="group hover:translate-x-1 hover:bg-indigo-50 transition-all cursor-pointer"
                                             onClick={() => setSelectedUserEntry({ ...entry, displayRank: idx + 1 })}
                                         >
-                                            <td className="px-6 py-4 bg-slate-50 group-hover:bg-indigo-50 border-y-2 border-l-2 border-slate-100 group-hover:border-indigo-100 rounded-l-3xl transition-colors">
-                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black ${idx === 0 ? 'bg-amber-400 text-white shadow-md' : idx === 1 ? 'bg-slate-300 text-white shadow-md' : idx === 2 ? 'bg-orange-300 text-white shadow-md' : 'text-slate-400'}`}>
+                                            <td className="px-3 md:px-6 py-2 bg-slate-50 group-hover:bg-indigo-50 border-y-2 border-l-2 border-slate-100 group-hover:border-indigo-100 rounded-l-2xl transition-colors">
+                                                <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center font-black text-xs ${idx === 0 ? 'bg-amber-400 text-white shadow-md' : idx === 1 ? 'bg-slate-300 text-white shadow-md' : idx === 2 ? 'bg-orange-300 text-white shadow-md' : 'text-slate-400'}`}>
                                                     {idx + 1}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 bg-slate-50 group-hover:bg-indigo-50 border-y-2 border-slate-100 group-hover:border-indigo-100 font-black text-slate-700 transition-colors">
-                                                <div className="flex items-center gap-3">
-                                                    <img src={getAvatarPath(entry.user?.avatar)} alt="avatar" className="w-8 h-8 rounded-full object-cover border-2 border-slate-200" />
-                                                    {entry.user?.name || 'Unknown User'}
+                                            <td className="px-3 md:px-6 py-2 bg-slate-50 group-hover:bg-indigo-50 border-y-2 border-slate-100 group-hover:border-indigo-100 font-black text-slate-700 transition-colors text-[11px] md:text-base">
+                                                <div className="flex items-center gap-2">
+                                                    <img src={getAvatarPath(entry.user?.avatar)} alt="avatar" className="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover border border-slate-200" />
+                                                    {entry.user?.name || 'Unknown'}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 bg-slate-50 group-hover:bg-indigo-50 border-y-2 border-slate-100 group-hover:border-indigo-100 text-right transition-colors">
-                                                <span className="text-xl font-black text-indigo-600 tabular-nums">{entry.score.toLocaleString()}</span>
+                                            <td className="px-3 md:px-6 py-2 bg-slate-50 group-hover:bg-indigo-50 border-y-2 border-slate-100 group-hover:border-indigo-100 text-right transition-colors leading-none">
+                                                <span className="text-base md:text-xl font-black text-indigo-600 tabular-nums">{entry.score.toLocaleString()}</span>
                                             </td>
-                                            <td className="px-6 py-4 bg-slate-50 group-hover:bg-indigo-50 border-y-2 border-r-2 border-slate-100 group-hover:border-indigo-100 rounded-r-3xl text-right font-bold text-slate-400 text-sm transition-colors">
+                                            <td className="px-3 md:px-6 py-2 bg-slate-50 group-hover:bg-indigo-50 border-y-2 border-r-2 border-slate-100 group-hover:border-indigo-100 rounded-r-2xl text-right font-bold text-slate-400 text-[10px] md:text-sm transition-colors">
                                                 {entry.timeTaken}s
                                             </td>
                                         </tr>
@@ -206,33 +208,30 @@ export default function LeaderboardPage() {
                 {/* Personal Stats Section Header - Only show if logged in */}
                 {user && (
                     <>
-                        <div className="h-1 bg-slate-200 w-full mb-12 rounded-full opacity-30" />
-                        <div className="flex items-center gap-3 mb-6 ml-4">
-                            <div className="w-10 h-10 bg-indigo-50 rounded-2xl flex items-center justify-center text-2xl">👤</div>
-                            <h3 className="text-2xl font-black text-slate-800 uppercase tracking-tighter">สถิติของคุณ</h3>
+                        <div className="h-1 bg-slate-200 w-full mb-6 rounded-full opacity-30" />
+                        <div className="flex items-center gap-2 mb-4 ml-2">
+                            <div className="w-8 h-8 bg-indigo-50 rounded-xl flex items-center justify-center text-lg">👤</div>
+                            <h3 className="text-xl font-black text-slate-800 uppercase tracking-tighter">สถิติของคุณ</h3>
                         </div>
 
                         {/* Overall User Card */}
-                        <div className="friendly-card mb-8 shadow-[10px_10px_0_rgba(79,70,229,0.1)] md:shadow-[20px_20px_0_rgba(79,70,229,0.1)] border-4 border-indigo-100 bg-white/80 backdrop-blur-sm p-4 md:p-8">
-                            <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 mb-8">
-                                <div className="w-20 h-20 md:w-24 md:h-24 bg-white border-4 border-indigo-200 rounded-[1rem] md:rounded-[1.5rem] flex items-center justify-center shadow-inner relative p-1 mt-2">
-                                    <img src={getAvatarPath(user?.avatar || (progress as any)?.avatar)} alt="avatar" className="w-full h-full object-cover rounded-[0.5rem] md:rounded-[1rem]" />
-                                    <div className="absolute -bottom-2 -right-2 w-6 h-6 md:w-8 md:h-8 bg-green-500 border-4 border-white rounded-full z-10 shadow-sm"></div>
+                        <div className="friendly-card mb-6 shadow-[8px_8px_0_rgba(79,70,229,0.1)] border-[3px] border-indigo-100 bg-white/80 backdrop-blur-sm p-4">
+                            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 mb-6">
+                                <div className="w-16 h-16 md:w-24 md:h-24 bg-white border-2 md:border-4 border-indigo-200 rounded-xl md:rounded-[1.5rem] flex items-center justify-center shadow-inner relative p-1 shrink-0">
+                                    <img src={getAvatarPath(user?.avatar || (progress as any)?.avatar)} alt="avatar" className="w-full h-full object-cover rounded-lg md:rounded-[1rem]" />
+                                    <div className="absolute -bottom-1 -right-1 w-5 h-5 md:w-8 md:h-8 bg-green-500 border-2 md:border-4 border-white rounded-full z-10 shadow-sm"></div>
                                 </div>
-                                <div className="flex-1 text-center md:text-left">
-                                    <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-1">{userName}</h2>
-                                    <div className="flex flex-wrap justify-center md:justify-start gap-2 md:gap-4 mt-2">
-                                        <span className="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-sm font-black uppercase tracking-widest border-2 border-slate-200">
+                                <div className="flex-1 text-center md:text-left min-w-0">
+                                    <h2 className="text-xl md:text-4xl font-black text-slate-800 mb-0.5 truncate">{userName}</h2>
+                                    <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-1">
+                                        <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-[8px] md:text-sm font-black uppercase tracking-widest border border-slate-200">
                                             🗺️ ปลดล็อก {unlockedCount}/10
                                         </span>
-                                        <span className="bg-indigo-50 text-indigo-600 px-4 py-1.5 rounded-full text-sm font-black uppercase tracking-widest border-2 border-indigo-100 italic">
-                                            {progress?.privacyMode ? '🕵️ โหมดส่วนตัว' : '🌍 สาธารณะ'}
-                                        </span>
                                     </div>
-
+  
                                     {/* PDPA Privacy Toggle */}
-                                    <div className="mt-4 flex flex-col items-center md:items-start gap-2">
-                                        <label className="flex items-center gap-3 cursor-pointer group bg-slate-50 hover:bg-slate-100 px-4 py-2 rounded-2xl border-2 border-slate-100 transition-all">
+                                    <div className="mt-3 flex flex-col items-center md:items-start gap-1">
+                                        <label className="flex items-center gap-2 cursor-pointer group bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-100 transition-all">
                                             <div className="relative inline-flex items-center">
                                                 <input
                                                     type="checkbox"
@@ -258,20 +257,17 @@ export default function LeaderboardPage() {
                                                         saveProgress(nextP)
                                                     }}
                                                 />
-                                                <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                            <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
                                             </div>
-                                            <span className="text-xs font-black text-slate-500 uppercase tracking-widest group-hover:text-slate-700">
-                                                {progress?.privacyMode ? 'ปิดโหมดส่วนตัว (แสดงบนกระดาน)' : 'เปิดโหมดส่วนตัว (PDPA)'}
+                                            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest group-hover:text-slate-700">
+                                                {progress?.privacyMode ? 'โหมดส่วนตัว' : 'สาธารณะ'}
                                             </span>
                                         </label>
-                                        <p className="text-[9px] text-slate-400 font-bold italic ml-2">
-                                            * เมื่อเปิดโหมดส่วนตัว คะแนนของคุณจะถูกซ่อนจากกระดานผู้นำสาธารณะ
-                                        </p>
                                     </div>
                                 </div>
-                                <div className="bg-gradient-to-br from-indigo-600 to-blue-700 text-white px-6 md:px-10 py-4 md:py-6 rounded-[2rem] md:rounded-[3rem] shadow-xl md:shadow-2xl border-4 border-white/20 transform hover:scale-105 transition-transform w-full md:w-auto text-center">
-                                    <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] opacity-80 mb-1 md:mb-2">คะแนนรวมทั้งหมด</p>
-                                    <p className="text-4xl md:text-6xl font-black tabular-nums leading-none tracking-tighter">{userScore.toLocaleString()}</p>
+                                <div className="bg-gradient-to-br from-indigo-600 to-blue-700 text-white px-5 md:px-10 py-3 md:py-6 rounded-[1.5rem] md:rounded-[3rem] shadow-xl border-2 border-white/20 transform hover:scale-105 transition-transform w-full md:w-auto text-center shrink-0">
+                                    <p className="text-[8px] md:text-xs font-black uppercase tracking-wider opacity-80 mb-0.5">รวมคะแนน</p>
+                                    <p className="text-2xl md:text-6xl font-black tabular-nums leading-none tracking-tighter">{userScore.toLocaleString()}</p>
                                 </div>
                             </div>
 
@@ -292,46 +288,34 @@ export default function LeaderboardPage() {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col xl:flex-row gap-8 items-center bg-slate-50/50 rounded-3xl p-4 md:p-8 border-2 border-slate-100 mt-8">
-                                <div className="flex-1 flex justify-center py-2 md:py-4">
+                            <div className="flex flex-col xl:flex-row gap-4 items-center bg-slate-50/50 rounded-2xl p-4 border-2 border-slate-100 mt-6 md:mt-8">
+                                <div className="flex-1 flex justify-center py-2 shrink-0">
                                     <BrainRadarChart
                                         data={[
-                                            { label: 'การจัดการ', value: cognitiveData?.averages?.executiveFunction || 0, color: '#4f46e5' },
-                                            { label: 'การคำนวณ', value: cognitiveData?.averages?.processingSpeed || 0, color: '#3b82f6' },
-                                            { label: 'มิติสัมพันธ์', value: cognitiveData?.averages?.workingMemory || 0, color: '#10b981' },
-                                            { label: 'การตอบสนอง', value: cognitiveData?.averages?.attention || 0, color: '#f59e0b' }
+                                            { label: 'จัดการ', value: cognitiveData?.averages?.executiveFunction || 0, color: '#4f46e5' },
+                                            { label: 'คำนวณ', value: cognitiveData?.averages?.processingSpeed || 0, color: '#3b82f6' },
+                                            { label: 'พื้นที่', value: cognitiveData?.averages?.workingMemory || 0, color: '#10b981' },
+                                            { label: 'ตอบสนอง', value: cognitiveData?.averages?.attention || 0, color: '#f59e0b' }
                                         ]}
-                                        size={220}
+                                        size={140}
                                     />
                                 </div>
-                                <div className="w-full xl:w-[480px] grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                                    <div className="bg-white p-4 md:p-5 rounded-3xl shadow-sm border-2 border-indigo-100/50 flex flex-col justify-center">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-[10px] md:text-[11px] font-black text-indigo-400 uppercase tracking-widest">การบริหารจัดการ</span>
-                                        </div>
-                                        <div className="text-xl md:text-2xl font-black text-indigo-600 leading-tight">โหมดจัดการ</div>
-                                        <div className="text-3xl md:text-4xl font-black text-indigo-700 mt-1 tabular-nums">{Math.round(cognitiveData?.averages?.executiveFunction || 0)}%</div>
+                                <div className="w-full grid grid-cols-2 gap-2">
+                                    <div className="bg-white p-2.5 rounded-xl border border-indigo-100 flex flex-col justify-center">
+                                        <div className="text-[7px] font-black text-indigo-400 uppercase tracking-widest leading-none mb-1">จัดการ</div>
+                                        <div className="text-xl font-black text-indigo-700 tabular-nums">{Math.round(cognitiveData?.averages?.executiveFunction || 0)}%</div>
                                     </div>
-                                    <div className="bg-white p-4 md:p-5 rounded-3xl shadow-sm border-2 border-emerald-100/50 flex flex-col justify-center">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-[10px] md:text-[11px] font-black text-emerald-400 uppercase tracking-widest">ความจำขณะทำงาน</span>
-                                        </div>
-                                        <div className="text-xl md:text-2xl font-black text-emerald-600 leading-tight">โหมดมิติสัมพันธ์</div>
-                                        <div className="text-3xl md:text-4xl font-black text-emerald-700 mt-1 tabular-nums">{Math.round(cognitiveData?.averages?.workingMemory || 0)}%</div>
+                                    <div className="bg-white p-2.5 rounded-xl border border-emerald-100 flex flex-col justify-center">
+                                        <div className="text-[7px] font-black text-emerald-400 uppercase tracking-widest leading-none mb-1">พื้นที่</div>
+                                        <div className="text-xl font-black text-emerald-700 tabular-nums">{Math.round(cognitiveData?.averages?.workingMemory || 0)}%</div>
                                     </div>
-                                    <div className="bg-white p-4 md:p-5 rounded-3xl shadow-sm border-2 border-blue-100/50 flex flex-col justify-center">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-[10px] md:text-[11px] font-black text-blue-400 uppercase tracking-widest">ความรวดเร็วในการคิด</span>
-                                        </div>
-                                        <div className="text-xl md:text-2xl font-black text-blue-600 leading-tight">โหมดคำนวณ</div>
-                                        <div className="text-3xl md:text-4xl font-black text-blue-700 mt-1 tabular-nums">{Math.round(cognitiveData?.averages?.processingSpeed || 0)}%</div>
+                                    <div className="bg-white p-2.5 rounded-xl border border-blue-100 flex flex-col justify-center">
+                                        <div className="text-[7px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1">คำนวณ</div>
+                                        <div className="text-xl font-black text-blue-700 tabular-nums">{Math.round(cognitiveData?.averages?.processingSpeed || 0)}%</div>
                                     </div>
-                                    <div className="bg-white p-4 md:p-5 rounded-3xl shadow-sm border-2 border-orange-100/50 flex flex-col justify-center">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-[10px] md:text-[11px] font-black text-orange-400 uppercase tracking-widest">ความรวดเร็วในการตอบสนอง</span>
-                                        </div>
-                                        <div className="text-xl md:text-2xl font-black text-orange-600 leading-tight">โหมดตอบสนอง</div>
-                                        <div className="text-3xl md:text-4xl font-black text-orange-700 mt-1 tabular-nums">{Math.round(cognitiveData?.averages?.attention || 0)}%</div>
+                                    <div className="bg-white p-2.5 rounded-xl border border-orange-100 flex flex-col justify-center">
+                                        <div className="text-[7px] font-black text-orange-400 uppercase tracking-widest leading-none mb-1">ตอบสนอง</div>
+                                        <div className="text-xl font-black text-orange-700 tabular-nums">{Math.round(cognitiveData?.averages?.attention || 0)}%</div>
                                     </div>
                                 </div>
                             </div>
@@ -344,15 +328,15 @@ export default function LeaderboardPage() {
                                     <h3 className="font-black text-[var(--text-main)] uppercase tracking-widest text-[10px] ml-4 mb-2">📊 รายละเอียดรายหมู่บ้าน</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {villageEntries.map((entry) => (
-                                            <div key={entry.villageId} className="bg-[var(--card-bg)] border-3 border-[var(--border-dark)] rounded-[2rem] p-5 shadow-[6px_6px_0_rgba(0,0,0,0.04)]">
-                                                <div className="flex items-center justify-between mb-3">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 bg-indigo-50 border-2 border-[var(--border-dark)] rounded-2xl flex items-center justify-center font-black text-indigo-600 text-lg shadow-[2px_2px_0_var(--border-dark)]">
+                                            <div key={entry.villageId} className="bg-[var(--card-bg)] border-2 border-[var(--border-dark)] rounded-[1.5rem] p-4 shadow-[4px_4px_0_rgba(0,0,0,0.04)]">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-8 h-8 bg-indigo-50 border border-[var(--border-dark)] rounded-xl flex items-center justify-center font-black text-indigo-600 text-sm">
                                                             {entry.villageId}
                                                         </div>
                                                         <div>
-                                                            <p className="font-black text-[var(--text-main)]">หมู่บ้านที่ {entry.villageId}</p>
-                                                            <p className="text-[10px] font-bold text-[var(--text-muted)]">เล่น {entry.playsCompleted}/{PLAYS_PER_VILLAGE} รอบ</p>
+                                                            <p className="font-black text-[var(--text-main)] text-xs leading-none mb-0.5">หมู่บ้านที่ {entry.villageId}</p>
+                                                            <p className="text-[8px] font-bold text-[var(--text-muted)] leading-none">เล่น {entry.playsCompleted}/{PLAYS_PER_VILLAGE} รอบ</p>
                                                         </div>
                                                     </div>
                                                     {entry.bestScore > 0 && (
@@ -387,6 +371,7 @@ export default function LeaderboardPage() {
                         }
                     </>
                 )}
+                </div>
 
                 <p className="text-center mt-12 text-[#717171] font-black uppercase tracking-[0.2em] text-[10px] opacity-50">
                     ข้อมูลสรุปคะแนนและการผจญภัยของคุณ 🧠
