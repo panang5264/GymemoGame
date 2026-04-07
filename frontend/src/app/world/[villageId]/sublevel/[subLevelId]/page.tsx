@@ -59,7 +59,7 @@ export default function SubLevelPage({
     }, [villageId, subLevelId, router, progress, isLoading])
 
     const handleConfirm = () => {
-        // ผู้เล่นเลือกใช้กุญแจข้ามด่าน
+        // ผู้เล่นเลือกใช้กุญแจเพื่อ "เริ่มเล่น"
         const consumedResult = consumeKey(progress)
         if (!consumedResult) {
             setModalOpen(false)
@@ -67,16 +67,23 @@ export default function SubLevelPage({
             return
         }
 
+        saveProgress(consumedResult)
+        setModalOpen(false)
+
+        // ไปที่ตัวเกมเลย
+        router.replace(getMinigameUrl(villageId, subLevelId))
+    }
+
+    const handleSkip = () => {
+        // Option to skip (if the modal still provides it)
+        const consumedResult = consumeKey(progress)
+        if (!consumedResult) return
+
         let nextP = consumedResult
-
-        // SKIP LOGIC: 50 points, Key count decreases
-        // Note: recordPlay handles point calculation (50 pts for skips)
         nextP = rawRecordPlay(nextP, villageId, 50, undefined, subLevelId)
-
         saveProgress(nextP)
         setModalOpen(false)
 
-        // กระโดดไปยังด่านถัดไป หรือกลับไปหน้าหน้าหมู่บ้านถ้าเป็นด่านสุดท้าย
         if (subLevelId < 12) {
             router.replace(`/world/${villageId}/sublevel/${subLevelId + 1}`)
         } else {
@@ -89,11 +96,6 @@ export default function SubLevelPage({
         router.back()
     }
 
-    const handlePlayNoKey = () => {
-        setModalOpen(false)
-        // เข้าไปเล่นเกมได้เลยแบบฟรีๆ ไม่เสียกุญแจ
-        router.replace(getMinigameUrl(villageId, subLevelId))
-    }
     return (
         <div className="game-page">
             <div className="dc-card">
@@ -105,7 +107,7 @@ export default function SubLevelPage({
                 villageId={villageId}
                 onCancel={handleCancel}
                 onConfirm={handleConfirm}
-                onPlay={handlePlayNoKey}
+                onSkip={handleSkip}
             />
         </div>
     )

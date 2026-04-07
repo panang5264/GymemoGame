@@ -750,116 +750,172 @@ export default function Home() {
           <div className="max-w-md mx-auto animate-in fade-in zoom-in duration-700">
             <div className="flex flex-col items-center">
               <div className="relative w-full aspect-square max-w-[280px] mb-10 group">
-                <div className="absolute inset-0 bg-white border-4 border-black rounded-[3rem] rotate-3 group-hover:rotate-0 transition-transform"></div>
-                <div className="absolute inset-0 bg-[#fefae0] border-4 border-black rounded-[3rem] -rotate-3 group-hover:rotate-0 transition-transform flex items-center justify-center shadow-[10px_10px_0_rgba(0,0,0,0.1)] overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/assets_employer/characters/grandpa_front.png" alt="คุณตา" className="w-full h-full object-contain object-bottom scale-125 translate-y-2" />
+                <div className="absolute inset-0 bg-white border-4 border-black rounded-[3rem] rotate-3 group-hover:rotate-0 transition-all duration-500"></div>
+                <div className="absolute inset-0 bg-[#fefae0] border-4 border-black rounded-[3rem] -rotate-3 group-hover:rotate-0 transition-all duration-500 flex items-center justify-center shadow-[10px_10px_0_rgba(0,0,0,0.1)] overflow-hidden">
+                  <img src="/assets_employer/characters/grandpa_front.png" alt="คุณตา" className="w-full h-full object-contain object-bottom scale-125 translate-y-2 group-hover:scale-110 transition-transform duration-700" />
                 </div>
-                <div className="absolute -bottom-4 -right-4 bg-red-500 text-white w-20 h-20 rounded-full border-4 border-black flex items-center justify-center text-3xl shadow-[4px_4px_0_#000] rotate-12 z-10">❤️</div>
+                <div className="absolute -bottom-4 -right-4 bg-red-500 text-white w-20 h-20 rounded-full border-4 border-black flex items-center justify-center text-3xl shadow-[4px_4px_0_#000] rotate-12 z-10 animate-bounce">❤️</div>
               </div>
 
-              <div className="bg-white border-4 border-black rounded-[2.5rem] p-8 relative shadow-[10px_10px_0_#000]">
+              <div className="bg-white border-4 border-black rounded-[2.5rem] p-8 relative shadow-[10px_10px_0_#000] w-full">
                 {/* Speech bubble arrow */}
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-white border-l-4 border-t-4 border-black rotate-45"></div>
 
-                <h3 className="text-xl font-black text-black mb-4 uppercase tracking-widest text-center">คุณตาผู้ดูแลหมู่บ้าน</h3>
-                <p className="text-2xl font-black leading-relaxed text-[#444] text-center italic">
-                  "ความทรงจำของพวกเราน่ะ...<br />
-                  ซ่อนอยู่ในความกล้าหาญของคนรุ่นใหม่เช่นเจ้า<br />
-                  <span className="text-red-500 underline decoration-wavy decoration-2">ช่วยพาแผนที่นี้กลับมามีชีวิตอีกครั้งนะ</span>"
+                <h3 className="text-xl font-black text-black mb-4 uppercase tracking-widest text-center opacity-40">คุณตาผู้ดูแลหมู่บ้าน</h3>
+                <p className="text-3xl font-black leading-tight text-[#1a1a1a] text-center">
+                  "พร้อมบริหารสมอง<br />กันหรือยัง?" ✨
                 </p>
+                <div className="mt-4 text-center">
+                  <p className="text-sm font-bold text-slate-400">มาฝึกฝนเพื่อปกป้องหมู่บ้านกันเถอะ!</p>
+                </div>
               </div>
 
-              <div className="mt-12 w-full">
+              <div className="mt-12 w-full relative">
+                {/* Pulsing indicator */}
+                <div className="absolute left-1/2 -top-8 -translate-x-1/2 flex items-center justify-center">
+                  <div className="w-4 h-4 bg-red-500 rounded-full animate-ping absolute"></div>
+                  <div className="w-4 h-4 bg-red-500 rounded-full relative"></div>
+                </div>
+
                 <button
                   onClick={nextPhase}
-                  className="pill-button w-full py-4 text-xl shadow-[0_8px_0_#1a1a1a] hover:translate-y-1 hover:shadow-[0_4px_0_#1a1a1a] active:translate-y-2 active:shadow-none transition-all"
+                  className="pill-button w-full py-5 text-2xl !bg-green-500 !text-white !border-black shadow-[0_8px_0_#166534] hover:translate-y-1 hover:shadow-[0_4px_0_#166534] active:translate-y-2 active:shadow-none transition-all"
                 >
-                  รับคำท้าและเตรียมตัว 🏹
+                  พร้อมแล้ว! ✨
                 </button>
-                <p className="mt-4 text-[10px] font-black text-[#717171] uppercase tracking-[0.2em] text-center">คำสั่งเสียจากผู้อาวุโส</p>
+                <p className="mt-4 text-[11px] font-black text-indigo-600 uppercase tracking-[0.3em] text-center animate-pulse">ก้าวแรกสู่การเป็นปรมาจารย์</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Phase 6: Tutorial Summary */}
+        {/* Phase 6: Tutorial Summary - Sequential Learning */}
         {phase === 'tutorial_summary' && (
-          <div className="friendly-card !p-6 md:!p-12 animate-in slide-in-from-bottom duration-700 max-w-5xl mx-auto border-[4px] md:border-[6px]">
-            <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-6 md:mb-10 gap-4 text-center md:text-left">
-              <div className="w-full">
-                <div className="inline-block px-3 py-0.5 bg-yellow-400 border-2 border-black text-[9px] font-black uppercase tracking-[0.2em] rounded-full mb-3">โหมดฝึกซ้อม</div>
-                <h2 className="text-3xl md:text-5xl font-black text-black tracking-tighter leading-none mb-3">เรียนรู้วิธีฟื้นฟู 🧠</h2>
-                <p className="text-[#717171] font-bold text-xs md:text-base">ทดสอบทักษะทั้ง 3 ด้านเพื่อเตรียมความพร้อมสู่การเดินทางจริง</p>
-              </div>
-              <div className="flex -space-x-3">
-                <div className="w-10 h-10 md:w-14 md:h-14 bg-white border-2 md:border-3 border-black rounded-lg md:rounded-xl flex items-center justify-center text-lg md:text-2xl shadow-md md:shadow-lg -rotate-12">📦</div>
-                <div className="w-10 h-10 md:w-14 md:h-14 bg-white border-2 md:border-3 border-black rounded-lg md:rounded-xl flex items-center justify-center text-lg md:text-2xl shadow-md md:shadow-lg rotate-0 z-10">🔢</div>
-                <div className="w-10 h-10 md:w-14 md:h-14 bg-white border-2 md:border-3 border-black rounded-lg md:rounded-xl flex items-center justify-center text-lg md:text-2xl shadow-md md:shadow-lg rotate-12">🗺️</div>
-              </div>
+          <div className="friendly-card !p-6 md:!p-12 animate-in slide-in-from-bottom duration-700 max-w-4xl mx-auto border-[4px] md:border-[6px] min-h-[650px] flex flex-col items-center">
+            
+            {/* Consistent Top Header */}
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-5xl font-black text-black mb-3 tracking-tight">งั้นมาสอนเล่นกันก่อนนะ</h2>
+              {storyStep > 0 && (
+                <div className="inline-block px-4 py-1.5 bg-indigo-50 border-2 border-indigo-100 text-indigo-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-full">
+                  ขั้นตอนที่ {storyStep} จาก 3
+                </div>
+              )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-10 mb-10 md:mb-16">
-              {/* Management */}
-              <div
-                onClick={() => setTrainingMode('management')}
-                className="group cursor-pointer relative bg-[#fffcf0] p-10 rounded-[4rem] border-4 border-black text-center shadow-[15px_15px_0_#000] hover:translate-y-[-12px] transition-all duration-500"
-              >
-                <div className="w-20 h-20 bg-orange-100 border-3 border-black rounded-[1.5rem] flex items-center justify-center text-4xl mx-auto mb-6 shadow-[6px_6px_0_#000] group-hover:rotate-12 transition-transform">📦</div>
-                <h4 className="font-black text-2xl text-black mb-4 tracking-tighter uppercase">การจัดการ</h4>
-                <p className="text-lg font-bold text-black/60 leading-relaxed">
-                  ฝึกการแยกแยะสิ่งของตามเงื่อนไข
-                </p>
-                <div className="mt-8 py-3 bg-[var(--border-dark)] text-white rounded-2xl text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                  ลองฝึกฝน ⚡
+            {/* Step 0: Let's learn or Skip */}
+            {storyStep === 0 && (
+              <div className="text-center animate-in zoom-in duration-500 py-10">
+                <div className="text-7xl md:text-9xl mb-10 drop-shadow-lg">💡</div>
+                <p className="text-[#717171] font-bold text-lg mb-12 max-w-sm">เพื่อการผจญภัยที่ราบรื่น มาลองฝึกทักษะพื้นฐานกันครับ</p>
+                
+                <div className="flex flex-col gap-6 w-full max-w-xs mx-auto">
+                  <div className="relative">
+                    <div className="absolute -top-3 -right-3 w-8 h-8 bg-red-500 rounded-full animate-ping z-10"></div>
+                    <button 
+                      onClick={() => setStoryStep(1)}
+                      className="pill-button w-full py-5 text-2xl !bg-indigo-600 !text-white shadow-[0_8px_0_#312e81]"
+                    >
+                      ลองฝึกฝนกัน ✨
+                    </button>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setClockTarget({ hour: 10, minute: 10 });
+                      setAssessmentSubPhase('memorize');
+                      setPhase('assessment');
+                    }}
+                    className="text-slate-400 font-black hover:text-slate-600 transition-colors uppercase tracking-widest text-xs"
+                  >
+                    ข้ามการฝึกฝน
+                  </button>
                 </div>
               </div>
+            )}
 
-              {/* Calculation */}
-              <div
-                onClick={() => setTrainingMode('calculation')}
-                className="group cursor-pointer relative bg-[#f0f7ff] p-10 rounded-[4rem] border-4 border-black text-center shadow-[15px_15px_0_#000] hover:translate-y-[-12px] transition-all duration-500"
-              >
-                <div className="w-28 h-28 bg-blue-100 border-4 border-black rounded-[2.5rem] flex items-center justify-center text-6xl mx-auto mb-10 shadow-[8px_8px_0_#000] group-hover:rotate-12 transition-transform">🔢</div>
-                <h4 className="font-black text-3xl text-black mb-6 tracking-tighter uppercase">การคำนวณ</h4>
-                <p className="text-xl font-bold text-black/60 leading-relaxed">
-                  ท้าทายความไวการคำนวณเลข
-                </p>
-                <div className="mt-8 py-3 bg-[var(--border-dark)] text-white rounded-2xl text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                  ลองฝึกฝน ⚡
+            {/* Step 1: Management Tutorial */}
+            {storyStep === 1 && (
+              <div className="w-full animate-in slide-in-from-right duration-500 text-center flex flex-col items-center">
+                <div 
+                  onClick={() => setTrainingMode('management')}
+                  className="group cursor-pointer relative bg-[#fffcf0] p-12 md:p-16 rounded-[4rem] border-4 border-black inline-block shadow-[20px_20px_0_#000] hover:scale-105 transition-all mb-12"
+                >
+                  <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-10 h-10 bg-red-500 rounded-full animate-ping"></div>
+                  <div className="w-28 h-28 bg-orange-100 border-4 border-black rounded-[2rem] flex items-center justify-center text-6xl mx-auto mb-8 shadow-[8px_8px_0_#000] group-hover:rotate-12 transition-transform">📦</div>
+                  <h4 className="font-black text-4xl text-black mb-6 uppercase">การจัดการ</h4>
+                  <p className="text-xl font-bold text-black/60 max-w-sm mx-auto leading-relaxed italic">
+                    "ฝึกการแยกแยะและจัดลำดับความสำคัญของสิ่งของ"
+                  </p>
+                </div>
+                <div className="mt-auto">
+                  <button 
+                    onClick={() => setStoryStep(2)}
+                    className="pill-button px-20 py-5 text-2xl shadow-[0_8px_0_#1a1a1a]"
+                  >
+                    ขั้นตอนต่อไป →
+                  </button>
                 </div>
               </div>
+            )}
 
-              {/* Spatial */}
-              <div
-                onClick={() => setTrainingMode('spatial')}
-                className="group cursor-pointer relative bg-[#f0fff4] p-10 rounded-[4rem] border-4 border-black text-center shadow-[15px_15px_0_#000] hover:translate-y-[-12px] transition-all duration-500"
-              >
-                <div className="w-28 h-28 bg-green-100 border-4 border-black rounded-[2.5rem] flex items-center justify-center text-6xl mx-auto mb-10 shadow-[8px_8px_0_#000] group-hover:rotate-12 transition-transform">🗺️</div>
-                <h4 className="font-black text-3xl text-black mb-6 tracking-tighter uppercase">มิติสัมพันธ์</h4>
-                <p className="text-xl font-bold text-black/60 leading-relaxed">
-                  วาดภาพในใจและจับคู่มุมมอง
-                </p>
-                <div className="mt-8 py-3 bg-[var(--border-dark)] text-white rounded-2xl text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                  ลองฝึกฝน ⚡
+            {/* Step 2: Calculation Tutorial */}
+            {storyStep === 2 && (
+              <div className="w-full animate-in slide-in-from-right duration-500 text-center flex flex-col items-center">
+                <div 
+                  onClick={() => setTrainingMode('calculation')}
+                  className="group cursor-pointer relative bg-[#f0f7ff] p-12 md:p-16 rounded-[4rem] border-4 border-black inline-block shadow-[20px_20px_0_#000] hover:scale-105 transition-all mb-12"
+                >
+                  <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-10 h-10 bg-red-500 rounded-full animate-ping"></div>
+                  <div className="w-28 h-28 bg-blue-100 border-4 border-black rounded-[2rem] flex items-center justify-center text-6xl mx-auto mb-8 shadow-[8px_8px_0_#000] group-hover:rotate-12 transition-transform">🔢</div>
+                  <h4 className="font-black text-4xl text-black mb-6 uppercase">การคำนวณ</h4>
+                  <p className="text-xl font-bold text-black/60 max-w-sm mx-auto leading-relaxed italic">
+                    "ท้าทายความไวในการคิดเลข เพื่อสมองที่เฉียบแหลม"
+                  </p>
+                </div>
+                <div className="mt-auto">
+                  <button 
+                    onClick={() => setStoryStep(3)}
+                    className="pill-button px-20 py-5 text-2xl shadow-[0_8px_0_#1a1a1a]"
+                  >
+                    ขั้นตอนต่อไป →
+                  </button>
                 </div>
               </div>
-            </div>
+            )}
 
-
-            <div className="bg-black text-[var(--text-on-dark)] p-6 md:p-10 rounded-[2rem] md:rounded-[3.5rem] mb-10 md:mb-16 text-center shadow-[0_10px_20px_rgba(0,0,0,0.2)] md:shadow-[0_15px_40px_rgba(0,0,0,0.2)] relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-20 text-7xl md:text-9xl -rotate-12 text-yellow-400">⚡</div>
-              <p className="text-xl md:text-3xl font-black leading-tight">
-                "ทุกหมู่บ้านรอคอยให้เจ้าปลดปล่อยความทรงจำกลับคืนมา"
-              </p>
-            </div>
-
-            <button
-              onClick={nextPhase}
-              className="pill-button w-full py-5 md:py-8 text-xl md:text-3xl shadow-[0_6px_0_#1a1a1a] md:shadow-[0_12px_0_#1a1a1a] hover:translate-y-1 hover:shadow-[0_3px_0_#1a1a1a] md:hover:shadow-[0_6px_0_#1a1a1a] active:translate-y-2 md:active:translate-y-4 active:shadow-none transition-all"
-            >
-              พร้อมแล้ว! เข้าสู่ก้าวสำคัญ 🗝️
-            </button>
+            {/* Step 3: Spatial Tutorial */}
+            {storyStep === 3 && (
+              <div className="w-full animate-in slide-in-from-right duration-500 text-center flex flex-col items-center">
+                <div 
+                  onClick={() => setTrainingMode('spatial')}
+                  className="group cursor-pointer relative bg-[#f0fff4] p-12 md:p-16 rounded-[4rem] border-4 border-black inline-block shadow-[20px_20px_0_#000] hover:scale-105 transition-all mb-12"
+                >
+                  <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-10 h-10 bg-red-500 rounded-full animate-ping"></div>
+                  <div className="w-28 h-28 bg-green-100 border-4 border-black rounded-[2rem] flex items-center justify-center text-6xl mx-auto mb-8 shadow-[8px_8px_0_#000] group-hover:rotate-12 transition-transform">🗺️</div>
+                  <h4 className="font-black text-4xl text-black mb-6 uppercase">มิติสัมพันธ์</h4>
+                  <p className="text-xl font-bold text-black/60 max-w-sm mx-auto leading-relaxed italic">
+                    "ฝึกการมองภาพในใจ และการเชื่อมโยงมิติที่ซับซ้อน"
+                  </p>
+                </div>
+                <div className="mt-auto">
+                  <button 
+                    onClick={() => {
+                      const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+                      const minutes = [10, 15, 20, 30, 40, 45, 50];
+                      setClockTarget({
+                        hour: hours[Math.floor(Math.random() * hours.length)],
+                        minute: minutes[Math.floor(Math.random() * minutes.length)]
+                      });
+                      setAssessmentSubPhase('memorize')
+                      setPhase('assessment')
+                    }}
+                    className="pill-button px-14 py-5 text-2xl !bg-[#4ade80] !text-white !border-black shadow-[0_8px_0_#166534] hover:translate-y-1 hover:shadow-[0_4px_0_#166534] active:translate-y-2 active:shadow-none transition-all"
+                  >
+                    พร้อมผจญภัยจริง! ✨
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -38,7 +38,7 @@ const UNLOCKED_ICONS = ['1.PNG', '2.PNG', '3.PNG', '4.PNG', '5.PNG', '6.PNG', '7
 
 const INTRO_SLIDES: Array<{ emoji: string; title: string; desc: string }> = [
   { emoji: '👋', title: 'ยินดีต้อนรับ', desc: 'มาสำรวจแผนที่โลกกัน!' },
-  { emoji: '⭐', title: 'ปลดล็อกด่าน', desc: 'เติม EXP ให้เต็มเพื่อปลดล็อกหมู่บ้านถัดไป' },
+  { emoji: '⭐', title: 'ปลดล็อกด่าน', desc: 'เติมประสบการณ์ ให้เต็มเพื่อปลดล็อกหมู่บ้านถัดไป' },
   { emoji: '🗝️', title: 'กุญแจ', desc: 'ใช้กุญแจเพื่อเล่นแต่ละด่าน (รีเจนทุก 30 นาที)' },
   { emoji: '✨', title: 'พร้อมเริ่ม', desc: 'กดเริ่มเลยเพื่อไปด่านแรก' },
 ]
@@ -188,7 +188,7 @@ export default function WorldPage() {
           <div className={styles.introCard}>
             <button className={styles.skipBtn} onClick={closeIntro}>ข้าม</button>
             <div className={styles.slideContent}>
-              <div className={styles.slideEmoji}>{INTRO_SLIDES[slideIndex].emoji}</div>
+              <div className={styles.slideEmoji}>✨</div>
               <h2 className={styles.slideTitle}>{INTRO_SLIDES[slideIndex].title}</h2>
               <p className={styles.slideDesc}>{INTRO_SLIDES[slideIndex].desc}</p>
             </div>
@@ -211,7 +211,7 @@ export default function WorldPage() {
                   ถัดไป →
                 </button>
               ) : (
-                <button className={`${styles.navBtn} ${styles.navBtnPrimary}`} onClick={closeIntro}>
+                <button className={`${styles.navBtn} !bg-green-500 !text-white !border-green-600 shadow-[0_4px_0_#166534] hover:shadow-[0_2px_0_#166534] hover:translate-y-0.5 transition-all`} onClick={closeIntro}>
                   เริ่มเลย! ✨
                 </button>
               )}
@@ -342,57 +342,97 @@ export default function WorldPage() {
       )}
 
       <div className={styles.topBar}>
-        <div className="flex flex-col">
-          <h1 className={styles.mapTitle}>🗺️ ยินดีต้อนรับ, {userName}</h1>
-          <p className="text-black/60 text-xs sm:text-sm font-black uppercase tracking-widest mt-1">เป้าหมาย: ฟื้นฟูให้ครบ 10 หมู่บ้าน</p>
+        <div className="flex items-center gap-2 md:gap-4 shrink-0">
+           {/* Keys - On the left as requested */}
+           <div className="bg-white px-3 py-2 rounded-xl border-2 border-black font-black text-xs md:text-sm shadow-[2px_2px_0_#000] flex items-center gap-2">
+            <span>🗝️</span>
+            <span>{currentKeys}</span>
+          </div>
         </div>
 
-        {/* Daily Mission Widget */}
-        <Link href="/daily-challenge" className="flex items-center gap-2 md:gap-4 bg-white/90 backdrop-blur-md px-3 py-2 md:px-6 md:py-3 rounded-2xl border-2 border-black shadow-[4px_4px_0_#000] hover:translate-y-[-2px] transition-all group shrink-0">
-          <div className="flex flex-col">
-            <span className="text-[8px] md:text-[10px] font-black text-black/40 uppercase tracking-widest leading-none">Daily</span>
-            <div className="flex gap-1 mt-1">
-              <div className={`w-2 h-2 md:w-3 md:h-3 rounded-full border border-black/20 ${dailyStatus.management ? 'bg-green-500' : 'bg-slate-200'}`} />
-              <div className={`w-2 h-2 md:w-3 md:h-3 rounded-full border border-black/20 ${dailyStatus.calculation ? 'bg-green-500' : 'bg-slate-200'}`} />
-              <div className={`w-2 h-2 md:w-3 md:h-3 rounded-full border border-black/20 ${dailyStatus.spatial ? 'bg-green-500' : 'bg-slate-200'}`} />
+        {/* Logo - Centered as requested */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center">
+            <h1 className="text-xl md:text-3xl font-black text-slate-800 tracking-tighter leading-none">Gymemo</h1>
+            <span className="text-[6px] md:text-[8px] font-black text-indigo-500 uppercase tracking-[0.3em] opacity-40">ADMINISTRATION</span>
+        </div>
+
+        {/* Global Progress Header (Daily/Keys/Signout) */}
+        <div className="flex items-center gap-2 md:gap-4 ml-auto shrink-0">
+          <button
+            onClick={() => router.push('/')}
+            className="hidden md:flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 rounded-xl border-2 border-rose-100 font-black text-xs hover:bg-rose-100 transition-all"
+          >
+            ออกจากระบบ 👋
+          </button>
+          <button
+            onClick={() => router.push('/')}
+            className="md:hidden w-10 h-10 flex items-center justify-center bg-rose-50 text-rose-600 rounded-xl border-2 border-rose-100 font-black text-xs transition-all active:scale-95 shadow-[2px_2px_0_#be123c]"
+          >
+            👋
+          </button>
+        </div>
+      </div>
+
+      {/* Main Action Hub - Mobile Optimized */}
+      <div className="w-full max-w-4xl mx-auto px-4 mt-6 space-y-4 relative z-10 animate-in slide-in-from-bottom duration-700">
+        {/* Row 1: Daily Mission (Big) */}
+        <Link href="/daily-challenge" className="w-full h-16 md:h-20 bg-gradient-to-r from-orange-400 to-orange-500 rounded-3xl border-4 border-black shadow-[0_6px_0_#000] flex items-center justify-between px-6 group active:translate-y-1 active:shadow-none transition-all">
+          <div className="flex items-center gap-4">
+            <span className="text-3xl">🎯</span>
+            <div className="text-left">
+              <h3 className="text-white font-black text-lg md:text-xl uppercase tracking-tight leading-tight">ภารกิจรายวัน</h3>
+              <p className="text-white/80 text-[10px] md:text-xs font-bold">เล่นครบ 3 เกมเพื่อฟื้นฟูสมอง!</p>
             </div>
           </div>
-          <div className="h-6 md:h-8 w-[1px] md:w-[2px] bg-black/10 mx-0.5" />
-          <div className="flex flex-col items-end">
-            <span className={`text-[10px] md:text-sm font-black leading-none ${isDailyDone ? 'text-green-600' : 'text-orange-500'}`}>
-              {isDailyDone ? 'ครบ! ✨' : 'ภารกิจ...'}
-            </span>
+          <div className="flex gap-2">
+             <div className={`w-3 h-3 rounded-full border-2 border-white/30 ${dailyStatus.management ? 'bg-white shadow-[0_0_10px_white]' : 'bg-white/20'}`} />
+             <div className={`w-3 h-3 rounded-full border-2 border-white/30 ${dailyStatus.calculation ? 'bg-white shadow-[0_0_10px_white]' : 'bg-white/20'}`} />
+             <div className={`w-3 h-3 rounded-full border-2 border-white/30 ${dailyStatus.spatial ? 'bg-white shadow-[0_0_10_white]' : 'bg-white/20'}`} />
           </div>
-          <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-black text-white flex items-center justify-center text-[10px] group-hover:scale-110 transition-transform hidden sm:flex">➔</div>
         </Link>
 
-        <div className={styles.topActions}>
-          <button className={styles.actionBtn} onClick={() => router.push('/leaderboard')}>
-            🏆 อันดับ
+        {/* Row 2: Secondary Tools Grid (4 Buttons) */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <button onClick={() => router.push('/leaderboard')} className="bg-white py-3 rounded-2xl border-4 border-black shadow-[4px_4px_0_#000] font-black text-xs md:text-sm flex flex-col items-center gap-1 hover:bg-slate-50 active:translate-y-0.5 active:shadow-none transition-all">
+             <span className="text-xl">🏆</span> อันดับโลก
           </button>
-          <button className={styles.actionBtn} onClick={() => setShowTutorial(true)}>
-            ❓ วิธีเล่น
+          <button onClick={() => setShowTutorial(true)} className="bg-white py-3 rounded-2xl border-4 border-black shadow-[4px_4px_0_#000] font-black text-xs md:text-sm flex flex-col items-center gap-1 hover:bg-slate-50 active:translate-y-0.5 active:shadow-none transition-all">
+             <span className="text-xl">🎓</span> พัฒนาการ
           </button>
-          <span className={styles.actionBtn}>
-            🔑 {currentKeys}/{MAX_KEYS} {formatCountdown(nextRegenIn)}
-          </span>
-          <button
-            className={styles.actionBtn}
-            onClick={() => {
-              setSlideIndex(0)
-              setShowIntro(true)
-            }}
-          >
-            📖 บทนำ
+          <button onClick={() => { setSlideIndex(0); setShowIntro(true); }} className="bg-white py-3 rounded-2xl border-4 border-black shadow-[4px_4px_0_#000] font-black text-xs md:text-sm flex flex-col items-center gap-1 hover:bg-slate-50 active:translate-y-0.5 active:shadow-none transition-all">
+             <span className="text-xl">📖</span> บทนำ
           </button>
+          <button onClick={() => router.push('/')} className="bg-white py-3 rounded-2xl border-4 border-black shadow-[4px_4px_0_#000] font-black text-xs md:text-sm flex flex-col items-center gap-1 hover:bg-slate-50 active:translate-y-0.5 active:shadow-none transition-all">
+             <span className="text-xl">👤</span> โปรไฟล์
+          </button>
+        </div>
 
-          <button className={styles.cheatBtn} onClick={unlockAllCheat}>
-            ⚡ Cheat
-          </button>
+        {/* Row 3: THE START BUTTON (Big Green) */}
+        {(() => {
+            const currentVillageId = Math.max(...unlockedVillages);
+            const currentVillageProgress = progress?.villages[String(currentVillageId)];
+            const plays = currentVillageProgress?.playsCompleted ?? 0;
+            const currentSubId = Math.min(12, (plays % 12) + 1);
+            
+            return (
+              <button 
+                onClick={() => router.push(`/world/${currentVillageId}/sublevel/${currentSubId}`)}
+                className="w-full py-5 md:py-7 bg-green-500 hover:bg-green-600 text-white rounded-[2.5rem] border-4 border-black shadow-[0_8px_0_#166534] flex items-center justify-center gap-4 group active:translate-y-2 active:shadow-none transition-all overflow-hidden relative"
+              >
+                <div className="absolute inset-0 bg-white/10 group-hover:bg-transparent transition-colors"></div>
+                <div className="flex flex-col items-center relative z-10">
+                   <span className="text-2xl md:text-3xl font-black uppercase tracking-tighter leading-none">เริ่มเกมต่อ ✨</span>
+                   <span className="text-[10px] md:text-xs font-bold text-black/40 mt-1">หมูบ้านที่ {currentVillageId} | ด่านย่อยที่ {currentSubId}</span>
+                </div>
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-full flex items-center justify-center group-hover:translate-x-2 transition-transform relative z-10">➔</div>
+              </button>
+            )
+        })()}
 
-          <button className={styles.actionBtn} onClick={resetProgress}>
-            🔄 รีเซ็ต
-          </button>
+        {/* Option: Cheat/Reset (Keep small) */}
+        <div className="flex justify-center gap-8 pt-2">
+           <button onClick={resetProgress} className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-red-500 transition-colors">ล้างข้อมูล</button>
+           <button onClick={unlockAllCheat} className="text-[10px] font-black text-slate-300 uppercase tracking-widest hover:text-indigo-500 transition-colors">ปลดล็อกโกง</button>
         </div>
       </div>
 
