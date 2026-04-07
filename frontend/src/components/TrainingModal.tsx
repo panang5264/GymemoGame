@@ -211,7 +211,7 @@ export default function TrainingModal({ mode, onClose }: TrainingModalProps) {
                                         onChange={e => setCalcInput(e.target.value)}
                                         onKeyDown={e => e.key === 'Enter' && handleCalcSubmit()}
                                     />
-                                    <button onClick={handleCalcSubmit} className="pill-button w-full py-4 text-xl">ถัดไป 🚀</button>
+                                    <button onClick={handleCalcSubmit} className="pill-button w-full py-4 text-xl">ถัดไป ✨</button>
                                 </div>
                             )}
 
@@ -263,9 +263,9 @@ export default function TrainingModal({ mode, onClose }: TrainingModalProps) {
 
                             <button
                                 onClick={onClose}
-                                className="pill-button w-full py-6 text-2xl shadow-[0_8px_0_#1a1a1a] hover:translate-y-1 hover:shadow-[0_4px_0_#1a1a1a] transition-all"
+                                className="pill-button w-full py-6 text-2xl !bg-green-500 !text-white border-4 border-black shadow-[0_8px_0_#166534] hover:translate-y-1 hover:shadow-[0_4px_0_#166534] transition-all"
                             >
-                                ไปลุยของจริงกัน! 🚀
+                                ไปลุยของจริงกัน! ✨
                             </button>
                         </div>
                     )}

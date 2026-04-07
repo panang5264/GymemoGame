@@ -23,9 +23,10 @@ export default function PairMatchingGame({ pairs, basePath, onComplete, onError 
 
     useEffect(() => {
         // Shuffle the items for display
-        const shuffledLeft = [...pairs].map(p => ({ id: p.target, file: p.target })).sort(() => Math.random() - 0.5)
-        // Get all right responses, map to the id of what they correct to
-        const shuffledRight = [...pairs].map(p => ({ id: p.target, file: p.correct })).sort(() => Math.random() - 0.5)
+        // @ts-ignore - pairs now includes optional id
+        const shuffledLeft = [...pairs].map(p => ({ id: (p as any).id || p.target, file: p.target })).sort(() => Math.random() - 0.5)
+        // @ts-ignore
+        const shuffledRight = [...pairs].map(p => ({ id: (p as any).id || p.target, file: p.correct })).sort(() => Math.random() - 0.5)
 
         setLeftItems(shuffledLeft)
         setRightItems(shuffledRight)

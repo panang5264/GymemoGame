@@ -247,7 +247,7 @@ export default function ClockIntro({
                         }`}
                 >
                     {isDone
-                        ? 'เริ่มการทดสอบถัดไป 🚀'
+                        ? 'เริ่มการทดสอบถัดไป ✨'
                         : activeHand
                             ? '📍 เลือกวางเข็มตรงนี้'
                             : (!hasMovedHour || !hasMovedMinute)

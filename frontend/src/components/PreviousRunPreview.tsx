@@ -45,8 +45,13 @@ export default function PreviousRunPreview({ villageId, onStart, onBack }: Previ
             <div className="max-w-md w-full bg-white rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in duration-500">
 
                 {/* Header */}
-                <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-8 text-white text-center">
-                    <div className="text-5xl mb-3">🏘️</div>
+                <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-8 text-white text-center relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 text-4xl rotate-12">🏘️</div>
+                    <img
+                        src={`/assets_employer/background/map/villages/unlocked/${villageId}.PNG`}
+                        className="w-24 h-24 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] animate-in slide-in-from-bottom duration-700"
+                        alt="Village"
+                    />
                     <h2 className="text-2xl font-black">หมู่บ้านที่ {villageId}</h2>
                     {hasHistory ? (
                         <p className="text-white/50 text-sm font-bold mt-1">คุณเคยเล่นมาแล้ว {history.length} รอบ</p>
@@ -129,10 +134,19 @@ export default function PreviousRunPreview({ villageId, onStart, onBack }: Previ
                     )}
 
                     {!hasHistory && (
-                        <div className="text-center py-6">
-                            <div className="text-5xl mb-4">🌟</div>
-                            <p className="font-black text-slate-600">เริ่มต้นการเดินทาง!</p>
-                            <p className="text-sm text-slate-400 font-bold mt-1">ประวัติของคุณจะแสดงที่นี่หลังเล่นครั้งแรก</p>
+                        <div className="text-center py-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                            <div className="relative inline-block mb-6">
+                                <div className="absolute inset-0 bg-yellow-400/20 blur-2xl rounded-full scale-150 animate-pulse"></div>
+                                <img
+                                    src={`/assets_employer/background/map/villages/unlocked/${villageId}.PNG`}
+                                    className="w-32 h-32 relative z-10 mx-auto"
+                                    alt="Village"
+                                />
+                            </div>
+                            <p className="font-black text-xl text-indigo-900">เริ่มต้นการเดินทาง! ✨</p>
+                            <p className="text-sm text-slate-400 font-black mt-2 max-w-[200px] mx-auto leading-relaxed">
+                                ประวัติการพัฒนาของคุณ<br />จะปรากฏที่นี่หลังเล่นรอบแรก
+                            </p>
                         </div>
                     )}
 
@@ -145,9 +159,9 @@ export default function PreviousRunPreview({ villageId, onStart, onBack }: Previ
                         </button>
                         <button
                             onClick={onStart}
-                            className="flex-2 flex-grow-[2] py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black transition-all active:scale-95 shadow-lg shadow-indigo-200"
+                            className="flex-2 flex-grow-[2] py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-black transition-all active:scale-95 shadow-lg shadow-green-100/50"
                         >
-                            {hasHistory ? '🔄 เล่นอีกรอบ' : '🚀 เริ่มเล่น!'}
+                            {hasHistory ? '🔄 เล่นอีกรอบ' : 'เริ่มเล่น! ✨'}
                         </button>
                     </div>
                 </div>

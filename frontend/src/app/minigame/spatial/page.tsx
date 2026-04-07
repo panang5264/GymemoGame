@@ -260,15 +260,49 @@ function SpatialGameInner() {
     setFeedback(null)
     if (levelParam <= 2) {
       // Village 1-2: Interactive Image Matching Pair game
-      const folderName = assetVersion.replace('v', '')
+      // สำหรับ Village 1-2 จะใช้โฟลเดอร์ชื่อ v1, v2 เสมอ (มี v นำหน้า)
+      const folderName = assetVersion // 'v1', 'v2', etc.
       const basePath = `/Asset_New/spatial/village_${villageId}/${folderName}`
+      let pairs: { target: string; correct: string }[] = []
 
-      // สร้างโจทย์ 10 คู่ตรงๆ เลยครับ (1.png ถึง 10.png)
-      const rows = 10
-      const pairs = Array.from({ length: rows }, (_, i) => ({
-        target: `${i + 1}.png`,
-        correct: `${i + 1}M.png`,
-      }))
+      // ปรับจูนจำนวนข้อและเส้นทางไฟล์ตามโครงสร้างจริงของแต่ละ Version ครับ
+      if (villageId === 1) {
+        if (assetVersion === 'v1') {
+          // Village 1/v1 มี 9 คู่ (1.png - 9.png) อยู่ในโฟลเดอร์หลักโดยตรง
+          pairs = Array.from({ length: 9 }, (_, i) => ({
+            id: `v1-${i + 1}`,
+            target: `${i + 1}.png`,
+            correct: `${i + 1}M.png`,
+          }))
+        } else if (assetVersion === 'v2') {
+          // v2: round1(1-5).png, round2(6-10).png
+          const p1 = Array.from({ length: 5 }, (_, i) => ({ id: `r1-${i + 1}`, target: `round1/${i + 1}.png`, correct: `round1/${i + 1}M.png` }))
+          const p2 = Array.from({ length: 5 }, (_, i) => ({ id: `r2-${i + 6}`, target: `round2/${i + 6}.png`, correct: `round2/${i + 6}M.png` }))
+          pairs = [...p1, ...p2]
+        } else if (assetVersion === 'v3') {
+          // v3: round1(1-5).png, round2(1-5).PNG (นับ 1 ใหม่และใช้ตัวใหญ่)
+          const p1 = Array.from({ length: 5 }, (_, i) => ({ id: `r1-${i + 1}`, target: `round1/${i + 1}.png`, correct: `round1/${i + 1}M.png` }))
+          const p2 = Array.from({ length: 5 }, (_, i) => ({ id: `r2-${i + 1}`, target: `round2/${i + 1}.PNG`, correct: `round2/${i + 1}M.PNG` }))
+          pairs = [...p1, ...p2]
+        } else if (assetVersion === 'v4') {
+          // v4: round1(1-5).PNG, round2(6-10).PNG (ใช้ตัวใหญ่ทั้งหมด)
+          const p1 = Array.from({ length: 5 }, (_, i) => ({ id: `r1-${i + 1}`, target: `round1/${i + 1}.PNG`, correct: `round1/${i + 1}M.PNG` }))
+          const p2 = Array.from({ length: 5 }, (_, i) => ({ id: `r2-${i + 6}`, target: `round2/${i + 6}.PNG`, correct: `round2/${i + 6}M.PNG` }))
+          pairs = [...p1, ...p2]
+        }
+      } else if (villageId === 2) {
+        // Village 2: ทุก Version ใช้ round1(1-6) และ round2(1-6) และ .PNG ทั้งหมด
+        const p1 = Array.from({ length: 6 }, (_, i) => ({ id: `r1-${i + 1}`, target: `round1/${i + 1}.PNG`, correct: `round1/${i + 1}M.PNG` }))
+        const p2 = Array.from({ length: 6 }, (_, i) => ({ id: `r2-${i + 1}`, target: `round2/${i + 1}.PNG`, correct: `round2/${i + 1}M.PNG` }))
+        pairs = [...p1, ...p2]
+      } else {
+        // Default fallback
+        pairs = Array.from({ length: 10 }, (_, i) => ({
+          id: `f-${i + 1}`,
+          target: `${i + 1}.png`,
+          correct: `${i + 1}M.png`,
+        }))
+      }
 
       setQuestionData({ isPairMatching: true, pairs, basePath })
       setQuestionText('จับคู่รูปทรงต้นแบบที่มีรอยแหว่งกับชิ้นส่วนที่หายไป 🧩')
