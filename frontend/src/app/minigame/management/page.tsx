@@ -695,6 +695,7 @@ function ManagementGameInner() {
   const [isExtraPhase, setIsExtraPhase] = useState(false)
   const [thoughtBubble, setThoughtBubble] = useState<string | null>(null)
   const [shuffledRecipes, setShuffledRecipes] = useState<CookingRecipe[]>([])
+  const [hintsUsed, setHintsUsed] = useState(0)
 
   // Maze State
   const [maze, setMaze] = useState<number[][]>([])
@@ -721,7 +722,7 @@ function ManagementGameInner() {
   useEffect(() => {
     if (phase === 'play' && config.mode === 'cooking') {
       setShowCookingOrder(true)
-      const timer = setTimeout(() => setShowCookingOrder(false), 6000)
+      const timer = setTimeout(() => setShowCookingOrder(false), 4000)
       return () => clearTimeout(timer)
     }
   }, [phase, config.mode, dishIndex])
@@ -926,6 +927,7 @@ function ManagementGameInner() {
     setCollectedIngredients([])
     setShowCookingOrder(true)
     setShowHint(false)
+    setHintsUsed(0)
     setIsExtraPhase(false)
     setThoughtBubble(null)
     setFeedback(null)
@@ -1246,41 +1248,41 @@ function ManagementGameInner() {
             </div>
           )}
 
-        {/* Exit Confirm Modal */}
-        {showExitConfirm && (
-          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-white rounded-[40px] shadow-2xl p-8 max-w-sm w-full border-4 border-red-500 animate-in zoom-in duration-300 text-center">
-              <h3 className="text-2xl font-black text-slate-800 mb-4">
-                ⚠️ ยืนยันการออกจากด่าน
-              </h3>
-              <p className="text-slate-600 font-bold mb-6">
-                หากออกจากด่านตอนนี้ คุณจะได้คะแนนเท่าที่ทำได้ และจะไม่สามารถผ่านไปยังด่านย่อยถัดไปได้ (ต้องใช้กุญแจใหม่เพื่อเริ่มตีด่านนี้) ยืนยันหรือไม่?
-              </p>
-              <div className="flex gap-4">
-                <button
-                  onClick={() => setShowExitConfirm(false)}
-                  className="flex-1 py-3 bg-slate-200 text-slate-700 rounded-2xl font-black shadow-sm transition-all active:scale-95"
-                >
-                  ยกเลิก
-                </button>
-                <button
-                  onClick={() => {
-                    if (modeParam === 'village') {
-                      router.push(`/world/${villageId || 1}`);
-                    } else if (modeParam === 'daily') {
-                      router.push('/daily-challenge');
-                    } else {
-                      router.push('/minigame');
-                    }
-                  }}
-                  className="flex-1 py-3 bg-red-500 text-white rounded-2xl font-black shadow-lg hover:bg-red-600 transition-all active:scale-95"
-                >
-                  ออกเลย
-                </button>
+          {/* Exit Confirm Modal */}
+          {showExitConfirm && (
+            <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
+              <div className="bg-white rounded-[40px] shadow-2xl p-8 max-w-sm w-full border-4 border-red-500 animate-in zoom-in duration-300 text-center">
+                <h3 className="text-2xl font-black text-slate-800 mb-4">
+                  ⚠️ ยืนยันการออกจากด่าน
+                </h3>
+                <p className="text-slate-600 font-bold mb-6">
+                  หากออกจากด่านตอนนี้ คุณจะได้คะแนนเท่าที่ทำได้ และจะไม่สามารถผ่านไปยังด่านย่อยถัดไปได้ (ต้องใช้กุญแจใหม่เพื่อเริ่มตีด่านนี้) ยืนยันหรือไม่?
+                </p>
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setShowExitConfirm(false)}
+                    className="flex-1 py-3 bg-slate-200 text-slate-700 rounded-2xl font-black shadow-sm transition-all active:scale-95"
+                  >
+                    ยกเลิก
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (modeParam === 'village') {
+                        router.push(`/world/${villageId || 1}`);
+                      } else if (modeParam === 'daily') {
+                        router.push('/daily-challenge');
+                      } else {
+                        router.push('/minigame');
+                      }
+                    }}
+                    className="flex-1 py-3 bg-red-500 text-white rounded-2xl font-black shadow-lg hover:bg-red-600 transition-all active:scale-95"
+                  >
+                    ออกเลย
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
           {phase === 'intro' && (
             <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-sm p-4 md:p-10">
@@ -1456,16 +1458,23 @@ function ManagementGameInner() {
                       เมนู: {shuffledRecipes[dishIndex]?.name}
                     </span>
                     {!showCookingOrder && !isExtraPhase && phase === 'play' && (
-                      <button
-                        onClick={() => {
-                          setShowHint(true);
-                          setTimeout(() => setShowHint(false), 3000);
-                        }}
-                        disabled={showHint}
-                        className={`mb-2 md:mb-4 px-4 md:px-6 py-1 md:py-2 rounded-full text-[10px] md:text-sm font-black transition-all shadow-md active:scale-95 border-2 ${showHint ? 'bg-indigo-100 text-indigo-400 border-indigo-200' : 'bg-white text-indigo-600 border-indigo-300 hover:bg-indigo-50 animate-bounce-gentle'}`}
-                      >
-                        {showHint ? '📖 กำลังแสดงสรุปสูตร...' : '💡 ดูสูตรอีกครั้ง'}
-                      </button>
+                      <div className="flex flex-col items-center gap-1">
+                        <button
+                          onClick={() => {
+                            if (hintsUsed >= 3) return;
+                            setShowHint(true);
+                            setHintsUsed(h => h + 1);
+                            setTimeout(() => setShowHint(false), 2000);
+                          }}
+                          disabled={showHint || hintsUsed >= 3}
+                          className={`mb-2 md:mb-4 px-4 md:px-6 py-1 md:py-2 rounded-full text-[10px] md:text-sm font-black transition-all shadow-md active:scale-95 border-2 ${showHint ? 'bg-indigo-100 text-indigo-400 border-indigo-200' : hintsUsed >= 3 ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' : 'bg-white text-indigo-600 border-indigo-300 hover:bg-indigo-50 animate-bounce-gentle'}`}
+                        >
+                          {showHint ? '📖 กำลังแสดงสรุปสูตร...' : hintsUsed >= 3 ? '❌ ใช้โควตาใบ้ครบแล้ว' : '💡 ดูสูตรอีกครั้ง'}
+                        </button>
+                        <span className="text-[10px] md:text-xs font-bold text-slate-500 mb-2">
+                          โควตาดูสูตร: {3 - hintsUsed}/3 ครั้ง
+                        </span>
+                      </div>
                     )}
 
                     {(showCookingOrder || showHint) && (
@@ -1482,7 +1491,7 @@ function ManagementGameInner() {
                             className="h-full bg-indigo-500 rounded-r-full"
                             style={{
                               animationName: 'shrinkWidth',
-                              animationDuration: showCookingOrder ? '6s' : '3s',
+                              animationDuration: showCookingOrder ? '8s' : '5s',
                               animationTimingFunction: 'linear',
                               animationFillMode: 'forwards'
                             }}

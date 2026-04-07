@@ -435,9 +435,19 @@ export default function WorldPage() {
         })()}
 
         {/* Bottom Options (Cheat/Reset) */}
-        <div className="flex justify-center gap-8 py-0.5">
-          <button onClick={resetProgress} className="text-[8px] font-black text-slate-400 opacity-50 hover:opacity-100 hover:text-red-500 transition-opacity">ล้างข้อมูล</button>
-          <button onClick={unlockAllCheat} className="text-[8px] font-black text-slate-300 opacity-50 hover:opacity-100 hover:text-indigo-500 transition-opacity">ปลดล็อก</button>
+        <div className="flex justify-center gap-12 py-2 mt-1">
+          <button 
+            onClick={resetProgress} 
+            className="text-[11px] font-black text-slate-500 opacity-70 hover:opacity-100 hover:text-red-600 transition-all uppercase tracking-widest border-b border-transparent hover:border-red-600/30"
+          >
+            ล้างข้อมูล
+          </button>
+          <button 
+            onClick={unlockAllCheat} 
+            className="text-[11px] font-black text-slate-400 opacity-60 hover:opacity-100 hover:text-indigo-600 transition-all uppercase tracking-widest border-b border-transparent hover:border-indigo-600/30"
+          >
+            ปลดล็อก
+          </button>
         </div>
       </div>
 
