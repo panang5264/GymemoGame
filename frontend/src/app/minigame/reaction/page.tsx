@@ -194,7 +194,7 @@ function MazeGameInner() {
                                 onClick={startRealGame}
                                 className="px-16 py-5 bg-indigo-600 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95"
                             >
-                                เริ่มเดินทาง 🚀
+                                เริ่มเดินทาง ✨
                             </button>
                         </div>
                     )}
@@ -262,7 +262,7 @@ function MazeGameInner() {
                                                 onClick={() => router.push(`/world/${villageIdParam}/sublevel/${subId + 1}`)}
                                                 className="w-full py-5 bg-green-500 hover:bg-green-600 text-white rounded-[24px] font-black text-xl shadow-xl transition-all active:scale-95"
                                             >
-                                                ด่านต่อไป 🚀
+                                                ด่านต่อไป ✨
                                             </button>
                                         ) : parseInt(villageIdParam) < 10 ? (
                                             <button

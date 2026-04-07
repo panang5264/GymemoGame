@@ -40,7 +40,7 @@ const INTRO_SLIDES: Array<{ emoji: string; title: string; desc: string }> = [
   { emoji: '👋', title: 'ยินดีต้อนรับ', desc: 'มาสำรวจแผนที่โลกกัน!' },
   { emoji: '⭐', title: 'ปลดล็อกด่าน', desc: 'เติม EXP ให้เต็มเพื่อปลดล็อกหมู่บ้านถัดไป' },
   { emoji: '🗝️', title: 'กุญแจ', desc: 'ใช้กุญแจเพื่อเล่นแต่ละด่าน (รีเจนทุก 30 นาที)' },
-  { emoji: '🚀', title: 'พร้อมเริ่ม', desc: 'กดเริ่มเลยเพื่อไปด่านแรก' },
+  { emoji: '✨', title: 'พร้อมเริ่ม', desc: 'กดเริ่มเลยเพื่อไปด่านแรก' },
 ]
 
 function formatCountdown(ms: number): string {
@@ -212,7 +212,7 @@ export default function WorldPage() {
                 </button>
               ) : (
                 <button className={`${styles.navBtn} ${styles.navBtnPrimary}`} onClick={closeIntro}>
-                  เริ่มเลย! 🚀
+                  เริ่มเลย! ✨
                 </button>
               )}
             </div>
@@ -303,7 +303,7 @@ export default function WorldPage() {
               onClick={() => setShowTutorial(false)}
               className={`${styles.navBtn} ${styles.navBtnPrimary} w-full text-lg md:text-xl py-3 md:py-4 rounded-xl md:rounded-2xl border-4 border-black shadow-[0_6px_0_#1a1a1a] hover:translate-y-1 hover:shadow-[0_4px_0_#1a1a1a] transition-all`}
             >
-              เข้าใจแล้ว เริ่มผจญภัย! 🚀
+              เข้าใจแล้ว เริ่มผจญภัย! ✨
             </button>
           </div>
         </div>

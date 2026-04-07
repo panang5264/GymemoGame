@@ -113,7 +113,7 @@ function ChestGameInner() {
                                 style={{ marginBottom: 0 }}
                                 onClick={() => router.push(`/world/${villageId}/sublevel/${subId + 1}`)}
                             >
-                                ด่านต่อไป 🚀
+                                ด่านต่อไป ✨
                             </button>
                         ) : villageId < 10 ? (
                             <button

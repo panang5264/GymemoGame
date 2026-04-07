@@ -48,7 +48,7 @@ interface BoxQuestion {
 const CUSTOM_BOX_DIRECTIONS: Record<string, Record<string, string>> = {
   "3": {
     "1.1": "มองจากบนลงล่าง ⬇️",
-    "1.2": "มองจากด้านข้าง ↔️",
+    "1.2": "มองจากบนลงล่าง ⬇️",
     "1.3": "มองจากล่างขึ้นบน ⬆️",
     "2.1": "มองจากด้านหน้า",
     "2.2": "มองจากด้านข้าง",
@@ -61,7 +61,7 @@ const CUSTOM_BOX_DIRECTIONS: Record<string, Record<string, string>> = {
     "4.3": "มองจากบนลงล่าง ⬇️",
   },
   "4": {
-    "1.1": "มองจากด้านขวา",
+    "1.1": "มองจากด้านบน⬇️",
     "1.2": "มองจากด้านหน้า",
     "1.3": "มองจากด้านซ้าย",
     "2.1": "มองจากด้านขวา",
@@ -78,7 +78,7 @@ const CUSTOM_BOX_DIRECTIONS: Record<string, Record<string, string>> = {
     "1.1": "มองจากด้านหน้า",
     "1.2": "มองจากด้านหน้า",
     "1.3": "มองจากด้านขวาของตัวโมเดล",
-    "2.1": "มองจากด้านซ้าย",
+    "2.1": "มองจากด้านข้างฝั่งซ้าย",
     "2.2": "มองจากด้านบนลงล่าง",
     "2.3": "มองจากด้านซ้าย",
     "3.1": "มองจากด้านขวา",
@@ -161,24 +161,12 @@ const CUSTOM_BOX_DIRECTIONS: Record<string, Record<string, string>> = {
   // คุณสามารถเพิ่มหมู่บ้าน 5, 6, 7... และเลขรอบที่คุณต้องการกำหนดเองได้ที่นี่ครับ
 }
 
-function pickBoxQuestion(level: number, villageId: number, version: string, questionIndex: number[]): { q: BoxQuestion; numOptions: number, index: number } {
+function pickBoxQuestion(level: number, villageId: number, version: string, qCount: number): { q: BoxQuestion; numOptions: number, index: number } {
   const roundNum = version.replace('v', '')
-  const storageKey = `spatial_played_box_v${villageId}_r${roundNum}`
-  let playedList: number[] = []
-  if (typeof window !== 'undefined') {
-    playedList = JSON.parse(sessionStorage.getItem(storageKey) || '[]')
-  }
 
-  if (playedList.length >= 3) {
-    playedList = []
-  }
-  const available = questionIndex
-  let subId = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : 1
-
-  if (typeof window !== 'undefined') {
-    playedList.push(subId)
-    sessionStorage.setItem(storageKey, JSON.stringify(playedList))
-  }
+  // Selection logic: Sequential based on question count (0, 1, 2)
+  const variantIndex = (qCount % 3) + 1
+  const subId = variantIndex
 
   const folderName = `${roundNum}.${subId}`
   const path = `${BASE}/village_${villageId}/${roundNum}/${folderName}`
@@ -268,7 +256,7 @@ function SpatialGameInner() {
   } | null>(null)
 
   const hasSavedRef = useRef(false)
-  const nextQuestion = useCallback(() => {
+  const nextQuestion = useCallback((qCount: number = 0) => {
     setFeedback(null)
     if (levelParam <= 2) {
       // Village 1-2: Interactive Image Matching Pair game
@@ -286,7 +274,7 @@ function SpatialGameInner() {
       setQuestionText('จับคู่รูปทรงต้นแบบที่มีรอยแหว่งกับชิ้นส่วนที่หายไป 🧩')
     } else {
       // Village 3+: Use Box asset images, fixed by version wrapper logic
-      const { q, numOptions, index } = pickBoxQuestion(levelParam, villageId, assetVersion, lastQuestionIndexRef.current)
+      const { q, numOptions, index } = pickBoxQuestion(levelParam, villageId, assetVersion, qCount)
 
       // ฟังก์ชันช่วยสุ่มโดยกรองเอาเฉพาะ WRONG ที่มีอยู่จริง (ผ่านการสุ่มลำดับ)
       const options = [q.correct, ...q.wrongs].sort(() => Math.random() - 0.5)
@@ -301,35 +289,32 @@ function SpatialGameInner() {
         finalOptions[0] = q.correct
       }
       lastQuestionIndexRef.current = lastQuestionIndexRef.current.filter((value) => value != index)
-      console.log(lastQuestionIndexRef.current)
-      // setQuestionIndex(lastQuestionIndexRef.current)
       setQuestionData({ targetImage: q.block, options: finalOptions, correctIndex: finalOptions.indexOf(q.correct) })
       setQuestionText(`ถ้า${q.direction} คุณจะเห็นหน้าตาบล็อกเป็นแบบใด? 📦`)
     }
   }, [levelParam, villageId, assetVersion])
 
-  useEffect(() => {
-    // ── กำหนด Version ตามเลขด่านย่อย (3, 6, 9, 12 = v1, v2, v3, v4) ──
-    let versionForThisRound = 'v1'
-    if (subId === 3) versionForThisRound = 'v1'
-    else if (subId === 6) versionForThisRound = 'v2'
-    else if (subId === 9) versionForThisRound = 'v3'
-    else if (subId === 12) versionForThisRound = 'v4'
-    else {
-      // โบนัสหรือกรณีอื่นๆ ค่อยใช้ Shuffle Bag
-      const ALL_VERSIONS = ['v1', 'v2', 'v3', 'v4']
-      const uniqueKey = `spatial_village_${villageId}`
-      versionForThisRound = getUniqueRandomVersion(uniqueKey, ALL_VERSIONS)
-    }
-    setAssetVersion(versionForThisRound)
+  const [isInitialized, setIsInitialized] = useState(false)
 
+  useEffect(() => {
+    // ── กำหนด Group (Round) ตามเลขด่านย่อยของโลก (1-4, 5-8, 9-12 จะวนลูป) ──
+    const roundIdx = ((subId - 1) % 4) + 1
+    const versionForThisRound = `v${roundIdx}`
+
+    setAssetVersion(versionForThisRound)
     hasSavedRef.current = false
     lastQuestionIndexRef.current = [1, 2, 3]
     setIsGameOver(false)
-    // setQuestionIndex([1, 2, 3])
     setQuestionCount(0)
-    nextQuestion()
-  }, [levelParam, subId, villageId, nextQuestion])
+    setIsInitialized(true)
+  }, [levelParam, subId, villageId])
+
+  useEffect(() => {
+    if (isInitialized) {
+      nextQuestion(0)
+      setIsInitialized(false)
+    }
+  }, [isInitialized, nextQuestion])
 
   const { progress, saveProgress } = useProgress()
   const { recordPlay } = useLevelSystem()
@@ -386,20 +371,28 @@ function SpatialGameInner() {
     return () => window.removeEventListener('gymemo:cheat_complete', handleCheat)
   }, [])
 
-  if (phase === 'intro' && levelParam === 1) {
+  if (phase === 'intro') {
+    const isPairLevels = levelParam <= 2
+    const introIcon = isPairLevels ? '🧩' : '📦'
+    const introTitle = isPairLevels ? 'จับคู่มิติสัมพันธ์' : 'มุมมองบล็อก 3D'
+    const villageNum = villageId // เอาไว้แสดงหมู่บ้าน
+
     return (
       <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4 font-['Supermarket']">
         <div className="max-w-md w-full bg-white/95 backdrop-blur-md rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-2xl border border-white/20 text-center animate-in zoom-in duration-500">
-          <div className="text-7xl md:text-8xl mb-6 md:mb-8 animate-bounce drop-shadow-xl">🗺️</div>
+          <div className="text-7xl md:text-8xl mb-6 md:mb-8 animate-bounce drop-shadow-xl">{introIcon}</div>
           {mode === 'daily' ? (
             <>
               <h2 className="text-2xl md:text-3xl font-black text-orange-500 mb-2 md:mb-4 uppercase tracking-tighter">🌟 ภารกิจรายวัน</h2>
-              <p className="text-slate-600 font-bold mb-6 md:mb-8 text-sm md:text-base px-2 bg-orange-50 py-2 border-2 border-orange-200 rounded-full">ด่านที่ 3/3: โหมดแผนที่และมิติ</p>
+              <p className="text-slate-600 font-bold mb-6 md:mb-8 text-sm md:text-base px-2 bg-orange-50 py-2 border-2 border-orange-200 rounded-full">ด่านที่ 3/3: มิติสัมพันธ์</p>
             </>
           ) : (
             <>
-              <h2 className="text-2xl md:text-3xl font-black text-slate-800 mb-3 md:mb-4 uppercase tracking-tighter">มิติจำลอง</h2>
-              <p className="text-slate-500 font-bold mb-6 md:mb-8 text-sm md:text-base px-2">{diffDesc}</p>
+              <h2 className="text-2xl md:text-3xl font-black text-slate-800 mb-3 md:mb-4 uppercase tracking-tighter">{introTitle}</h2>
+              <div className="bg-indigo-50 border-2 border-indigo-100 rounded-2xl p-4 mb-6 md:mb-8">
+                <p className="text-indigo-600 font-black text-xs md:text-sm uppercase tracking-widest mb-1">หมู่บ้านที่ {villageNum}</p>
+                <p className="text-slate-500 font-bold text-sm md:text-base leading-relaxed">{diffDesc}</p>
+              </div>
             </>
           )}
           <button
@@ -408,7 +401,7 @@ function SpatialGameInner() {
             }}
             className={`w-full py-4 text-white rounded-[20px] font-black text-xl shadow-xl hover:scale-105 transition-all active:scale-95 ${mode === 'daily' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}
           >
-            {mode === 'daily' ? 'เริ่มภารกิจ! 🚀' : 'เริ่มเลย! 🚀'}
+            {mode === 'daily' ? 'เริ่มภารกิจ! ✨' : 'เริ่มเลย! ✨'}
           </button>
         </div>
       </div>
@@ -452,7 +445,7 @@ function SpatialGameInner() {
                 <>
                   {subId < 12 ? (
                     <button className="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-black text-lg shadow-md transition-all active:scale-95" onClick={() => router.push(`/world/${villageId}/sublevel/${subId + 1}`)}>
-                      ด่านต่อไป 🚀
+                      ด่านต่อไป ✨
                     </button>
                   ) : villageId < 10 ? (
                     <button className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-black text-lg shadow-md transition-all active:scale-95" onClick={() => router.push(`/world/${villageId + 1}`)}>
@@ -490,13 +483,15 @@ function SpatialGameInner() {
                 onComplete={() => {
                   setFeedback({ type: 'correct', message: '✨ ถูกต้องทั้งหมด! เก่งมาก' })
                   setTimeout(() => {
-                    if (questionCount + 1 >= MAX_QUESTIONS) {
-                      setIsGameOver(true)
-                    } else {
-                      setQuestionCount(prev => prev + 1)
-                      console.log(questionCount)
-                      nextQuestion()
-                    }
+                    setQuestionCount((prevCount) => {
+                      const nextCount = prevCount + 1
+                      if (nextCount >= MAX_QUESTIONS) {
+                        setIsGameOver(true)
+                        return prevCount
+                      }
+                      nextQuestion(nextCount)
+                      return nextCount
+                    })
                   }, 1500)
                 }}
                 onError={() => setErrorCount(e => e + 1)}
@@ -537,13 +532,15 @@ function SpatialGameInner() {
                         if (idx === questionData.correctIndex) {
                           setFeedback({ type: 'correct', message: '✨ ถูกต้องแล้ว! เก่งมาก' })
                           setTimeout(() => {
-                            if (questionCount + 1 >= MAX_QUESTIONS) {
-                              setIsGameOver(true)
-                            } else {
-                              let count = questionCount
-                              setQuestionCount(count + 1)
-                              nextQuestion()
-                            }
+                            setQuestionCount((prevCount) => {
+                              const nextCount = prevCount + 1
+                              if (nextCount >= MAX_QUESTIONS) {
+                                setIsGameOver(true)
+                                return prevCount
+                              }
+                              nextQuestion(nextCount)
+                              return nextCount
+                            })
                           }, 1200)
                         } else {
                           setErrorCount(e => e + 1)

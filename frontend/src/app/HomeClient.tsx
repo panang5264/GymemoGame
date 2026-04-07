@@ -484,7 +484,7 @@ export default function Home() {
                     className="w-full py-5 bg-indigo-600 text-white rounded-[2rem] font-black text-2xl shadow-[0_8px_0_#312e81] hover:translate-y-[-4px] hover:shadow-[0_12px_0_#312e81] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-3"
                   >
                     <span>เข้าสู่บทเรียน</span>
-                    <span className="text-3xl">🚀</span>
+                    <span className="text-3xl">✨</span>
                   </button>
 
                   <div className="h-[2px] bg-slate-100 my-2" />

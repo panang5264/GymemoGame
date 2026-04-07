@@ -295,7 +295,7 @@ function CalculationGameInner() {
             className={`w-full py-5 text-white rounded-[2rem] font-black text-xl shadow-xl active:scale-95 transition-all ${mode === 'daily' ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500'}`}
             onClick={startGame}
           >
-            {mode === 'daily' ? 'เริ่มภารกิจ! 🚀' : 'ไปกันเลย! 🚀'}
+            {mode === 'daily' ? 'เริ่มภารกิจ! ✨' : 'ไปกันเลย! ✨'}
           </button>
         </div>
       </div>
@@ -370,7 +370,7 @@ function CalculationGameInner() {
                 onClick={() => setShowInfo(false)}
                 className="w-full mt-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-lg shadow-lg hover:bg-indigo-700 active:scale-95 transition-all"
               >
-                เข้าใจแล้ว! 🚀
+                เข้าใจแล้ว! ✨
               </button>
             </div>
           </div>
@@ -524,7 +524,7 @@ function CalculationGameInner() {
               <>
                 {subId < 12 ? (
                   <Link href={`/world/${villageId}/sublevel/${subId + 1}`} className="w-full py-5 bg-green-500 hover:bg-green-600 text-white rounded-[1.5rem] font-black text-xl shadow-lg transition-all text-center active:scale-95">
-                    ด่านต่อไป 🚀
+                    ด่านต่อไป ✨
                   </Link>
                 ) : parseInt(villageId, 10) < 10 ? (
                   <Link href={`/world/${parseInt(villageId, 10) + 1}`} className="w-full py-5 bg-orange-500 hover:bg-orange-600 text-white rounded-[1.5rem] font-black text-xl shadow-lg transition-all text-center active:scale-95">

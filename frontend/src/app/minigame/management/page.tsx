@@ -1218,7 +1218,7 @@ function ManagementGameInner() {
                   onClick={() => setPhase('play')}
                   className={`w-full py-5 text-white rounded-[24px] font-black text-2xl shadow-xl hover:scale-105 transition-all active:scale-95 ${modeParam === 'daily' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-slate-800'}`}
                 >
-                  {modeParam === 'daily' ? 'เริ่มภารกิจ! 🚀' : 'เริ่มเล่น 🚀'}
+                  {modeParam === 'daily' ? 'เริ่มภารกิจ! ✨' : 'เริ่มเล่น ✨'}
                 </button>
               </div>
             </div>
@@ -1256,7 +1256,7 @@ function ManagementGameInner() {
                           onClick={() => handleNext(`/world/${villageId}/sublevel/${subId + 1}`)}
                           className="w-full py-5 bg-green-500 hover:bg-green-600 text-white rounded-[24px] font-black text-2xl shadow-xl transition-all active:scale-95"
                         >
-                          ด่านต่อไป 🚀
+                          ด่านต่อไป ✨
                         </button>
                       ) : villageId < 10 ? (
                         <button
