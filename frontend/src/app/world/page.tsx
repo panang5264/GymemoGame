@@ -253,7 +253,7 @@ export default function WorldPage() {
                 className="group relative bg-[#fcfaf2] p-5 md:p-6 rounded-[2rem] border-4 border-black text-center shadow-[6px_6px_0_#000] hover:translate-y-[-5px] transition-all hover:bg-orange-50/50"
               >
                 <div className="w-12 h-12 md:w-16 md:h-16 bg-orange-50 border-2 border-black rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3 shadow-[4px_4px_0_#000]">📦</div>
-                <h4 className="font-black text-lg text-black mb-1 tracking-tighter">MANAGEMENT</h4>
+                <h4 className="font-black text-lg text-black mb-1 tracking-tighter uppercase">โหมดจัดการ</h4>
                 <div className="h-0.5 w-8 bg-orange-400 mx-auto mb-3 rounded-full"></div>
                 <p className="text-xs md:text-sm font-bold text-black/70 leading-relaxed">
                   ฝึกทักษะการแยกแยะและจัดหมวดหมู่สิ่งของ
@@ -267,7 +267,7 @@ export default function WorldPage() {
                 className="group relative bg-[#fcfaf2] p-5 md:p-6 rounded-[2rem] border-4 border-black text-center shadow-[6px_6px_0_#000] hover:translate-y-[-5px] transition-all hover:bg-blue-50/50"
               >
                 <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-50 border-2 border-black rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3 shadow-[4px_4px_0_#000]">🔢</div>
-                <h4 className="font-black text-lg text-black mb-1 tracking-tighter">CALCULATION</h4>
+                <h4 className="font-black text-lg text-black mb-1 tracking-tighter uppercase">โหมดคำนวณ</h4>
                 <div className="h-0.5 w-8 bg-blue-400 mx-auto mb-3 rounded-full"></div>
                 <p className="text-xs md:text-sm font-bold text-black/70 leading-relaxed">
                   ท้าทายความไวในการแก้โจทย์คณิตศาสตร์
@@ -281,7 +281,7 @@ export default function WorldPage() {
                 className="group relative bg-[#fcfaf2] p-5 md:p-6 rounded-[2rem] border-4 border-black text-center shadow-[6px_6px_0_#000] hover:translate-y-[-5px] transition-all hover:bg-green-50/50"
               >
                 <div className="w-12 h-12 md:w-16 md:h-16 bg-green-50 border-2 border-black rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3 shadow-[4px_4px_0_#000]">🗺️</div>
-                <h4 className="font-black text-lg text-black mb-1 tracking-tighter">SPATIAL</h4>
+                <h4 className="font-black text-lg text-black mb-1 tracking-tighter uppercase">โหมดมิติสัมพันธ์</h4>
                 <div className="h-0.5 w-8 bg-green-400 mx-auto mb-3 rounded-full"></div>
                 <p className="text-xs md:text-sm font-bold text-black/70 leading-relaxed">
                   ฝึกการวาดภาพในใจ จับคู่มุมมองและรูปทรง
@@ -292,7 +292,7 @@ export default function WorldPage() {
 
             <div className="bg-white/60 backdrop-blur-md p-5 md:p-6 rounded-3xl mb-6 md:mb-8 text-left border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,0.05)] relative overflow-hidden">
               <div className="absolute top-0 right-0 p-4 opacity-10 text-4xl rotate-12">🎯</div>
-              <p className="text-[10px] font-black text-black/40 uppercase tracking-[0.2em] mb-1">Our Mission Objective</p>
+              <p className="text-[10px] font-black text-black/40 uppercase tracking-[0.2em] mb-1">ภารกิจสำรวจส่วนตัว</p>
               <p className="text-sm md:text-base font-black text-black leading-tight">
                 สะสม <span className="text-orange-500 underline decoration-2 underline-offset-2">EXP</span> เพื่อปลดล็อกพื้นที่ถัดไป <br />
                 และ <span className="bg-yellow-300 px-2 py-0.5 rounded-lg border-2 border-yellow-400/20 inline-block">กู้คืนความทรงจำที่หายไป</span> กลับคืนมา!
@@ -301,7 +301,7 @@ export default function WorldPage() {
 
             <button
               onClick={() => setShowTutorial(false)}
-              className={`${styles.navBtn} ${styles.navBtnPrimary} w-full text-lg md:text-xl py-3 md:py-4 rounded-xl md:rounded-2xl border-4 border-black shadow-[0_6px_0_#1a1a1a] hover:translate-y-1 hover:shadow-[0_4px_0_#1a1a1a] transition-all`}
+              className={`${styles.navBtn} ${styles.navBtnPrimary} w-full text-lg md:text-xl py-3 md:py-4 rounded-xl md:rounded-2xl border-4 border-black !bg-green-500 !text-white !border-black shadow-[0_6px_0_#166534] hover:translate-y-1 hover:shadow-[0_4px_0_#166534] transition-all`}
             >
               เข้าใจแล้ว เริ่มผจญภัย! ✨
             </button>

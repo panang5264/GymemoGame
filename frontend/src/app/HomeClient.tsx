@@ -322,47 +322,64 @@ export default function Home() {
                 </div>
               </form>
             ) : (
-              <form onSubmit={handleLogin} className="space-y-6">
-                {error && (
-                  <div className="bg-red-100 text-red-600 p-4 rounded-2xl text-sm font-bold text-center mb-4">
-                    {error}
+              <div>
+                {/* Welcome Back Shortcut (If already logged in) */}
+                {progress.userName && (
+                  <div className="mb-10 p-6 bg-indigo-50 border-4 border-black rounded-[2rem] shadow-[8px_8px_0_#312e81] animate-in zoom-in duration-500">
+                    <p className="text-indigo-600 font-black text-[10px] uppercase tracking-widest mb-2 text-center">เข้าสู่ระบบล่าสุดในชื่อ</p>
+                    <h3 className="text-2xl font-black text-slate-800 mb-6 text-center">{progress.userName} ✨</h3>
+                    <button
+                      onClick={() => router.push('/world')}
+                      className="pill-button w-full py-4 !bg-green-500 !text-white !border-black shadow-[0_6px_0_#166534] hover:shadow-[0_2px_0_#166534] hover:translate-y-0.5 transition-all text-xl"
+                    >
+                      เข้าสู่แผนที่โลกเลย!
+                    </button>
+                    <p className="mt-4 text-[9px] text-slate-400 font-black uppercase tracking-widest text-center">หรือล็อกอินใหม่ด้วยบัญชีอื่นด้านล่าง</p>
                   </div>
                 )}
-                <div className="relative group">
-                  <div className="absolute left-7 top-1/2 -translate-y-1/2 text-2xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">📞</div>
-                  <input
-                    type="tel"
-                    placeholder="เบอร์โทรศัพท์"
-                    className="pill-input pill-input-icon w-full py-4 text-lg"
-                    value={username}
-                    onChange={e => setUsername(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="relative group">
-                  <div className="absolute left-7 top-1/2 -translate-y-1/2 text-2xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">🔒</div>
-                  <input
-                    type="password"
-                    placeholder="รหัสผ่าน (PASSWORD)"
-                    className="pill-input pill-input-icon w-full py-5 text-xl"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="flex flex-col gap-4">
-                  <button disabled={loading} className="pill-button w-full py-4 md:py-5 text-xl md:text-2xl mt-4 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_5px_0_#000] md:shadow-[0_7px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70">
-                    {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowForgot(true)}
-                    className="text-base font-bold text-slate-400 hover:text-indigo-600 transition-colors"
-                  >
-                    ลืมรหัสผ่าน? รีเซ็ตได้ที่นี่ 🔑
-                  </button>
-                </div>
-              </form>
+
+                <form onSubmit={handleLogin} className="space-y-6">
+                  {error && (
+                    <div className="bg-red-100 text-red-600 p-4 rounded-2xl text-sm font-bold text-center mb-4">
+                      {error}
+                    </div>
+                  )}
+                  <div className="relative group">
+                    <div className="absolute left-7 top-1/2 -translate-y-1/2 text-2xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">📞</div>
+                    <input
+                      type="tel"
+                      placeholder="เบอร์โทรศัพท์"
+                      className="pill-input pill-input-icon w-full py-4 text-lg"
+                      value={username}
+                      onChange={e => setUsername(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="relative group">
+                    <div className="absolute left-7 top-1/2 -translate-y-1/2 text-2xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">🔒</div>
+                    <input
+                      type="password"
+                      placeholder="รหัสผ่าน (PASSWORD)"
+                      className="pill-input pill-input-icon w-full py-5 text-xl"
+                      value={password}
+                      onChange={e => setPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <button disabled={loading} className="pill-button w-full py-4 md:py-5 text-xl md:text-2xl mt-4 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_5px_0_#000] md:shadow-[0_7px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70">
+                      {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowForgot(true)}
+                      className="text-base font-bold text-slate-400 hover:text-indigo-600 transition-colors"
+                    >
+                      ลืมรหัสผ่าน? รีเซ็ตได้ที่นี่ 🔑
+                    </button>
+                  </div>
+                </form>
+              </div>
             )}
 
             <div className="mt-8 text-center text-base font-bold text-[#717171]">
@@ -594,12 +611,12 @@ export default function Home() {
                 {/* Local History Section */}
                 <div className="mt-8 pt-8 border-t-2 border-slate-100">
                   <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-4">📜 ประวัติความสำเร็จ (ในเครื่องนี้)</h4>
-                  <div className="space-y-2">
+                  <div className="space-y-2 max-h-[280px] overflow-y-auto pr-2 custom-scrollbar border-b-2 border-transparent">
                     {history && history.length > 0 ? (
                       history.map((h: any, i: number) => (
-                        <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100 text-xs">
+                        <div key={i} className="flex items-center justify-between p-3 bg-slate-50/50 rounded-2xl border border-slate-100 text-xs hover:bg-white hover:shadow-sm transition-all group">
                           <div className="text-left">
-                            <p className="font-black text-slate-700">{new Date(h.date).toLocaleDateString('th-TH')}</p>
+                            <p className="font-black text-slate-700 group-hover:text-black transition-colors">{new Date(h.date).toLocaleDateString('th-TH')}</p>
                             <p className="text-[10px] text-slate-400">ปลดล็อก {h.villages} หมู่บ้าน</p>
                           </div>
                           <div className="text-right">
@@ -611,6 +628,22 @@ export default function Home() {
                       <p className="text-[10px] text-slate-300 font-bold py-4">ยังไม่พบประวัติการเล่น</p>
                     )}
                   </div>
+                </div>
+
+                {/* Back and Direct Map Buttons */}
+                <div className="mt-10 flex flex-col gap-4">
+                  <button
+                    onClick={() => router.push('/world')}
+                    className="pill-button w-full py-5 text-2xl !bg-green-500 !text-white !border-black shadow-[0_8px_0_#166534] hover:translate-y-1 hover:shadow-[0_4px_0_#166534] active:translate-y-2 active:shadow-none transition-all"
+                  >
+                    เข้าสู่แผนที่โลก
+                  </button>
+                  <button
+                    onClick={() => setPhase('login')}
+                    className="text-slate-400 font-black hover:text-slate-600 transition-colors uppercase tracking-widest text-xs flex items-center justify-center gap-2 py-2"
+                  >
+                    ← ย้อนกลับหน้าหลัก
+                  </button>
                 </div>
               </div>
             </div>
@@ -771,17 +804,17 @@ export default function Home() {
               </div>
 
               <div className="mt-12 w-full relative">
-                {/* Pulsing indicator */}
-                <div className="absolute left-1/2 -top-8 -translate-x-1/2 flex items-center justify-center">
-                  <div className="w-4 h-4 bg-red-500 rounded-full animate-ping absolute"></div>
-                  <div className="w-4 h-4 bg-red-500 rounded-full relative"></div>
-                </div>
-
                 <button
                   onClick={nextPhase}
-                  className="pill-button w-full py-5 text-2xl !bg-green-500 !text-white !border-black shadow-[0_8px_0_#166534] hover:translate-y-1 hover:shadow-[0_4px_0_#166534] active:translate-y-2 active:shadow-none transition-all"
+                  className="pill-button w-full py-5 text-2xl !bg-green-500 !text-white !border-black shadow-[0_8px_0_#166534] hover:translate-y-1 hover:shadow-[0_4px_0_#166534] active:translate-y-2 active:shadow-none transition-all relative"
                 >
                   พร้อมแล้ว! ✨
+
+                  {/* Red pulsing indicator moved INSIDE the button for perfect alignment */}
+                  <div className="absolute right-3 top-1 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                    <div className="w-6 h-6 bg-red-500 rounded-full animate-ping absolute border-2 border-white"></div>
+                    <div className="w-6 h-6 bg-red-500 rounded-full relative border-2 border-white"></div>
+                  </div>
                 </button>
                 <p className="mt-4 text-[11px] font-black text-indigo-600 uppercase tracking-[0.3em] text-center animate-pulse">ก้าวแรกสู่การเป็นปรมาจารย์</p>
               </div>
@@ -792,7 +825,7 @@ export default function Home() {
         {/* Phase 6: Tutorial Summary - Sequential Learning */}
         {phase === 'tutorial_summary' && (
           <div className="friendly-card !p-6 md:!p-12 animate-in slide-in-from-bottom duration-700 max-w-4xl mx-auto border-[4px] md:border-[6px] min-h-[650px] flex flex-col items-center">
-            
+
             {/* Consistent Top Header */}
             <div className="text-center mb-10">
               <h2 className="text-3xl md:text-5xl font-black text-black mb-3 tracking-tight">งั้นมาสอนเล่นกันก่อนนะ</h2>
@@ -808,18 +841,18 @@ export default function Home() {
               <div className="text-center animate-in zoom-in duration-500 py-10">
                 <div className="text-7xl md:text-9xl mb-10 drop-shadow-lg">💡</div>
                 <p className="text-[#717171] font-bold text-lg mb-12 max-w-sm">เพื่อการผจญภัยที่ราบรื่น มาลองฝึกทักษะพื้นฐานกันครับ</p>
-                
+
                 <div className="flex flex-col gap-6 w-full max-w-xs mx-auto">
                   <div className="relative">
                     <div className="absolute -top-3 -right-3 w-8 h-8 bg-red-500 rounded-full animate-ping z-10"></div>
-                    <button 
+                    <button
                       onClick={() => setStoryStep(1)}
                       className="pill-button w-full py-5 text-2xl !bg-indigo-600 !text-white shadow-[0_8px_0_#312e81]"
                     >
                       ลองฝึกฝนกัน ✨
                     </button>
                   </div>
-                  <button 
+                  <button
                     onClick={() => {
                       setClockTarget({ hour: 10, minute: 10 });
                       setAssessmentSubPhase('memorize');
@@ -836,19 +869,19 @@ export default function Home() {
             {/* Step 1: Management Tutorial */}
             {storyStep === 1 && (
               <div className="w-full animate-in slide-in-from-right duration-500 text-center flex flex-col items-center">
-                <div 
+                <div
                   onClick={() => setTrainingMode('management')}
                   className="group cursor-pointer relative bg-[#fffcf0] p-12 md:p-16 rounded-[4rem] border-4 border-black inline-block shadow-[20px_20px_0_#000] hover:scale-105 transition-all mb-12"
                 >
                   <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-10 h-10 bg-red-500 rounded-full animate-ping"></div>
                   <div className="w-28 h-28 bg-orange-100 border-4 border-black rounded-[2rem] flex items-center justify-center text-6xl mx-auto mb-8 shadow-[8px_8px_0_#000] group-hover:rotate-12 transition-transform">📦</div>
-                  <h4 className="font-black text-4xl text-black mb-6 uppercase">การจัดการ</h4>
+                  <h4 className="font-black text-4xl text-black mb-6 uppercase">โหมดจัดการ</h4>
                   <p className="text-xl font-bold text-black/60 max-w-sm mx-auto leading-relaxed italic">
-                    "ฝึกการแยกแยะและจัดลำดับความสำคัญของสิ่งของ"
+                    "ฝึกทักษะการแยกแยะและจัดหมวดหมู่สิ่งของ"
                   </p>
                 </div>
                 <div className="mt-auto">
-                  <button 
+                  <button
                     onClick={() => setStoryStep(2)}
                     className="pill-button px-20 py-5 text-2xl shadow-[0_8px_0_#1a1a1a]"
                   >
@@ -861,19 +894,19 @@ export default function Home() {
             {/* Step 2: Calculation Tutorial */}
             {storyStep === 2 && (
               <div className="w-full animate-in slide-in-from-right duration-500 text-center flex flex-col items-center">
-                <div 
+                <div
                   onClick={() => setTrainingMode('calculation')}
                   className="group cursor-pointer relative bg-[#f0f7ff] p-12 md:p-16 rounded-[4rem] border-4 border-black inline-block shadow-[20px_20px_0_#000] hover:scale-105 transition-all mb-12"
                 >
                   <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-10 h-10 bg-red-500 rounded-full animate-ping"></div>
                   <div className="w-28 h-28 bg-blue-100 border-4 border-black rounded-[2rem] flex items-center justify-center text-6xl mx-auto mb-8 shadow-[8px_8px_0_#000] group-hover:rotate-12 transition-transform">🔢</div>
-                  <h4 className="font-black text-4xl text-black mb-6 uppercase">การคำนวณ</h4>
+                  <h4 className="font-black text-4xl text-black mb-6 uppercase">โหมดคำนวณ</h4>
                   <p className="text-xl font-bold text-black/60 max-w-sm mx-auto leading-relaxed italic">
                     "ท้าทายความไวในการคิดเลข เพื่อสมองที่เฉียบแหลม"
                   </p>
                 </div>
                 <div className="mt-auto">
-                  <button 
+                  <button
                     onClick={() => setStoryStep(3)}
                     className="pill-button px-20 py-5 text-2xl shadow-[0_8px_0_#1a1a1a]"
                   >
@@ -886,19 +919,19 @@ export default function Home() {
             {/* Step 3: Spatial Tutorial */}
             {storyStep === 3 && (
               <div className="w-full animate-in slide-in-from-right duration-500 text-center flex flex-col items-center">
-                <div 
+                <div
                   onClick={() => setTrainingMode('spatial')}
                   className="group cursor-pointer relative bg-[#f0fff4] p-12 md:p-16 rounded-[4rem] border-4 border-black inline-block shadow-[20px_20px_0_#000] hover:scale-105 transition-all mb-12"
                 >
                   <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-10 h-10 bg-red-500 rounded-full animate-ping"></div>
                   <div className="w-28 h-28 bg-green-100 border-4 border-black rounded-[2rem] flex items-center justify-center text-6xl mx-auto mb-8 shadow-[8px_8px_0_#000] group-hover:rotate-12 transition-transform">🗺️</div>
-                  <h4 className="font-black text-4xl text-black mb-6 uppercase">มิติสัมพันธ์</h4>
+                  <h4 className="font-black text-4xl text-black mb-6 uppercase">โหมดมิติสัมพันธ์</h4>
                   <p className="text-xl font-bold text-black/60 max-w-sm mx-auto leading-relaxed italic">
                     "ฝึกการมองภาพในใจ และการเชื่อมโยงมิติที่ซับซ้อน"
                   </p>
                 </div>
                 <div className="mt-auto">
-                  <button 
+                  <button
                     onClick={() => {
                       const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
                       const minutes = [10, 15, 20, 30, 40, 45, 50];
