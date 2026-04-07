@@ -68,6 +68,7 @@ function MazeGameInner() {
 
     // ── Asset Version Mockup ──
     const [assetVersion, setAssetVersion] = useState<string>('v1')
+    const [showExitConfirm, setShowExitConfirm] = useState(false)
 
     const [phase, setPhase] = useState<'intro' | 'memorize' | 'clock' | 'recall' | 'play' | 'done'>('intro')
     const [memoryWords, setMemoryWords] = useState<string[]>([])
@@ -172,8 +173,16 @@ function MazeGameInner() {
                 {/* Header Bar */}
                 <div className="h-12 md:h-20 bg-white border-b-2 border-slate-50 flex items-center justify-between px-3 md:px-10 shrink-0">
                     <div className="flex items-center gap-2 md:gap-4">
+                        {phase === 'play' && (
+                            <button
+                                onClick={() => setShowExitConfirm(true)}
+                                className="w-7 h-7 md:w-10 md:h-10 shrink-0 rounded-full bg-red-500/80 hover:bg-red-600 text-white flex items-center justify-center font-black shadow-md border-2 border-red-300 transition-all active:scale-90"
+                            >
+                                <span className="text-sm md:text-xl relative -top-[1px]">×</span>
+                            </button>
+                        )}
                         <div className="w-7 h-7 md:w-12 md:h-12 bg-indigo-50 rounded-lg md:rounded-2xl flex items-center justify-center text-base md:text-3xl">🧭</div>
-                        <h1 className="text-xs md:text-2xl font-black text-slate-800 tracking-tight">Maze Runner (ด่าน {levelParam})</h1>
+                        <h1 className="text-xs md:text-2xl font-black text-slate-800 tracking-tight">ทำทาง (ด่าน {levelParam})</h1>
                     </div>
                     <div className="flex items-center">
                         <div className="flex flex-col items-end">
@@ -195,6 +204,42 @@ function MazeGameInner() {
                             >
                                 เริ่มเดินทาง ✨
                             </button>
+                        </div>
+                    )}
+
+                    {/* Exit Confirm Modal */}
+                    {showExitConfirm && (
+                        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
+                            <div className="bg-white rounded-[40px] shadow-2xl p-8 max-w-sm w-full border-4 border-red-500 animate-in zoom-in duration-300 text-center">
+                                <h3 className="text-2xl font-black text-slate-800 mb-4">
+                                    ⚠️ ยืนยันการออกจากด่าน
+                                </h3>
+                                <p className="text-slate-600 font-bold mb-6">
+                                    หากออกจากด่านตอนนี้ คุณจะได้คะแนนเท่าที่ทำได้ และจะไม่สามารถผ่านไปยังด่านย่อยถัดไปได้ (ต้องใช้กุญแจใหม่เพื่อเริ่มตีด่านนี้) ยืนยันหรือไม่?
+                                </p>
+                                <div className="flex gap-4">
+                                    <button
+                                        onClick={() => setShowExitConfirm(false)}
+                                        className="flex-1 py-3 bg-slate-200 text-slate-700 rounded-2xl font-black shadow-sm transition-all active:scale-95"
+                                    >
+                                        ยกเลิก
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            if (mode === 'village') {
+                                                router.push(`/world/${villageIdParam || 1}`);
+                                            } else if (mode === 'daily') {
+                                                router.push('/daily-challenge');
+                                            } else {
+                                                router.push('/minigame');
+                                            }
+                                        }}
+                                        className="flex-1 py-3 bg-red-500 text-white rounded-2xl font-black shadow-lg hover:bg-red-600 transition-all active:scale-95"
+                                    >
+                                        ออกเลย
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     )}
 

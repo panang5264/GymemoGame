@@ -211,6 +211,7 @@ function SpatialGameInner() {
   // สุ่มว่าจะใช้ Version 1, 2, 3 หรือ 4 (ดึงภาพจาก Asset_New/spatial/...)
   const [assetVersion, setAssetVersion] = useState<string>('v1')
 
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
   const [phase, setPhase] = useState<'intro' | 'memorize' | 'clock' | 'recall' | 'play'>('intro')
   const [memoryWords, setMemoryWords] = useState<string[]>([])
   const [clockTarget] = useState(() => ({
@@ -447,19 +448,29 @@ function SpatialGameInner() {
     <div className="h-screen flex flex-col items-center justify-center p-1 md:p-4 font-['Supermarket'] overflow-hidden">
       <div className="w-full max-w-4xl bg-white rounded-[24px] md:rounded-[40px] shadow-2xl overflow-hidden flex flex-col h-full md:h-[calc(100vh-140px)] relative border border-slate-100">
         {/* Header */}
-        <div className="bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm border-b border-slate-100 mb-1 md:mb-4 shrink-0">
-          <h1 className="text-sm md:text-xl font-black text-slate-800 text-center mb-0.5 relative inline-block w-full">
-            {mode === 'daily' ? '🌟 ภารกิจรายวัน: พื้นที่' : `📦 มิติสัมพันธ์ — ด่าน ${subId}`}
-            <span className="ml-2 md:ml-4 text-[9px] md:text-sm text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100 italic">
-              ข้อ {questionCount + 1} / {MAX_QUESTIONS}
-            </span>
-            {isBonus && (
-              <span className="absolute -top-2.5 right-0 bg-yellow-400 text-yellow-900 text-[8px] md:text-xs font-black px-1.5 py-0.5 rounded-full border border-yellow-500 shadow-sm animate-pulse">
-                x2 BONUS
-              </span>
+        <div className="min-h-[3rem] md:min-h-[5.5rem] py-1.5 md:py-4 bg-white border-b border-slate-100 flex flex-row items-center justify-between px-2.5 md:px-8 shrink-0 z-20 rounded-t-[24px] md:rounded-t-[40px] shadow-sm relative">
+          <div className="flex flex-1 items-center gap-2 md:gap-5 pr-1.5 min-w-0">
+            {phase === 'play' && (
+              <button
+                onClick={() => setShowExitConfirm(true)}
+                className="w-7 h-7 md:w-10 md:h-10 shrink-0 rounded-full bg-red-500/80 hover:bg-red-600 text-white flex items-center justify-center font-black shadow-md border-2 border-red-300 transition-all active:scale-90"
+              >
+                <span className="text-sm md:text-xl relative -top-[1px]">×</span>
+              </button>
             )}
-          </h1>
-          <p className="text-center text-slate-500 font-bold uppercase tracking-wider text-[8px] md:text-sm leading-none">{diffDesc}</p>
+            <div className="w-9 h-9 md:w-14 md:h-14 shrink-0 bg-indigo-50/80 rounded-xl md:rounded-2xl flex items-center justify-center text-lg md:text-3xl relative border border-indigo-100 shadow-inner">
+              🧩
+              {isBonus && (
+                <div className="absolute -top-1.5 -right-2 bg-yellow-400 text-yellow-900 text-[8px] md:text-xs font-black px-1.5 py-0.5 rounded-full border border-yellow-500 shadow-sm">
+                  x2
+                </div>
+              )}
+            </div>
+            <h1 className="text-lg md:text-3xl font-black text-slate-800 tracking-tight leading-none min-w-0 flex flex-col pt-0.5">
+              ด่าน {levelParam}
+              <span className="text-[9px] md:text-xs text-slate-400 mt-0.5 truncate flex-1">{questionText || diffDesc}</span>
+            </h1>
+          </div>
         </div>
 
         {isComplete ? (
@@ -494,20 +505,81 @@ function SpatialGameInner() {
             </div>
           </div>
         ) : (
-          <div className="w-full flex-1 flex flex-col items-center justify-center min-h-0 overflow-hidden">
-            {/* Feedback / Question Text */}
-            <div className="mb-2 md:mb-8 min-h-[25px] md:min-h-[50px] text-center w-full mt-0.5 md:mt-4 shrink-0">
-              {feedback && (
-                <div className={`inline-block px-3 md:px-8 py-1 md:py-2.5 rounded-full font-black text-[10px] md:text-lg shadow-lg border-2 md:border-4 ${feedback.type === 'correct' ? 'bg-green-500 text-white border-green-300' : 'bg-red-500 text-white border-red-300 animate-shake'}`}>
-                  {feedback.message}
+          <div className="flex-1 relative overflow-hidden bg-slate-50 flex flex-col">
+            {feedback && (
+              <div className={`absolute top-10 left-1/2 -translate-x-1/2 z-[100] px-10 py-3 rounded-full font-black text-xl shadow-2xl transition-all border-4 ${feedback.type === 'correct' ? 'bg-green-500 text-white border-green-300' : 'bg-red-500 text-white border-red-300 animate-shake'
+                }`}>
+                {feedback.message}
+              </div>
+            )}
+
+            {/* Exit Confirm Modal */}
+            {showExitConfirm && (
+              <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
+                <div className="bg-white rounded-[40px] shadow-2xl p-8 max-w-sm w-full border-4 border-red-500 animate-in zoom-in duration-300 text-center">
+                  <h3 className="text-2xl font-black text-slate-800 mb-4">
+                    ⚠️ ยืนยันการออกจากด่าน
+                  </h3>
+                  <p className="text-slate-600 font-bold mb-6">
+                    หากออกจากด่านตอนนี้ คุณจะได้คะแนนเท่าที่ทำได้ และจะไม่สามารถผ่านไปยังด่านย่อยถัดไปได้ (ต้องใช้กุญแจใหม่เพื่อเริ่มตีด่านนี้) ยืนยันหรือไม่?
+                  </p>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => setShowExitConfirm(false)}
+                      className="flex-1 py-3 bg-slate-200 text-slate-700 rounded-2xl font-black shadow-sm transition-all active:scale-95"
+                    >
+                      ยกเลิก
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (mode === 'village') {
+                          router.push(`/world/${villageId || 1}`);
+                        } else if (mode === 'daily') {
+                          router.push('/daily-challenge');
+                        } else {
+                          router.push('/minigame');
+                        }
+                      }}
+                      className="flex-1 py-3 bg-red-500 text-white rounded-2xl font-black shadow-lg hover:bg-red-600 transition-all active:scale-95"
+                    >
+                      ออกเลย
+                    </button>
+                  </div>
                 </div>
-              )}
-              {!feedback && questionText && (
-                <div className="inline-block px-3 md:px-10 py-1 md:py-3 rounded-full font-bold text-slate-600 bg-white/80 backdrop-blur-sm border border-white/50 shadow-sm text-xs md:text-base">
-                  💡 {questionText}
+              </div>
+            )}
+
+            {phase === 'intro' && (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-sm p-4 md:p-10">
+                <div className="max-w-md w-full bg-white rounded-3xl md:rounded-[40px] p-8 md:p-10 shadow-2xl border border-slate-100 text-center animate-in zoom-in">
+                  <div className="text-5xl md:text-7xl mb-4 md:mb-6 animate-bounce">🧩</div>
+                  <h2 className="text-2xl md:text-3xl font-black text-slate-800 mb-2 md:mb-4">ด่าน {levelParam}</h2>
+                  <p className="text-slate-600 font-bold mb-6 md:mb-8 text-base md:text-lg">{diffDesc}</p>
+                  <button
+                    className="w-full py-4 md:py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-xl md:text-2xl shadow-[0_6px_0_#4338ca] hover:shadow-[0_4px_0_#4338ca] hover:translate-y-[2px] active:shadow-none active:translate-y-[6px] transition-all"
+                    onClick={() => {
+                      if (levelParam >= 3) {
+                        setPhase('memorize')
+                      } else {
+                        setPhase('play')
+                      }
+                    }}
+                  >
+                    เริ่มเลย! ✨
+                  </button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+
+            <div className="w-full flex-1 flex flex-col items-center justify-center min-h-0 overflow-hidden">
+              {/* Feedback / Question Text */}
+              <div className="mb-2 md:mb-8 min-h-[25px] md:min-h-[50px] text-center w-full mt-0.5 md:mt-4 shrink-0">
+                {!feedback && questionText && (
+                  <div className="inline-block px-3 md:px-10 py-1 md:py-3 rounded-full font-bold text-slate-600 bg-white/80 backdrop-blur-sm border border-white/50 shadow-sm text-xs md:text-base">
+                    💡 {questionText}
+                  </div>
+                )}
+              </div>
 
             {/* Pair matching (Level 1-2) */}
             {questionData?.isPairMatching && (
@@ -612,6 +684,7 @@ function SpatialGameInner() {
               </div>
             )}
           </div>
+        </div>
         )}
       </div>
 

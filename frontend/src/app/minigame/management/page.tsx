@@ -43,12 +43,14 @@ const ITEM_SIZE_PERCENT = 22 // Approximate item size as % of container width
 
 function getRandomPos(existingItems: { x?: number; y?: number }[] = []) {
   const maxAttempts = 30
-  const margin = 12 // keep items away from edges
+  const marginX = 18 // Keep further from horizontal edges
+  const marginY = 15 // Keep further from vertical edges
+  const maxY = 45 // Limit height spawn area so it doesn't overlap drop zones
   const minDist = ITEM_SIZE_PERCENT // min distance between item centers (%)
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const x = margin + Math.random() * (100 - margin * 2)
-    const y = margin + Math.random() * (55 - margin * 2)
+    const x = marginX + Math.random() * (100 - marginX * 2)
+    const y = marginY + Math.random() * (maxY - marginY)
 
     // Check collision with all existing items
     const hasCollision = existingItems.some(item => {
@@ -65,10 +67,11 @@ function getRandomPos(existingItems: { x?: number; y?: number }[] = []) {
   const cols = 3
   const idx = existingItems.length % (cols * 2)
   return {
-    x: margin + (idx % cols) * ((100 - margin * 2) / (cols - 1)),
-    y: margin + Math.floor(idx / cols) * 30,
+    x: marginX + (idx % cols) * ((100 - marginX * 2) / (cols - 1 || 1)),
+    y: marginY + Math.floor(idx / cols) * 15,
   }
 }
+
 
 // ── Algorithm การสุ่ม Asset Version ไม่ซ้ำ (Shuffle Bag) ───────────────────
 function getUniqueRandomVersion(gameKey: string, versions: string[]) {
@@ -150,6 +153,21 @@ const COOKING_RECIPES: CookingRecipe[] = [
     extra: 'น้ำปลา',
     thought: 'อยากได้ความนัวเพิ่มจัง...',
     round: 3
+  },
+  // Round 4 (Sub-level 10, 8 etc.)
+  {
+    name: 'กะเพราทะเล',
+    ingredients: ['กุ้ง', 'ปูนิ่ม', 'พริกแดง', 'กะเพรา', 'น้ำปลา'],
+    extra: 'พริกแดง',
+    thought: 'ขอความจัดจ้านเพิ่มหน่อย!',
+    round: 4
+  },
+  {
+    name: 'ต้มข่าไก่',
+    ingredients: ['อกไก่', 'กะทิ', 'เห็ดพัด', 'น้ำตาล', 'น้ำปลา'],
+    extra: 'น้ำตาล',
+    thought: 'หวานหอมกะทิเพิ่มอีกนิด...',
+    round: 4
   }
 ]
 
@@ -157,7 +175,7 @@ const ROUND_INGREDIENTS_LIST: Record<number, string[]> = {
   1: ['กระเทียม', 'กะเพรา', 'กุยช่าย', 'กุ้ง', 'ข้าวสวย', 'ถั่วงอก', 'น้ำตาล', 'น้ำปลา', 'พริกแดง', 'หมูสับ', 'เต้าหู้', 'เส้นจันท์', 'แตงกวา', 'ไข่ไก่'],
   2: ['กระเทียม', 'กุ้ง', 'น้ำตาล', 'น้ำปลา', 'พริกแดง', 'หมูสับ', 'ไข่ไก่'],
   3: ['กระเทียม', 'กุ้ง', 'ข้าวสวย', 'น้ำตาล', 'น้ำปลา', 'พริกแดง', 'แตงกวา', 'ไข่ไก่'],
-  4: ['กระเทียม', 'กุ้ง', 'น้ำตาล', 'น้ำปลา', 'พริกแดง', 'หมูสับ', 'ไข่ไก่'] // Fallback for Round 4
+  4: ['กุ้ง', 'ปูนิ่ม', 'พริกแดง', 'กะเพรา', 'น้ำปลา', 'อกไก่', 'กะทิ', 'เห็ดพัด', 'น้ำตาล']
 }
 
 function getIngPath(name: string, round: number, level: number = 4) {
@@ -642,6 +660,7 @@ function ManagementGameInner() {
   const [assetVersion, setAssetVersion] = useState<string>('v1')
 
   // Phase State
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
   const [phase, setPhase] = useState<'intro' | 'memorize' | 'clock' | 'recall' | 'play' | 'done'>('intro')
   const [memoryWords, setMemoryWords] = useState<string[]>([])
   const [clockTarget] = useState(() => ({
@@ -1187,6 +1206,14 @@ function ManagementGameInner() {
         {/* Header Bar */}
         <div className="min-h-[3rem] md:min-h-[5.5rem] py-1.5 md:py-4 bg-white border-b border-slate-100 flex flex-row items-center justify-between px-2.5 md:px-8 shrink-0 z-20 rounded-t-[24px] md:rounded-t-[40px] shadow-sm relative">
           <div className="flex items-center gap-2 md:gap-5 flex-1 pr-1.5">
+            {phase === 'play' && (
+              <button
+                onClick={() => setShowExitConfirm(true)}
+                className="w-7 h-7 md:w-10 md:h-10 shrink-0 rounded-full bg-red-500/80 hover:bg-red-600 text-white flex items-center justify-center font-black shadow-md border-2 border-red-300 transition-all active:scale-90"
+              >
+                <span className="text-sm md:text-xl relative -top-[1px]">×</span>
+              </button>
+            )}
             <div className="w-9 h-9 md:w-14 md:h-14 bg-indigo-50/80 rounded-xl md:rounded-2xl flex items-center justify-center text-lg md:text-3xl relative shrink-0 border border-indigo-100 shadow-inner">
               {levelParam <= 3 ? '📦' : levelParam <= 5 ? '🍳' : levelParam <= 9 ? '🧭' : '📝'}
               {isBonus && (
@@ -1218,6 +1245,42 @@ function ManagementGameInner() {
               {feedback.message}
             </div>
           )}
+
+        {/* Exit Confirm Modal */}
+        {showExitConfirm && (
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
+            <div className="bg-white rounded-[40px] shadow-2xl p-8 max-w-sm w-full border-4 border-red-500 animate-in zoom-in duration-300 text-center">
+              <h3 className="text-2xl font-black text-slate-800 mb-4">
+                ⚠️ ยืนยันการออกจากด่าน
+              </h3>
+              <p className="text-slate-600 font-bold mb-6">
+                หากออกจากด่านตอนนี้ คุณจะได้คะแนนเท่าที่ทำได้ และจะไม่สามารถผ่านไปยังด่านย่อยถัดไปได้ (ต้องใช้กุญแจใหม่เพื่อเริ่มตีด่านนี้) ยืนยันหรือไม่?
+              </p>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setShowExitConfirm(false)}
+                  className="flex-1 py-3 bg-slate-200 text-slate-700 rounded-2xl font-black shadow-sm transition-all active:scale-95"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  onClick={() => {
+                    if (modeParam === 'village') {
+                      router.push(`/world/${villageId || 1}`);
+                    } else if (modeParam === 'daily') {
+                      router.push('/daily-challenge');
+                    } else {
+                      router.push('/minigame');
+                    }
+                  }}
+                  className="flex-1 py-3 bg-red-500 text-white rounded-2xl font-black shadow-lg hover:bg-red-600 transition-all active:scale-95"
+                >
+                  ออกเลย
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
           {phase === 'intro' && (
             <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-sm p-4 md:p-10">

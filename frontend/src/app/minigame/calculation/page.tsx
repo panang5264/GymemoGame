@@ -11,7 +11,7 @@
  * Phases: intro → memorize → test → done
  */
 
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback, Suspense, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -27,6 +27,7 @@ import MemoryRecallChallenge from '@/components/MemoryRecallChallenge'
 
 function CalculationGameInner() {
   const searchParams = useSearchParams()
+  const router = useRouter()
 
   const mode = searchParams.get('mode') ?? 'practice'
   const seed = searchParams.get('seed') ?? getDateKey()
@@ -57,6 +58,7 @@ function CalculationGameInner() {
   // Results from localStorage
   const [isTimeUp, setIsTimeUp] = useState(false)
   const [isRunning, setIsRunning] = useState(false)
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
 
   // Clock Target (Randomized once per session)
   const [clockTarget] = useState(() => ({
@@ -317,11 +319,17 @@ function CalculationGameInner() {
     const distractorMeta = getDistractorMeta(question)
 
     return (
-      <div className="h-screen flex flex-col items-center p-2 md:p-4 font-['Supermarket'] overflow-hidden">
+      <div className="min-h-[100dvh] flex flex-col items-center p-3 md:p-6 font-['Supermarket'] overflow-y-auto overflow-x-hidden pb-10 md:pb-4">
         {/* Responsive Header */}
-        <div className="w-full max-w-3xl flex justify-between items-center mb-4 mt-1 md:mt-8 px-2 md:px-0">
+        <div className="w-full max-w-3xl flex justify-between items-center mb-4 mt-2 md:mt-8 px-2 md:px-0">
           <div className="flex items-center gap-2 relative">
-            <h1 className="text-lg md:text-2xl font-black text-white drop-shadow-md tracking-tight">🔢 ด่าน {level.level}</h1>
+            <button
+              onClick={() => setShowExitConfirm(true)}
+              className="w-7 h-7 md:w-10 md:h-10 rounded-full bg-red-500/80 hover:bg-red-600 text-white flex items-center justify-center font-black shadow-md border-2 border-red-300 transition-all active:scale-90"
+            >
+              <span className="text-sm md:text-xl relative -top-[1px]">×</span>
+            </button>
+            <h1 className="text-lg md:text-2xl font-black text-white drop-shadow-md tracking-tight ml-1">🔢 ด่าน {level.level}</h1>
             {isBonus && (
               <div className="absolute -top-2 left-[15%] bg-yellow-400 text-yellow-900 text-[8px] md:text-xs font-black px-1.5 py-0.5 rounded-full border border-yellow-500 shadow-sm z-10 whitespace-nowrap">
                 x2 BONUS
@@ -376,24 +384,61 @@ function CalculationGameInner() {
           </div>
         )}
 
+        {/* Exit Confirm Modal */}
+        {showExitConfirm && (
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
+            <div className="bg-white rounded-[40px] shadow-2xl p-8 max-w-sm w-full border-4 border-red-500 animate-in zoom-in duration-300 text-center">
+              <h3 className="text-2xl font-black text-slate-800 mb-4">
+                ⚠️ ยืนยันการออกจากด่าน
+              </h3>
+              <p className="text-slate-600 font-bold mb-6">
+                หากออกจากด่านตอนนี้ คุณจะได้คะแนนเท่าที่ทำได้ และจะไม่สามารถผ่านไปยังด่านย่อยถัดไปได้ (ต้องใช้กุญแจใหม่เพื่อเริ่มตีด่านนี้) ยืนยันหรือไม่?
+              </p>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setShowExitConfirm(false)}
+                  className="flex-1 py-3 bg-slate-200 text-slate-700 rounded-2xl font-black shadow-sm transition-all active:scale-95"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  onClick={() => {
+                    setIsRunning(false);
+                    if (mode === 'village') {
+                      router.push(`/world/${villageId || 1}`);
+                    } else if (mode === 'daily') {
+                      router.push('/daily-challenge');
+                    } else {
+                      router.push('/minigame');
+                    }
+                  }}
+                  className="flex-1 py-3 bg-red-500 text-white rounded-2xl font-black shadow-lg hover:bg-red-600 transition-all active:scale-95"
+                >
+                  ออกเลย
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Game Container - Optimized for mobile width and PC laptop height */}
-        <div className="bg-white p-4 md:p-12 rounded-[2rem] md:rounded-[3.5rem] shadow-2xl max-w-2xl w-full text-center relative overflow-hidden flex flex-col justify-center min-h-0 h-full flex-grow animate-fadeUp">
+        <div className="bg-white p-6 md:p-12 rounded-[2rem] md:rounded-[3.5rem] shadow-2xl max-w-2xl w-full text-center relative flex flex-col justify-center min-h-0 flex-1 my-2 md:my-4 border border-slate-100 animate-fadeUp">
           <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
 
           <div className="flex flex-col justify-center mb-6 md:mb-10">
-            <div className="scale-90 md:scale-110 relative">
+            <div className="scale-90 md:scale-110 relative w-fit mx-auto">
               <Timer isRunning={isRunning} initialSeconds={60} onTimeUp={handleTimeUp} mode="down" />
-              <div className={`absolute -top-3 md:-top-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-white text-[8px] md:text-[10px] font-black px-2 py-0.5 rounded-full animate-pulse uppercase tracking-wider ${level.level === 10 ? 'bg-red-500' : 'bg-blue-600 shadow-[0_4px_12px_rgba(79,70,229,0.3)]'}`}>
+              <div className={`absolute -top-4 md:-top-5 left-1/2 -translate-x-1/2 whitespace-nowrap text-white text-[9px] md:text-xs font-black px-3 py-1 rounded-full animate-pulse uppercase tracking-wider ${level.level === 10 ? 'bg-red-500' : 'bg-blue-600 shadow-[0_4px_12px_rgba(79,70,229,0.3)]'}`}>
                 {level.level === 10 ? '⚠️ Interference Active ⚠️' : '⏱️ Mission: 15 Questions / 1 Minute'}
               </div>
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col justify-center min-h-0">
-            <div className="min-h-[120px] md:min-h-[220px] flex items-center justify-center mb-2 md:mb-8">
-              <div className="flex justify-center gap-1.5 md:gap-4 items-center flex-wrap max-w-full px-1">
+          <div className="flex-1 flex flex-col justify-center items-center min-h-0 w-full px-2 sm:px-6">
+            <div className="min-h-[140px] md:min-h-[220px] flex items-center justify-center mb-6 md:mb-10 w-full overflow-hidden">
+              <div className="flex justify-center gap-2 md:gap-5 items-center flex-wrap max-w-full">
                 {question.operands.map((value, index) => (
-                  <div key={`op-${index}`} className="flex items-center gap-2 md:gap-3">
+                  <div key={`op-${index}`} className="flex items-center gap-2 md:gap-4">
                     {(() => {
                       const isDistractor =
                         question.messing_index === index ||
@@ -402,19 +447,19 @@ function CalculationGameInner() {
                       const customMessing = question.custom_messing?.[index] ?? (distractorMeta.indices.has(index) ? distractorMeta.fallbackText : undefined)
 
                       if (question.hidden_index === index) {
-                        return <div className="w-8 h-8 md:w-12 md:h-12 flex items-center justify-center bg-blue-50 border-2 md:border-4 border-dashed border-blue-200 rounded-xl text-xl md:text-3xl text-blue-600 font-black animate-pulse shrink-0">?</div>
+                        return <div className="w-10 h-10 md:w-16 md:h-16 flex items-center justify-center bg-blue-50 border-2 md:border-4 border-dashed border-blue-200 rounded-xl text-2xl md:text-4xl text-blue-600 font-black animate-pulse shrink-0">?</div>
                       }
 
                       if (isDistractor) {
                         return (
                           <div className="relative group shrink-0">
                             {customMessing !== undefined ? (
-                              <span className="text-2xl md:text-4xl font-black text-slate-500 transition-all group-hover:text-slate-700 group-hover:scale-105 whitespace-nowrap">
+                              <span className="text-3xl md:text-5xl font-black text-slate-400 transition-all group-hover:text-slate-600 group-hover:scale-105 whitespace-nowrap mix-blend-multiply opacity-60">
                                 {customMessing}
                               </span>
                             ) : (
                               <>
-                                <span className="text-2xl md:text-4xl animate-bounce inline-block">🤡</span>
+                                <span className="text-3xl md:text-5xl animate-bounce inline-block opacity-70">🤡</span>
                                 <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">ตัวแปรส่วนเกิน!</div>
                               </>
                             )}
@@ -424,14 +469,14 @@ function CalculationGameInner() {
 
                       if (typeof value === 'number') {
                         return (
-                          <span className={`text-2xl min-[360px]:text-3xl md:text-6xl lg:text-7xl font-black tracking-tighter shrink-0 ${value < 0 ? 'text-red-600' : 'text-slate-950'}`}>
+                          <span className={`text-3xl min-[360px]:text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter shrink-0 ${value < 0 ? 'text-red-600' : 'text-slate-900'}`}>
                             {value}
                           </span>
                         )
                       }
 
                       return (
-                        <div className="p-1 md:p-2 bg-white rounded-xl border-2 border-slate-100 shadow-sm flex items-center justify-center w-[65px] h-[55px] md:w-[120px] md:h-[110px] shrink-0 transform hover:scale-105 transition-transform">
+                        <div className="p-1 md:p-3 bg-white rounded-xl border-2 border-slate-100 shadow-sm flex items-center justify-center w-[75px] h-[65px] md:w-[130px] md:h-[120px] shrink-0 transform hover:scale-105 transition-transform">
                           <Image src={(value as any).path} width={110} height={100} className="rounded-lg object-contain w-full h-full" alt={(value as any).name} />
                         </div>
                       )
@@ -439,21 +484,21 @@ function CalculationGameInner() {
 
                     {/* Operator between operands */}
                     {index < question.operators.length && (
-                      <span className="text-xl md:text-5xl text-slate-900 font-black shrink-0 px-0.5 md:px-2">
+                      <span className="text-2xl sm:text-3xl md:text-6xl text-slate-800 font-black shrink-0 px-1 md:px-3">
                         {question.operators[index].name}
                       </span>
                     )}
 
                     {/* Show equals sign at the end if not already present in operators */}
                     {index === question.operands.length - 1 && !question.operators.some(op => op.name === '=') && (
-                      <div className="flex items-center gap-1.5 md:gap-4 ml-1.5 md:ml-4 shrink-0">
-                        <span className="text-xl md:text-5xl font-black text-slate-900">=</span>
+                      <div className="flex items-center gap-2 md:gap-5 ml-2 md:ml-6 shrink-0 border-l-2 md:border-l-4 border-slate-100 pl-3 md:pl-6">
+                        <span className="text-2xl sm:text-3xl md:text-6xl font-black text-slate-800">=</span>
                         {question.final_result !== undefined ? (
-                          <span className={`text-2xl min-[360px]:text-3xl md:text-6xl lg:text-7xl font-black tracking-tighter ${question.final_result < 0 ? 'text-red-600' : 'text-slate-950'}`}>
+                          <span className={`text-3xl min-[360px]:text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter ${question.final_result < 0 ? 'text-red-600' : 'text-slate-900'}`}>
                             {question.final_result}
                           </span>
                         ) : (
-                          <div className="w-10 h-10 md:w-20 md:h-20 flex items-center justify-center bg-blue-50 border-4 md:border-6 border-dashed border-blue-200 rounded-xl md:rounded-2xl text-2xl md:text-5xl text-blue-600 font-black">?</div>
+                          <div className="w-12 h-12 md:w-24 md:h-24 flex items-center justify-center bg-blue-50 border-4 md:border-[6px] border-dashed border-blue-200 rounded-xl md:rounded-[2rem] text-3xl md:text-6xl text-blue-600 font-black">?</div>
                         )}
                       </div>
                     )}
@@ -463,13 +508,13 @@ function CalculationGameInner() {
             </div>
           </div>
 
-          <div className="relative z-10 w-full max-w-md mx-auto">
-            <div className="flex flex-col items-center gap-6 md:gap-8">
+          <div className="relative z-10 w-full max-w-sm mx-auto shrink-0 mt-auto">
+            <div className="flex flex-col items-center gap-4 md:gap-6">
               <input
                 autoFocus
                 inputMode="numeric"
                 pattern="[0-9]*"
-                className={`w-full bg-slate-50 border-[3px] md:border-[8px] rounded-[1rem] md:rounded-[2rem] py-3 md:py-6 px-4 md:px-10 text-2xl md:text-5xl font-black text-center outline-none transition-all shadow-inner ${lastCorrect === true ? 'border-green-500 text-green-600 bg-green-50/50' : lastCorrect === false ? 'border-red-500 text-red-600 animate-shake bg-red-50/50' : 'border-slate-100 focus:border-blue-400 text-blue-700 focus:shadow-[0_0_0_8px_rgba(59,130,246,0.1)]'}`}
+                className={`w-full bg-slate-50 border-[3px] md:border-[6px] rounded-2xl md:rounded-[2rem] py-3 md:py-6 px-4 md:px-10 text-3xl md:text-5xl font-black text-center outline-none transition-all shadow-inner ${lastCorrect === true ? 'border-green-500 text-green-600 bg-green-50/50' : lastCorrect === false ? 'border-red-500 text-red-600 animate-shake bg-red-50/50' : 'border-slate-200 focus:border-blue-400 text-blue-700 focus:shadow-[0_0_0_8px_rgba(59,130,246,0.1)]'}`}
                 placeholder="?"
                 value={answer}
                 disabled={isTimeUp || lastCorrect !== null}
@@ -477,7 +522,7 @@ function CalculationGameInner() {
                 onChange={(e) => setAnswer(e.target.value)}
               />
               <button
-                className={`w-full py-3 md:py-6 rounded-[1rem] md:rounded-[2rem] font-black text-xl md:text-3xl transition-all ${isTimeUp || lastCorrect !== null ? 'bg-slate-100 text-slate-300' : 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-[0_5px_0_#2563eb] md:shadow-[0_12px_0_#2563eb] hover:translate-y-[2px] hover:shadow-[0_4px_0_#2563eb] active:translate-y-[5px] md:active:translate-y-[8px] active:shadow-none'}`}
+                className={`w-full py-4 md:py-6 rounded-2xl md:rounded-[2rem] font-black text-xl md:text-3xl transition-all ${isTimeUp || lastCorrect !== null ? 'bg-slate-200 text-slate-400' : 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-[0_6px_0_#2563eb] md:shadow-[0_12px_0_#2563eb] hover:translate-y-[2px] hover:shadow-[0_4px_0_#2563eb] active:translate-y-[6px] md:active:translate-y-[12px] active:shadow-none'}`}
                 disabled={isTimeUp || lastCorrect !== null}
                 onClick={handleSubmit}
               >

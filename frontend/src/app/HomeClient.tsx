@@ -215,7 +215,7 @@ export default function Home() {
 
 
   return (
-    <div className="h-[100dvh] w-full flex flex-col items-center justify-center p-1.5 md:p-6 bg-[var(--bg-warm)] selection:bg-orange-100 selection:text-orange-900 font-['Supermarket'] overflow-hidden relative">
+    <div className="flex-1 min-h-[calc(100vh-80px)] w-full flex flex-col items-center justify-start pt-2 min-[400px]:pt-[5vh] lg:justify-center p-1.5 md:p-6 bg-[var(--bg-warm)] selection:bg-orange-100 selection:text-orange-900 font-['Supermarket'] overflow-hidden relative">
       {/* Background Decor */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-5%] right-[-5%] w-[30%] h-[30%] bg-orange-100/50 blur-[100px] rounded-full" />
@@ -226,7 +226,7 @@ export default function Home() {
 
         {/* Phase 1: Login / Forgot Password */}
         {phase === 'login' && (
-          <div className="friendly-card animate-in fade-in zoom-in duration-500 relative min-h-0 flex flex-col justify-center py-4 md:py-10">
+          <div className="friendly-card animate-in fade-in zoom-in duration-500 relative min-h-0 flex flex-col justify-center p-3 md:p-10">
             {/* Guide Button */}
             {!showForgot && (
               <button
@@ -239,18 +239,18 @@ export default function Home() {
             )}
 
             <div className="flex flex-col items-center mb-2 md:mb-10 text-center">
-              <div className="w-14 h-14 min-[400px]:w-20 min-[400px]:h-20 md:w-28 md:h-28 bg-white border-2 min-[400px]:border-4 border-[#1a1a1a] rounded-full flex items-center justify-center mb-1 md:mb-6 overflow-hidden">
+              <div className="w-12 h-12 min-[400px]:w-16 min-[400px]:h-16 md:w-28 md:h-28 bg-white border-2 min-[400px]:border-4 border-[#1a1a1a] rounded-full flex items-center justify-center mb-0.5 md:mb-6 overflow-hidden">
                 {showForgot ? (
-                  <span className="text-3xl md:text-5xl">🔑</span>
+                  <span className="text-2xl min-[400px]:text-3xl md:text-5xl">🔑</span>
                 ) : (
                   <img src="/assets_employer/logo.png" className="w-full h-full object-cover scale-[1.25]" alt="Gymemo Game Logo" />
                 )}
               </div>
               {!showForgot && <p className="text-indigo-600 font-black uppercase tracking-[0.3em] text-[8px] md:text-xs mb-0.5">เข้าสู่การผจญภัย</p>}
-              <h1 className="text-2xl md:text-5xl font-black text-[#1a1a1a] tracking-tight uppercase leading-none">
-                {showForgot ? 'ลืมรหัสผ่าน' : 'Gymemo Game'}
+              <h1 className="text-xl min-[400px]:text-2xl md:text-5xl font-black text-[#1a1a1a] tracking-tight uppercase leading-none">
+                {showForgot ? 'ลืมรหัสผ่าน' : 'GYMEMO GAME'}
               </h1>
-              {!showForgot && <p className="text-slate-700 font-black mt-1 md:mt-3 text-[13px] md:text-lg drop-shadow-sm">ยินดีต้อนรับนักสำรวจความจำ!</p>}
+              {!showForgot && <p className="text-slate-700 font-black mt-0.5 md:mt-3 text-[10px] min-[400px]:text-xs md:text-lg drop-shadow-sm">ยินดีต้อนรับนักสำรวจความจำ!</p>}
             </div>
 
             {showForgot ? (
@@ -325,12 +325,12 @@ export default function Home() {
               <div>
                 {/* Welcome Back Shortcut (If already logged in) */}
                 {progress.userName && (
-                  <div className="mb-6 md:mb-10 p-4 md:p-6 bg-indigo-50 border-4 border-black rounded-[2rem] shadow-[6px_6px_0_#312e81] animate-in zoom-in duration-500">
-                    <p className="text-indigo-600 font-black text-[10px] uppercase tracking-widest mb-2 text-center">เข้าสู่ระบบล่าสุดในชื่อ</p>
-                    <h3 className="text-2xl font-black text-slate-800 mb-6 text-center">{progress.userName} ✨</h3>
+                  <div className="mb-4 md:mb-10 p-3 md:p-6 bg-indigo-50 border-4 border-black rounded-[1.5rem] md:rounded-[2rem] shadow-[4px_4px_0_#312e81] md:shadow-[6px_6px_0_#312e81] animate-in zoom-in duration-500">
+                    <p className="text-indigo-600 font-black text-[9px] min-[400px]:text-[10px] uppercase tracking-widest mb-1 md:mb-2 text-center">เข้าสู่ระบบล่าสุดในชื่อ</p>
+                    <h3 className="text-xl md:text-2xl font-black text-slate-800 mb-3 md:mb-6 text-center">{progress.userName} ✨</h3>
                     <button
                       onClick={() => router.push('/world')}
-                      className="pill-button w-full py-4 !bg-green-500 !text-white !border-black shadow-[0_6px_0_#166534] hover:shadow-[0_2px_0_#166534] hover:translate-y-0.5 transition-all text-xl"
+                      className="pill-button w-full py-3 md:py-4 !bg-green-500 !text-white !border-black shadow-[0_4px_0_#166534] md:shadow-[0_6px_0_#166534] hover:shadow-[0_2px_0_#166534] hover:translate-y-0.5 transition-all text-base md:text-xl"
                     >
                       เข้าสู่แผนที่โลกเลย!
                     </button>
@@ -345,29 +345,29 @@ export default function Home() {
                     </div>
                   )}
                   <div className="relative group">
-                    <div className="absolute left-7 top-1/2 -translate-y-1/2 text-2xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">📞</div>
+                    <div className="absolute left-7 top-1/2 -translate-y-1/2 text-lg md:text-2xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">📞</div>
                     <input
                       type="tel"
                       placeholder="เบอร์โทรศัพท์"
-                      className="pill-input pill-input-icon w-full py-4 text-lg"
+                      className="pill-input pill-input-icon w-full py-3 md:py-4 text-base md:text-lg"
                       value={username}
                       onChange={e => setUsername(e.target.value)}
                       required
                     />
                   </div>
                   <div className="relative group">
-                    <div className="absolute left-7 top-1/2 -translate-y-1/2 text-2xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">🔒</div>
+                    <div className="absolute left-7 top-1/2 -translate-y-1/2 text-lg md:text-2xl opacity-60 group-focus-within:opacity-100 transition-opacity z-10">🔒</div>
                     <input
                       type="password"
                       placeholder="รหัสผ่าน (PASSWORD)"
-                      className="pill-input pill-input-icon w-full py-5 text-xl"
+                      className="pill-input pill-input-icon w-full py-3 md:py-5 text-base md:text-xl"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       required
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <button disabled={loading} className="pill-button w-full py-3 md:py-5 text-base md:text-2xl mt-0 md:mt-4 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_4px_0_#000] md:shadow-[0_7px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70">
+                    <button disabled={loading} className="pill-button w-full py-3 md:py-5 text-base md:text-2xl mt-0 md:mt-4 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_3px_0_#000] md:shadow-[0_7px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70">
                       {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
                     </button>
                     <button
@@ -382,16 +382,16 @@ export default function Home() {
               </div>
             )}
 
-            <div className="mt-4 md:mt-8 text-center text-sm md:text-base font-bold text-[#717171]">
-              ยังไม่มีบัญชี? <Link href="/register" className="text-blue-600 underline hover:text-blue-800 ml-1">สมัครสมาชิก</Link>
+            <div className="mt-2 md:mt-8 text-center text-xs md:text-base font-bold text-[#717171]">
+              ยังไม่มีบัญชี? <Link href="/register" className="text-blue-600 underline hover:text-blue-800 ml-1 mt-1 inline-block">สมัครสมาชิก</Link>
             </div>
 
             {/* Other Options Row: Leaderboard with Game Feel */}
-            <div className="mt-4 md:mt-10 pt-4 md:pt-10 border-t-2 border-[#1a1a1a]/10">
-              <p className="text-center text-[10px] md:text-sm font-bold text-[#717171] mb-4 md:mb-8 uppercase tracking-widest leading-none">ทางเลือกอื่นสำหรับนักเดินทาง</p>
+            <div className="mt-2 md:mt-10 pt-2 md:pt-10 border-t-2 border-[#1a1a1a]/10">
+              <p className="text-center text-[9px] md:text-sm font-bold text-[#717171] mb-2 md:mb-8 uppercase tracking-widest leading-none">ทางเลือกอื่นสำหรับนักเดินทาง</p>
               <button
                 onClick={() => router.push('/leaderboard')}
-                className="w-full py-2.5 md:py-6 bg-slate-800 border-2 md:border-4 border-[#1a1a1a] rounded-full font-black text-white uppercase tracking-widest hover:bg-black transition-all shadow-[3px_3px_0_#4f46e5] md:shadow-[6px_6px_0_#4f46e5] text-sm md:text-xl flex items-center justify-center gap-2 md:gap-3"
+                className="w-full py-2.5 md:py-6 bg-slate-800 border-2 md:border-4 border-[#1a1a1a] rounded-full font-black text-white uppercase tracking-widest hover:bg-black transition-all shadow-[2px_2px_0_#4f46e5] md:shadow-[6px_6px_0_#4f46e5] text-sm md:text-xl flex items-center justify-center gap-2 md:gap-3"
               >
                 <span>🏆</span> กระดานผู้นำ
               </button>
