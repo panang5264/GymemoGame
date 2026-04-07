@@ -444,7 +444,7 @@ function SpatialGameInner() {
 
 
   return (
-    <div className="min-h-[calc(100vh-140px)] py-4 sm:py-6 flex flex-col items-center relative overflow-hidden font-['Supermarket']">
+    <div className="min-h-screen py-2 sm:py-4 flex flex-col items-center relative overflow-hidden font-['Supermarket']">
       <div className="max-w-4xl w-full px-2 sm:px-4 relative z-10">
         {/* Header */}
         <div className="bg-white p-2.5 sm:p-4 rounded-xl md:rounded-2xl shadow-sm border border-slate-200 mb-2 sm:mb-6">
@@ -553,7 +553,8 @@ function SpatialGameInner() {
                 </div>
 
                 {/* Answer choices */}
-                <div className={`grid gap-3 sm:gap-4 md:gap-5 w-full max-w-2xl px-2 sm:px-4 pb-8 ${questionData.options.length === 2
+                <div className={`grid gap-2 sm:gap-3 md:gap-5 w-full max-w-2xl px-2 sm:px-4 pb-4 sm:pb-8 mt-2 ${
+                  questionData.options.length === 2
                   ? 'grid-cols-2'
                   : questionData.options.length === 3
                     ? 'grid-cols-3'
@@ -582,12 +583,12 @@ function SpatialGameInner() {
                           setTimeout(() => setFeedback(null), 1000)
                         }
                       }}
-                      className="group relative p-1.5 sm:p-4 bg-white hover:bg-indigo-50 border-b-2 sm:border-b-8 border-slate-200 hover:border-indigo-300 rounded-lg sm:rounded-[2rem] shadow-sm sm:shadow-lg transition-all active:scale-95 flex flex-col items-center justify-center min-h-[70px] sm:min-h-[150px]"
+                      className="group relative p-1.5 sm:p-3 bg-white hover:bg-indigo-50 border-b-2 sm:border-b-8 border-slate-200 hover:border-indigo-300 rounded-xl sm:rounded-[2rem] shadow-sm sm:shadow-lg transition-all active:scale-95 flex flex-col items-center justify-center min-h-[70px] sm:min-h-[130px]"
                     >
                       <img
                         src={opt}
                         style={DIP_STYLE}
-                        className="max-w-[40px] max-h-[40px] sm:max-w-[100px] sm:max-h-[100px] object-contain group-hover:scale-105 transition-transform"
+                        className="w-[50px] h-[50px] sm:max-w-[100px] sm:max-h-[100px] object-contain group-hover:scale-105 transition-transform"
                         alt={`option ${idx}`}
                         onError={(e) => {
                           const img = e.currentTarget;

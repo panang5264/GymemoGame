@@ -215,18 +215,18 @@ export default function Home() {
 
 
   return (
-    <div className="flex-1 w-full flex flex-col items-center justify-center p-4 md:p-6 bg-[var(--bg-warm)] selection:bg-orange-100 selection:text-orange-900 font-['Supermarket'] overflow-y-auto">
+    <div className="h-[100dvh] w-full flex flex-col items-center justify-center p-3 md:p-6 bg-[var(--bg-warm)] selection:bg-orange-100 selection:text-orange-900 font-['Supermarket'] overflow-hidden relative">
       {/* Background Decor */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-5%] right-[-5%] w-[30%] h-[30%] bg-orange-100/50 blur-[100px] rounded-full" />
         <div className="absolute bottom-[-5%] left-[-5%] w-[30%] h-[30%] bg-rose-100/50 blur-[100px] rounded-full" />
       </div>
 
-      <div className={`w-full relative z-10 transition-all duration-700 ${(phase === 'tutorial_summary' || phase === 'profile') ? 'max-w-5xl' : (phase === 'intro' ? 'max-w-7xl' : (phase === 'login' ? 'max-w-xl' : 'max-w-md'))}`}>
+      <div className={`w-full relative z-10 transition-all duration-700 max-h-full overflow-y-auto custom-scrollbar ${(phase === 'tutorial_summary' || phase === 'profile') ? 'max-w-5xl' : (phase === 'intro' ? 'max-w-7xl' : (phase === 'login' ? 'max-w-xl' : 'max-w-md'))}`}>
 
         {/* Phase 1: Login / Forgot Password */}
         {phase === 'login' && (
-          <div className="friendly-card animate-in fade-in zoom-in duration-500 relative min-h-[450px] flex flex-col justify-center py-10">
+          <div className="friendly-card animate-in fade-in zoom-in duration-500 relative min-h-[400px] flex flex-col justify-center py-6 md:py-10">
             {/* Guide Button */}
             {!showForgot && (
               <button
@@ -238,8 +238,8 @@ export default function Home() {
               </button>
             )}
 
-            <div className="flex flex-col items-center mb-6 md:mb-10 text-center">
-              <div className="w-24 h-24 md:w-28 md:h-28 bg-white border-4 border-[#1a1a1a] rounded-full flex items-center justify-center mb-6 overflow-hidden">
+            <div className="flex flex-col items-center mb-4 md:mb-10 text-center">
+              <div className="w-20 h-20 md:w-28 md:h-28 bg-white border-4 border-[#1a1a1a] rounded-full flex items-center justify-center mb-4 md:mb-6 overflow-hidden">
                 {showForgot ? (
                   <span className="text-5xl">🔑</span>
                 ) : (
@@ -325,7 +325,7 @@ export default function Home() {
               <div>
                 {/* Welcome Back Shortcut (If already logged in) */}
                 {progress.userName && (
-                  <div className="mb-10 p-6 bg-indigo-50 border-4 border-black rounded-[2rem] shadow-[8px_8px_0_#312e81] animate-in zoom-in duration-500">
+                  <div className="mb-6 md:mb-10 p-4 md:p-6 bg-indigo-50 border-4 border-black rounded-[2rem] shadow-[6px_6px_0_#312e81] animate-in zoom-in duration-500">
                     <p className="text-indigo-600 font-black text-[10px] uppercase tracking-widest mb-2 text-center">เข้าสู่ระบบล่าสุดในชื่อ</p>
                     <h3 className="text-2xl font-black text-slate-800 mb-6 text-center">{progress.userName} ✨</h3>
                     <button
@@ -338,7 +338,7 @@ export default function Home() {
                   </div>
                 )}
 
-                <form onSubmit={handleLogin} className="space-y-6">
+                <form onSubmit={handleLogin} className="space-y-4 md:space-y-6">
                   {error && (
                     <div className="bg-red-100 text-red-600 p-4 rounded-2xl text-sm font-bold text-center mb-4">
                       {error}
@@ -367,7 +367,7 @@ export default function Home() {
                     />
                   </div>
                   <div className="flex flex-col gap-4">
-                    <button disabled={loading} className="pill-button w-full py-4 md:py-5 text-xl md:text-2xl mt-4 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_5px_0_#000] md:shadow-[0_7px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70">
+                    <button disabled={loading} className="pill-button w-full py-4 md:py-5 text-xl md:text-2xl mt-3 md:mt-4 bg-[var(--border-dark)] text-[var(--text-on-dark)] shadow-[0_5px_0_#000] md:shadow-[0_7px_0_#000] active:shadow-none active:translate-y-[2px] disabled:opacity-70">
                       {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
                     </button>
                     <button
@@ -387,11 +387,11 @@ export default function Home() {
             </div>
 
             {/* Other Options Row: Leaderboard with Game Feel */}
-            <div className="mt-10 pt-10 border-t-2 border-[#1a1a1a]/10">
-              <p className="text-center text-sm font-bold text-[#717171] mb-8 uppercase tracking-widest">ทางเลือกอื่นสำหรับนักเดินทาง</p>
+            <div className="mt-6 md:mt-10 pt-6 md:pt-10 border-t-2 border-[#1a1a1a]/10">
+              <p className="text-center text-xs md:text-sm font-bold text-[#717171] mb-6 md:mb-8 uppercase tracking-widest">ทางเลือกอื่นสำหรับนักเดินทาง</p>
               <button
                 onClick={() => router.push('/leaderboard')}
-                className="w-full py-6 bg-slate-800 border-4 border-[#1a1a1a] rounded-full font-black text-white uppercase tracking-widest hover:bg-black transition-all shadow-[8px_8px_0_#4f46e5] text-xl flex items-center justify-center gap-3"
+                className="w-full py-4 md:py-6 bg-slate-800 border-4 border-[#1a1a1a] rounded-full font-black text-white uppercase tracking-widest hover:bg-black transition-all shadow-[6px_6px_0_#4f46e5] text-lg md:text-xl flex items-center justify-center gap-3"
               >
                 <span>🏆</span> กระดานผู้นำระดับโลก
               </button>
@@ -725,7 +725,7 @@ export default function Home() {
 
         {/* Phase 4: Game Intro Narrative (Story Panels) */}
         {phase === 'intro' && (
-          <div className="w-full max-w-4xl mx-auto h-[85vh] flex flex-col items-center justify-center p-4">
+          <div className="w-full max-w-4xl mx-auto h-full flex flex-col items-center justify-center py-2 px-4">
             <div className="bg-white border-6 border-black rounded-[3rem] shadow-[15px_15px_0_#000] overflow-hidden w-full flex flex-col h-full animate-in zoom-in duration-500">
               {/* Panel Area */}
               <div className="flex-1 relative overflow-hidden bg-slate-100">

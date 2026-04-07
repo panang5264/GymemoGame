@@ -9,6 +9,8 @@ export default function Header() {
   const { user, logout } = useAuth()
   const pathname = usePathname()
 
+  if (pathname.startsWith('/world')) return null
+
   const isAdmin = user?.role === 'admin'
 
   const navLinks = isAdmin

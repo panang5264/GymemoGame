@@ -37,12 +37,36 @@ const ITEM_LIFETIME = 7000
 const MAX_ACTIVE_ITEMS = 3
 const MAZE_FADE_TIME = 3000
 
-// ─── Helper: Random Position ────────────────────────────────────────────────
+// ─── Helper: Random Position with Collision Detection ─────────────────────
 
-function getRandomPos() {
+const ITEM_SIZE_PERCENT = 22 // Approximate item size as % of container width
+
+function getRandomPos(existingItems: { x?: number; y?: number }[] = []) {
+  const maxAttempts = 30
+  const margin = 12 // keep items away from edges
+  const minDist = ITEM_SIZE_PERCENT // min distance between item centers (%)
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const x = margin + Math.random() * (100 - margin * 2)
+    const y = margin + Math.random() * (55 - margin * 2)
+
+    // Check collision with all existing items
+    const hasCollision = existingItems.some(item => {
+      if (item.x == null || item.y == null) return false
+      const dx = x - item.x
+      const dy = (y - item.y) * 1.6 // scale y because aspect ratio
+      return Math.sqrt(dx * dx + dy * dy) < minDist
+    })
+
+    if (!hasCollision) return { x, y }
+  }
+
+  // Fallback: grid placement when no free spot found
+  const cols = 3
+  const idx = existingItems.length % (cols * 2)
   return {
-    x: 10 + Math.random() * 80,
-    y: 10 + Math.random() * 55,
+    x: margin + (idx % cols) * ((100 - margin * 2) / (cols - 1)),
+    y: margin + Math.floor(idx / cols) * 30,
   }
 }
 
@@ -801,7 +825,8 @@ function ManagementGameInner() {
 
       if (currentPool.length < MAX_ACTIVE_ITEMS && currentQueue.length > 0) {
         const nextItem = currentQueue[0]
-        const { x, y } = getRandomPos()
+        // Pass existing items for collision detection
+        const { x, y } = getRandomPos(currentPool)
         const newItem = { ...nextItem, createdAt: Date.now(), x, y }
 
         setActivePool([...currentPool, newItem])
@@ -1295,12 +1320,18 @@ function ManagementGameInner() {
                       <div
                         key={item.id}
                         onClick={() => setSelectedSortItemId(prev => prev === item.id ? null : item.id)}
-                        className={`absolute w-28 h-28 md:w-40 md:h-40 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing z-10 select-none animate-in fade-in zoom-in transition-all duration-300 ${selectedSortItemId === item.id ? 'scale-110 -translate-y-4 filter drop-shadow-[0_0_20px_rgba(79,70,229,0.5)]' : ''}`}
-                        style={{ left: `${item.x}%`, top: `${item.y}%`, transform: 'translate(-50%, -50%)' }}
+                        className={`absolute flex flex-col items-center justify-center cursor-grab active:cursor-grabbing z-10 select-none animate-in fade-in zoom-in transition-all duration-300 ${selectedSortItemId === item.id ? 'scale-110 -translate-y-3 filter drop-shadow-[0_0_20px_rgba(79,70,229,0.5)]' : ''}`}
+                        style={{
+                          left: `${item.x}%`,
+                          top: `${item.y}%`,
+                          transform: 'translate(-50%, -50%)',
+                          // Clamp to prevent overflow at edges
+                          maxWidth: 'min(112px, 30vw)',
+                        }}
                       >
                         <div className={`transition-all duration-300 transform ${selectedSortItemId === item.id ? 'scale-110' : 'group-hover:-translate-y-2'}`}>
                           {item.imageUrl ? (
-                            <div className={`w-24 h-24 md:w-36 md:h-36 bg-white rounded-2xl shadow-xl flex items-center justify-center border-4 overflow-hidden pointer-events-none transition-colors ${selectedSortItemId === item.id ? 'border-indigo-500' : 'border-indigo-100'}`}>
+                            <div className={`w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 bg-white rounded-2xl shadow-xl flex items-center justify-center border-4 overflow-hidden pointer-events-none transition-colors ${selectedSortItemId === item.id ? 'border-indigo-500' : 'border-indigo-100'}`}>
                               <img
                                 src={item.imageUrl}
                                 className="w-[85%] h-[85%] object-cover mix-blend-multiply"
@@ -1309,12 +1340,12 @@ function ManagementGameInner() {
                               />
                             </div>
                           ) : (
-                            <div className="w-24 h-24 md:w-36 md:h-36 bg-white rounded-2xl shadow-xl flex items-center justify-center border-4 border-indigo-100 pointer-events-none">
-                              <span className="text-6xl md:text-8xl drop-shadow-lg">{item.emoji}</span>
+                            <div className="w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 bg-white rounded-2xl shadow-xl flex items-center justify-center border-4 border-indigo-100 pointer-events-none">
+                              <span className="text-4xl sm:text-6xl md:text-8xl drop-shadow-lg">{item.emoji}</span>
                             </div>
                           )}
                         </div>
-                        <div className="mt-2 bg-white px-3 py-1 md:px-5 md:py-2 rounded-full shadow-md text-sm md:text-xl font-black text-indigo-900 border-2 border-slate-100 tracking-wide text-center">
+                        <div className="mt-1 bg-white px-2 py-0.5 sm:px-3 sm:py-1 md:px-5 md:py-2 rounded-full shadow-md text-[10px] sm:text-sm md:text-xl font-black text-indigo-900 border-2 border-slate-100 tracking-wide text-center whitespace-nowrap max-w-[90px] sm:max-w-none truncate sm:overflow-visible">
                           {item.label}
                         </div>
                         <div className="absolute -bottom-4 left-4 right-4 h-2.5 bg-slate-200 rounded-full overflow-hidden border-2 border-white shadow-sm">
@@ -1323,7 +1354,7 @@ function ManagementGameInner() {
                       </div>
                     ))}
                   </div>
-                  <div className="h-44 w-full flex justify-center gap-12 md:gap-24 px-10 pb-8">
+                  <div className="shrink-0 w-full flex justify-center gap-4 sm:gap-8 md:gap-16 px-3 sm:px-6 md:px-10 pb-4 pt-2">
                     {config.categories.map(cat => (
                       <div
                         key={cat.id}
@@ -1338,18 +1369,18 @@ function ManagementGameInner() {
                             setSelectedSortItemId(null);
                           }
                         }}
-                        className={`flex flex-col items-center group cursor-pointer transition-all ${selectedSortItemId ? 'animate-bounce-gentle' : ''}`}
+                        className={`flex flex-col items-center group cursor-pointer transition-all max-w-[140px] sm:max-w-[180px] ${selectedSortItemId ? 'animate-bounce-gentle' : ''}`}
                       >
-                        <div className={`w-28 h-16 md:w-40 md:h-28 bg-white rounded-[20px] md:rounded-[28px] border-4 border-dashed shadow-2xl flex items-center justify-center transition-all relative overflow-hidden ${selectedSortItemId ? 'border-indigo-400 bg-indigo-50/30' : 'border-slate-300 group-hover:border-blue-400'}`}>
+                        <div className={`w-20 h-12 sm:w-28 sm:h-16 md:w-40 md:h-24 bg-white rounded-[16px] md:rounded-[28px] border-4 border-dashed shadow-2xl flex items-center justify-center transition-all relative overflow-hidden ${selectedSortItemId ? 'border-indigo-400 bg-indigo-50/30' : 'border-slate-300 group-hover:border-blue-400'}`}>
                           {cat.imageUrl ? (
                             <img src={cat.imageUrl} className="w-full h-full object-cover" alt={cat.title} />
                           ) : (
-                            <span className="text-5xl md:text-7xl drop-shadow-xl transition-transform duration-500 group-hover:scale-110">
+                            <span className="text-3xl sm:text-5xl md:text-7xl drop-shadow-xl transition-transform duration-500 group-hover:scale-110">
                               {cat.emoji || '📦'}
                             </span>
                           )}
                         </div>
-                        <div className="mt-2 bg-white px-6 py-2 rounded-2xl shadow-xl border-b-4 border-slate-200 text-sm md:text-base font-black text-slate-800 uppercase tracking-tighter">
+                        <div className="mt-1 sm:mt-2 bg-white px-2 sm:px-4 py-1 sm:py-2 rounded-2xl shadow-xl border-b-4 border-slate-200 text-[9px] sm:text-sm md:text-base font-black text-slate-800 uppercase tracking-tighter text-center leading-tight">
                           {cat.title}
                         </div>
                       </div>
